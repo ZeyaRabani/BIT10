@@ -1,8 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
-import { Button } from './ui/button';
-// import ResponsiveNavbar from './ResponsiveNavbar'
 import { ModeToggle } from './ModeToggle'
+import ResponsiveNavbar from './ResponsiveNavbar'
 
 export default function Navbar() {
     return (
@@ -44,7 +43,7 @@ export default function Navbar() {
 
                 <div className='flex space-x-2 justify-between items-center ml-2'>
                     <ModeToggle />
-                    {/* <ResponsiveNavbar /> */}
+                    <ResponsiveNavbar />
                 </div>
 
             </nav>

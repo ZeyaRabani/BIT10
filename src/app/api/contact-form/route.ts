@@ -3,9 +3,9 @@ import nodemailer from 'nodemailer'
 import Mail from 'nodemailer/lib/mailer'
 
 export async function POST(request: NextRequest) {
-    const username = process.env.NEXT_PUBLIC_EMAIL_USERNAME;
     const myEmail = process.env.NEXT_PUBLIC_PERSONAL_EMAIL;
     const password = process.env.NEXT_PUBLIC_EMAIL_PASSWORD;
+    const email2 = 'harshalraikwar2311@gmail.com'
 
     const { email, name, message } = await request.json();
 
@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
     const mailOptions: Mail.Options = {
         from: myEmail,
         to: myEmail,
+        cc: [`${email2}`],
         replyTo: email,
         subject: `Message from ${name} (${email}) on C10 Contact Us page`,
         html: `

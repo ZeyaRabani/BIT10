@@ -64,7 +64,7 @@ const FeatureCard: React.FC<Feature> = ({ title, description }) => (
 export default function Page() {
   return (
     <MaxWidthWrapper>
-      <div className='flex flex-wrap-reverse md:grid md:grid-cols-2 pb-8 md:pb-0'>
+      <div className='flex flex-wrap-reverse md:grid md:grid-cols-2 pb-8 md:pb-0 px-0 md:px-12'>
 
         <div className='md:flex md:flex-col md:justify-center'>
           <h2 className='self-center mb-4 text-2xl font-semibold tracking-wider md:text-4xl'>Empowering Your Portfolio with the Future of Finance</h2>
