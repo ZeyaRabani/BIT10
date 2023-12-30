@@ -77,7 +77,7 @@ export default function Page() {
                     <AccordionItem value={`item-${faqItems.length + 1}`}>
                         <AccordionTrigger className='hover:no-underline text-left text-xl font-semibold tracking-wide'>How can I contact C10 support?</AccordionTrigger>
                         <AccordionContent className='text-lg'>
-                            For any inquiries or support, you can reach out to C10&apos;s customer support team through the provided contact details on the platform. Additionally, you can contact us by submitting the form on the <Link href='/contact' passHref className='text-primary underline'>Contact page</Link>, or feel free to send us an email at <a href='mailto:harshalraikwar07@gmail.com' className='text-primary underline'>harshalraikwar07@gmail.com</a>. Our team is ready to assist you with any questions or concerns.
+                            For any inquiries or support, you can reach out to C10&apos;s customer support team through the provided contact details on the platform. Additionally, you can contact us by submitting the form on the <Link href='/contact' passHref className='text-primary underline'>Contact page</Link>, or feel free to send us an email at <a href='mailto:ziyarabani@gmail.com' className='text-primary underline'>ziyarabani@gmail.com</a>. Our team is ready to assist you with any questions or concerns.
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>

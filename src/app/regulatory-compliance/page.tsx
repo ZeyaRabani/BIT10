@@ -89,8 +89,8 @@ export default function Page() {
             <h1 className='text-xl md:text-2xl font-semibold tracking-wide'>9. Contact Us</h1>
             <p className='text-lg'>
               If you have questions or concerns about regulatory compliance or if you require additional information, please contact our legal team at {' '}
-              <a href='mailto:harshalraikwar07@gmail.com' className='text-blue-800 dark:text-blue-400 underline cursor-pointer'>
-                harshalraikwar07@gmail.com
+              <a href='mailto:ziyarabani@gmail.com' className='text-blue-800 dark:text-blue-400 underline cursor-pointer'>
+                ziyarabani@gmail.com
               </a>
               .
             </p>

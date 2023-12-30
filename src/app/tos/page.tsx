@@ -108,8 +108,8 @@ export default function Page() {
             <h1 className='text-xl md:text-2xl font-semibold tracking-wide'>Contact Us</h1>
             <p className='text-lg'>
               If you have any questions or concerns about these Terms of Service, please contact us at{' '}
-              <a href='mailto:harshalraikwar07@gmail.com' className='text-blue-800 dark:text-blue-400 underline cursor-pointer'>
-                harshalraikwar07@gmail.com
+              <a href='mailto:ziyarabani@gmail.com' className='text-blue-800 dark:text-blue-400 underline cursor-pointer'>
+                ziyarabani@gmail.com
               </a>
               .
             </p>
