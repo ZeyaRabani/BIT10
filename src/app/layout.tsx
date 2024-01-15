@@ -10,7 +10,7 @@ import ScrollToTop from '@/components/ScrollToTop'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'C10',
+  title: 'BIT10',
   description: 'Empowering Your Portfolio with the Future of Finance',
 }
 

@@ -10,19 +10,19 @@ const privacyContent: RegulatoryComplianceProps[] = [
   {
     title: '1. Introduction',
     content: [
-      'C10 is committed to adhering to applicable regulations to create a secure and legal investment environment. This page outlines our approach to regulatory compliance and provides information about the measures we take to ensure compliance with relevant laws.'
+      'BIT10 is committed to adhering to applicable regulations to create a secure and legal investment environment. This page outlines our approach to regulatory compliance and provides information about the measures we take to ensure compliance with relevant laws.'
     ]
   },
   {
     title: '2. Legal Structure',
     content: [
-      'C10 operates under the legal structure of [Your Legal Entity]. This legal entity is subject to the laws and regulations of the jurisdiction in which it is established.'
+      'BIT10 operates under the legal structure of [Your Legal Entity]. This legal entity is subject to the laws and regulations of the jurisdiction in which it is established.'
     ]
   },
   {
     title: '3. Anti-Money Laundering (AML) and Know Your Customer (KYC) Policies',
     content: [
-      'To prevent illegal activities, C10 has implemented robust Anti-Money Laundering (AML) and Know Your Customer (KYC) policies. Users may be required to verify their identity through a secure and confidential process.'
+      'To prevent illegal activities, BIT10 has implemented robust Anti-Money Laundering (AML) and Know Your Customer (KYC) policies. Users may be required to verify their identity through a secure and confidential process.'
     ]
   },
   {
@@ -34,25 +34,25 @@ const privacyContent: RegulatoryComplianceProps[] = [
   {
     title: '5. Compliance with Financial Regulations',
     content: [
-      'C10 complies with all relevant financial regulations, including but not limited to [List Specific Regulations]. We work closely with regulatory authorities to ensure our operations align with industry standards and legal requirements.'
+      'BIT10 complies with all relevant financial regulations, including but not limited to [List Specific Regulations]. We work closely with regulatory authorities to ensure our operations align with industry standards and legal requirements.'
     ]
   },
   {
     title: '6. Transaction Reporting',
     content: [
-      'To maintain transparency and fulfill regulatory obligations, C10 may be required to report certain transactions to regulatory authorities. Users will be informed of any such reporting in accordance with applicable laws.'
+      'To maintain transparency and fulfill regulatory obligations, BIT10 may be required to report certain transactions to regulatory authorities. Users will be informed of any such reporting in accordance with applicable laws.'
     ]
   },
   {
     title: '7. Legal Disclaimer',
     content: [
-      'While we strive to maintain compliance with regulations, the cryptocurrency and blockchain industry is subject to rapid changes in regulatory frameworks. C10 reserves the right to adapt its practices to remain in compliance with evolving legal requirements.'
+      'While we strive to maintain compliance with regulations, the cryptocurrency and blockchain industry is subject to rapid changes in regulatory frameworks. BIT10 reserves the right to adapt its practices to remain in compliance with evolving legal requirements.'
     ]
   },
   {
     title: '8. User Responsibilities',
     content: [
-      'Users of C10 are responsible for ensuring their compliance with local laws and regulations related to cryptocurrency investments. C10 does not provide legal or financial advice, and users should seek professional advice if they have concerns about legal compliance.'
+      'Users of BIT10 are responsible for ensuring their compliance with local laws and regulations related to cryptocurrency investments. BIT10 does not provide legal or financial advice, and users should seek professional advice if they have concerns about legal compliance.'
     ]
   }
 ]

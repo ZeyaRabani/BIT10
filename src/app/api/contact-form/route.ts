@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         to: myEmail,
         cc: [`${email2}`],
         replyTo: email,
-        subject: `Message from ${name} (${email}) on C10 Contact Us page`,
+        subject: `Message from ${name} (${email}) on BIT10 Contact Us page`,
         html: `
         <div style='background-color: #020817; color: #ffffff; text-align: center; padding: 10px; border-radius: 10px;'>
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
             <hr style='border-top: 1px solid #666; width: 80%;'>
 
-            <span style='font-size: 1.5em;'>Message from ${name} (${email}) on C10 Contact Us page</span>
+            <span style='font-size: 1.5em;'>Message from ${name} (${email}) on BIT10 Contact Us page</span>
 
             <p style='text-align: left; font-size: 15px; padding: 4px 20px'>
                 ${message}
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
             </a>
 
             <p style='color: #666; text-align: center;'>
-                This email was sent from the C10 Contact Us page.
+                This email was sent from the BIT10 Contact Us page.
             </p>
 
             <p style='color: #999; text-align: center;'>

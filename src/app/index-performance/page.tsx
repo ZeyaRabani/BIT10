@@ -72,7 +72,7 @@ export default function Page() {
                 <div className='text-xl'>Benchmark Comparison</div>
                 <div className='flex flex-col md:grid md:grid-cols-2 md:gap-2 space-y-2 md:space-y-0 py-4 items-center justify-center w-full'>
                     <div className='w-full bg-accent p-4 rounded h-[50vh]'>
-                        <div>Bitcoin native assets With our C10 Token</div>
+                        <div>Bitcoin native assets With our BIT10 Token</div>
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart
                                 width={500}

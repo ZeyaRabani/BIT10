@@ -39,7 +39,7 @@ export default function ResponsiveNavbar() {
                                 <div className='flex items-start justify-between p-5 border-solid rounded-t'>
                                     <Link href='/' passHref>
                                         <div className='inline-flex items-center text-3xl font-base tracking-wide cursor-pointer'>
-                                            C10
+                                            BIT10
                                         </div>
                                     </Link>
 

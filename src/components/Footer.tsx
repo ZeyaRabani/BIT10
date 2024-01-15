@@ -166,7 +166,7 @@ export default function Footer() {
 
                 <div className="flex items-center justify-between">
                     <Link href='/' passHref>
-                        <div className="text-3xl font-semibold text-gray-800 dark:text-white">C10</div>
+                        <div className="text-3xl font-semibold text-gray-800 dark:text-white">BIT10</div>
                     </Link>
 
                     <div className="flex -mx-2">
@@ -195,7 +195,7 @@ export default function Footer() {
             </div>
 
             <div className='flex flex-wrap justify-center items-center py-2 text-center text-xl w-full mx-auto z-[48]'>
-                &copy; {currentYear} C10, Inc. All rights reserved.
+                &copy; {currentYear} BIT10, Inc. All rights reserved.
             </div>
         </footer>
     )

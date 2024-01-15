@@ -9,7 +9,7 @@ export default function Navbar() {
             <nav className='flex items-center py-2 flex-wrap px-2.5 md:px-20 tracking-wider justify-between'>
                 <Link href='/' passHref>
                     <div className='inline-flex items-center text-4xl md:text-5xl cursor-pointer font-base'>
-                        C10
+                        BIT10
                     </div>
                 </Link>
 
