@@ -5,7 +5,7 @@ import Mail from 'nodemailer/lib/mailer'
 export async function POST(request: NextRequest) {
     const myEmail = process.env.NEXT_PUBLIC_PERSONAL_EMAIL;
     const password = process.env.NEXT_PUBLIC_EMAIL_PASSWORD;
-    const email2 = 'ziyarabani@gmail.com'
+    const email2 = 'harshalraikwar07@gmail.com'
 
     const { email, name, message } = await request.json();
 
