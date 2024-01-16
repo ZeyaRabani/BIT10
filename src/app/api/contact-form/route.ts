@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     });
 
     const mailOptions: Mail.Options = {
-        from: myEmail,
+        from: email,
         to: myEmail,
         cc: [`${email2}`],
         replyTo: email,
