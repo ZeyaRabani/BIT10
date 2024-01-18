@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const password = process.env.NEXT_PUBLIC_EMAIL_PASSWORD;
     const email2 = 'harshalraikwar07@gmail.com'
 
-    const { email, name, twitter, message } = await request.json();
+    const { email, name, message } = await request.json();
 
     const transport = nodemailer.createTransport({
         service: 'gmail',
@@ -30,11 +30,7 @@ export async function POST(request: NextRequest) {
 
             <hr style='border-top: 1px solid #666; width: 80%;'>
 
-            <span style='font-size: 1.5em;'>Message from ${name} (${email}) on BIT10 Contact Us page from Angle Users</span>
-
-            <p style='text-align: left; font-size: 15px; padding: 4px 20px'>
-                Twitter handle: ${twitter}
-            </p>
+            <span style='font-size: 1.5em;'>Message from ${name} (${email}) on BIT10 Contact Us page for Everyone</span>
 
             <p style='text-align: left; font-size: 15px; padding: 4px 20px'>
                 ${message}

@@ -24,10 +24,6 @@ export default function Navbar() {
                             <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Dashboard</span>
                         </Link>
 
-                        <Link href='/index-performance' passHref>
-                            <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Index Performance</span>
-                        </Link>
-
                         <Link href='/regulatory-compliance' passHref>
                             <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Regulatory Compliance</span>
                         </Link>

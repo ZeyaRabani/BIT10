@@ -29,10 +29,6 @@ const quickLinks: FooterLinks[] = [
         link: 'dashboard'
     },
     {
-        title: 'Index Performance',
-        link: 'index-erformance'
-    },
-    {
         title: 'Regulatory Compliance',
         link: 'regulatory-compliance'
     }
@@ -169,24 +165,24 @@ export default function Footer() {
                         <div className="text-3xl font-semibold text-gray-800 dark:text-white">BIT10</div>
                     </Link>
 
-                    <div className="flex -mx-2">
-                        <a href="#" className="mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
+                    <div className="flex md:-mx-2">
+                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
                             <Linkedin />
                         </a>
 
-                        <a href="#" className="mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
+                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
                             <Facebook />
                         </a>
 
-                        <a href="#" className="mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
+                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
                             <Instagram />
                         </a>
 
-                        <a href="#" className="mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
+                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
                             <Twitter />
                         </a>
 
-                        <a href="#" className="mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
+                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
                             <Youtube />
                         </a>
 
