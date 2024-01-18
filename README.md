@@ -42,6 +42,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     <p>Miro board(Assignment 1, 2, 3): <a href="https://miro.com/app/board/uXjVNPAEShc=/" target="_blank" rel="noreferrer">Miro Board Link</a></p>
     <h2>CEO: </h2>
     <p>Zeya Rabani</p>
-    <h2>Co-founder/CTO</h2>
+    <h2>Co-founder/CTO: </h2>
     <p>Harshal Raikwar</p>
 </details>
