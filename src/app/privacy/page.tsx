@@ -109,6 +109,16 @@ export default function Page() {
           ))}
 
           <div className='gap-1'>
+            <h1 className='text-xl md:text-2xl font-semibold tracking-wide'>9. Use of Google Analytics</h1>
+            <p className='text-lg'>a. We use Google Analytics in an anonymous and aggregate manner.</p>
+            <p className='text-lg'>b. No personally identifiable information about individual users is collected.</p>
+            <p className='text-lg'>c. Google Analytics collects data such as page views, session duration, and user interactions.</p>
+            <p className='text-lg'>d. This information helps us analyze user interactions and improve our platform.</p>
+            <p className='text-lg'>e. For more details, refer to Google Analytics <a href='https://policies.google.com/terms' target='_blank' className='underline'>Terms of Service</a> and <a href='https://policies.google.com/privacy' target='_blank' className='underline'>Privacy Policy</a>.</p>
+            <p className='text-lg'>f. To learn more about how Google uses information from sites or apps that use their services, please visit <a href='https://policies.google.com/technologies/partner-sites' target='_blank' className='underline'>How Google uses information</a>.</p>
+          </div>
+
+          <div className='gap-1'>
             <h1 className='text-xl md:text-2xl font-semibold tracking-wide'>Contact Us</h1>
             <p className='text-lg'>
               If you have any questions or concerns about this Privacy Policy, please contact us at{' '}

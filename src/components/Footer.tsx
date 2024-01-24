@@ -100,14 +100,6 @@ export default function Footer() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4">
                     <div className="sm:col-span-2">
                         <h1 className="max-w-lg text-xl font-semibold tracking-tight text-gray-800 xl:text-2xl dark:text-white">Subscribe our newsletter to get update.</h1>
-
-                        {/* <div className="flex flex-col mx-auto mt-6 space-x-0 md:space-x-2 space-y-3 md:space-y-0 md:flex-row">
-                            <Input id="email" type="text" className='w-full md:w-1/2' placeholder="Email Address" />
-
-                            <Button>
-                                Subscribe
-                            </Button>
-                        </div> */}
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col mx-auto mt-6 md:space-x-2 space-y-3 md:space-y-0 md:flex-row'>
                                 <FormField
@@ -166,7 +158,7 @@ export default function Footer() {
                     </Link>
 
                     <div className="flex md:-mx-2">
-                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
+                        {/* <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
                             <Linkedin />
                         </a>
 
@@ -176,15 +168,15 @@ export default function Footer() {
 
                         <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
                             <Instagram />
-                        </a>
+                        </a> */}
 
-                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
+                        <a href="https://twitter.com/bit10startup" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
                             <Twitter />
                         </a>
 
-                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
+                        {/* <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
                             <Youtube />
-                        </a>
+                        </a> */}
 
                     </div>
                 </div>

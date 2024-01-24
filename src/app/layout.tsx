@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from "@/components/theme-provider"
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { Toaster } from "@/components/ui/toaster"
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider attribute='class' defaultTheme='dark' enableSystem disableTransitionOnChange>
+          <GoogleAnalytics trackingId={process.env.NEXT_PUBLIC_GOOGLE_ID as string} />
           <main className='relative flex flex-col min-h-screen'>
             <Navbar />
             <div className='flex-grow flex-1 pt-20 lg:pt-24'>
