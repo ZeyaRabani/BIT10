@@ -16,6 +16,9 @@ import { makeStandardFungiblePostCondition, bufferCVFromString, contractPrincipa
 import { verifyMessageSignature, verifyMessageSignatureRsv } from "@stacks/encryption"
 import { clearLocalStorage, loadFromLocalStorage, saveToLocalStorage } from "@/lib/sendBTC"
 
+const WALL_CONNECT_API = process.env.NEXT_PUBLIC_PROJECT_ID
+
+
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
     return this.toString();
@@ -87,8 +90,7 @@ export default function Page() {
             const c = await Client.init({
                 logger: "debug",
                 relayUrl: "wss://relay.walletconnect.com",
-                projectId: "a450e71d8320703f06157f0ce4e7188a", // register at WalletConnect and create one for yourself - https://cloud.walletconnect.com/
-                // you need to have a valid ID or the app will not start
+                projectId: WALL_CONNECT_API,
                 metadata: {
                     name: "BIT10",
                     description: "Empowering Your Portfolio with the Future of Finance",

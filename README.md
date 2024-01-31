@@ -1,6 +1,6 @@
 # BIT10
 
-Welcome to the first ever Fully Decentralized ETF
+Welcome to the first ever Fully Decentralized ETF.
 
 ## Build with
 
