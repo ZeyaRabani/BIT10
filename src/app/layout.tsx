@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from "@/components/theme-provider"
 import GoogleAnalytics from '@/components/GoogleAnalytics'
+import { Web3Modal } from '@/context/Web3Modal'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { Toaster } from "@/components/ui/toaster"
@@ -25,15 +26,17 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute='class' defaultTheme='dark' enableSystem disableTransitionOnChange>
           <GoogleAnalytics trackingId={process.env.NEXT_PUBLIC_GOOGLE_ID as string} />
-          <main className='relative flex flex-col min-h-screen'>
-            <Navbar />
-            <div className='flex-grow flex-1 pt-20 lg:pt-24'>
-              {children}
-            </div>
-            <ScrollToTop />
-            <Toaster />
-            <Footer />
-          </main>
+          <Web3Modal>
+            <main className='relative flex flex-col min-h-screen'>
+              <Navbar />
+              <div className='flex-grow flex-1 pt-20 lg:pt-24'>
+                {children}
+              </div>
+              <ScrollToTop />
+              <Toaster />
+              <Footer />
+            </main>
+          </Web3Modal>
         </ThemeProvider>
       </body>
     </html>

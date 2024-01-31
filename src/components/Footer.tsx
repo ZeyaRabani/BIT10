@@ -26,11 +26,15 @@ interface FooterLinks {
 const quickLinks: FooterLinks[] = [
     {
         title: 'Dashboard',
-        link: 'dashboard'
+        link: '/dashboard'
+    },
+    {
+        title: 'Portfolio',
+        link: '/portfolio'
     },
     {
         title: 'Regulatory Compliance',
-        link: 'regulatory-compliance'
+        link: '/regulatory-compliance'
     }
 ]
 

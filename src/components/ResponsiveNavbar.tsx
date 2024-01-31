@@ -62,6 +62,10 @@ export default function ResponsiveNavbar() {
                                         Dashboard
                                     </Link>
 
+                                    <Link onClick={() => closeOnCurrent('/portfolio')} href='/portfolio' className='inline-flex w-auto px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white transition cursor-pointer' passHref>
+                                        Portfolio
+                                    </Link>
+
                                     <Link onClick={() => closeOnCurrent('/regulatory-compliance')} href='/regulatory-compliance' className='inline-flex w-auto px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white transition cursor-pointer' passHref>
                                         Regulatory Compliance
                                     </Link>
