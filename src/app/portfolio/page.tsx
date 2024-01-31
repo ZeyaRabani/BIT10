@@ -51,16 +51,16 @@ export default function Page() {
 
   return (
     <div>
-      {session ? (
+      {/* {session ? ( */}
         <Portfolio />
-      ) : (
+      {/* ) : (
         <Suspense fallback={<>Loading...</>}>
           <div className='grid place-items-center'>
             <Button className='text-white px-6' onClick={() => open()}>Connect Wallet</Button>
           </div>
           <InformationCard message='Connect your wallet to view your portfolio' />
         </Suspense>
-      )}
+      )} */}
     </div>
   )
 }
