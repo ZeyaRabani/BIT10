@@ -28,7 +28,7 @@ export default function Page() {
         try {
             disconnect();
         } catch (error) {
-            console.log(error);
+            // console.log(error);
         }
     }
 

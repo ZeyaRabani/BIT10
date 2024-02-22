@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
     const myEmail = process.env.NEXT_PUBLIC_PERSONAL_EMAIL;
     const password = process.env.NEXT_PUBLIC_EMAIL_PASSWORD;
     const email2 = 'harshalraikwar07@gmail.com'
+    const email3 = 'auxane.freslon@gmail.com'
 
     const { email, name, twitter, message } = await request.json();
 
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     const mailOptions: Mail.Options = {
         from: email,
         to: myEmail,
-        cc: [`${email2}`],
+        cc: [`${email2}`, `${email3}`],
         replyTo: email,
         subject: `Message from ${name} (${email}) on BIT10 Contact Us page`,
         html: `

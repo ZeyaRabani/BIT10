@@ -118,10 +118,10 @@ export default function Page() {
     return (
         <MaxWidthWrapper className='flex flex-col justify-center items-center space-y-2'>
             <Tabs defaultValue="angle" className="w-[300px] md:w-[70%]">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                    <TabsTrigger value="angle">For Angle Users</TabsTrigger>
-                    <TabsTrigger value="everyone">For Everyone</TabsTrigger>
-                </TabsList>
+                {/* <TabsList className="grid w-full grid-cols-2 mb-4"> */}
+                    {/* <TabsTrigger value="angle">For Early Users</TabsTrigger> */}
+                    {/* <TabsTrigger value="everyone">For Questions</TabsTrigger> */}
+                {/* </TabsList> */}
                 <div className='flex min-h-full items-center justify-center'>
                     <div className='animate-fade-in-down max-w-5xl border-2 border-accent rounded-lg mb-8' >
                         <div className='md:flex w-full'>
@@ -200,7 +200,7 @@ export default function Page() {
                                         </form>
                                     </Form>
                                 </TabsContent>
-                                <TabsContent value="everyone">
+                                {/* <TabsContent value="everyone">
                                     <Form {...form}>
                                         <form onSubmit={form.handleSubmit(onSubmitEveryone)} className="space-y-4">
                                             <FormField
@@ -251,7 +251,7 @@ export default function Page() {
                                             </Button>
                                         </form>
                                     </Form>
-                                </TabsContent>
+                                </TabsContent> */}
                             </div>
                         </div>
                     </div>

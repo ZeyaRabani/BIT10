@@ -69,9 +69,9 @@ export default function IndexPreformance() {
                 const response = await fetch(API_URL);
                 const result = await response.json();
                 setData(result.data);
-                console.log(result.data);
+                // console.log(result.data);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                // console.error('Error fetching data:', error);
             } finally {
                 setLoading(false);
             }
@@ -80,9 +80,8 @@ export default function IndexPreformance() {
         fetchData();
     }, []);
 
-    // Convert API data to an array of DataPoint objects
     const chartData: DataPoint[] = data.coins.map((crypto) => ({
-        date: crypto.name, // You can use a different property for the date if needed
+        date: crypto.name,
         price: crypto.quote.USD.price,
     }));
 

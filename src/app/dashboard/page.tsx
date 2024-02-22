@@ -137,7 +137,7 @@ export default function Page() {
 
             if (uri) {
                 QRCodeModal.open(uri, () => {
-                    console.log("QR Code Modal closed");
+                    // console.log("QR Code Modal closed");
                 });
             }
 
@@ -162,7 +162,7 @@ export default function Page() {
 
             if (uri) {
                 QRCodeModal.open(uri, () => {
-                    console.log("QR Code Modal closed");
+                    // console.log("QR Code Modal closed");
                 });
             }
 
@@ -617,7 +617,7 @@ export default function Page() {
                                     if (session && session.namespaces && session.namespaces.bip122) {
                                         await handleBtcTransfer();
                                     } else {
-                                        console.error('Session or bip122 namespace not available');
+                                        // console.error('Session or bip122 namespace not available');
                                     }
                                 }}
                                 // @ts-ignore

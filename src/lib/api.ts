@@ -27,7 +27,7 @@ export const getTopBRC20Tokens = async () => {
 
     return brc20Tokens;
   } catch (error) {
-    console.error('Error fetching top BRC-20 tokens:', error);
+    // console.error('Error fetching top BRC-20 tokens:', error);
     throw error;
   }
 };

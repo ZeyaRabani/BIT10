@@ -75,7 +75,7 @@ export default function PriceView({
 
     const sellTokenDecimals = POLYGON_TOKENS_BY_SYMBOL[sellToken].decimals;
 
-    console.log(sellAmount, sellTokenDecimals, "<-");
+    // console.log(sellAmount, sellTokenDecimals, "<-");
     const parsedSellAmount =
         sellAmount && tradeDirection === "sell"
             ? parseUnits(sellAmount, sellTokenDecimals).toString()
@@ -106,7 +106,7 @@ export default function PriceView({
             onSuccess: (data) => {
                 setPrice(data);
                 if (tradeDirection === "sell") {
-                    console.log(formatUnits(data.buyAmount, buyTokenDecimals), data);
+                    // console.log(formatUnits(data.buyAmount, buyTokenDecimals), data);
                     setBuyAmount(formatUnits(data.buyAmount, buyTokenDecimals));
                 } else {
                     setSellAmount(formatUnits(data.sellAmount, sellTokenDecimals));
@@ -120,14 +120,14 @@ export default function PriceView({
         token: POLYGON_TOKENS_BY_SYMBOL[sellToken].address,
     });
 
-    console.log(sellAmount);
+    // console.log(sellAmount);
 
     const disabled =
         data && sellAmount
             ? parseUnits(sellAmount, sellTokenDecimals) > data.value
             : true;
 
-    console.log(data, isError, isLoading);
+    // console.log(data, isError, isLoading);
 
     return (
         <form>

@@ -52,7 +52,8 @@ export default function Page() {
   return (
     <div>
       {/* {session ? ( */}
-        <Portfolio />
+      {/* Uncomment the code below */}
+        {/* <Portfolio /> */}
       {/* ) : (
         <Suspense fallback={<>Loading...</>}>
           <div className='grid place-items-center'>

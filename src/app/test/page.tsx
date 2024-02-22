@@ -19,9 +19,9 @@ export default function CryptoList() {
         const response = await fetch(API_URL);
         const result = await response.json();
         setData(result.data);
-        console.log(result.data);
+        // console.log(result.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }

@@ -4,7 +4,7 @@ export const saveToLocalStorage = (key: string, item: any): void => {
     try {
         store.set(key, item);
     } catch (e) {
-        console.error(e);
+        // console.error(e);
     }
 };
 
@@ -21,6 +21,6 @@ export const clearLocalStorage = (): void => {
     try {
         store.clearAll();
     } catch (e) {
-        console.error(e);
+        // console.error(e);
     }
 };

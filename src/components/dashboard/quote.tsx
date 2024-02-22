@@ -54,8 +54,8 @@ export default function QuoteView({
         {
             onSuccess: (data) => {
                 setQuote(data);
-                console.log("quote", data);
-                console.log(formatUnits(data.buyAmount, buyTokenInfo.decimals), data);
+                // console.log("quote", data);
+                // console.log(formatUnits(data.buyAmount, buyTokenInfo.decimals), data);
             },
         }
     );
@@ -71,8 +71,8 @@ export default function QuoteView({
         return <div>Getting best quote...</div>;
     }
 
-    console.log("quote", quote);
-    console.log(formatUnits(quote.sellAmount, sellTokenInfo.decimals));
+    // console.log("quote", quote);
+    // console.log(formatUnits(quote.sellAmount, sellTokenInfo.decimals));
 
     return (
         <div className="p-3 mx-auto max-w-screen-sm ">
@@ -129,7 +129,7 @@ export default function QuoteView({
             <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
                 onClick={() => {
-                    console.log("submitting quote to blockchain");
+                    // console.log("submitting quote to blockchain");
                     sendTransaction && sendTransaction();
                 }}
             >

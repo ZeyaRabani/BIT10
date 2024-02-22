@@ -28,13 +28,13 @@ export default function RootLayout({
           <GoogleAnalytics trackingId={process.env.NEXT_PUBLIC_GOOGLE_ID as string} />
           <Web3Modal>
             <main className='relative flex flex-col min-h-screen'>
-              <Navbar />
+              {/* <Navbar /> */}
               <div className='flex-grow flex-1 pt-20 lg:pt-24'>
                 {children}
               </div>
               <ScrollToTop />
               <Toaster />
-              <Footer />
+              {/* <Footer /> */}
             </main>
           </Web3Modal>
         </ThemeProvider>

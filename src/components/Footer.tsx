@@ -1,15 +1,15 @@
 "use client"
 
 import React, { useState } from 'react'
-import Link from 'next/link'
-import { Button } from './ui/button'
-import { Input } from './ui/input'
 import { addUserNewsletter } from '@/lib/supabaseRequests'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useToast } from "@/components/ui/use-toast"
 import { Form, FormControl, FormField, FormItem, FormDescription, FormMessage } from './ui/form'
+import Link from 'next/link'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
 import { Linkedin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react'
 
 const FormSchema = z.object({
@@ -72,7 +72,7 @@ export default function Footer() {
         defaultValues: {
             email: "",
         },
-    })
+    });
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         const email = data.email;
@@ -96,7 +96,7 @@ export default function Footer() {
                 }
             }
         }
-    }
+    };
 
     return (
         <footer className="bg-gray-100 dark:bg-gray-900">

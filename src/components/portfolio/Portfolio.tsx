@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '../ui/badge'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { PreformanceTableDataType, preformanceTableColumns } from './columns'
+import Bit10Preformance from '@/components/bit10Preformance'
 import { DataTable } from '@/components/ui/data-table'
 
 interface PreformanceDataType {
@@ -182,6 +183,9 @@ export default function Portfolio() {
             </LineChart>
           </ResponsiveContainer>
         </div>
+      </div>
+      <div>
+        <Bit10Preformance />
       </div>
       <div className='py-4 w-full'>
         <Card className='relative'>
