@@ -29,7 +29,8 @@ export default function RootLayout({
           <Web3Modal>
             <main className='relative flex flex-col min-h-screen'>
               {/* <Navbar /> */}
-              <div className='flex-grow flex-1 pt-20 lg:pt-24'>
+              {/* <div className='flex-grow flex-1 pt-20 lg:pt-24'> */}
+              <div className='flex-grow flex-1'>
                 {children}
               </div>
               <ScrollToTop />

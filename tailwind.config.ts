@@ -82,6 +82,9 @@ module.exports = {
         'fade-in-down-nav': 'fade-in-down 0.1s ease-out',
         'fade-bottom-up': 'fade-bottom-up 0.2s ease-out',
       },
+      fontFamily: {
+        'readex': ['Readex Pro', 'sans-serif']
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
