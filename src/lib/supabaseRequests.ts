@@ -82,3 +82,18 @@ export const signUpUserList = async ({ user_name, user_email, user_twitter }: Si
         return new Response('Error checking for existing email', { status: 500 });
     }
 }
+
+export const getUserSignUpList = async () => {
+    try {
+        const { data, error } = await supabase.from('user_signups').select('*');
+
+        if (error) {
+            return new Response('Error checking for existing address', { status: 200 });
+        }
+
+        return data;
+
+    } catch (error) {
+        return new Response('Error checking for existing address', { status: 500 });
+    }
+}
