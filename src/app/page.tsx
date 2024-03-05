@@ -180,20 +180,13 @@ export default function Page() {
           <CardHeader>
             <CardTitle className='text-black text-4xl md:text-5xl text-center'>BIT10</CardTitle>
             <CardDescription className='text-black text-lg pt-8'>
-              <p className='py-0.5'>BIT10 is building the S&P500 of Bitcoin DeFi assets. Through 1 token, you will soon be able to diversify your portfolio with dozens of other assets belonging to the Bitcoin DeFi environment.</p>
-              <p className='py-0.5'>We are launching our token this month and are looking at some testers to get feedbacks.</p>
+              <p className='py-0.5'>BIT10 is building the S&P500 of Bitcoin DeFi assets. We are launching our token this month and are looking at some testers to get feedbacks.</p>
               <p className='pt-0.5'>What you will get:</p>
               <ul>
                 <li className='list-disc ml-5'>Early access to our first smart asset.</li>
                 <li className='list-disc ml-5'>Opportunity to develop new product with us.</li>
-                <li className='list-disc ml-5'>Private channel in our future Discord</li>
-              </ul>
-              <p className='pt-0.5'>To be on the whitelist and be certain to be selected:</p>
-              <ul>
-                <li className='list-disc ml-5'>Like and repost the first post of this <a href='https://twitter.com/bit10startup' target='_blank' className='underline'>thread.</a>.</li>
-                <li className='list-disc ml-5'>Tag three friends on the <a href='https://twitter.com/bit10startup' target='_blank' className='underline'>post.</a>.</li>
-                <li className='list-disc ml-5'>Follow us on <a href='https://twitter.com/bit10startup' target='_blank' className='underline'>Twitter.</a></li>
-                <li className='list-disc ml-5'>Enter your email below.</li>
+                <li className='list-disc ml-5'>Access to a private channel in our future Discord.</li>
+                <li className='list-disc ml-5'>Points for…</li>
               </ul>
             </CardDescription>
           </CardHeader>
