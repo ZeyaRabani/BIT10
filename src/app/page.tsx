@@ -180,7 +180,7 @@ export default function Page() {
           <CardHeader>
             <CardTitle className='text-black text-4xl md:text-5xl text-center'>BIT10</CardTitle>
             <CardDescription className='text-black text-lg pt-8'>
-              <p className='py-0.5'>BIT10 is building the S&P500 of Bitcoin DeFi assets. We are launching our token this month and are looking at some testers to get feedbacks.</p>
+              <p className='py-0.5'>Sign up to become a <a href='https://twitter.com/bit10startup' target='_blank' className='underline'>testnet user</a> of BIT10.</p>
               <p className='pt-0.5'>What you will get:</p>
               <ul>
                 <li className='list-disc ml-5'>Early access to our first smart asset.</li>
