@@ -22,7 +22,7 @@ interface SignUpListType {
 export const addUserNewsletter = async ({ email }: NewsLetterType) => {
     try {
         const { data, error } = await supabase
-            .from('newsletter_subscribers')
+            .from('user_signups')
             .insert([
                 { email: email },
             ])
@@ -62,7 +62,7 @@ export const addUserToWaitlist = async ({ address }: WaitlistType) => {
 export const signUpUserList = async ({ user_name, user_email, user_twitter }: SignUpListType) => {
     try {
         const { data, error } = await supabase
-            .from('user_sign_up')
+            .from('old_user_sign_up')
             .insert([
                 {
                     user_name: user_name,
