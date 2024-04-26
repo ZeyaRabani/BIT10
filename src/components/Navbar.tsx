@@ -1,7 +1,9 @@
 "use client"
 
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useWeb3Modal } from '@web3modal/wagmi/react'
+import Client from '@walletconnect/sign-client'
+import QRCodeModal from "@walletconnect/qrcode-modal"
 import { useAccount, useDisconnect } from 'wagmi'
 import Link from 'next/link'
 import { ModeToggle } from './ModeToggle'
@@ -23,11 +25,48 @@ const profileLinkData: NavLinkType[] = [
 ]
 
 export default function Navbar() {
+    const [client, setClient] = useState(undefined);
+    const [chain, setChain] = useState(undefined);
+    const [session, setSession] = useState(undefined);
+
     const { address, isConnecting } = useAccount();
     const { open } = useWeb3Modal();
     const { disconnect } = useDisconnect();
 
     const { toast } = useToast();
+
+    const wallet_api = process.env.NEXT_PUBLIC_PROJECT_ID;
+
+    const chains = [
+        // "stacks:1",
+        // "stacks:2147483648",
+        // "bip122:000000000019d6689c085ae165831e93",
+        // "bip122:000000000933ea01ad0ee984209779ba",
+    ];
+
+    useEffect(() => {
+        const f = async () => {
+            const c = await Client.init({
+                logger: 'debug',
+                relayUrl: 'wss://relay.walletconnect.com',
+                projectId: wallet_api,
+                metadata: {
+                    name: "Bit10",
+                    description: "Awesome application",
+                    url: "https://your_app_url.com/",
+                    icons: ["https://avatars.githubusercontent.com/u/37784886"],
+                },
+            });
+
+            // @ts-ignore
+            setClient(c);
+        }
+
+        if (client === undefined) {
+            f();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [client]);
 
     useEffect(() => {
         const addUserToWaitlistAsync = async () => {
@@ -37,13 +76,79 @@ export default function Navbar() {
                         address: address,
                     });
                 } catch (error) {
-                    // console.error("Error adding user to waitlist:", error);
+                    // console.error('Error adding user to waitlist:', error);
                 }
             }
         };
 
         addUserToWaitlistAsync();
     }, [address]);
+
+    // @ts-ignore
+    const handleConnect = async (chain: any) => {
+        setChain(undefined);
+        if (chain.includes("stacks")) {
+            // @ts-ignore
+            const { uri, approval } = await client.connect({
+                pairingTopic: undefined,
+                requiredNamespaces: {
+                    stacks: {
+                        methods: [
+                            "stacks_signMessage",
+                            "stacks_stxTransfer",
+                            "stacks_contractCall",
+                            "stacks_contractDeploy",
+                        ],
+                        chains: [chain],
+                        events: [],
+                    },
+                },
+            });
+
+            if (uri) {
+                QRCodeModal.open(uri, () => {
+                    console.log("QR Code Modal closed");
+                });
+            }
+
+            const sessn = await approval();
+            setSession(sessn);
+            setChain(chain);
+            // @ts-ignore
+            saveToLocalStorage("session", sessn);
+            // @ts-ignore
+            saveToLocalStorage("chain", chain);
+            QRCodeModal.close();
+        } else {
+            // @ts-ignore
+            const { uri, approval } = await client.connect({
+                pairingTopic: undefined,
+                requiredNamespaces: {
+                    bip122: {
+                        methods: ["bitcoin_btcTransfer"],
+                        chains: [chain],
+                        events: [],
+                    },
+                },
+            });
+
+            if (uri) {
+                QRCodeModal.open(uri, () => {
+                    console.log("QR Code Modal closed");
+                });
+            }
+
+            const sessn = await approval();
+            setSession(sessn);
+            setChain(chain);
+            // @ts-ignore
+            saveToLocalStorage("session", sessn);
+            // @ts-ignore
+            saveToLocalStorage("chain", chain);
+            QRCodeModal.close();
+            console.log("Session", sessn);
+        }
+    };
 
     const disconnectWallet = () => {
         try {
@@ -105,6 +210,7 @@ export default function Navbar() {
                             <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Contact Us</span>
                         </Link>
 
+                        {/* {session ? ( */}
                         {address ? (
                             <>
                                 <Popover>
@@ -124,7 +230,18 @@ export default function Navbar() {
                             </>
                         ) : (
                             <>
+                                {/* <Button className='text-white px-6' onClick={async () => await handleConnect('bip122:000000000933ea01ad0ee984209779ba')}>Connect Wallet</Button> */}
                                 <Button className='text-white px-6' onClick={() => open()}>Connect Wallet</Button>
+                                {/* {
+                                    !session && (
+                                        <div className="box">
+                                            <h3>Select chain:</h3>
+                                            {chains.map((c, idx) => {
+                                                return (<div key={`chain-${idx}`}>{c} <button disabled={!client} onClick={async () => await handleConnect(c)}>connect</button></div>);
+                                            })}
+                                        </div>
+                                    )
+                                } */}
                             </>
                         )}
 

@@ -74,7 +74,6 @@ export default function Page() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch data from Coinbase APIs
         const coinbaseResponsePromises = [
           axios.get('https://api.coinbase.com/v2/prices/STX-USD/buy'),
           axios.get('https://api.coinbase.com/v2/prices/MAPO-USD/buy'),
@@ -89,15 +88,19 @@ export default function Page() {
         );
         setCoinbaseData(coinbaseAmounts);
 
-        // Fetch data from Coingecko APIs via CORS proxy
         const coingeckoResponsePromises = [
-          axios.get('https://cors-anywhere.herokuapp.com/https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=conflux-token'),
-          axios.get('https://cors-anywhere.herokuapp.com/https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=sovryn')
+          axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=conflux-token'),
+          axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=sovryn')
         ];
 
         const coingeckoResponses = await Promise.all(coingeckoResponsePromises);
 
-        const coingeckoPrices = coingeckoResponses.map((response) => response.data[0].current_price);
+        const coingeckoPrices = coingeckoResponses.map((response) => {
+          if (response.status === 403 || response.data.length === 0) {
+            return 0;
+          }
+          return response.data[0].current_price;
+        });
         setCoingeckoData(coingeckoPrices);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -108,7 +111,6 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    // Calculate average price once both Coinbase and Coingecko data are fetched
     if (coinbaseData.length > 0 && coingeckoData.length > 0) {
       const totalAmount = coinbaseData.reduce((acc, cur) => acc + cur, 0);
       const totalPrice = coingeckoData.reduce((acc, cur) => acc + cur, 0);
