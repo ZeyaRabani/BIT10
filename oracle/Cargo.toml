@@ -1,0 +1,4 @@
+[workspace]
+members = [
+    "src/bit10_oracle_backend",
+]

@@ -30,7 +30,7 @@
     "@walletconnect/utils": "^2.11.0",
     "@web3modal/wagmi": "^3.5.7",
     "apexcharts": "^3.45.2",
-    "axios": "^1.6.5",
+    "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "connectkit": "^1.6.0",

@@ -1,0 +1,17 @@
+{
+  "canisters": {
+    "bit10_oracle_backend": {
+      "candid": "src/bit10_oracle_backend/bit10_oracle_backend.did",
+      "package": "bit10_oracle_backend",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
