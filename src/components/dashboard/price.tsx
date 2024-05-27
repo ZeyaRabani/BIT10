@@ -196,7 +196,7 @@ export default function PriceView({
                     <CardDescription>Decentralized exchange demo</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <section className='rounded p-2 bg-gray-200 dark:bg-gray-700'>
+                    <section className='rounded p-2 '>
                         <div className='flex flex-row items-center justify-between text-[0.8rem]'>
                             <div>From</div>
                             <div>Balance BTC 5.5</div>

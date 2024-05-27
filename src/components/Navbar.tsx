@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import { useWeb3Modal } from '@web3modal/wagmi/react'
-import Client from '@walletconnect/sign-client'
-import QRCodeModal from "@walletconnect/qrcode-modal"
+import Client from "@walletconnect/sign-client";
+import QRCodeModal from "@walletconnect/qrcode-modal";
+import { clearLocalStorage, saveToLocalStorage, loadFromLocalStorage } from "@/lib/utils";
 import { useAccount, useDisconnect } from 'wagmi'
 import Link from 'next/link'
 import { ModeToggle } from './ModeToggle'
@@ -13,6 +14,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from './ui/button'
 import { LogOut, User } from 'lucide-react'
 import { addUserToWaitlist } from '@/lib/supabaseRequests'
+import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 
 interface NavLinkType {
     href: string;
@@ -20,29 +23,30 @@ interface NavLinkType {
 }
 
 const profileLinkData: NavLinkType[] = [
-    { href: '/dashboard', text: 'Dashboard' },
+    { href: '/dashboard', text: 'Swap' },
     { href: '/portfolio', text: 'Portfolio' }
 ]
 
 export default function Navbar() {
     const [client, setClient] = useState(undefined);
     const [chain, setChain] = useState(undefined);
-    const [session, setSession] = useState(undefined);
+    const [session, setSession] = useState(undefined)
 
     const { address, isConnecting } = useAccount();
     const { open } = useWeb3Modal();
-    const { disconnect } = useDisconnect();
+    // const { disconnect } = useDisconnect();
 
     const { toast } = useToast();
-
     const wallet_api = process.env.NEXT_PUBLIC_PROJECT_ID;
+    
+    const pathname = usePathname();
 
-    const chains = [
-        // "stacks:1",
-        // "stacks:2147483648",
-        // "bip122:000000000019d6689c085ae165831e93",
-        // "bip122:000000000933ea01ad0ee984209779ba",
-    ];
+    // const chains = [
+    // "stacks:1",
+    // "stacks:2147483648",
+    // "bip122:000000000019d6689c085ae165831e93",
+    // "bip122:000000000933ea01ad0ee984209779ba",
+    // ];
 
     useEffect(() => {
         const f = async () => {
@@ -52,9 +56,9 @@ export default function Navbar() {
                 projectId: wallet_api,
                 metadata: {
                     name: "Bit10",
-                    description: "Awesome application",
-                    url: "https://your_app_url.com/",
-                    icons: ["https://avatars.githubusercontent.com/u/37784886"],
+                    description: "Bit10",
+                    url: "https://www.bit10.app",
+                    icons: ["https://www.bit10.app/favicon.ico"],
                 },
             });
 
@@ -68,23 +72,6 @@ export default function Navbar() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [client]);
 
-    useEffect(() => {
-        const addUserToWaitlistAsync = async () => {
-            if (address) {
-                try {
-                    await addUserToWaitlist({
-                        address: address,
-                    });
-                } catch (error) {
-                    // console.error('Error adding user to waitlist:', error);
-                }
-            }
-        };
-
-        addUserToWaitlistAsync();
-    }, [address]);
-
-    // @ts-ignore
     const handleConnect = async (chain: any) => {
         setChain(undefined);
         if (chain.includes("stacks")) {
@@ -114,9 +101,7 @@ export default function Navbar() {
             const sessn = await approval();
             setSession(sessn);
             setChain(chain);
-            // @ts-ignore
             saveToLocalStorage("session", sessn);
-            // @ts-ignore
             saveToLocalStorage("chain", chain);
             QRCodeModal.close();
         } else {
@@ -141,28 +126,59 @@ export default function Navbar() {
             const sessn = await approval();
             setSession(sessn);
             setChain(chain);
-            // @ts-ignore
+            console.log(sessn)
             saveToLocalStorage("session", sessn);
-            // @ts-ignore
             saveToLocalStorage("chain", chain);
             QRCodeModal.close();
-            console.log("Session", sessn);
         }
     };
 
-    const disconnectWallet = () => {
-        try {
-            disconnect();
-            toast({
-                title: 'Wallet Disconnected Successfully!',
-            })
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: `${error}`,
-            })
-        }
+    const disconnect = async () => {
+        clearLocalStorage();
+        // @ts-ignore
+        await client.pairing.delete(session.topic, {
+            code: 100,
+            message: "deleting",
+        });
+        setSession(undefined);
+        setChain(undefined);
+        toast({
+            title: 'Wallet Disconnected Successfully!',
+        })
     };
+
+    useEffect(() => {
+        const addUserToWaitlistAsync = async () => {
+            if (session) {
+                try {
+                    await addUserToWaitlist({
+                        // address: address,
+                        // @ts-ignore
+                        address: session.namespaces.bip122.accounts[0].split(':')[2],
+                    });
+                } catch (error) {
+                    // console.error('Error adding user to waitlist:', error);
+                }
+            }
+        };
+
+        addUserToWaitlistAsync();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [address]);
+
+    // const disconnectWallet = () => {
+    //     try {
+    //         disconnect();
+    // toast({
+    //     title: 'Wallet Disconnected Successfully!',
+    // })
+    //     } catch (error) {
+    //         toast({
+    //             variant: 'destructive',
+    //             title: `${error}`,
+    //         })
+    //     }
+    // };
 
     const renderLinksProfile = (links: any) => {
         return links.map((link: any) => (
@@ -178,17 +194,32 @@ export default function Navbar() {
         <div className='backdrop-blur-xl fixed z-50 w-full'>
             <nav className='flex items-center py-2 flex-wrap px-2.5 md:px-20 tracking-wider justify-between'>
                 <Link href='/' passHref>
-                    <div className='inline-flex items-center text-4xl md:text-5xl cursor-pointer font-base'>
+                    {/* <div className='inline-flex items-center text-4xl md:text-5xl cursor-pointer font-base'>
                         BIT10
-                    </div>
+                    </div> */}
+                    <Image src='/logo/logo.png' alt='logo' width={60} height={60} />
                 </Link>
 
-                <div className='hidden top-navbar w-full lg:inline-flex lg:flex-grow lg:w-auto' >
+                <div className='hidden w-full lg:inline-flex lg:flex-grow lg:w-auto' >
                     <div className='lg:inline-flex lg:flex-row lg:ml-auto lg:w-auto w-full lg:items-center items-start flex flex-col lg:h-auto space-x-2' >
 
                         <Link href='/' passHref>
-                            <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Home</span>
+                            <span className={`lg:inline-flex lg:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer ${pathname === '/' && 'border-b-2 border-white hover:border-none'}`}>Swap</span>
                         </Link>
+
+                        <Link href='/portfolio' passHref>
+                            <span className={`lg:inline-flex lg:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer ${pathname === '/portfolio' && 'border-b-2 border-white hover:border-none'}`}>Portfolio</span>
+                        </Link>
+
+                        <Link href='/about' passHref>
+                            <span className={`lg:inline-flex lg:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer ${pathname === '/about' && 'border-b-2 border-white hover:border-none'}`}>About</span>
+                        </Link>
+
+                    </div>
+                </div>
+
+                <div className='hidden w-full lg:inline-flex lg:flex-grow lg:w-auto' >
+                    <div className='lg:inline-flex lg:flex-row lg:ml-auto lg:w-auto w-full lg:items-center items-start flex flex-col lg:h-auto space-x-2' >
 
                         {/* <Link href='/dashboard' passHref>
                             <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Dashboard</span>
@@ -198,7 +229,7 @@ export default function Navbar() {
                             <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Portfolio</span>
                         </Link> */}
 
-                        <Link href='/regulatory-compliance' passHref>
+                        {/* <Link href='/regulatory-compliance' passHref>
                             <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Regulatory Compliance</span>
                         </Link>
 
@@ -208,30 +239,17 @@ export default function Navbar() {
 
                         <Link href='/contact' passHref>
                             <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Contact Us</span>
-                        </Link>
+                        </Link> */}
 
-                        {/* {session ? ( */}
-                        {address ? (
-                            <>
-                                <Popover>
-                                    <PopoverTrigger>
-                                        <User className='cursor-pointer hover:text-primary' />
-                                    </PopoverTrigger>
-                                    <PopoverContent align='end' className='max-w-[12rem] mt-2 hidden lg:block'>
-                                        {renderLinksProfile(profileLinkData)}
-                                        <div className='flex flex-row justify-between items-center text-destructive cursor-pointer' onClick={() => disconnectWallet()}>
-                                            Disconnect Wallet
-                                            <div>
-                                                <LogOut size={16} />
-                                            </div>
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
-                            </>
+                        {session ? (
+                            // {/* {address ? ( */}
+                            <Button variant='destructive' onClick={() => disconnect()}>
+                                Disconnect
+                            </Button>
                         ) : (
                             <>
-                                {/* <Button className='text-white px-6' onClick={async () => await handleConnect('bip122:000000000933ea01ad0ee984209779ba')}>Connect Wallet</Button> */}
-                                <Button className='text-white px-6' onClick={() => open()}>Connect Wallet</Button>
+                                <Button className='text-white px-6' onClick={async () => await handleConnect('bip122:000000000933ea01ad0ee984209779ba')}>Connect Wallet</Button>
+                                {/* <Button className='text-white px-6' onClick={() => open()}>Connect Wallet</Button> */}
                                 {/* {
                                     !session && (
                                         <div className="box">
@@ -249,9 +267,8 @@ export default function Navbar() {
 
                 </div>
 
-
                 <div className='flex space-x-2 justify-between items-center ml-2'>
-                    <ModeToggle />
+                    {/* <ModeToggle /> */}
                     <ResponsiveNavbar />
                 </div>
 

@@ -1,11 +1,12 @@
 "use client"
 
 import React, { useState } from 'react'
-import { signUpUserList } from '@/lib/supabaseRequests'
+import { addUserNewsletter } from '@/lib/supabaseRequests'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from '@/components/ui/use-toast'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import Image from 'next/image'
 import { Form, FormControl, FormField, FormItem, FormDescription, FormMessage, FormLabel } from '@/components/ui/form'
@@ -13,126 +14,93 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
 const FormSchema = z.object({
-    user_name: z.string().min(3, {
-        message: 'Name must be at least 3 characters long.',
-    }),
-    user_email: z.string().email({
+    email: z.string({
+        required_error: 'Email is required.',
+    }).email({
         message: 'Invalid email format.',
     }),
-    user_twitter: z.string().min(3, {
-        message: 'Username must be at least 3 characters long.',
-    }).optional()
 })
 
 export default function Page() {
-    const [waitlist, setSignUpList] = useState([]);
-    const { toast } = useToast();
+    const [waitlist, setWaitlist] = useState([]);
+    const { toast } = useToast()
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            user_name: "",
-            user_email: "",
-            // user_twitter: "",
+            email: "",
         },
     });
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const name = data.user_name;
-        const email = data.user_email;
-        const twitter = data.user_twitter;
+        const email = data.email;
 
         if (email) {
-            const result = await signUpUserList({ user_name: name, user_email: email, user_twitter: twitter });
+            const result = await addUserNewsletter({ email });
 
             if (result) {
                 // @ts-ignore
                 if (result.error === '409') {
                     toast({
-                        title: "User already added Signed Up",
+                        title: "User already Signed Up!",
                     })
                 } else {
                     // @ts-ignore
-                    setSignUpList((prevWaitlist) => [...prevWaitlist, email]);
+                    setWaitlist((prevWaitlist) => [...prevWaitlist, email]);
                     toast({
-                        title: "User added to Signed Up list!",
+                        title: "User Signed Up!",
                     })
                     form.reset();
                 }
             }
         }
-    }
+    };
 
     return (
-        <MaxWidthWrapper>
-            <div className='flex items-center justify-center pb-8'>
-                <div className='w-full md:max-w-[60vw] grid md:grid-cols-2 gap-2 rounded-lg bg-[#F3F4F6]'>
-                    <div className='hidden md:grid md:place-items-center bg-primary rounded-l-lg'>
-                        <Image src='/assets/sign-up/undraw_nakamoto_-2-iv6.svg' className='p-8' alt='Sign Up' width={500} height={500} />
-                    </div>
-                    <div>
-                        <h1 className='text-black text-3xl font-bold text-center pt-8'>Sign Up</h1>
+        <div className="relative h-screen">
+            <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: "url('/assets/home/signup-bg.jpg')" }}></div>
+            <div className="absolute top-4 left-2 z-10">
+                <Image src='/logo/logo.png' height={80} width={80} alt='img' />
+            </div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                <Card className="w-[90vw] md:w-[550px] md:px-6 bg-opacity-50 bg-white font-readex">
+                    <CardHeader>
+                        <CardTitle className='text-black text-4xl md:text-5xl text-center'>BIT10</CardTitle>
+                        <CardDescription className='text-black text-lg pt-8'>
+                            <p className='py-0.5'>Sign up to become a <a href='https://twitter.com/bit10startup/status/1764954854965821729' target='_blank' className='underline'>testnet user</a> of BIT10.</p>
+                            <p className='pt-0.5'>What you will get:</p>
+                            <ul>
+                                <li className='list-disc ml-5'>Early access to our first smart asset.</li>
+                                <li className='list-disc ml-5'>Opportunity to develop new product with us.</li>
+                                <li className='list-disc ml-5'>Access to a private channel in our future Discord.</li>
+                                <li className='list-disc ml-5'>Points for…</li>
+                            </ul>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-2 px-4 py-4'>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className='w-full flex flex-col space-y-4'>
                                 <FormField
                                     control={form.control}
-                                    name="user_name"
+                                    name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className='text-gray-600'>Your Name</FormLabel>
                                             <FormControl>
-                                                <Input {...field} className="w-full bg-[#FFFFFF] text-gray-900" placeholder='Your Name' />
+                                                <Input {...field} className="w-full bg-white text-black text-lg" placeholder='Email' />
                                             </FormControl>
-                                            <FormDescription>
-                                                Your Full Name
-                                            </FormDescription>
                                             <FormMessage className='text-destructive' />
                                         </FormItem>
                                     )}
                                 />
 
-                                <FormField
-                                    control={form.control}
-                                    name="user_email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className='text-gray-600'>Your Email</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} className="w-full bg-[#FFFFFF] text-gray-900" placeholder='Your Email' />
-                                            </FormControl>
-                                            <FormDescription>
-                                                Your Email
-                                            </FormDescription>
-                                            <FormMessage className='text-destructive' />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="user_twitter"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className='text-gray-600'>Your Twitter Handle (optional)</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} className="w-full bg-[#FFFFFF] text-gray-900" placeholder='Your Twitter Handle' />
-                                            </FormControl>
-                                            <FormDescription>
-                                                Your Twitter Handle includeing @
-                                            </FormDescription>
-                                            <FormMessage className='text-destructive' />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <Button type='submit' className='text-white bg-primary w-full hover:bg-primary/90'>
-                                    Sign Up for Waitlist
+                                <Button type='submit' className='text-white bg-black hover:bg-gray-900 w-56 self-center text-lg'>
+                                    Join Us
                                 </Button>
                             </form>
                         </Form>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
             </div>
-        </MaxWidthWrapper>
+        </div>
     )
 }

@@ -55,23 +55,15 @@ export default function ResponsiveNavbar() {
                                 <div className='grid place-items-center text-xl py-2 gap-2 w-full mb-4'>
 
                                     <Link onClick={() => closeOnCurrent('/')} href='/' className='inline-flex w-auto px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white transition cursor-pointer' passHref>
-                                        Home
-                                    </Link>
-
-                                    <Link onClick={() => closeOnCurrent('/dashboard')} href='/dashboard' className='inline-flex w-auto px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white transition cursor-pointer' passHref>
-                                        Dashboard
+                                        Swap
                                     </Link>
 
                                     <Link onClick={() => closeOnCurrent('/portfolio')} href='/portfolio' className='inline-flex w-auto px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white transition cursor-pointer' passHref>
                                         Portfolio
                                     </Link>
 
-                                    <Link onClick={() => closeOnCurrent('/regulatory-compliance')} href='/regulatory-compliance' className='inline-flex w-auto px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white transition cursor-pointer' passHref>
-                                        Regulatory Compliance
-                                    </Link>
-
-                                    <Link onClick={() => closeOnCurrent('/contact')} href='/contact' className='inline-flex w-auto px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white transition cursor-pointer' passHref>
-                                        Contact Us
+                                    <Link onClick={() => closeOnCurrent('/about')} href='/about' className='inline-flex w-auto px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white transition cursor-pointer' passHref>
+                                        About
                                     </Link>
 
                                 </div>

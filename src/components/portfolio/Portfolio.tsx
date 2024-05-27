@@ -28,7 +28,7 @@ const preformanceTableData: PreformanceTableDataType[] = [
   {
     settelment: '26 Dec, 2023',
     tradeDate: '25 Dec, 2023',
-    symbol: 'BIT10',
+    symbol: 'B.DeFi',
     name: 'From Bit10',
     quantity: 4,
     type: 'Fund Recieved',
@@ -58,7 +58,7 @@ const preformanceTableData: PreformanceTableDataType[] = [
   {
     settelment: '2 Jan, 2024',
     tradeDate: '1 Jan, 2024',
-    symbol: 'BIT10',
+    symbol: 'B.DeFi',
     name: 'From Bit10',
     quantity: 5,
     type: 'Reinested',
@@ -68,8 +68,8 @@ const preformanceTableData: PreformanceTableDataType[] = [
   {
     settelment: '4 Jan, 2024',
     tradeDate: '3 Jan, 2024',
-    symbol: 'BIT10-G',
-    name: 'From Bit10 Gold',
+    symbol: 'B.Ordi',
+    name: 'From Bit10 Ordi',
     quantity: 3,
     type: 'Buy',
     price: 2500,
@@ -127,7 +127,7 @@ export default function Portfolio() {
       <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
         <h1 className='text-3xl font-bold'>Welcome back</h1>
         <Button className='text-white' asChild>
-          <Link href='/dashboard'>Buy & Sell</Link>
+          <Link href='/'>Buy & Sell</Link>
         </Button>
       </div>
 
@@ -185,7 +185,7 @@ export default function Portfolio() {
         </div>
       </div>
       <div>
-        <Bit10Preformance />
+        {/* <Bit10Preformance /> */}
       </div>
       <div className='py-4 w-full'>
         <Card className='relative'>

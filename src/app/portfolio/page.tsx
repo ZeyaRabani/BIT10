@@ -22,46 +22,46 @@ export default function Page() {
 
   useEffect(() => {
     const f = async () => {
-        const c = await Client.init({
-            logger: "debug",
-            relayUrl: "wss://relay.walletconnect.com",
-            projectId: WALL_CONNECT_API,
-            metadata: {
-                name: "BIT10",
-                description: "Empowering Your Portfolio with the Future of Finance",
-                url: "https://bit10.vercel.app",
-                icons: ["https://avatars.githubusercontent.com/u/37784886"],
-            },
-        });
+      const c = await Client.init({
+        logger: "debug",
+        relayUrl: "wss://relay.walletconnect.com",
+        projectId: WALL_CONNECT_API,
+        metadata: {
+          name: "BIT10",
+          description: "Empowering Your Portfolio with the Future of Finance",
+          url: "https://bit10.vercel.app",
+          icons: ["https://avatars.githubusercontent.com/u/37784886"],
+        },
+      });
 
-        // @ts-ignore
-        setClient(c);
+      // @ts-ignore
+      setClient(c);
     };
 
     if (client === undefined) {
-        f();
+      f();
     }
     if (loadFromLocalStorage("session")) {
-        setSession(loadFromLocalStorage("session"));
+      setSession(loadFromLocalStorage("session"));
     }
     if (loadFromLocalStorage("chain")) {
-        setChain(loadFromLocalStorage("chain"));
+      setChain(loadFromLocalStorage("chain"));
     }
-}, [client]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client]);
 
   return (
     <div>
-      {/* {session ? ( */}
-      {/* Uncomment the code below */}
-        {/* <Portfolio /> */}
-      {/* ) : (
+      {session ? (
+        < Portfolio />
+      ) : (
         <Suspense fallback={<>Loading...</>}>
-          <div className='grid place-items-center'>
-            <Button className='text-white px-6' onClick={() => open()}>Connect Wallet</Button>
-          </div>
+          {/* <div className='grid place-items-center'> */}
+            {/* <Button className='text-white px-6' onClick={() => open()}>Connect Wallet</Button> */}
+          {/* </div> */}
           <InformationCard message='Connect your wallet to view your portfolio' />
         </Suspense>
-      )} */}
+      )}
     </div>
   )
 }
