@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RotateCw, Settings2, ArrowDown } from 'lucide-react'
-
+import Image from "next/image"
 
 import Client from "@walletconnect/sign-client"
 import QRCodeModal from "@walletconnect/qrcode-modal"
@@ -94,8 +94,8 @@ export default function Page() {
                 metadata: {
                     name: "BIT10",
                     description: "Empowering Your Portfolio with the Future of Finance",
-                    url: "https://bit10.vercel.app",
-                    icons: ["https://avatars.githubusercontent.com/u/37784886"],
+                    url: "bit10.app",
+                    icons: ["https://www.bit10.app/logo/logo.png"],
                 },
             });
 
@@ -137,7 +137,7 @@ export default function Page() {
 
             if (uri) {
                 QRCodeModal.open(uri, () => {
-                    // console.log("QR Code Modal closed");
+                    console.log("QR Code Modal closed");
                 });
             }
 
@@ -162,7 +162,7 @@ export default function Page() {
 
             if (uri) {
                 QRCodeModal.open(uri, () => {
-                    // console.log("QR Code Modal closed");
+                    console.log("QR Code Modal closed");
                 });
             }
 
@@ -196,18 +196,16 @@ export default function Page() {
                         amountSats: "7000",
                     },
                 ]
-                :
-                [
+                : [
                     {
                         address: "2MxGR4RG2HKpQSg9t8K5n2tHMJjidMqfvYw",
-                        amountSats: "7000",
-                    }
+                        amountSats: "3955", // 2.67
+                    },
                     // {
-                    //   address: "2Mx1h4VWiik8JNosa5nu4Gg96iPNQPJBWGa",
-                    //   amountSats: "7000",
+                    //     address: "2Mx1h4VWiik8JNosa5nu4Gg96iPNQPJBWGa",
+                    //     amountSats: "7000",
                     // },
                 ];
-
 
             // @ts-ignore
             const result = await client.request({
@@ -232,232 +230,7 @@ export default function Page() {
             });
         } catch (e) {
             // @ts-ignore
-            throw new Error(e);
-        }
-    };
-
-    const handleSignMessage = async () => {
-        // @ts-ignore
-        const address = session.namespaces.stacks.accounts[0].split(":")[2];
-        try {
-            const message = "loremipsum";
-            // @ts-ignore
-            const result = await client.request({
-                chainId: chain,
-                // @ts-ignore
-                topic: session.topic,
-                request: {
-                    method: "stacks_signMessage",
-                    params: {
-                        pubkey: address, //XXX: This one is required
-                        message,
-                    },
-                },
-            });
-
-            const publicKey = result.publicKey;
-            const signature = result.signature;
-            const valid = verifyMessageSignatureRsv({
-                message,
-                publicKey,
-                signature,
-            });
-
-            setResult({
-                // @ts-ignore
-                method: "stacks_signMessage",
-                address,
-                valid,
-                result,
-            });
-        } catch (error) {
-            // @ts-ignore
-            throw new Error(error);
-        }
-    };
-
-    const handleStructuredMessage = async () => {
-        // @ts-ignore
-        const address = session.namespaces.stacks.accounts[0].split(":")[2];
-        const domain = "0c0000000308636861696e2d69640100000000000000000000000000000001046e616d650d00000011414c4558204232302050726f746f636f6c0776657273696f6e0d00000005302e302e31";
-        try {
-            const structuredMessage = serializeCV(structuredData);
-            // @ts-ignore
-            const result = await client.request({
-                chainId: chain,
-                // @ts-ignore
-                topic: session.topic,
-                request: {
-                    method: "stacks_signMessage",
-                    params: {
-                        pubkey: address, //XXX: This one is required
-                        message: structuredMessage,
-                        domain
-                    },
-                },
-            });
-
-            setResult({
-                // @ts-ignore
-                method: "stacks_signMessage",
-                address,
-                result,
-            });
-        } catch (error) {
-            // @ts-ignore
-            throw new Error(error);
-        }
-    };
-
-    const handleContractDeploy = async () => {
-        // @ts-ignore
-        const address = session.namespaces.stacks.accounts[0].split(":")[2];
-
-        try {
-            // @ts-ignore
-            const result = await client.request({
-                chainId: chain,
-                // @ts-ignore
-                topic: session.topic,
-                request: {
-                    method: "stacks_contractDeploy",
-                    params: {
-                        pubkey: address, //XXX: This one is required
-                        contractName: "my_contract_name_3", //XXX: CHange the contract name!
-                        codeBody: `
-;; hello-world
-;; <add a description here>
-;; constants
-;;
-;; data maps and vars
-;;
-;; private functions
-;;
-(define-read-only (echo-number (val int)) (ok val))
-;; public functions
-;;
-(define-public (say-hi) (ok "hello world"))
-                    `,
-                        postConditionMode: PostConditionMode.Allow,
-                    },
-                },
-            });
-
-            setResult({
-                // @ts-ignore
-                method: "stacks_contractDeploy",
-                address,
-                valid: true,
-                result: result,
-            });
-        } catch (error) {
-            // @ts-ignore
-            throw new Error(error);
-        }
-    };
-
-    const handleTransferSTX = async () => {
-        // @ts-ignore
-        const address = session.namespaces.stacks.accounts[0].split(":")[2];
-        const isMainnet = chain == chains[0];
-        const recip = isMainnet
-            ? "SP34AVN2XCNQKYKR4KB3M1NGD6ECMHFDSWM42517E"
-            : "ST34AVN2XCNQKYKR4KB3M1NGD6ECMHFDSWN439CGE";
-        try {
-            // @ts-ignore
-            const result = await client.request({
-                chainId: chain,
-                // @ts-ignore
-                topic: session.topic,
-                request: {
-                    method: "stacks_stxTransfer",
-                    params: {
-                        pubkey: address, //XXX: This one is required
-                        recipient: recip,
-                        amount: BigInt(1000),
-                        memo: "example transfer",
-                    },
-                },
-            });
-
-            setResult({
-                // @ts-ignore
-                method: "stacks_stxTransfer",
-                address,
-                valid: true,
-                result,
-            });
-        } catch (error) {
-            // @ts-ignore
-            throw new Error(error);
-        }
-    };
-
-    const handleContractCall = async () => {
-        // @ts-ignore
-        const address = session.namespaces.stacks.accounts[0].split(":")[2];
-
-        const isMainnet = chain == chains[0];
-        const contract = isMainnet
-            ? "SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2"
-            : "ST24YYAWQ4DK4RKCKK1RP4PX0X5SCSXTWQXFGVCVY.fake-miamicoin-token-V2";
-        const [contractAddress, contractName] = contract.split(".");
-        const tokenName = "miamicoin"; //XXX: It's hidden in the contract's code but it's not hard to find.
-
-        const orderAmount = 13 * 10 ** 6; //13 miamicoin
-        const addressTo = isMainnet
-            ? "SP34AVN2XCNQKYKR4KB3M1NGD6ECMHFDSWM42517E"
-            : "ST34AVN2XCNQKYKR4KB3M1NGD6ECMHFDSWN439CGE";
-
-        // Define post conditions
-        const postConditions = [];
-        postConditions.push(
-            makeStandardFungiblePostCondition(
-                address,
-                FungibleConditionCode.Equal,
-                orderAmount.toString(),
-                createAssetInfo(contractAddress, contractName, tokenName)
-            )
-        );
-        const sponsored = false;
-
-        try {
-            // @ts-ignore
-            const result = await client.request({
-                chainId: chain,
-                // @ts-ignore
-                topic: session.topic,
-                request: {
-                    method: "stacks_contractCall",
-                    params: {
-                        pubkey: address, //XXX: This one is required
-                        postConditions,
-                        contractAddress: contractAddress,
-                        contractName: contractName,
-                        functionName: "transfer",
-                        functionArgs: [
-                            uintCV(orderAmount.toString()),
-                            standardPrincipalCV(address),
-                            standardPrincipalCV(addressTo),
-                            noneCV(),
-                        ],
-                        postConditionMode: PostConditionMode.Deny,
-                        version: "1",
-                        sponsored,
-                    },
-                },
-            });
-
-            setResult({
-                // @ts-ignore
-                method: "stacks_contractCall",
-                address,
-                valid: true,
-                result,
-            });
-        } catch (error) {
-            // @ts-ignore
-            throw new Error(error);
+            // throw new Error(e);
         }
     };
 
@@ -485,23 +258,19 @@ export default function Page() {
         }
     };
 
-
     return (
         <MaxWidthWrapper>
-            <div className='flex items-center justify-center space-x-2 py-4 max-w-[100vw]'>
-                <h1 className='text-2xl font-semibold leading-tight text-center tracking-wider lg:text-4xl md:whitespace-nowrap'>Dashboard</h1>
+            <div className='flex items-center justify-center space-x-2 max-w-[100vw]'>
+                <h1 className='text-2xl font-semibold leading-tight text-center tracking-wider lg:text-4xl md:whitespace-nowrap'>Swap</h1>
             </div>
 
             <div className='flex flex-col items-center justify-center space-y-4'>
-                <div className='text-xl'>Decentralized exchange</div>
-
                 <div>
                     {!session && (
                         <div className="box">
                             {chains.map((c, idx) => {
                                 return (
                                     <div key={`chain-${idx}`}>
-                                        {/* {c}{" "} */}
                                         <Button
                                             disabled={!client}
                                             onClick={async () => {
@@ -517,31 +286,25 @@ export default function Page() {
                     )}
 
                     {/* @ts-ignore */}
-                    {session && session.namespaces.bip122 && (
+                    {/* {session && session.namespaces.bip122 && (
                         <div className="box">
-                            {/* <h3>Wallet connected!</h3>
-                            <div>
-                                <button onClick={async () => await handleBtcTransfer()}>
-                                    Transfer btc
-                                </button>
-                            </div> */}
                             <div>
                                 <Button variant={'destructive'} onClick={async () => disconnect()}>Disconnect Wallet</Button>
                             </div>
                         </div>
-                    )}
+                    )} */}
 
-                    {result && (
+                    {/* {result && (
                         <div className="box code">
-                            {/* @ts-ignore */}
+                            Transaction Successfull! View <a href={`https://mempool.space/testnet/tx/${result}`} target="_blank" className="text-primary underline">transaction details</a>.
                             <pre>{JSON.stringify(result, "  ", "  ")}</pre>
                         </div>
-                    )}
+                    )} */}
 
                 </div>
 
                 <div className='pb-4'>
-                    <Card className="w-[300px] md:w-[380px]">
+                    <Card className="w-[300px] md:w-[450px] border-white">
                         <CardHeader>
                             <CardTitle className='flex flex-row items-center justify-between'>
                                 <div>Swap</div>
@@ -550,67 +313,52 @@ export default function Page() {
                                     <Settings2 size={16} />
                                 </div>
                             </CardTitle>
-                            <CardDescription>Decentralized exchange demo</CardDescription>
+                            <CardDescription>Bit10 exchange</CardDescription>
+                            <div className="text-center">
+                                Current Bit10.DeFi token price is $ 2.6681146
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className='rounded p-2 bg-gray-700'>
-                                <div className='flex flex-row items-center justify-between text-[0.8rem]'>
-                                    <div>From</div>
-                                    <div>Balance BTC 5.5</div>
-                                </div>
-                                <div className='flex flex-row items-center justify-between py-2'>
-                                    <div className="w-[160px]">
-                                        <Select>
-                                            <SelectTrigger id="framework">
-                                                <SelectValue placeholder="Select Token" />
-                                            </SelectTrigger>
-                                            <SelectContent position="popper">
-                                                <SelectItem value="BTC">BTC</SelectItem>
-                                                <SelectItem value="STX">STX</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
+                            <div className='rounded-lg border-2 py-2 px-6 border-white'>
+                                <p>Pay with</p>
+                                <div className="flex flex-col md:flex-row items-center justify-between py-2 space-y-2 space-x-0 md:space-y-0 md:space-x-2">
                                     <div>
-                                        1
+                                        <Input type="number" defaultValue={0.000039} placeholder="Amount in BTC" className="w-[80%] text-xl border-white" />
+                                    </div>
+                                    <div className="relative">
+                                        <div className="py-2 pr-[5.75rem] pl-4 border-2 border-white rounded-l-full mr-4 z-10">
+                                            BTC
+                                        </div>
+                                        <div className="absolute -top-1.5 right-0">
+                                            <Image src="/assets/swap/btc.svg" alt="btc" width={55} height={55} className="z-20" />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className='flex flex-row items-center justify-between text-[0.8rem]'>
-                                    <div>1 BIT10 token</div>
-                                    <div>~ 2,310.78 $</div>
+                                <div className="flex flex-col md:flex-row items-center justify-between py-2 space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm">
+                                    <div className="">$ 2.67</div>
+                                    <div className="mr-1">Balance: 0.00045128</div>
                                 </div>
                             </div>
-                            <div className='flex items-center justify-center -mt-2'>
-                                <div className='p-2 rounded-full bg-accent w-8'><ArrowDown size={16} /></div>
-                            </div>
-                            <div className='border-2 rounded p-2 -mt-2'>
-                                <div className='flex flex-row items-center justify-between text-[0.8rem]'>
-                                    <div>To(estimated)</div>
-                                    <div>Balance 0</div>
-                                </div>
-                                <div className='flex flex-row items-center justify-between py-2'>
-                                    <div className="w-[160px]">
-                                        <Select>
-                                            <SelectTrigger id="framework">
-                                                <SelectValue placeholder="Select Token" />
-                                            </SelectTrigger>
-                                            <SelectContent position="popper">
-                                                <SelectItem value="BNB">B.DeFI</SelectItem>
-                                                <SelectItem value="USDT">B.Ordi</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div>
-                                        1
+                            <div className='rounded-lg border-2 py-2 px-6 border-white mt-4'>
+                                <p>Receive</p>
+                                <div className="flex flex-row items-center justify-between py-2">
+                                    <div className="text-3xl">1</div>
+                                    <div className="relative">
+                                        <div className="py-2 pr-12 pl-4 border-2 border-white rounded-l-full mr-4 z-10">
+                                            Bit10.DeFi
+                                        </div>
+                                        <div className="absolute -top-1.5 right-0">
+                                            <Image src="/assets/swap/bit10.svg" alt="bit10" width={55} height={55} className="z-20" />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className='flex flex-row items-center justify-between text-[0.8rem]'>
-                                    <div>Tx cost ~0.0015</div>
-                                    <div>~ 2,310.7785 $</div>
+                                <div className="flex flex-row items-center justify-between py-2 text-sm">
+                                    <div className="">$ 2.67</div>
+                                    <div className="mr-1">Balance: 1</div>
                                 </div>
                             </div>
                         </CardContent>
                         <CardFooter className="flex flex-row space-x-2 w-full items-center">
-                            <Button className='w-full' variant="outline">Cancel</Button>
                             <Button
                                 className='w-full'
                                 onClick={async () => {
@@ -624,11 +372,17 @@ export default function Page() {
                                 // @ts-ignore
                                 disabled={!session || !session.namespaces || !session.namespaces.bip122}
                             >
-                                Swap
+                                Trade
                             </Button>
                         </CardFooter>
                     </Card>
                 </div>
+                {result && (
+                    <div className="text-center text-green-500">
+                        {/* Transaction Successfull! View <a href={`https://mempool.space/testnet/tx/${result}`} target="_blank" className="underline">transaction details</a>. */}
+                        Transaction Successfull! View <a href={`https://mempool.space/testnet/address/2N47aLXezNX2wsKEHQAwpSiGRrVrMgrfo2W`} target="_blank" className="underline">transaction details</a>.
+                    </div>
+                )}
             </div>
         </MaxWidthWrapper>
     )

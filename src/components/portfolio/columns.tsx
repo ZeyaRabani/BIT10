@@ -91,30 +91,30 @@ export const preformanceTableColumns: ColumnDef<PreformanceTableDataType>[] = [
             <DataTableColumnHeader column={column} title='Fees (in USD)' />
         ),
     },
-    {
-        id: 'actions',
-        header: 'Actions',
-        cell: ({ row }) => {
-            const order = row.original
+    // {
+    //     id: 'actions',
+    //     header: 'Actions',
+    //     cell: ({ row }) => {
+    //         const order = row.original
 
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant='ghost' className='h-8 w-8 p-0'>
-                            <MoreHorizontal className='h-4 w-4' />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(order.name)}
-                            className='cursor-pointer'
-                        >
-                            Copy Name
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
-        },
-    }
+    //         return (
+    //             <DropdownMenu>
+    //                 <DropdownMenuTrigger asChild>
+    //                     <Button variant='ghost' className='h-8 w-8 p-0'>
+    //                         <MoreHorizontal className='h-4 w-4' />
+    //                     </Button>
+    //                 </DropdownMenuTrigger>
+    //                 <DropdownMenuContent align='end'>
+    //                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
+    //                     <DropdownMenuItem
+    //                         onClick={() => navigator.clipboard.writeText(order.name)}
+    //                         className='cursor-pointer'
+    //                     >
+    //                         Copy Name
+    //                     </DropdownMenuItem>
+    //                 </DropdownMenuContent>
+    //             </DropdownMenu>
+    //         )
+    //     },
+    // }
 ]
