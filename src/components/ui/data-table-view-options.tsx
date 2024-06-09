@@ -12,10 +12,9 @@ interface DataTableViewOptionsProps<TData> {
 
 const formatColumnName = (columnName: string): string => {
     return columnName
-        .replace(/([a-z])([A-Z])/g, '$1 $2')
-        .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
-        .toLowerCase()
-        .replace(/^\w/, (c) => c.toUpperCase());
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
 };
 
 export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
@@ -31,7 +30,7 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                     View
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-[150px]'>
+            <DropdownMenuContent align='end' className='w-[200px]'>
                 <DropdownMenuLabel>View columns</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {table

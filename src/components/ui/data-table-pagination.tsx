@@ -8,11 +8,15 @@ interface DataTablePaginationProps<TData> {
 }
 
 export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+    const { pageIndex, pageSize } = table.getState().pagination;
+    const rowCount = table.getRowCount();
+    const startIndex = pageIndex * pageSize + 1;
+    const endIndex = Math.min((pageIndex + 1) * pageSize, rowCount);
+
     return (
         <div className='flex flex-col md:flex-row items-center justify-between px-2 w-full'>
             <div className='flex-1 text-sm text-muted-foreground'>
-                {table.getFilteredSelectedRowModel().rows.length} of{' '}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
+                Showing <strong>{startIndex}- {endIndex}</strong> of <strong>{rowCount}</strong>
             </div>
             <div className='flex flex-col md:flex-row items-center space-y-2 md:space-y-0 space-x-0 md:space-x-6 lg:space-x-8'>
                 <div className='flex items-center space-x-2 py-2'>

@@ -1,120 +1,68 @@
 "use client"
 
 import { ColumnDef } from '@tanstack/react-table'
-import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { MoreHorizontal } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 
-export type PreformanceTableDataType = {
-    settelment: string;
-    tradeDate: string;
-    symbol: string;
-    name: string;
-    quantity: number;
-    type: 'Fund Recieved' | 'Divident' | 'Reinested' | 'Buy';
-    price: number;
-    fees: number;
+export type PortfolioTableDataType = {
+    token_swap_id: string;
+    user_payment_address: string;
+    user_ordinals_address: string;
+    user_stacks_address: string;
+    token_purchase_amount: string;
+    token_purchase_name: string;
+    bit10_token_quantity: string;
+    bit10_token_name: string;
+    token_transaction_signature: string;
+    token_bought_at: Date | string;
 }
 
-export const preformanceTableColumns: ColumnDef<PreformanceTableDataType>[] = [
+export const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && 'indeterminate')
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label='Select all'
-            />
-        ),
-        cell: ({ row }) => (
-            <div className='h-4'>
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label='Select row'
-                />
-            </div>
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: 'settelment',
+        accessorKey: 'token_swap_id',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Settelment' />
+            <DataTableColumnHeader column={column} title='Swap ID' />
         ),
     },
     {
-        accessorKey: 'tradeDate',
+        accessorKey: 'token_purchase_amount',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Trade Date' />
+            <DataTableColumnHeader column={column} title='Purchase Amount' info='Amount paid for buying token' />
         ),
     },
     {
-        accessorKey: 'symbol',
+        accessorKey: 'bit10_token_quantity',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Symbol' />
+            <DataTableColumnHeader column={column} title='Quantity' info='No. of Bit10 token bought' />
         ),
     },
     {
-        accessorKey: 'name',
+        accessorKey: 'bit10_token_name',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Name' />
+            <DataTableColumnHeader column={column} title='Bit10 Token' />
         ),
     },
     {
-        accessorKey: 'quantity',
+        accessorKey: 'token_bought_at',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Quantity' />
+            <DataTableColumnHeader column={column} title='Token Bought at' />
         ),
     },
     {
-        accessorKey: 'type',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Type' />
-        ),
-    },
-    {
-        accessorKey: 'price',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Price (in USD)' />
-        ),
-    },
-    {
-        accessorKey: 'fees',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Fees (in USD)' />
-        ),
-    },
-    // {
-    //     id: 'actions',
-    //     header: 'Actions',
-    //     cell: ({ row }) => {
-    //         const order = row.original
+        id: 'view_transaction',
+        header: 'View Transaction',
+        cell: ({ row }) => {
+            const order = row.original
 
-    //         return (
-    //             <DropdownMenu>
-    //                 <DropdownMenuTrigger asChild>
-    //                     <Button variant='ghost' className='h-8 w-8 p-0'>
-    //                         <MoreHorizontal className='h-4 w-4' />
-    //                     </Button>
-    //                 </DropdownMenuTrigger>
-    //                 <DropdownMenuContent align='end'>
-    //                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-    //                     <DropdownMenuItem
-    //                         onClick={() => navigator.clipboard.writeText(order.name)}
-    //                         className='cursor-pointer'
-    //                     >
-    //                         Copy Name
-    //                     </DropdownMenuItem>
-    //                 </DropdownMenuContent>
-    //             </DropdownMenu>
-    //         )
-    //     },
-    // }
+            return (
+                <a href={order.token_purchase_name === 'BTC' ? `https://mempool.space/testnet/tx/${order.token_transaction_signature}` : `https://explorer.hiro.so/txid/${order.token_transaction_signature}?chain=testnet`} target='_blank'>
+                    <Button>
+                        View Transaction
+                        <ExternalLink className='ml-1 w-4 h-4' />
+                    </Button>
+                </a>
+            )
+        },
+    }
 ]

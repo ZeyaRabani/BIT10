@@ -1,266 +1,143 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { useWeb3Modal } from '@web3modal/wagmi/react'
-import Client from "@walletconnect/sign-client";
-import QRCodeModal from "@walletconnect/qrcode-modal";
-import { clearLocalStorage, saveToLocalStorage, loadFromLocalStorage } from "@/lib/utils";
-import { useAccount, useDisconnect } from 'wagmi'
+import { useWallet } from '@/context/WalletContext'
+import { addNewUser } from '@/actions/dbActions'
+import { toast } from 'sonner'
 import Link from 'next/link'
-import { ModeToggle } from './ModeToggle'
-import ResponsiveNavbar from './ResponsiveNavbar'
-import { useToast } from './ui/use-toast'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Button } from './ui/button'
-import { LogOut, User } from 'lucide-react'
-import { addUserToWaitlist } from '@/lib/supabaseRequests'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-
-interface NavLinkType {
-    href: string;
-    text: string;
-}
-
-const profileLinkData: NavLinkType[] = [
-    { href: '/dashboard', text: 'Swap' },
-    { href: '/portfolio', text: 'Portfolio' }
-]
+import ResponsiveNavbar from './ResponsiveNavbar'
+import { Button } from './ui/button'
+import Image from 'next/image'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 
 export default function Navbar() {
-    const [client, setClient] = useState(undefined);
-    const [chain, setChain] = useState(undefined);
-    const [session, setSession] = useState(undefined)
+    const [isHidden, setIsHidden] = useState(false);
+    const [prevScrollPos, setPrevScrollPos] = useState(0);
+    const [open, setOpen] = useState<boolean>(false);
 
-    const { address, isConnecting } = useAccount();
-    const { open } = useWeb3Modal();
-    // const { disconnect } = useDisconnect();
-
-    const { toast } = useToast();
-    const wallet_api = process.env.NEXT_PUBLIC_PROJECT_ID;
-    
+    const { isConnected, connectWallet, disconnectWallet, paymentAddress, ordinalsAddress, stacksAddress } = useWallet();
     const pathname = usePathname();
 
-    // const chains = [
-    // "stacks:1",
-    // "stacks:2147483648",
-    // "bip122:000000000019d6689c085ae165831e93",
-    // "bip122:000000000933ea01ad0ee984209779ba",
-    // ];
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollPos = window.scrollY;
+            setIsHidden(currentScrollPos > prevScrollPos && currentScrollPos > 0);
+            setPrevScrollPos(currentScrollPos);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [prevScrollPos]);
 
     useEffect(() => {
-        const f = async () => {
-            const c = await Client.init({
-                logger: 'debug',
-                relayUrl: 'wss://relay.walletconnect.com',
-                projectId: wallet_api,
-                metadata: {
-                    name: "Bit10",
-                    description: "Bit10",
-                    url: "https://www.bit10.app",
-                    icons: ["https://www.bit10.app/favicon.ico"],
-                },
-            });
-
-            // @ts-ignore
-            setClient(c);
-        }
-
-        if (client === undefined) {
-            f();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [client]);
-
-    const handleConnect = async (chain: any) => {
-        setChain(undefined);
-        if (chain.includes("stacks")) {
-            // @ts-ignore
-            const { uri, approval } = await client.connect({
-                pairingTopic: undefined,
-                requiredNamespaces: {
-                    stacks: {
-                        methods: [
-                            "stacks_signMessage",
-                            "stacks_stxTransfer",
-                            "stacks_contractCall",
-                            "stacks_contractDeploy",
-                        ],
-                        chains: [chain],
-                        events: [],
-                    },
-                },
-            });
-
-            if (uri) {
-                QRCodeModal.open(uri, () => {
-                    console.log("QR Code Modal closed");
-                });
-            }
-
-            const sessn = await approval();
-            setSession(sessn);
-            setChain(chain);
-            saveToLocalStorage("session", sessn);
-            saveToLocalStorage("chain", chain);
-            QRCodeModal.close();
-        } else {
-            // @ts-ignore
-            const { uri, approval } = await client.connect({
-                pairingTopic: undefined,
-                requiredNamespaces: {
-                    bip122: {
-                        methods: ["bitcoin_btcTransfer"],
-                        chains: [chain],
-                        events: [],
-                    },
-                },
-            });
-
-            if (uri) {
-                QRCodeModal.open(uri, () => {
-                    console.log("QR Code Modal closed");
-                });
-            }
-
-            const sessn = await approval();
-            setSession(sessn);
-            setChain(chain);
-            console.log(sessn)
-            saveToLocalStorage("session", sessn);
-            saveToLocalStorage("chain", chain);
-            QRCodeModal.close();
-        }
-    };
-
-    const disconnect = async () => {
-        clearLocalStorage();
-        // @ts-ignore
-        await client.pairing.delete(session.topic, {
-            code: 100,
-            message: "deleting",
-        });
-        setSession(undefined);
-        setChain(undefined);
-        toast({
-            title: 'Wallet Disconnected Successfully!',
-        })
-    };
-
-    useEffect(() => {
-        const addUserToWaitlistAsync = async () => {
-            if (session) {
+        const addUserToDB = async () => {
+            if (isConnected && paymentAddress && ordinalsAddress && stacksAddress) {
                 try {
-                    await addUserToWaitlist({
-                        // address: address,
-                        // @ts-ignore
-                        address: session.namespaces.bip122.accounts[0].split(':')[2],
+                    const result = await addNewUser({
+                        paymentAddress: paymentAddress.toString(),
+                        ordinalsAddress: ordinalsAddress.toString(),
+                        stacksAddress: stacksAddress.toString(),
                     });
+                    if (result === 'Error adding new user') {
+                        toast.error('An error occurred while setting up your account. Please try again!.');
+                    }
+                    // toast.success('Wallet connected successfully!');
                 } catch (error) {
-                    // console.error('Error adding user to waitlist:', error);
+                    toast.error('An error occurred while setting up your account. Please try again!.');
                 }
             }
         };
 
-        addUserToWaitlistAsync();
+        addUserToDB();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [address]);
+    }, [paymentAddress, ordinalsAddress, stacksAddress]);
 
-    // const disconnectWallet = () => {
-    //     try {
-    //         disconnect();
-    // toast({
-    //     title: 'Wallet Disconnected Successfully!',
-    // })
-    //     } catch (error) {
-    //         toast({
-    //             variant: 'destructive',
-    //             title: `${error}`,
-    //         })
-    //     }
-    // };
+    const handleWalletSelect = async () => {
+        connectWallet();
+        setOpen(false);
+    }
 
-    const renderLinksProfile = (links: any) => {
-        return links.map((link: any) => (
-            <Link key={link.href} href={link.href} passHref>
-                <div className={`pb-[0.4rem] pr-1 hover:text-primary text-[0.95rem] ${link.icon ? 'flex flex-row justify-between items-center' : ''}`}>
-                    {link.text}
-                </div>
-            </Link>
-        ));
+    const handleDisconnect = async () => {
+        disconnectWallet();
     };
 
     return (
-        <div className='backdrop-blur-xl fixed z-50 w-full'>
-            <nav className='flex items-center py-2 flex-wrap px-2.5 md:px-20 tracking-wider justify-between'>
+        <div className={`backdrop-blur-3xl fixed top-0 z-50 w-full transition-all duration-200 ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}>
+            <nav className='flex items-center py-2 flex-wrap px-2.5 md:pl-20 md:pr-2 tracking-wider justify-between'>
                 <Link href='/' passHref>
-                    {/* <div className='inline-flex items-center text-4xl md:text-5xl cursor-pointer font-base'>
-                        BIT10
-                    </div> */}
                     <Image src='/logo/logo.png' alt='logo' width={60} height={60} />
                 </Link>
 
-                <div className='hidden w-full lg:inline-flex lg:flex-grow lg:w-auto' >
-                    <div className='lg:inline-flex lg:flex-row lg:ml-auto lg:w-auto w-full lg:items-center items-start flex flex-col lg:h-auto space-x-2' >
+                <div className='hidden w-full md:inline-flex md:flex-grow md:w-auto' >
+                    <div className='md:inline-flex md:flex-row md:ml-auto md:w-auto w-full md:items-center items-start flex flex-col md:h-auto space-x-2' >
 
                         <Link href='/' passHref>
-                            <span className={`lg:inline-flex lg:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer ${pathname === '/' && 'border-b-2 border-white hover:border-none'}`}>Swap</span>
+                            <span className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary cursor-pointer ${pathname === '/' && 'border-b-2 border-white hover:border-none'}`}>Swap</span>
                         </Link>
 
                         <Link href='/portfolio' passHref>
-                            <span className={`lg:inline-flex lg:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer ${pathname === '/portfolio' && 'border-b-2 border-white hover:border-none'}`}>Portfolio</span>
+                            <span className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary cursor-pointer ${pathname === '/portfolio' && 'border-b-2 border-white hover:border-none'}`}>Portfolio</span>
                         </Link>
 
                         <Link href='/about' passHref>
-                            <span className={`lg:inline-flex lg:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer ${pathname === '/about' && 'border-b-2 border-white hover:border-none'}`}>About</span>
+                            <span className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary cursor-pointer ${pathname === '/about' && 'border-b-2 border-white hover:border-none'}`}>About</span>
                         </Link>
 
                     </div>
                 </div>
 
-                <div className='hidden w-full lg:inline-flex lg:flex-grow lg:w-auto' >
-                    <div className='lg:inline-flex lg:flex-row lg:ml-auto lg:w-auto w-full lg:items-center items-start flex flex-col lg:h-auto space-x-2' >
+                <div className='hidden w-full md:inline-flex md:flex-grow md:w-auto' >
+                    <div className='md:inline-flex md:flex-row md:ml-auto md:w-auto w-full md:items-center items-start flex flex-col md:h-auto space-x-2' >
 
-                        {/* <Link href='/dashboard' passHref>
-                            <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Dashboard</span>
-                        </Link>
-
-                        <Link href='/portfolio' passHref>
-                            <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Portfolio</span>
-                        </Link> */}
-
-                        {/* <Link href='/regulatory-compliance' passHref>
-                            <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Regulatory Compliance</span>
-                        </Link>
-
-                        <Link href='/sign-up' passHref>
-                            <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Sign Up for Early User</span>
-                        </Link>
-
-                        <Link href='/contact' passHref>
-                            <span className='lg:inline-flex lg:w-auto w-full px-3 py-2 rounded items-center justify-center hover:bg-primary hover:text-white cursor-pointer'>Contact Us</span>
-                        </Link> */}
-
-                        {session ? (
-                            // {/* {address ? ( */}
-                            <Button variant='destructive' onClick={() => disconnect()}>
-                                Disconnect
-                            </Button>
+                        {isConnected ? (
+                            <Button variant='destructive' onClick={handleDisconnect}>Disconnect wallet</Button>
                         ) : (
-                            <>
-                                <Button className='text-white px-6' onClick={async () => await handleConnect('bip122:000000000933ea01ad0ee984209779ba')}>Connect Wallet</Button>
-                                {/* <Button className='text-white px-6' onClick={() => open()}>Connect Wallet</Button> */}
-                                {/* {
-                                    !session && (
-                                        <div className="box">
-                                            <h3>Select chain:</h3>
-                                            {chains.map((c, idx) => {
-                                                return (<div key={`chain-${idx}`}>{c} <button disabled={!client} onClick={async () => await handleConnect(c)}>connect</button></div>);
-                                            })}
+                            <Dialog open={open} onOpenChange={setOpen}>
+                                <DialogTrigger asChild>
+                                    <Button>
+                                        Connect Wallet
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className='max-w-[90vw] md:max-w-[400px]'>
+                                    <div className='flex flex-col space-y-4'>
+                                        <p className='text-lg text-center'>Connect your wallet to get started</p>
+                                        <div className='flex flex-col space-y-2'>
+                                            <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent' onClick={handleWalletSelect}>
+                                                <Image height='30' width='30' src='/assets/wallet/xverse.svg' alt='Xverse' className='rounded' />
+                                                <div className='text-lg md:text-xl'>
+                                                    Xverse
+                                                </div>
+                                            </Button>
+                                            <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
+                                                <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
+                                                    <Image height='30' width='30' src='/assets/wallet/unisat.svg' alt='UniSat' className='rounded' />
+                                                    <div className='text-lg md:text-xl'>
+                                                        UniSat
+                                                    </div>
+                                                </div>
+                                                <div className='text-sm text-accent-foreground/80'>
+                                                    Available soon
+                                                </div>
+                                            </Button>
+                                            <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
+                                                <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
+                                                    <Image height='30' width='30' src='/assets/wallet/phantom.svg' alt='Phantom' className='rounded' />
+                                                    <div className='text-lg md:text-xl'>
+                                                        Phantom
+                                                    </div>
+                                                </div>
+                                                <div className='text-sm text-accent-foreground/80'>
+                                                    Available soon
+                                                </div>
+                                            </Button>
                                         </div>
-                                    )
-                                } */}
-                            </>
+                                    </div>
+
+                                    <p className='py-2 text-center'>By connecting a wallet, you agree to Bit10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                                </DialogContent>
+                            </Dialog>
                         )}
 
                     </div>
@@ -268,11 +145,10 @@ export default function Navbar() {
                 </div>
 
                 <div className='flex space-x-2 justify-between items-center ml-2'>
-                    {/* <ModeToggle /> */}
                     <ResponsiveNavbar />
                 </div>
 
             </nav>
         </div>
-    )
+    );
 }

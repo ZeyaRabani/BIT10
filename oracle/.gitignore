@@ -11,7 +11,7 @@
 .dfx/
 
 # generated files
-src/declarations/
+**/declarations/
 
 # rust
 target/
@@ -19,6 +19,7 @@ target/
 # frontend code
 node_modules/
 dist/
+.svelte-kit/
 
 # environment variables
 .env

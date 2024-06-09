@@ -1,4 +1,5 @@
 [workspace]
 members = [
-    "src/bit10_oracle_backend",
+    "src/oracle_backend"
 ]
+resolver = "2"

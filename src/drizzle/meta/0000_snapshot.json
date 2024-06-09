@@ -1,0 +1,254 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "6",
+  "dialect": "postgresql",
+  "tables": {
+    "public.user_signups2": {
+      "name": "user_signups2",
+      "schema": "",
+      "columns": {
+        "newsletter_subscribers_id": {
+          "name": "newsletter_subscribers_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "newsletter_subscribers_email_key2": {
+          "columns": [
+            "email"
+          ],
+          "nullsNotDistinct": false,
+          "name": "newsletter_subscribers_email_key2"
+        }
+      }
+    },
+    "public.waitlist_address": {
+      "name": "waitlist_address",
+      "schema": "",
+      "columns": {
+        "waitlist_address_id": {
+          "name": "waitlist_address_id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "waitlist_address_address_key": {
+          "columns": [
+            "address"
+          ],
+          "nullsNotDistinct": false,
+          "name": "waitlist_address_address_key"
+        }
+      }
+    },
+    "public.user_signups": {
+      "name": "user_signups",
+      "schema": "",
+      "columns": {
+        "newsletter_subscribers_id": {
+          "name": "newsletter_subscribers_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "newsletter_subscribers_email_key": {
+          "columns": [
+            "email"
+          ],
+          "nullsNotDistinct": false,
+          "name": "newsletter_subscribers_email_key"
+        }
+      }
+    },
+    "public.old_user_sign_up": {
+      "name": "old_user_sign_up",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_name": {
+          "name": "user_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_email": {
+          "name": "user_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_twitter": {
+          "name": "user_twitter",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_sign_up_user_email_key": {
+          "columns": [
+            "user_email"
+          ],
+          "nullsNotDistinct": false,
+          "name": "user_sign_up_user_email_key"
+        },
+        "user_sign_up_user_twitter_key": {
+          "columns": [
+            "user_twitter"
+          ],
+          "nullsNotDistinct": false,
+          "name": "user_sign_up_user_twitter_key"
+        }
+      }
+    }
+  },
+  "enums": {
+    "auth.aal_level": {
+      "name": "aal_level",
+      "values": [
+        "aal1",
+        "aal2",
+        "aal3"
+      ],
+      "schema": "auth"
+    },
+    "auth.code_challenge_method": {
+      "name": "code_challenge_method",
+      "values": [
+        "s256",
+        "plain"
+      ],
+      "schema": "auth"
+    },
+    "auth.factor_status": {
+      "name": "factor_status",
+      "values": [
+        "unverified",
+        "verified"
+      ],
+      "schema": "auth"
+    },
+    "auth.factor_type": {
+      "name": "factor_type",
+      "values": [
+        "totp",
+        "webauthn"
+      ],
+      "schema": "auth"
+    },
+    "auth.one_time_token_type": {
+      "name": "one_time_token_type",
+      "values": [
+        "confirmation_token",
+        "reauthentication_token",
+        "recovery_token",
+        "email_change_token_new",
+        "email_change_token_current",
+        "phone_change_token"
+      ],
+      "schema": "auth"
+    },
+    "pgsodium.key_status": {
+      "name": "key_status",
+      "values": [
+        "default",
+        "valid",
+        "invalid",
+        "expired"
+      ],
+      "schema": "pgsodium"
+    },
+    "pgsodium.key_type": {
+      "name": "key_type",
+      "values": [
+        "aead-ietf",
+        "aead-det",
+        "hmacsha512",
+        "hmacsha256",
+        "auth",
+        "shorthash",
+        "generichash",
+        "kdf",
+        "secretbox",
+        "secretstream",
+        "stream_xchacha20"
+      ],
+      "schema": "pgsodium"
+    },
+    "realtime.action": {
+      "name": "action",
+      "values": [
+        "INSERT",
+        "UPDATE",
+        "DELETE",
+        "TRUNCATE",
+        "ERROR"
+      ],
+      "schema": "realtime"
+    },
+    "realtime.equality_op": {
+      "name": "equality_op",
+      "values": [
+        "eq",
+        "neq",
+        "lt",
+        "lte",
+        "gt",
+        "gte",
+        "in"
+      ],
+      "schema": "realtime"
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {}
+  }
+}

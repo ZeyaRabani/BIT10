@@ -1,0 +1,3 @@
+service : {
+    "bit_10_oracle": () -> (text);
+}

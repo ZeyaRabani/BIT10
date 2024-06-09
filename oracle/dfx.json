@@ -1,12 +1,19 @@
 {
   "canisters": {
-    "bit10_oracle_backend": {
-      "candid": "src/bit10_oracle_backend/bit10_oracle_backend.did",
-      "package": "bit10_oracle_backend",
+    "oracle_backend": {
+      "candid": "src/oracle_backend/oracle_backend.did",
+      "package": "oracle_backend",
       "type": "rust"
     }
   },
   "defaults": {
+    "bitcoin": {
+      "enabled": true,
+      "log_level": "info",
+      "nodes": [
+        "127.0.0.1:18444"
+      ]
+    },
     "build": {
       "args": "",
       "packtool": ""
