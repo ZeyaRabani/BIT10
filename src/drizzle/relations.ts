@@ -1,5 +1,16 @@
 import { relations } from 'drizzle-orm/relations'
-import { users, token_swap } from './schema'
+import { te_users, te_token_swap, users, token_swap } from './schema'
+
+export const te_token_swapRelations = relations(te_token_swap, ({ one }) => ({
+	te_user: one(te_users, {
+		fields: [te_token_swap.user_principal_id],
+		references: [te_users.user_principal_id]
+	}),
+}));
+
+export const te_usersRelations = relations(te_users, ({ many }) => ({
+	te_token_swaps: many(te_token_swap),
+}));
 
 export const token_swapRelations = relations(token_swap, ({ one }) => ({
 	user_user_ordinals_address: one(users, {

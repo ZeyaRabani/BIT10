@@ -52,7 +52,7 @@ export default function Page() {
                 <Image src='/logo/logo.png' height={80} width={80} alt='img' />
             </div>
             <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10'>
-                <Card className='w-[90vw] md:w-[550px] md:px-6 bg-opacity-50 bg-white font-readex'>
+                <Card className='w-[90vw] md:w-[550px] md:px-6 bg-opacity-50 bg-white'>
                     <CardHeader>
                         <CardTitle className='text-black text-4xl md:text-5xl text-center'>BIT10</CardTitle>
                         <CardDescription className='text-black text-lg pt-8'>

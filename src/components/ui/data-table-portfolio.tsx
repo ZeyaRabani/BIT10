@@ -10,17 +10,13 @@ import { Search, X } from 'lucide-react'
 
 export type PortfolioTableDataType = {
     token_swap_id: string;
-    user_payment_address: string;
-    user_ordinals_address: string;
-    user_stacks_address: string;
+    user_principal_id: string;
     token_purchase_amount: string;
     token_purchase_name: string;
     bit10_token_quantity: string;
     bit10_token_name: string;
-    token_transaction_signature: string;
+    token_transaction_status: string;
     token_bought_at: Date | string;
-    newsletter_subscribers_id?: number;
-    email?: string;
 }
 
 interface DataTableProps<TData> {

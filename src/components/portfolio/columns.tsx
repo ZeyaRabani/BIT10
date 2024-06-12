@@ -2,19 +2,15 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
-import { Button } from '@/components/ui/button'
-import { ExternalLink } from 'lucide-react'
 
 export type PortfolioTableDataType = {
     token_swap_id: string;
-    user_payment_address: string;
-    user_ordinals_address: string;
-    user_stacks_address: string;
+    user_principal_id: string;
     token_purchase_amount: string;
     token_purchase_name: string;
     bit10_token_quantity: string;
     bit10_token_name: string;
-    token_transaction_signature: string;
+    token_transaction_status: string;
     token_bought_at: Date | string;
 }
 
@@ -34,13 +30,13 @@ export const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
         accessorKey: 'bit10_token_quantity',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Quantity' info='No. of Bit10 token bought' />
+            <DataTableColumnHeader column={column} title='Quantity' info='No. of BIT10 token bought' />
         ),
     },
     {
         accessorKey: 'bit10_token_name',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Bit10 Token' />
+            <DataTableColumnHeader column={column} title='BIT10 Token' />
         ),
     },
     {
@@ -50,19 +46,9 @@ export const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
         ),
     },
     {
-        id: 'view_transaction',
-        header: 'View Transaction',
-        cell: ({ row }) => {
-            const order = row.original
-
-            return (
-                <a href={order.token_purchase_name === 'BTC' ? `https://mempool.space/testnet/tx/${order.token_transaction_signature}` : `https://explorer.hiro.so/txid/${order.token_transaction_signature}?chain=testnet`} target='_blank'>
-                    <Button>
-                        View Transaction
-                        <ExternalLink className='ml-1 w-4 h-4' />
-                    </Button>
-                </a>
-            )
-        },
+        accessorKey: 'token_transaction_status',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Transaction Status' />
+        ),
     }
 ]

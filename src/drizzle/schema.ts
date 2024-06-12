@@ -1,4 +1,4 @@
-import { pgTable, unique, pgEnum, bigint, text, serial, varchar, timestamp, primaryKey } from 'drizzle-orm/pg-core'
+import { pgTable, unique, pgEnum, bigint, text, timestamp, serial, varchar, primaryKey } from 'drizzle-orm/pg-core'
 
 export const aal_level = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const code_challenge_method = pgEnum('code_challenge_method', ['s256', 'plain'])
@@ -21,6 +21,18 @@ export const waitlist_address = pgTable('waitlist_address', {
 		}
 	});
 
+export const te_users = pgTable('te_users', {
+	user_id: text('user_id').primaryKey().notNull(),
+	user_principal_id: text('user_principal_id').notNull(),
+	created_at: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
+},
+	(table) => {
+		return {
+			te_users_user_id_key: unique('te_users_user_id_key').on(table.user_id),
+			te_users_user_principal_id_key: unique('te_users_user_principal_id_key').on(table.user_principal_id),
+		}
+	});
+
 export const user_signups = pgTable('user_signups', {
 	newsletter_subscribers_id: serial('newsletter_subscribers_id').primaryKey().notNull(),
 	email: varchar('email', { length: 255 }).notNull(),
@@ -31,6 +43,23 @@ export const user_signups = pgTable('user_signups', {
 		}
 	});
 
+export const te_token_swap = pgTable('te_token_swap', {
+	token_swap_id: text('token_swap_id').primaryKey().notNull(),
+	user_principal_id: text('user_principal_id').notNull().references(() => te_users.user_principal_id),
+	token_purchase_amount: text('token_purchase_amount').notNull(),
+	token_purchase_name: text('token_purchase_name').notNull(),
+	token_purchase_usd_amount: text('token_purchase_usd_amount').notNull(),
+	bit10_token_quantity: text('bit10_token_quantity').notNull(),
+	bit10_token_name: text('bit10_token_name').notNull(),
+	token_transaction_status: text('token_transaction_status').notNull(),
+	token_bought_at: timestamp('token_bought_at', { withTimezone: true, mode: 'string' }).notNull(),
+},
+	(table) => {
+		return {
+			te_token_swap_token_swap_id_key: unique('te_token_swap_token_swap_id_key').on(table.token_swap_id),
+		}
+	});
+
 export const token_swap = pgTable('token_swap', {
 	token_swap_id: text('token_swap_id').primaryKey().notNull(),
 	user_payment_address: text('user_payment_address').notNull().references(() => users.user_payment_address),
@@ -38,12 +67,17 @@ export const token_swap = pgTable('token_swap', {
 	user_stacks_address: text('user_stacks_address').notNull().references(() => users.user_stacks_address),
 	token_purchase_amount: text('token_purchase_amount').notNull(),
 	token_purchase_name: text('token_purchase_name').notNull(),
-	token_purchase_usd_amount: text('token_purchase_usd_amount').notNull(),
 	bit10_token_quantity: text('bit10_token_quantity').notNull(),
 	bit10_token_name: text('bit10_token_name').notNull(),
 	token_transaction_signature: text('token_transaction_signature').notNull(),
 	token_bought_at: timestamp('token_bought_at', { withTimezone: true, mode: 'string' }).notNull(),
-});
+	token_purchase_usd_amount: text('token_purchase_usd_amount').notNull(),
+},
+	(table) => {
+		return {
+			token_swap_token_swap_id_key: unique('token_swap_token_swap_id_key').on(table.token_swap_id),
+		}
+	});
 
 export const users = pgTable('users', {
 	user_id: text('user_id').notNull(),

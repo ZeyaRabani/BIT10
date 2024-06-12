@@ -88,7 +88,7 @@ export default function Page() {
                 const result = await Promise.all(coinbaseRequests);
                 setCoinbaseData(result);
             } catch (error) {
-                toast.error('Error fetching Bit10 price. Please try again!');
+                toast.error('Error fetching BIT10 price. Please try again!');
             }
         };
 
@@ -104,7 +104,7 @@ export default function Page() {
 
                 setCoinMarketCapData(prices);
             } catch (error) {
-                toast.error('Error fetching Bit10 price. Please try again!');
+                toast.error('Error fetching BIT10 price. Please try again!');
             }
         };
 

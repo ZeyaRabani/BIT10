@@ -16,7 +16,7 @@ export default function Navbar() {
     const [prevScrollPos, setPrevScrollPos] = useState(0);
     const [open, setOpen] = useState<boolean>(false);
 
-    const { isConnected, connectWallet, disconnectWallet, paymentAddress, ordinalsAddress, stacksAddress } = useWallet();
+    const { isConnected, connectWallet, disconnectWallet, principalId } = useWallet();
     const pathname = usePathname();
 
     useEffect(() => {
@@ -33,12 +33,10 @@ export default function Navbar() {
 
     useEffect(() => {
         const addUserToDB = async () => {
-            if (isConnected && paymentAddress && ordinalsAddress && stacksAddress) {
+            if (isConnected && principalId) {
                 try {
                     const result = await addNewUser({
-                        paymentAddress: paymentAddress.toString(),
-                        ordinalsAddress: ordinalsAddress.toString(),
-                        stacksAddress: stacksAddress.toString(),
+                        principalId: principalId.toString(),
                     });
                     if (result === 'Error adding new user') {
                         toast.error('An error occurred while setting up your account. Please try again!.');
@@ -52,7 +50,7 @@ export default function Navbar() {
 
         addUserToDB();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [paymentAddress, ordinalsAddress, stacksAddress]);
+    }, [principalId]);
 
     const handleWalletSelect = async () => {
         connectWallet();
@@ -105,9 +103,20 @@ export default function Navbar() {
                                         <p className='text-lg text-center'>Connect your wallet to get started</p>
                                         <div className='flex flex-col space-y-2'>
                                             <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent' onClick={handleWalletSelect}>
-                                                <Image height='30' width='30' src='/assets/wallet/xverse.svg' alt='Xverse' className='rounded' />
+                                                <Image height='30' width='30' src='/assets/wallet/plug.svg' alt='Plug' className='rounded' />
                                                 <div className='text-lg md:text-xl'>
-                                                    Xverse
+                                                    Plug
+                                                </div>
+                                            </Button>
+                                            <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
+                                                <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
+                                                    <Image height='30' width='30' src='/assets/wallet/xverse.svg' alt='Xverse' className='rounded' />
+                                                    <div className='text-lg md:text-xl'>
+                                                        Xverse
+                                                    </div>
+                                                </div>
+                                                <div className='text-sm text-accent-foreground/80'>
+                                                    Available soon
                                                 </div>
                                             </Button>
                                             <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
@@ -135,7 +144,7 @@ export default function Navbar() {
                                         </div>
                                     </div>
 
-                                    <p className='py-2 text-center'>By connecting a wallet, you agree to Bit10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                                    <p className='py-2 text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
                                 </DialogContent>
                             </Dialog>
                         )}

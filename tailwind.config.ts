@@ -99,6 +99,10 @@ const config = {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
         },
+        rotate360: {
+          from: { transform: 'rotate(0deg)' },
+          to: { transform: 'rotate(-360deg)' },
+        },
         'load': {
           '0%': {
             boxShadow: `
@@ -160,6 +164,7 @@ const config = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'spin-slow': 'spin 3s linear infinite',
+        'spin-fast': 'spin 0.5s linear',
         'fade-in-down': 'fade-in-down 0.2s forwards ease-out',
         'fade-out-up': 'fade-out-up 0.2s forwards ease-out',
         'fade-in-down-nav': 'fade-in-down 0.2s ease-out',
@@ -169,6 +174,7 @@ const config = {
         'fade-right': 'fade-right 0.2s ease-out',
         'fade-left-slow': 'fade-left 0.6s ease-out',
         'fade-right-slow': 'fade-right 0.6s ease-out',
+        'rotate360': 'rotate360 0.5s linear',
         'preloader': 'round 1.7s infinite ease, load 1.7s infinite ease'
       },
     },

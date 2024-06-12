@@ -18,7 +18,7 @@ export default function Page() {
         </Suspense>
       ) : (
         <Suspense fallback={<Preloader />}>
-          <InformationCard message='Connect your wallet to buy Bit10 tokens' />
+          <InformationCard message='Connect your wallet to buy BIT10 tokens' />
         </Suspense>
       )}
     </MaxWidthWrapper>
