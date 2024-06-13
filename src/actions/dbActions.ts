@@ -1,11 +1,12 @@
 "use server"
 
 import { db } from '@/db/db'
-import { user_signups, te_users, te_token_swap } from '@/db/schema'
+import { user_signups, te_users, te_token_swap, te_request_btc } from '@/db/schema'
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
 
 interface NewTokenSwap {
+    newTokenSwapId: string;
     principalId: string;
     paymentAmount: string;
     paymentName: string;
@@ -55,11 +56,11 @@ export const addNewUser = async ({ principalId }: { principalId: string }) => {
     }
 };
 
-export const newTokenSwap = async ({ principalId, paymentAmount, paymentName, paymentAmountUSD, bit10tokenQuantity, bit10tokenName }: NewTokenSwap) => {
+export const newTokenSwap = async ({ newTokenSwapId, principalId, paymentAmount, paymentName, paymentAmountUSD, bit10tokenQuantity, bit10tokenName }: NewTokenSwap) => {
     try {
-        const uuid = crypto.randomBytes(16).toString('hex');
-        const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
-        const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
+        // const uuid = crypto.randomBytes(16).toString('hex');
+        // const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+        // const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
 
         await db.insert(te_token_swap).values({
             token_swap_id: newTokenSwapId,
@@ -112,5 +113,35 @@ export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: s
         return data;
     } catch (error) {
         return 'Error fetching user recent activity';
+    }
+}
+
+export const requestBIT10BTC = async ({ email, principalId }: { email: string, principalId: string }) => {
+    try {
+        await db.insert(te_request_btc).values({
+            email: email,
+            user_principal_id: principalId
+        });
+        return 'Request added successfully';
+    } catch (error) {
+        return 'Error adding request';
+    }
+};
+
+export const swapDetails = async ({ swapId }: { swapId: string }) => {
+    try {
+        const data = await db.select({
+            token_swap_id: te_token_swap.token_swap_id,
+            user_principal_id: te_token_swap.user_principal_id,
+            token_purchase_amount: te_token_swap.token_purchase_amount,
+            token_purchase_name: te_token_swap.token_purchase_name,
+            token_transaction_status: te_token_swap.token_transaction_status,
+            token_bought_at: te_token_swap.token_bought_at,
+        })
+            .from(te_token_swap)
+            .where(eq(te_token_swap.token_swap_id, swapId));
+        return data;
+    } catch (error) {
+        return 'Error fetching swap details';
     }
 }

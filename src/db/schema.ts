@@ -1,4 +1,4 @@
-import { pgTable, unique, pgEnum, bigint, text, timestamp, serial, varchar, primaryKey } from 'drizzle-orm/pg-core'
+import { pgTable, unique, pgEnum, bigint, text, timestamp, serial, varchar, boolean, primaryKey } from 'drizzle-orm/pg-core'
 
 export const aal_level = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const code_challenge_method = pgEnum('code_challenge_method', ['s256', 'plain'])
@@ -59,6 +59,13 @@ export const te_token_swap = pgTable('te_token_swap', {
 			te_token_swap_token_swap_id_key: unique('te_token_swap_token_swap_id_key').on(table.token_swap_id),
 		}
 	});
+
+export const te_request_btc = pgTable('te_request_btc', {
+	request_id: serial('request_id').primaryKey().notNull(),
+	email: varchar('email', { length: 255 }).notNull(),
+	user_principal_id: text('user_principal_id').notNull(),
+	btc_sent: boolean('btc_sent').default(false),
+});
 
 export const token_swap = pgTable('token_swap', {
 	token_swap_id: text('token_swap_id').primaryKey().notNull(),

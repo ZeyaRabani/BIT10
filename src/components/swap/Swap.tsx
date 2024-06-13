@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10_btc.did'
+import crypto from 'crypto'
 import { newTokenSwap } from '@/actions/dbActions'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Button } from '@/components/ui/button'
@@ -69,8 +70,8 @@ export default function Swap() {
 
         fetchData();
 
-        // const intervalId = setInterval(fetchData, 30000);
-        // return () => clearInterval(intervalId);
+        const intervalId = setInterval(fetchData, 30000);
+        return () => clearInterval(intervalId);
     }, []);
 
     useEffect(() => {
@@ -173,13 +174,31 @@ export default function Swap() {
 
                 const transfer = await actor.icrc1_transfer(args);
                 if (transfer.Ok && principalId) {
+                    const uuid = crypto.randomBytes(16).toString('hex');
+                    const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+                    const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
+
                     const result = await newTokenSwap({
+                        newTokenSwapId: newTokenSwapId,
                         principalId: principalId,
                         paymentAmount: ((parseInt(values.bit10_amount) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)).toFixed(6),
                         paymentName: 'BIT10.BTC',
                         paymentAmountUSD: (parseInt(values.bit10_amount) * parseFloat(totalSum.toFixed(4))).toFixed(4),
                         bit10tokenQuantity: (values.bit10_amount).toString(),
                         bit10tokenName: 'BIT10.DEFI'
+                    });
+
+                    await fetch('/bit10-defi-request', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            newTokenSwapId: newTokenSwapId,
+                            principalId: principalId,
+                            bit10tokenQuantity: (values.bit10_amount).toString(),
+                            bit10tokenBoughtAt: new Date().toISOString(),
+                        }),
                     });
                     if (result === 'Token swap added successfully') {
                         toast.success('Token swap was successful!');
@@ -308,7 +327,7 @@ export default function Swap() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className='flex flex-row space-x-2 w-full items-center'>
-                                    <Button className='w-full' disabled={!isConnected || swaping} >
+                                    <Button className='w-full' disabled={!isConnected || swaping || ((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) < 0.00003 || Number.isNaN((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount))} >
                                         {swaping && <Loader2 className='animate-spin mr-2' size={15} />}
                                         {swaping ? 'Trading...' : 'Trade'}
                                     </Button>

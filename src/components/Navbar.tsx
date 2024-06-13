@@ -70,19 +70,23 @@ export default function Navbar() {
 
                 <div className='hidden w-full md:inline-flex md:flex-grow md:w-auto' >
                     <div className='md:inline-flex md:flex-row md:ml-auto md:w-auto w-full md:items-center items-start flex flex-col md:h-auto space-x-2' >
-
                         <Link href='/' passHref>
-                            <span className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary cursor-pointer ${pathname === '/' && 'border-b-2 border-white hover:border-none'}`}>Swap</span>
+                            <span className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary cursor-pointer ${pathname === '/' && 'border-b-2 border-white hover:border-transparent'}`}>
+                                Swap
+                            </span>
                         </Link>
 
                         <Link href='/portfolio' passHref>
-                            <span className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary cursor-pointer ${pathname === '/portfolio' && 'border-b-2 border-white hover:border-none'}`}>Portfolio</span>
+                            <span className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary cursor-pointer ${pathname === '/portfolio' && 'border-b-2 border-white hover:border-transparent'}`}>
+                                Portfolio
+                            </span>
                         </Link>
 
                         <Link href='/about' passHref>
-                            <span className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary cursor-pointer ${pathname === '/about' && 'border-b-2 border-white hover:border-none'}`}>About</span>
+                            <span className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:bg-primary cursor-pointer ${pathname === '/about' && 'border-b-2 border-white hover:border-transparent'}`}>
+                                About
+                            </span>
                         </Link>
-
                     </div>
                 </div>
 

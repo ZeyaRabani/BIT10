@@ -152,9 +152,20 @@ export function DataTable<TData, TValue>({
                                                             {formatDate((flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactElement<any>).props.cell.renderValue())}
                                                         </>
                                                     ) : (
-                                                        <>
-                                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                        </>
+                                                        cell.id === `${row.id}_bit10_token_name` ? (
+                                                            <>
+                                                                <div className='flex flex-row items-center'>
+                                                                    <div className='flex flex-row space-x-1'>
+                                                                        <span>{row.original.bit10_token_quantity}</span>
+                                                                        <span>{row.original.bit10_token_name}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                            </>
+                                                        )
                                                     )
                                                 )}
                                         </TableCell>

@@ -12,7 +12,7 @@ import Link from 'next/link'
 import { Tooltip as ShadcnTooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Badge } from '@/components/ui/badge'
 import clsx from 'clsx'
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
+import { LineChart, PieChart, Pie, Tooltip, Cell, Label, TooltipProps, Line, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 import { performanceDataMonthly, performanceDataWeekly } from './performanceData'
 import { RotateCcw } from 'lucide-react'
 import { PortfolioTableDataType, portfolioTableColumns } from './columns'
@@ -28,6 +28,17 @@ interface UserPortfolioType {
 }
 
 type Tab = 'monthly' | 'weekly';
+
+const data02 = [
+    { name: 'ICP', value: 16.66 },
+    { name: 'STX', value: 16.66 },
+    { name: 'CFX', value: 16.66 },
+    { name: 'MAPO', value: 16.66 },
+    { name: 'RIF', value: 16.66 },
+    { name: 'SOV', value: 16.66 },
+];
+
+const colors = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366'];
 
 export default function Portfolio() {
     const [loading, setLoading] = useState(true);
@@ -173,6 +184,23 @@ export default function Portfolio() {
         return `${id.slice(0, 4)}...${id.slice(-3)}`;
     };
 
+    const CustomPieChartTooltip: React.FC<TooltipProps<any, any>> = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            const colorClasses = ['text-[#ff0066]', 'text-[#ff8c1a]', 'text-[#1a1aff]', 'text-[#ff1aff]', 'text-[#3385ff]', 'text-[#ffa366]'];
+            return (
+                <div className='bg-white p-2 rounded'>
+                    {payload.map((entry: any, index: number) => (
+                        <div key={`item-${index}`} className={`text-sm tracking-wide ${colorClasses[index]}`}>
+                            {entry.name}: {entry.value.toFixed(2)}%
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
+        return null;
+    }
+
     const handleTabClick = (tab: Tab) => {
         setActiveTab(tab);
     };
@@ -225,7 +253,7 @@ export default function Portfolio() {
     };
 
     return (
-        <MaxWidthWrapper className='md:py-4'>
+        <MaxWidthWrapper className='pb-4 md:pt-4'>
             {loading ? (
                 <div className='flex flex-col space-y-4'>
                     <div className='flex flex-col lg:grid lg:grid-cols-3 space-y-2 lg:space-y-0 space-x-0 lg:space-x-4'>
@@ -266,7 +294,8 @@ export default function Portfolio() {
                             <Link href='/'>Buy BIT10 Token</Link>
                         </Button>
                     </div>
-                    <div className='flex flex-col lg:grid lg:grid-cols-3 space-y-2 lg:space-y-0 space-x-0 lg:space-x-4'>
+
+                    <div className='flex flex-col lg:grid lg:grid-cols-4 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
                         <Card className='border-white w-full lg:col-span-1'>
                             <CardHeader>
                                 <div className='text-2xl md:text-4xl text-center md:text-start'>Your Current Balance</div>
@@ -275,29 +304,33 @@ export default function Portfolio() {
                                 <TooltipProvider>
                                     <ShadcnTooltip delayDuration={300}>
                                         <div className='flex flex-row items-center justify-start space-x-2'>
-                                            <TooltipTrigger asChild>
-                                                <div className='flex flex-row items-end space-x-2'>
+                                            <div className='flex flex-row items-end space-x-2'>
+                                                <TooltipTrigger asChild>
                                                     <p className='text-4xl font-semibold'>{totalPurchaseBit10Token} BIT10</p>
-                                                    <p className='text-xl font-semibold'>~ $ {(totalPurchaseBit10Token * totalSum).toFixed(2)}</p>
-                                                </div>
-                                            </TooltipTrigger>
+                                                </TooltipTrigger>
+                                            </div>
                                             <TooltipContent className={totalPurchaseBit10Token === 0 ? 'hidden' : 'block'}>
                                                 <p>BIT10 Token Current Value: $ {(totalPurchaseBit10Token * totalSum).toFixed(4)}</p>
                                                 <p>Initial Investment in BIT10 Tokens: ${totalPurchaseUSD.toFixed(4)}</p>
                                             </TooltipContent>
-                                            {!isNaN(((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) / totalPurchaseUSD) &&
-                                                <Badge variant={(totalPurchaseBit10Token * totalSum) - totalPurchaseUSD >= 0 ? 'success' : 'destructive'} className='flex flex-row space-x-1'>
-                                                    <div>
-                                                        {((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) >= 0 ? '+' : '-'}
-                                                    </div>
-                                                    <div>
-                                                        {Math.abs((((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) / totalPurchaseUSD) * 100).toFixed(2)}%
-                                                    </div>
-                                                </Badge>
-                                            }
+                                            <div>
+                                                {!isNaN(((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) / totalPurchaseUSD) &&
+                                                    <Badge variant={(totalPurchaseBit10Token * totalSum) - totalPurchaseUSD >= 0 ? 'success' : 'destructive'} className='flex flex-row space-x-1'>
+                                                        <div>
+                                                            {((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) >= 0 ? '+' : '-'}
+                                                        </div>
+                                                        <div>
+                                                            {Math.abs((((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) / totalPurchaseUSD) * 100).toFixed(2)}%
+                                                        </div>
+                                                    </Badge>
+                                                }
+                                            </div>
                                         </div>
                                     </ShadcnTooltip>
                                 </TooltipProvider>
+                                <div>
+                                    <p className='text-xl font-semibold'>~ $ {(totalPurchaseBit10Token * totalSum).toFixed(2)}</p>
+                                </div>
                                 <div>
                                     <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
                                     <div className='flex flex-col space-y-1 py-1'>
@@ -317,6 +350,33 @@ export default function Portfolio() {
                                         )}
                                     </div>
                                 </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className='border-white w-full lg:col-span-1'>
+                            <CardHeader>
+                                <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Allocations</div>
+                            </CardHeader>
+                            <CardContent className='w-full h-64 select-none'>
+                                <ResponsiveContainer width='100%' height='100%'>
+                                    <PieChart width={400} height={400}>
+                                        <Pie
+                                            dataKey='value'
+                                            isAnimationActive={false}
+                                            data={data02}
+                                            cx='50%'
+                                            cy='50%'
+                                            innerRadius={90}
+                                            outerRadius={115}
+                                            fill='#8884d8'>
+                                            {data02.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                            ))}
+                                            <Label value='Allocation' position='center' className='text-white' />
+                                        </Pie>
+                                        <Tooltip content={<CustomPieChartTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
                             </CardContent>
                         </Card>
 
