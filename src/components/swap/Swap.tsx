@@ -314,7 +314,7 @@ export default function Swap() {
                                                     </div>
                                                 </div>
                                                 <div className='-ml-12 z-20'>
-                                                    <Image src='/assets/swap/BIT10.svg' alt='bit10' width={75} height={75} className='z-20' />
+                                                    <Image src='/assets/swap/bit10.svg' alt='bit10' width={75} height={75} className='z-20' />
                                                 </div>
                                             </div>
                                         </div>
