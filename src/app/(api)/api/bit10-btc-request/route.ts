@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import Mail from 'nodemailer/lib/mailer'
+import { render } from '@react-email/render'
+import { BIT10BTCRequest } from '@/emails/BIT10.BTCRequest'
 
 export async function POST(request: NextRequest) {
     const myEmail = process.env.NEXT_PUBLIC_PERSONAL_EMAIL;
@@ -17,40 +19,24 @@ export async function POST(request: NextRequest) {
         },
     });
 
+    const emailHtml = render(BIT10BTCRequest({ email, principalId }));
+
     const mailOptions: Mail.Options = {
-        from: myEmail,
+        from: {
+            name: 'BIT10',
+            address: `${myEmail}`
+        },
         to: myEmail,
-        cc: [`${email2}`],
-        // replyTo: email,
-        subject: `BIT10.DEFI token request from ${principalId}`,
-        html: `
-        <div style='background-color: #1E1E1E; color: #ffffff; text-align: center; padding: 10px; border-radius: 10px;'>
-
-            <span style='font-size: 2.5em;'>Hello there 👋</span>
-
-            <hr style='border-top: 1px solid #666; width: 80%;'>
-
-            <span style='font-size: 1.5em;'>Request from ${principalId} on BIT10 Faucet page for BIT10.BTC tokens</span>
-
-            <p style='text-align: left; font-size: 15px; padding: 0px 20px;'>
-                email: ${email}
-            </p>
-            <p style='text-align: left; font-size: 15px; padding: 0px 20px;'>
-                principalId: ${principalId}
-            </p>
-
-            <p style='color: #666; text-align: center;'>
-                This email was sent from the BIT10 Faucet page.
-            </p>
-        </div>
-            `,
+        cc: email2,
+        subject: `BIT10.BTC token request from ${principalId}`,
+        html: emailHtml
     };
 
     const sendMailPromise = () =>
         new Promise<string>((resolve, reject) => {
             transport.sendMail(mailOptions, function (err) {
                 if (!err) {
-                    resolve('Message sent successfully!');
+                    resolve('Email sent successfully!');
                 } else {
                     reject(err.message);
                 }
@@ -59,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     try {
         await sendMailPromise();
-        return NextResponse.json({ message: 'Message sent successfully!' });
+        return NextResponse.json({ message: 'Email sent successfully!' });
     } catch (err) {
         return NextResponse.json({ error: err }, { status: 500 });
     }

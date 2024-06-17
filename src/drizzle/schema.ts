@@ -65,7 +65,12 @@ export const te_request_btc = pgTable('te_request_btc', {
 	email: varchar('email', { length: 255 }).notNull(),
 	user_principal_id: text('user_principal_id').notNull(),
 	btc_sent: boolean('btc_sent').default(false),
-});
+},
+	(table) => {
+		return {
+			te_request_btc_request_id_key: unique('te_request_btc_request_id_key').on(table.request_id),
+		}
+	});
 
 export const token_swap = pgTable('token_swap', {
 	token_swap_id: text('token_swap_id').primaryKey().notNull(),
