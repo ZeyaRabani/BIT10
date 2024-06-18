@@ -1,9 +1,69 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+const FormSchema = z.object({
+    email: z.string({
+        required_error: 'Email is required.',
+    }).email({
+        message: 'Invalid email format.',
+    })
+})
+
 export default function Page() {
+    const [submitting, setSubmitting] = useState(false);
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            email: '',
+        }
+    });
+
+    async function onSubmit(data: z.infer<typeof FormSchema>) {
+        if (data.email) {
+
+            setSubmitting(true);
+
+            await fetch('/bit10-testnet-welcome', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    maillist: [data.email],
+                })
+            })
+                .then((res) => res.json())
+                .then((response) => {
+                    toast.success(response.message)
+                    form.reset();
+                })
+                .catch((error) => {
+                    toast.error('An error occurred while submitting the form. Please try again!');
+                })
+                .finally(() => {
+                    setSubmitting(false);
+                });
+
+            // if (result === 'Request added successfully') {
+            //     toast.success('Request added successfully! BIT10.BTC will be sent to your principal ID.');
+            //     form.reset();
+            //     setSubmitting(false);
+            // } else {
+            //     toast.error('An error occurred. Please try again!');
+            //     setSubmitting(false);
+            // }
+        }
+    }
 
     const maillist1 = [
         'hr5359@srmist.edu.in',
@@ -499,7 +559,7 @@ export default function Page() {
                 <Button onClick={() => sendEmail(maillist2)}>Send Email</Button>
             </div> */}
 
-            <div className='border-2 rounded p-4 flex flex-col items-center justify-center'>
+            {/* <div className='border-2 rounded p-4 flex flex-col items-center justify-center'>
                 <div>The email will be sent to:</div>
                 <div className='flex flex-row flex-wrap max-w-[80vw]'>
                     {maillist3.map((email, index) => (
@@ -701,7 +761,35 @@ export default function Page() {
                     ))}
                 </div>
                 <Button onClick={() => sendEmail(mailist19)}>Send Email</Button>
+            </div> */}
+
+            <div className='border-2 rounded p-4 flex flex-col items-center justify-center'>
+                <h1 className='Text-2xl'>Send Welcome Email</h1>
+
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className='w-full flex flex-col space-y-4'>
+                        <FormField
+                            control={form.control}
+                            name='email'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Send welcome email to</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className='border-white' placeholder='Send welcome email to' />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <Button type='submit' disabled={submitting}>
+                            {submitting && <Loader2 className='w-4 h-4 animate-spin mr-2' />}
+                            {submitting ? 'Sending...' : 'Send Email'}
+                        </Button>
+                    </form>
+                </Form>
             </div>
+            
         </div>
     )
 }
