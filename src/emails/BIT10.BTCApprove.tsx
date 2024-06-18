@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tailwind, Body, Container, Head, Html, Preview, Section, Text, Row, Img, Column, Link } from '@react-email/components'
+import { Tailwind, Body, Container, Head, Html, Preview, Section, Text, Img, Link } from '@react-email/components'
 
 export function BIT10BTCApprove({ email, principalId }: { email: string, principalId: string }) {
     return (
