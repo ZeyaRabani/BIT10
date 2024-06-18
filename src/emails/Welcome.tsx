@@ -10,14 +10,14 @@ export function Welcome() {
                 <Body className='bg-[#f3f3f5] font-sansSerif'>
                     <Container className='w-[680px] max-w-full mx-auto'>
                         <Section className='flex p-4'>
-                            <Img width='180' height='40' src='https://bit10.app/logo/logo-with-name.png' />
+                            <Img width='180' src='https://bit10.app/logo/logo-with-name.png' />
                             {/* <Img width='180' src='https://securelancerstorage.s3.ap-south-1.amazonaws.com/user_d9c773a2080e43fdad30f59ee8d6bb50/profile/resume/logo-with-name.png' /> */}
                         </Section>
 
                         <Section className='rounded-t-md flex flex-col bg-[#EA580C]'>
                             <Row className='flex flex-row justify-between'>
                                 <Column className='p-3.5'>
-                                    <Img className='max-w-full' width='100' src='https://bit10.app/assets/email/rocket.png' />
+                                    <Img className='max-w-full' width='120' src='https://bit10.app/assets/email/rocket.png' />
                                     {/* <Img className='max-w-full' width='120' src='https://securelancerstorage.s3.ap-south-1.amazonaws.com/user_d9c773a2080e43fdad30f59ee8d6bb50/profile/resume/rocket.png' /> */}
                                 </Column>
                                 <Column className='py-5 px-7 pb-3.5'>
