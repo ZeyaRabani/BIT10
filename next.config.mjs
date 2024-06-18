@@ -19,6 +19,10 @@ const nextConfig = {
                 destination: `/api/bit10-testnet-welcome/:slug*`,
             },
             {
+                source: '/bit10-btc-request-approve/:slug*',
+                destination: `/api/bit10-btc-request-approve/:slug*`,
+            },
+            {
                 source: '/ingest/:path*',
                 destination: 'https://us.i.posthog.com/:path*',
             },

@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '
 import { Input } from '@/components/ui/input'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import BIT10BTCApprovalEmail from './BIT10BTCApprovalEmail'
 
 const FormSchema = z.object({
     email: z.string({
@@ -53,15 +54,6 @@ export default function Page() {
                 .finally(() => {
                     setSubmitting(false);
                 });
-
-            // if (result === 'Request added successfully') {
-            //     toast.success('Request added successfully! BIT10.BTC will be sent to your principal ID.');
-            //     form.reset();
-            //     setSubmitting(false);
-            // } else {
-            //     toast.error('An error occurred. Please try again!');
-            //     setSubmitting(false);
-            // }
         }
     }
 
@@ -789,7 +781,9 @@ export default function Page() {
                     </form>
                 </Form>
             </div>
-            
+
+            <BIT10BTCApprovalEmail />
+
         </div>
     )
 }
