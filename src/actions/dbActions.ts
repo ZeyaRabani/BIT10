@@ -70,7 +70,7 @@ export const newTokenSwap = async ({ newTokenSwapId, principalId, paymentAmount,
             token_purchase_usd_amount: paymentAmountUSD,
             bit10_token_quantity: bit10tokenQuantity,
             bit10_token_name: bit10tokenName,
-            token_transaction_status: 'Unconfirmed', // Confirmed
+            token_transaction_status: 'Unconfirmed', // Confirmed || Failed
             token_bought_at: new Date().toISOString()
         });
 

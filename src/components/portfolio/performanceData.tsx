@@ -63,13 +63,13 @@ export const performanceDataMonthly: PerformanceDataType[] = [
     },
     {
         month: 'June',
-        bit10: 2.5894,
-        icp: 12.07,
-        stx: 1.8361,
-        cfx: 0.2152,
-        mapo: 0.01349,
-        rif: 0.1593,
-        sov: 1.2423
+        bit10: 1.7960,
+        icp: 8.1588,
+        stx: 1.7218,
+        cfx: 0.1611,
+        mapo: 0.009763,
+        rif: 0.09642,
+        sov: 0.6282
     },
 ];
 
@@ -307,12 +307,22 @@ export const performanceDataWeekly: PerformanceDataType[] = [
     },
     {
         week: 'Jun 10, 2024',
-        bit10: 2.4732,
-        icp: 11.11,
-        stx: 2.2217,
-        cfx: 0.19,
-        mapo: 0.012,
-        rif: 0.144,
-        sov: 1.1614
+        bit10: 2.1273,
+        icp: 9.6148,
+        stx: 1.9016,
+        cfx: 0.1913,
+        mapo: 0.01075,
+        rif: 0.1117,
+        sov: 0.9335
+    },
+    {
+        week: 'Jun 17, 2024',
+        bit10: 1.7328,
+        icp: 7.8870,
+        stx: 1.5910,
+        cfx: 0.1489,
+        mapo: 0.009198,
+        rif: 0.09348,
+        sov: 0.6675
     },
 ]

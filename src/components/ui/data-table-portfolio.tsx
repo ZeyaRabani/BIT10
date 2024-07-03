@@ -6,7 +6,7 @@ import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
-import { Search, X } from 'lucide-react'
+import { Search, X, CircleCheck, Timer, CircleX } from 'lucide-react'
 
 export type PortfolioTableDataType = {
     token_swap_id: string;
@@ -33,11 +33,8 @@ export function DataTable<TData, TValue>({
     inputPlaceHolder,
 }: DataTableProps<PortfolioTableDataType>) {
     const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-        []
-    )
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({})
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
 
     const table = useReactTable({
@@ -90,6 +87,53 @@ export function DataTable<TData, TValue>({
         return formattedDate;
     };
 
+    const renderCellContent = (cell: any, row: any) => {
+        switch (cell.column.id) {
+            case 'token_purchase_amount':
+                return (
+                    <div className='flex flex-row space-x-1 items-center'>
+                        <div>{row.original.token_purchase_amount}</div>
+                        <div>{row.original.token_purchase_name}</div>
+                    </div>
+                );
+            case 'token_bought_at':
+                return formatDate(row.original.token_bought_at);
+            case 'bit10_token_name':
+                return (
+                    <div className='flex flex-row space-x-1 items-center'>
+                        <div>{row.original.bit10_token_quantity}</div>
+                        <div>{row.original.bit10_token_name}</div>
+                    </div>
+                );
+            case 'token_transaction_status':
+                if (row.original.token_transaction_status === 'Confirmed') {
+                    return (
+                        <div className='flex flex-row space-x-1 items-center'>
+                            <div><CircleCheck className='w-4 h-4 pb-0.5' /></div>
+                            <div>{row.original.token_transaction_status}</div>
+                        </div>
+                    )
+                } else if (row.original.token_transaction_status === 'Failed') {
+                    return (
+                        <div className='flex flex-row space-x-1 items-center'>
+                            <div><CircleX className='w-4 h-4 pb-0.5' /></div>
+                            <div>{row.original.token_transaction_status}</div>
+                        </div>
+                    )
+                }
+                else {
+                    return (
+                        <div className='flex flex-row space-x-1 items-center'>
+                            <div><Timer className='w-4 h-4 pb-0.5' /></div>
+                            <div>{row.original.token_transaction_status}</div>
+                        </div>
+                    )
+                }
+            default:
+                return flexRender(cell.column.columnDef.cell, cell.getContext());
+        }
+    };
+
     return (
         <div className='flex flex-col space-y-2'>
             <div className='flex items-center'>
@@ -114,18 +158,16 @@ export function DataTable<TData, TValue>({
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                    </TableHead>
+                                ))}
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -138,36 +180,7 @@ export function DataTable<TData, TValue>({
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
-                                            {
-                                                cell.column.id === 'token_purchase_amount' ? (
-                                                    <div className='flex flex-row items-center'>
-                                                        <div className='flex flex-row space-x-1'>
-                                                            <span>{row.original.token_purchase_name}</span>
-                                                            <span>{row.original.token_purchase_amount}</span>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    cell.id === `${row.id}_token_bought_at` ? (
-                                                        <>
-                                                            {formatDate((flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactElement<any>).props.cell.renderValue())}
-                                                        </>
-                                                    ) : (
-                                                        cell.id === `${row.id}_bit10_token_name` ? (
-                                                            <>
-                                                                <div className='flex flex-row items-center'>
-                                                                    <div className='flex flex-row space-x-1'>
-                                                                        <span>{row.original.bit10_token_quantity}</span>
-                                                                        <span>{row.original.bit10_token_name}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                            </>
-                                                        )
-                                                    )
-                                                )}
+                                            {renderCellContent(cell, row)}
                                         </TableCell>
                                     ))}
                                 </TableRow>

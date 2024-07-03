@@ -222,7 +222,7 @@ export default function Swap() {
         <MaxWidthWrapper>
             <div className='flex flex-col py-4 md:py-8 h-full items-center justify-center'>
                 {loading ? (
-                    <Card className='w-[300px] md:w-[450px] px-2 pt-6'>
+                    <Card className='w-[300px] md:w-[450px] px-2 pt-6 animate-fade-bottom-up'>
                         <CardContent className='flex flex-col space-y-2'>
                             {['h-24', 'h-32', 'h-32', 'h-12'].map((classes, index) => (
                                 <Skeleton key={index} className={classes} />
@@ -230,7 +230,7 @@ export default function Swap() {
                         </CardContent>
                     </Card>
                 ) : (
-                    <Card className='w-[300px] md:w-[450px]'>
+                    <Card className='w-[300px] md:w-[450px] animate-fade-bottom-up'>
                         <CardHeader>
                             <CardTitle className='flex flex-row items-center justify-between'>
                                 <div>Swap</div>

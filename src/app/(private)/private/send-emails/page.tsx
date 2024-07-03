@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import BIT10BTCApprovalEmail from './BIT10BTCApprovalEmail'
+import ICPInterview from './ICPInterview'
 
 const FormSchema = z.object({
     email: z.string({
@@ -783,6 +784,8 @@ export default function Page() {
             </div>
 
             <BIT10BTCApprovalEmail />
+
+            <ICPInterview />
 
         </div>
     )

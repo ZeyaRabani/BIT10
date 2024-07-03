@@ -162,7 +162,7 @@ export default function Portfolio() {
     }, [userPortfolio]);
 
     useEffect(() => {
-        const fetchSignUpData = async () => {
+        const fetchRecentActivityData = async () => {
             if (principalId) {
                 const result = await userRecentActivity({ paymentAddress: principalId });
                 setPortfolioData(result as PortfolioTableDataType[]);
@@ -174,7 +174,7 @@ export default function Portfolio() {
             }
         };
 
-        fetchSignUpData();
+        fetchRecentActivityData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -256,8 +256,8 @@ export default function Portfolio() {
         <MaxWidthWrapper className='pb-4 md:pt-4'>
             {loading ? (
                 <div className='flex flex-col space-y-4'>
-                    <div className='flex flex-col lg:grid lg:grid-cols-3 space-y-2 lg:space-y-0 space-x-0 lg:space-x-4'>
-                        <Card className='border-white w-full lg:col-span-1'>
+                    <div className='flex flex-col lg:grid lg:grid-cols-4 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
+                        <Card className='border-white w-full lg:col-span-1 animate-fade-left-slow'>
                             <CardContent>
                                 <div className='flex flex-col h-full space-y-2 pt-8'>
                                     {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -266,7 +266,16 @@ export default function Portfolio() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className='border-white w-full lg:col-span-2'>
+                        <Card className='border-white w-full lg:col-span-1 animate-fade-in-down-slow'>
+                            <CardContent>
+                                <div className='flex flex-col h-full space-y-2 pt-8'>
+                                    {['h-10 w-3/4', 'h-44'].map((classes, index) => (
+                                        <Skeleton key={index} className={classes} />
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card className='border-white w-full lg:col-span-2 animate-fade-right-slow'>
                             <CardContent>
                                 <div className='flex flex-col h-full space-y-2 pt-8'>
                                     {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -276,7 +285,7 @@ export default function Portfolio() {
                             </CardContent>
                         </Card>
                     </div>
-                    <Card>
+                    <Card className='border-white w-full animate-fade-bottom-up-slow'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
@@ -289,14 +298,14 @@ export default function Portfolio() {
             ) : (
                 <div className='flex flex-col space-y-4'>
                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
-                        <h1 className='text-center md:text-start text-3xl font-bold'>Welcome back {formatPrincipalId(principalId)}</h1>
-                        <Button className='text-white' asChild>
+                        <h1 className='text-center md:text-start text-3xl font-bold animate-fade-left-slow'>Welcome back {formatPrincipalId(principalId)}</h1>
+                        <Button className='text-white animate-fade-right-slow' asChild>
                             <Link href='/'>Buy BIT10 Token</Link>
                         </Button>
                     </div>
 
-                    <div className='flex flex-col lg:grid lg:grid-cols-4 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
-                        <Card className='border-white w-full lg:col-span-1'>
+                    <div className='flex flex-col lg:grid lg:grid-cols-2 xl:grid-cols-4 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
+                        <Card className='border-white w-full lg:col-span-1 animate-fade-left-slow'>
                             <CardHeader>
                                 <div className='text-2xl md:text-4xl text-center md:text-start'>Your Current Balance</div>
                             </CardHeader>
@@ -353,9 +362,9 @@ export default function Portfolio() {
                             </CardContent>
                         </Card>
 
-                        <Card className='border-white w-full lg:col-span-1'>
+                        <Card className='border-white w-full lg:col-span-1 animate-fade-in-down-slow'>
                             <CardHeader>
-                                <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Allocations</div>
+                                <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10.DEFI Allocations</div>
                             </CardHeader>
                             <CardContent className='w-full h-64 select-none'>
                                 <ResponsiveContainer width='100%' height='100%'>
@@ -380,7 +389,7 @@ export default function Portfolio() {
                             </CardContent>
                         </Card>
 
-                        <Card className='border-white lg:col-span-2'>
+                        <Card className='border-white lg:col-span-2 animate-fade-right-slow'>
                             <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
                                 <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Performance</div>
                                 <div className='flex flex-row space-x-2 items-center justify-center'>
@@ -464,7 +473,7 @@ export default function Portfolio() {
                     </div>
 
                     {recentActivityLoading ? (
-                        <Card>
+                        <Card className='border-white animate-fade-bottom-up-slow'>
                             <CardContent>
                                 <div className='flex flex-col h-full space-y-2 pt-8'>
                                     {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
@@ -474,7 +483,7 @@ export default function Portfolio() {
                             </CardContent>
                         </Card>
                     ) : (
-                        <Card className='relative border-white'>
+                        <Card className='border-white animate-fade-bottom-up-slow'>
                             <CardHeader>
                                 <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent activity</div>
                             </CardHeader>

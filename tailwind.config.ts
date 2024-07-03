@@ -174,6 +174,8 @@ const config = {
         'fade-right': 'fade-right 0.2s ease-out',
         'fade-left-slow': 'fade-left 0.6s ease-out',
         'fade-right-slow': 'fade-right 0.6s ease-out',
+        'fade-bottom-up-slow': 'fade-bottom-up 0.6s ease-out',
+        'fade-in-down-slow': 'fade-in-down 0.6s ease-out',
         'rotate360': 'rotate360 0.5s linear',
         'preloader': 'round 1.7s infinite ease, load 1.7s infinite ease'
       },

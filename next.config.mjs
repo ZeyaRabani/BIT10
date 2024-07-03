@@ -23,6 +23,10 @@ const nextConfig = {
                 destination: `/api/bit10-btc-request-approve/:slug*`,
             },
             {
+                source: '/icp-interview/:slug*',
+                destination: `/api/icp-interview/:slug*`,
+            },
+            {
                 source: '/ingest/:path*',
                 destination: 'https://us.i.posthog.com/:path*',
             },
