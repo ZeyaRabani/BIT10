@@ -82,7 +82,7 @@ export default function SwapIdDetails({ swapId }: { swapId: string }) {
     return (
         <MaxWidthWrapper className='py-4 flex justify-center'>
             {loading ? (
-                <Card className='border-white w-full md:w-3/4'>
+                <Card className='w-full md:w-3/4 dark:border-white'>
                     <CardContent>
                         <div className='flex flex-col h-full space-y-2 pt-8'>
                             {['h-10 w-64', 'h-10', 'h-10', 'h-10', 'h-10', 'h-10', 'h-10'].map((classes, index) => (
@@ -92,7 +92,7 @@ export default function SwapIdDetails({ swapId }: { swapId: string }) {
                     </CardContent>
                 </Card>
             ) : (
-                <Card className='border-white w-full md:w-3/4'>
+                <Card className='w-full md:w-3/4 dark:border-white'>
                     <CardHeader className='text-center md:text-start text-3xl font-semibold'>
                         Swap Details
                     </CardHeader>

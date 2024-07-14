@@ -24,7 +24,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [incorrectPassword, setIncorrectPassword] = useState(false);
     const [selectedFunnyPassword, setSelectedFunnyPassword] = useState<string | null>(null);
 
-    const correctPassword = 'cghvjhblkndgcjhdfkghioudfh2863487yhiruodfhu';
+    const correctPassword = process.env.NEXT_PUBLIC_PRIVATE_PASS;
 
     const handlePasswordChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
         setPassword(event.target.value);

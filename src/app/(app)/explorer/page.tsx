@@ -53,7 +53,7 @@ export default function Page() {
                                     <FormItem>
                                         <FormLabel>Swap ID</FormLabel>
                                         <FormControl>
-                                            <Input {...field} className='border-white' placeholder='Swap ID' />
+                                            <Input {...field} className='dark:border-white' placeholder='Swap ID' />
                                         </FormControl>
                                         <FormDescription>Please enter the Swap ID associated with your transaction.</FormDescription>
                                         <FormMessage />

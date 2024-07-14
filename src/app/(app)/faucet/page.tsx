@@ -89,7 +89,7 @@ export default function Page() {
                                     <FormItem>
                                         <FormLabel>Your Email</FormLabel>
                                         <FormControl>
-                                            <Input {...field} className='border-white' placeholder='Your Email' />
+                                            <Input {...field} className='dark:border-white' placeholder='Your Email' />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -103,7 +103,7 @@ export default function Page() {
                                     <FormItem>
                                         <FormLabel>Principal ID</FormLabel>
                                         <FormControl>
-                                            <Input {...field} className='border-white' placeholder='Principal ID' />
+                                            <Input {...field} className='dark:border-white' placeholder='Principal ID' />
                                         </FormControl>
                                         <FormDescription>Principal ID of your Plug wallet</FormDescription>
                                         <FormMessage />

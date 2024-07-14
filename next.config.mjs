@@ -27,6 +27,10 @@ const nextConfig = {
                 destination: `/api/icp-interview/:slug*`,
             },
             {
+                source: '/contact-form/:slug*',
+                destination: `/api/contact-form/:slug*`,
+            },
+            {
                 source: '/ingest/:path*',
                 destination: 'https://us.i.posthog.com/:path*',
             },

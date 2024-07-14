@@ -10,6 +10,7 @@ Welcome to the first ever Fully Decentralized ETF.
 - Drizzle
 - Recharts
 - shadcn/ui
+- Aceternity UI
 
 ## To Do
 
@@ -40,6 +41,5 @@ npm install
 # Run the app
 npm run dev
 ```
-
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

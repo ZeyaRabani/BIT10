@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { useWallet } from '@/context/WalletContext'
 import { useForm } from 'react-hook-form'
@@ -291,7 +289,7 @@ export default function Swap() {
                                                         <FormItem>
                                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                                 <FormControl>
-                                                                    <SelectTrigger className='border-white'>
+                                                                    <SelectTrigger className='dark:border-white'>
                                                                         <SelectValue placeholder='Select number of tokens' />
                                                                     </SelectTrigger>
                                                                 </FormControl>
@@ -330,7 +328,7 @@ export default function Swap() {
                                 <CardFooter className='flex flex-row space-x-2 w-full items-center'>
                                     <Button className='w-full' disabled={!isConnected || swaping || ((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) < 0.00002 || Number.isNaN((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount))} >
                                         {swaping && <Loader2 className='animate-spin mr-2' size={15} />}
-                                        {swaping ? 'Trading...' : 'Trade'}
+                                        {swaping ? 'Swaping...' : 'Swap'}
                                     </Button>
                                 </CardFooter>
                             </form>

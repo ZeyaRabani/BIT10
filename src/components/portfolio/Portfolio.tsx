@@ -4,16 +4,17 @@ import React, { useState, useEffect } from 'react'
 import { userPortfolioDetails, userRecentActivity } from '@/actions/dbActions'
 import { useWallet } from '@/context/WalletContext'
 import { toast } from 'sonner'
-import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Tooltip as ShadcnTooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Badge } from '@/components/ui/badge'
+import { Label, Pie, PieChart, Area, AreaChart, CartesianGrid, XAxis, YAxis, ReferenceArea } from 'recharts'
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
+import { bit10Allocation } from '@/data/bit10TokenAllocation'
 import clsx from 'clsx'
-import { LineChart, PieChart, Pie, Tooltip, Cell, Label, TooltipProps, Line, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
-import { performanceDataMonthly, performanceDataWeekly } from './performanceData'
+import { performanceDataMonthly, performanceDataWeekly } from '@/data/performanceData'
 import { RotateCcw } from 'lucide-react'
 import { PortfolioTableDataType, portfolioTableColumns } from './columns'
 import { DataTable } from '@/components/ui/data-table-portfolio'
@@ -29,16 +30,58 @@ interface UserPortfolioType {
 
 type Tab = 'monthly' | 'weekly';
 
-const data02 = [
-    { name: 'ICP', value: 16.66 },
-    { name: 'STX', value: 16.66 },
-    { name: 'CFX', value: 16.66 },
-    { name: 'MAPO', value: 16.66 },
-    { name: 'RIF', value: 16.66 },
-    { name: 'SOV', value: 16.66 },
-];
+const chartConfig: ChartConfig = {
+    'BIT10.DEFI': {
+        label: 'BIT10.DEFI',
+    },
+    'BIT10.BRC20': {
+        label: 'BIT10.BRC20',
+    },
+    'ICP': {
+        label: 'ICP',
+    },
+    'STX': {
+        label: 'STX',
+    },
+    'CFX': {
+        label: 'CFX',
+    },
+    'MAPO': {
+        label: 'MAPO',
+    },
+    'RIF': {
+        label: 'RIF',
+    },
+    'SOV': {
+        label: 'SOV',
+    },
+    'bit10': {
+        label: 'BIT10.DEFI',
+    },
+    'icp': {
+        label: 'ICP',
+    },
+    'stx': {
+        label: 'STX',
+    },
+    'cfx': {
+        label: 'CFX',
+    },
+    'mapo': {
+        label: 'MAPO',
+    },
+    'rif': {
+        label: 'RIF',
+    },
+    'sov': {
+        label: 'SOV',
+    },
+}
 
-const colors = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366'];
+const bit10FillArray = [
+    { tokenName: 'BIT10.DEFI', fill: '#D5520E' },
+    { tokenName: 'BIT10.BRC20', fill: '#ff8533' },
+];
 
 export default function Portfolio() {
     const [loading, setLoading] = useState(true);
@@ -49,6 +92,7 @@ export default function Portfolio() {
     const [coinbaseData, setCoinbaseData] = useState<number[]>([]);
     const [coinMarketCapData, setCoinMarketCapData] = useState<number[]>([]);
     const [totalSum, setTotalSum] = useState<number>(0);
+    const [innerRadius, setInnerRadius] = useState<number>(80);
     const [activeTab, setActiveTab] = useState<Tab>('monthly');
     const [selection, setSelection] = useState<{ startX: string | null, endX: string | null }>({ startX: null, endX: null });
     const [data, setData] = useState(performanceDataWeekly);
@@ -178,50 +222,46 @@ export default function Portfolio() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1200) {
+                setInnerRadius(90);
+            } else if (window.innerWidth >= 768) {
+                setInnerRadius(70);
+            } else {
+                setInnerRadius(60);
+            }
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     const formatPrincipalId = (id: string | undefined) => {
         if (!id) return '';
         if (id.length <= 7) return id;
         return `${id.slice(0, 4)}...${id.slice(-3)}`;
     };
 
-    const CustomPieChartTooltip: React.FC<TooltipProps<any, any>> = ({ active, payload }) => {
-        if (active && payload && payload.length) {
-            const colorClasses = ['text-[#ff0066]', 'text-[#ff8c1a]', 'text-[#1a1aff]', 'text-[#ff1aff]', 'text-[#3385ff]', 'text-[#ffa366]'];
-            return (
-                <div className='bg-white p-2 rounded'>
-                    {payload.map((entry: any, index: number) => (
-                        <div key={`item-${index}`} className={`text-sm tracking-wide ${colorClasses[index]}`}>
-                            {entry.name}: {entry.value.toFixed(2)}%
-                        </div>
-                    ))}
-                </div>
-            );
-        }
+    const currentBalanceChartData = Object.keys(bit10TokenSums).length === 0
+        ? [{ tokenName: 'No Data', tokenQuantity: 1, fill: '#ebebe0' }]
+        : Object.entries(bit10TokenSums).map(([name, sum]) => {
+            const foundToken = bit10FillArray.find(item => item.tokenName === name);
+            return {
+                tokenName: name,
+                tokenQuantity: sum,
+                fill: foundToken ? foundToken.fill : '#000000',
+            };
+        });
 
-        return null;
-    }
+    const showChartTooltip = Object.keys(bit10TokenSums).length > 0;
 
     const handleTabClick = (tab: Tab) => {
         setActiveTab(tab);
-    };
-
-    const CustomTooltip = ({ active, payload, label, payloadTitle }: { active: boolean, payload: any[], label?: string, payloadTitle: string[] }) => {
-        if (active && payload && payload.length) {
-            const colorClasses = ['text-[#ff0066]', 'text-[#ff8c1a]', 'text-[#1a1aff]', 'text-[#ff1aff]', 'text-[#3385ff]', 'text-[#ffa366]'];
-            return (
-                <div className='bg-white px-2 pt-1 rounded'>
-                    <div className='text-gray-800'>{`${label}`}</div>
-                    <div className='text-sm tracking-wide text-primary'>{`${payloadTitle[0]}`}: $ {`${payload[0].value}`}</div>
-                    <div className='grid grid-cols-2 gap-y-1 gap-x-1 py-1'>
-                        {payloadTitle.slice(1, 7).map((title, index) => (
-                            <div key={index} className={`text-sm tracking-wide ${colorClasses[index]}`}>
-                                {`${title}`}: $ {`${payload[index + 1].value}`}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
     };
 
     const handleMouseDown = (e: any) => {
@@ -253,11 +293,11 @@ export default function Portfolio() {
     };
 
     return (
-        <MaxWidthWrapper className='pb-4 md:pt-4'>
+        <div className='py-4'>
             {loading ? (
                 <div className='flex flex-col space-y-4'>
                     <div className='flex flex-col lg:grid lg:grid-cols-4 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
-                        <Card className='border-white w-full lg:col-span-1 animate-fade-left-slow'>
+                        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow'>
                             <CardContent>
                                 <div className='flex flex-col h-full space-y-2 pt-8'>
                                     {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -266,7 +306,7 @@ export default function Portfolio() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className='border-white w-full lg:col-span-1 animate-fade-in-down-slow'>
+                        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-in-down-slow'>
                             <CardContent>
                                 <div className='flex flex-col h-full space-y-2 pt-8'>
                                     {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -275,7 +315,7 @@ export default function Portfolio() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className='border-white w-full lg:col-span-2 animate-fade-right-slow'>
+                        <Card className='dark:border-white w-full lg:col-span-2 animate-fade-right-slow'>
                             <CardContent>
                                 <div className='flex flex-col h-full space-y-2 pt-8'>
                                     {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -285,7 +325,7 @@ export default function Portfolio() {
                             </CardContent>
                         </Card>
                     </div>
-                    <Card className='border-white w-full animate-fade-bottom-up-slow'>
+                    <Card className='dark:border-white w-full animate-fade-bottom-up-slow'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
@@ -299,97 +339,196 @@ export default function Portfolio() {
                 <div className='flex flex-col space-y-4'>
                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
                         <h1 className='text-center md:text-start text-3xl font-bold animate-fade-left-slow'>Welcome back {formatPrincipalId(principalId)}</h1>
-                        <Button className='text-white animate-fade-right-slow' asChild>
-                            <Link href='/'>Buy BIT10 Token</Link>
+                        <Button className='animate-fade-right-slow' asChild>
+                            <Link href='/swap'>Buy BIT10 Token</Link>
                         </Button>
                     </div>
 
-                    <div className='flex flex-col lg:grid lg:grid-cols-2 xl:grid-cols-4 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
-                        <Card className='border-white w-full lg:col-span-1 animate-fade-left-slow'>
+                    <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
+                        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow'>
                             <CardHeader>
                                 <div className='text-2xl md:text-4xl text-center md:text-start'>Your Current Balance</div>
                             </CardHeader>
-                            <CardContent className='flex flex-col space-y-3'>
-                                <TooltipProvider>
-                                    <ShadcnTooltip delayDuration={300}>
-                                        <div className='flex flex-row items-center justify-start space-x-2'>
-                                            <div className='flex flex-row items-end space-x-2'>
-                                                <TooltipTrigger asChild>
-                                                    <p className='text-4xl font-semibold'>{totalPurchaseBit10Token} BIT10</p>
-                                                </TooltipTrigger>
-                                            </div>
-                                            <TooltipContent className={totalPurchaseBit10Token === 0 ? 'hidden' : 'block'}>
-                                                <p>BIT10 Token Current Value: $ {(totalPurchaseBit10Token * totalSum).toFixed(4)}</p>
-                                                <p>Initial Investment in BIT10 Tokens: ${totalPurchaseUSD.toFixed(4)}</p>
-                                            </TooltipContent>
-                                            <div>
-                                                {!isNaN(((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) / totalPurchaseUSD) &&
-                                                    <Badge variant={(totalPurchaseBit10Token * totalSum) - totalPurchaseUSD >= 0 ? 'success' : 'destructive'} className='flex flex-row space-x-1'>
-                                                        <div>
-                                                            {((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) >= 0 ? '+' : '-'}
-                                                        </div>
-                                                        <div>
-                                                            {Math.abs((((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) / totalPurchaseUSD) * 100).toFixed(2)}%
-                                                        </div>
-                                                    </Badge>
-                                                }
-                                            </div>
-                                        </div>
-                                    </ShadcnTooltip>
-                                </TooltipProvider>
-                                <div>
-                                    <p className='text-xl font-semibold'>~ $ {(totalPurchaseBit10Token * totalSum).toFixed(2)}</p>
+                            <CardContent className='grid md:grid-cols-2 gap-4 items-center'>
+                                <div className='flex-1 pb-0'>
+                                    <ChartContainer
+                                        config={chartConfig}
+                                        className='aspect-square max-h-[300px]'
+                                    >
+                                        <PieChart>
+                                            {showChartTooltip && (
+                                                <ChartTooltip
+                                                    cursor={false}
+                                                    content={<ChartTooltipContent hideLabel />}
+                                                />
+                                            )}
+                                            <Pie
+                                                data={currentBalanceChartData}
+                                                dataKey='tokenQuantity'
+                                                nameKey='tokenName'
+                                                innerRadius={innerRadius}
+                                                strokeWidth={5}
+                                            >
+                                                <Label
+                                                    content={({ viewBox }) => {
+                                                        if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                            return (
+                                                                <text
+                                                                    x={viewBox.cx}
+                                                                    y={viewBox.cy}
+                                                                    textAnchor='middle'
+                                                                    dominantBaseline='middle'
+                                                                >
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={viewBox.cy}
+                                                                        className='fill-foreground text-3xl font-bold'
+                                                                    >
+                                                                        {totalPurchaseBit10Token} BIT10
+                                                                    </tspan>
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={(viewBox.cy || 0) + 24}
+                                                                        className='fill-muted-foreground'
+                                                                    >
+                                                                        Total Balance
+                                                                    </tspan>
+                                                                </text>
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                            </Pie>
+                                        </PieChart>
+                                    </ChartContainer>
                                 </div>
-                                <div>
-                                    <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
-                                    <div className='flex flex-col space-y-1 py-1'>
-                                        <div className='flex flex-row justify-between items-center px-2'>
-                                            <div>Token Name</div>
-                                            <div>No. of Tokens</div>
-                                        </div>
-                                        {Object.keys(bit10TokenSums).length === 0 ? (
-                                            <div className='text-center'>You currently own no But10 tokens</div>
-                                        ) : (
-                                            Object.entries(bit10TokenSums).map(([name, sum]) => (
-                                                <div className='flex flex-row justify-between items-center hover:bg-accent p-2 rounded' key={name}>
-                                                    <div>{name}</div>
-                                                    <div>{sum}</div>
+                                <div className='flex w-full flex-col space-y-3'>
+                                    <TooltipProvider>
+                                        <ShadcnTooltip delayDuration={300}>
+                                            <div className='flex flex-row items-center justify-start space-x-2'>
+                                                <div className='flex flex-row items-end space-x-2'>
+                                                    <TooltipTrigger asChild>
+                                                        <p className='text-4xl font-semibold'>{totalPurchaseBit10Token} BIT10</p>
+                                                    </TooltipTrigger>
                                                 </div>
-                                            ))
-                                        )}
+                                                <TooltipContent className={totalPurchaseBit10Token === 0 ? 'hidden' : 'block'}>
+                                                    <p>BIT10 Token Current Value: $ {(totalPurchaseBit10Token * totalSum).toFixed(4)}</p>
+                                                    <p>Initial Investment in BIT10 Tokens: ${totalPurchaseUSD.toFixed(4)}</p>
+                                                </TooltipContent>
+                                                <div>
+                                                    {!isNaN(((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) / totalPurchaseUSD) &&
+                                                        <Badge variant={(totalPurchaseBit10Token * totalSum) - totalPurchaseUSD >= 0 ? 'success' : 'destructive'} className='flex flex-row space-x-1'>
+                                                            <div>
+                                                                {((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) >= 0 ? '+' : '-'}
+                                                            </div>
+                                                            <div>
+                                                                {Math.abs((((totalPurchaseBit10Token * totalSum) - totalPurchaseUSD) / totalPurchaseUSD) * 100).toFixed(2)}%
+                                                            </div>
+                                                        </Badge>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </ShadcnTooltip>
+                                    </TooltipProvider>
+                                    <div>
+                                        <p className='text-xl font-semibold'>~ $ {(totalPurchaseBit10Token * totalSum).toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
+                                        <div className='flex flex-col space-y-1 py-1'>
+                                            <div className='flex flex-row justify-between items-center px-2'>
+                                                <div>Token Name</div>
+                                                <div>No. of Tokens</div>
+                                            </div>
+                                            {Object.keys(bit10TokenSums).length === 0 ? (
+                                                <div className='text-center'>You currently own no But10 tokens</div>
+                                            ) : (
+                                                Object.entries(bit10TokenSums).map(([name, sum]) => (
+                                                    <div className='flex flex-row justify-between items-center hover:bg-accent p-2 rounded' key={name}>
+                                                        <div>{name}</div>
+                                                        <div>{sum}</div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className='border-white w-full lg:col-span-1 animate-fade-in-down-slow'>
+                        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-in-down-slow'>
                             <CardHeader>
-                                <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10.DEFI Allocations</div>
+                                <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Allocations</div>
                             </CardHeader>
-                            <CardContent className='w-full h-64 select-none'>
-                                <ResponsiveContainer width='100%' height='100%'>
-                                    <PieChart width={400} height={400}>
-                                        <Pie
-                                            dataKey='value'
-                                            isAnimationActive={false}
-                                            data={data02}
-                                            cx='50%'
-                                            cy='50%'
-                                            innerRadius={90}
-                                            outerRadius={115}
-                                            fill='#8884d8'>
-                                            {data02.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                                            ))}
-                                            <Label value='Allocation' position='center' className='text-white' />
-                                        </Pie>
-                                        <Tooltip content={<CustomPieChartTooltip />} />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                            <CardContent className='grid md:grid-cols-2 gap-4 items-center'>
+                                <div className='flex-1'>
+                                    <ChartContainer
+                                        config={chartConfig}
+                                        className='aspect-square max-h-[300px]'
+                                    >
+                                        <PieChart>
+                                            <ChartTooltip
+                                                cursor={false}
+                                                content={<ChartTooltipContent hideLabel />}
+                                            />
+                                            <Pie
+                                                data={bit10Allocation}
+                                                dataKey='value'
+                                                nameKey='name'
+                                                innerRadius={innerRadius}
+                                                strokeWidth={5}
+                                            >
+                                                <Label
+                                                    content={({ viewBox }) => {
+                                                        if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                            return (
+                                                                <text
+                                                                    x={viewBox.cx}
+                                                                    y={viewBox.cy}
+                                                                    textAnchor='middle'
+                                                                    dominantBaseline='middle'
+                                                                >
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={viewBox.cy}
+                                                                        className='fill-foreground text-xl font-bold'
+                                                                    >
+                                                                        BIT10.DEFI
+                                                                    </tspan>
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={(viewBox.cy || 0) + 24}
+                                                                        className='fill-muted-foreground'
+                                                                    >
+                                                                        Allocations
+                                                                    </tspan>
+                                                                </text>
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                            </Pie>
+                                        </PieChart>
+                                    </ChartContainer>
+                                </div>
+                                <div className='flex w-full flex-col space-y-3'>
+                                    <h1 className='text-2xl'>BIT10.DEFI Allocations</h1>
+                                    <div className='flex flex-col'>
+                                        {bit10Allocation.map(({ name, value, fill }) => (
+                                            <div key={name} className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-2 rounded'>
+                                                <div className='flex flex-row items-center space-x-1'>
+                                                    <div className='w-3 h-3 rounded' style={{ backgroundColor: fill }}></div>
+                                                    <div>{name}</div>
+                                                </div>
+                                                <div>{value} %</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
 
-                        <Card className='border-white lg:col-span-2 animate-fade-right-slow'>
+                        <Card className='dark:border-white md:col-span-2 animate-fade-right-slow'>
                             <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
                                 <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Performance</div>
                                 <div className='flex flex-row space-x-2 items-center justify-center'>
@@ -412,68 +551,125 @@ export default function Portfolio() {
                                                 activeTab === 'monthly' ? 'left-1' : 'left-[calc(50%-0.25rem)]'
                                             )}
                                         />
-                                        <div onClick={() => handleTabClick('monthly')} className={`relative z-10 w-1/2 px-4 py-1 text-sm cursor-pointer text-center font-medium focus:outline-none ${activeTab === 'monthly' ? 'text-white' : 'text-gray-200'}`}>Monthly</div>
-                                        <div onClick={() => handleTabClick('weekly')} className={`relative z-10 w-1/2 px-4 py-1 text-sm cursor-pointer text-center font-medium focus:outline-none ${activeTab === 'weekly' ? 'text-white' : 'text-gray-200'}`}>Weekly</div>
+                                        <div onClick={() => handleTabClick('monthly')} className={`relative z-10 w-1/2 px-4 py-1 text-sm cursor-pointer text-center font-medium focus:outline-none ${activeTab === 'monthly' && 'text-white'}`}>Monthly</div>
+                                        <div onClick={() => handleTabClick('weekly')} className={`relative z-10 w-1/2 px-4 py-1 text-sm cursor-pointer text-center font-medium focus:outline-none ${activeTab === 'weekly' && 'text-white'}`}>Weekly</div>
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent className='w-full h-64 select-none'>
+                            <CardContent className='select-none -ml-12 md:-ml-8'>
                                 {activeTab === 'monthly' &&
-                                    <ResponsiveContainer width='100%' height='100%'>
-                                        <LineChart
-                                            width={500}
-                                            height={300}
-                                            data={performanceDataMonthly}
-                                            margin={{ top: 5, bottom: 5, right: 10 }} >
-                                            <CartesianGrid strokeDasharray='3 3' />
-                                            <XAxis dataKey='month' padding={{ left: 5 }} />
-                                            <YAxis />
-                                            <Legend />
-                                            <Tooltip content={<CustomTooltip active={false} payload={[]} payloadTitle={['BIT10.DEFI', 'ICP', 'STX', 'CFX', 'MAPO', 'RIF', 'SOV']} />} />
-                                            <Line type='monotone' dataKey='bit10' name='BIT10.DEFI' stroke='#D5520E' activeDot={{ r: 8 }} />
-                                            <Line type='monotone' dataKey='icp' name='ICP' stroke='#ff0066' />
-                                            <Line type='monotone' dataKey='stx' name='STX' stroke='#ff8c1a' />
-                                            <Line type='monotone' dataKey='cfx' name='CFX' stroke='#1a1aff' />
-                                            <Line type='monotone' dataKey='mapo' name='MAPO' stroke='#ff1aff' />
-                                            <Line type='monotone' dataKey='rif' name='RIF' stroke='#3385ff' />
-                                            <Line type='monotone' dataKey='sov' name='SOV' stroke='#ffa366' />
-                                        </LineChart>
-                                    </ResponsiveContainer>
+                                    <ChartContainer config={chartConfig} className='max-h-[300px] w-full'>
+                                        <AreaChart accessibilityLayer data={performanceDataMonthly}>
+                                            <CartesianGrid vertical={false} />
+                                            <XAxis dataKey='month' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)} />
+                                            <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
+                                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                            <defs>
+                                                <linearGradient id='bit10' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='icp' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#ff0066' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#ff0066' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='stx' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#ff8c1a' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#ff8c1a' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='cfx' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#1a1aff' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#1a1aff' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='mapo' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#ff1aff' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#ff1aff' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='rif' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#3385ff' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#3385ff' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='sov' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#ffa366' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#ffa366' stopOpacity={0.1} />
+                                                </linearGradient>
+                                            </defs>
+                                            <Area dataKey='bit10' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
+
+                                            <Area dataKey='mapo' type='natural' fill='#ff1aff' fillOpacity={0.4} stroke='#ff1aff' stackId='a' />
+                                            <Area dataKey='rif' type='natural' fill='#3385ff' fillOpacity={0.4} stroke='#3385ff' stackId='a' />
+                                            <Area dataKey='cfx' type='natural' fill='#1a1aff' fillOpacity={0.4} stroke='#1a1aff' stackId='a' />
+                                            <Area dataKey='sov' type='natural' fill='#ffa366' fillOpacity={0.4} stroke='#ffa366' stackId='a' />
+                                            <Area dataKey='stx' type='natural' fill='#ff8c1a' fillOpacity={0.4} stroke='#ff8c1a' stackId='a' />
+                                            <Area dataKey='icp' type='natural' fill='#ff0066' fillOpacity={0.4} stroke='#ff0066' stackId='a' />
+                                            <ChartLegend content={<ChartLegendContent />} />
+                                        </AreaChart>
+                                    </ChartContainer>
                                 }
                                 {activeTab === 'weekly' &&
-                                    <ResponsiveContainer width='100%' height='100%'>
-                                        <LineChart
-                                            width={500}
-                                            height={300}
+                                    <ChartContainer config={chartConfig} className='max-h-[300px] w-full'>
+                                        <AreaChart
+                                            accessibilityLayer
                                             data={data}
-                                            margin={{ top: 5, bottom: 5, right: 10 }}
                                             onMouseDown={handleMouseDown}
                                             onMouseMove={handleMouseMove}
-                                            onMouseUp={handleMouseUp} >
-                                            <CartesianGrid strokeDasharray='3 3' />
-                                            <XAxis dataKey='week' padding={{ left: 5 }} />
-                                            <YAxis />
-                                            <Legend />
-                                            <Tooltip content={<CustomTooltip active={false} payload={[]} payloadTitle={['BIT10.DEFI', 'ICP', 'STX', 'CFX', 'MAPO', 'RIF', 'SOV']} />} />
-                                            <Line type='monotone' dataKey='bit10' name='BIT10.DEFI' stroke='#D5520E' activeDot={{ r: 8 }} />
-                                            <Line type='monotone' dataKey='icp' name='ICP' stroke='#ff0066' animationDuration={500} />
-                                            <Line type='monotone' dataKey='stx' name='STX' stroke='#ff8c1a' animationDuration={500} />
-                                            <Line type='monotone' dataKey='cfx' name='CFX' stroke='#1a1aff' animationDuration={500} />
-                                            <Line type='monotone' dataKey='mapo' name='MAPO' stroke='#ff1aff' animationDuration={500} />
-                                            <Line type='monotone' dataKey='rif' name='RIF' stroke='#3385ff' animationDuration={500} />
-                                            <Line type='monotone' dataKey='sov' name='SOV' stroke='#ffa366' animationDuration={500} />
+                                            onMouseUp={handleMouseUp}
+                                        >
+                                            <CartesianGrid vertical={false} />
+                                            <XAxis dataKey='week' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)} />
+                                            <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
+                                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                            <defs>
+                                                <linearGradient id='bit10' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='icp' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#ff0066' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#ff0066' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='stx' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#ff8c1a' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#ff8c1a' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='cfx' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#1a1aff' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#1a1aff' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='mapo' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#ff1aff' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#ff1aff' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='rif' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#3385ff' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#3385ff' stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id='sov' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#ffa366' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#ffa366' stopOpacity={0.1} />
+                                                </linearGradient>
+                                            </defs>
+                                            <Area dataKey='bit10' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
+
+                                            <Area dataKey='mapo' type='natural' fill='#ff1aff' fillOpacity={0.4} stroke='#ff1aff' stackId='a' />
+                                            <Area dataKey='rif' type='natural' fill='#3385ff' fillOpacity={0.4} stroke='#3385ff' stackId='a' />
+                                            <Area dataKey='cfx' type='natural' fill='#1a1aff' fillOpacity={0.4} stroke='#1a1aff' stackId='a' />
+                                            <Area dataKey='sov' type='natural' fill='#ffa366' fillOpacity={0.4} stroke='#ffa366' stackId='a' />
+                                            <Area dataKey='stx' type='natural' fill='#ff8c1a' fillOpacity={0.4} stroke='#ff8c1a' stackId='a' />
+                                            <Area dataKey='icp' type='natural' fill='#ff0066' fillOpacity={0.4} stroke='#ff0066' stackId='a' />
                                             {selection.startX !== null && selection.endX !== null && (
                                                 <ReferenceArea x1={selection.startX} x2={selection.endX} strokeOpacity={0.3} />
                                             )}
-                                        </LineChart>
-                                    </ResponsiveContainer>
+                                            <ChartLegend content={<ChartLegendContent />} />
+                                        </AreaChart>
+                                    </ChartContainer>
                                 }
                             </CardContent>
                         </Card>
                     </div>
 
                     {recentActivityLoading ? (
-                        <Card className='border-white animate-fade-bottom-up-slow'>
+                        <Card className='dark:border-white animate-fade-bottom-up-slow'>
                             <CardContent>
                                 <div className='flex flex-col h-full space-y-2 pt-8'>
                                     {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
@@ -483,7 +679,7 @@ export default function Portfolio() {
                             </CardContent>
                         </Card>
                     ) : (
-                        <Card className='border-white animate-fade-bottom-up-slow'>
+                        <Card className='dark:border-white animate-fade-bottom-up-slow'>
                             <CardHeader>
                                 <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent activity</div>
                             </CardHeader>
@@ -499,6 +695,6 @@ export default function Portfolio() {
                     )}
                 </div>
             )}
-        </MaxWidthWrapper>
+        </div>
     )
 }

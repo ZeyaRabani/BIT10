@@ -29,7 +29,7 @@ export default function ScrollToTopBtn() {
     };
 
     return (
-        <button className={`fixed bottom-4 right-4 md:bottom-8 md:right-12 z-10 bg-accent border-2 border-primary rounded-full p-2 outline-none ${showButton ? 'transition-opacity duration-200 opacity-100' : 'hidden'}`} onClick={scrollToTop}>
+        <button className={`fixed bottom-4 right-4 md:bottom-8 md:right-14 z-[48] bg-accent border-2 border-primary rounded-full p-2 outline-none ${showButton ? 'transition-opacity duration-200 opacity-100' : 'hidden'}`} onClick={scrollToTop}>
             <ChevronsUp />
         </button>
     )

@@ -87,7 +87,6 @@ export default function Page() {
 
     return (
         <MaxWidthWrapper>
-
             <div className='flex items-center justify-center space-x-2 py-4 max-w-[100vw]'>
                 <h1 className='text-2xl font-semibold leading-tight text-center tracking-wider lg:text-4xl md:whitespace-nowrap'>Terms of Service</h1>
             </div>

@@ -1,25 +1,24 @@
-import type { Metadata } from 'next'
 import './globals.css'
-import { cn } from '@/lib/utils'
+import { cn, constructMetadata } from '@/lib/utils'
 import { WalletProvider } from '@/context/WalletContext'
+import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import ScrollToTopBtn from '@/components/ScrollToTopBtn'
 
-export const metadata: Metadata = {
-  title: 'BIT10',
-  description: 'Empowering Your Portfolio with the Future of Finance',
-}
+export const metadata = constructMetadata();
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang='en'>
       <body className={cn('min-h-screen bg-background antialiased font-sansSerif')}>
         <WalletProvider>
-          <main>
-            {children}
-          </main>
-          <ScrollToTopBtn />
-          <Toaster richColors closeButton />
+          <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+            <main>
+              {children}
+            </main>
+            <ScrollToTopBtn />
+            <Toaster richColors closeButton />
+          </ThemeProvider>
         </WalletProvider>
       </body>
     </html>

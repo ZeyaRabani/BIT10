@@ -74,7 +74,7 @@ export default function BIT10BTCApprovalEmail() {
                             <FormItem>
                                 <FormLabel>Send email to</FormLabel>
                                 <FormControl>
-                                    <Input {...field} className='border-white' placeholder='Send email to' />
+                                    <Input {...field} className='dark:border-white' placeholder='Send email to' />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -88,7 +88,7 @@ export default function BIT10BTCApprovalEmail() {
                             <FormItem>
                                 <FormLabel>Wallet Principal ID</FormLabel>
                                 <FormControl>
-                                    <Input {...field} className='border-white' placeholder='Wallet Principal ID' />
+                                    <Input {...field} className='dark:border-white' placeholder='Wallet Principal ID' />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

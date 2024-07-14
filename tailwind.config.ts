@@ -1,5 +1,9 @@
 import type { Config } from 'tailwindcss'
 
+const {
+  default: flattenColorPalette,
+} = require('tailwindcss/lib/util/flattenColorPalette');
+
 const config = {
   darkMode: ['class'],
   content: [
@@ -95,11 +99,24 @@ const config = {
           from: { opacity: '0', transform: 'translateX(20px)' },
           to: { opacity: '1', transform: 'translateX(0)' },
         },
+        'spotlight': {
+          '0%': {
+            opacity: '0',
+            transform: 'translate(-72%, -62%) scale(0.5)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translate(-50%,-40%) scale(1)',
+          },
+        },
+        'scroll': {
+          to: { transform: 'translate(calc(-50% - 0.5rem))', },
+        },
         'round': {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
         },
-        rotate360: {
+        'rotate360': {
           from: { transform: 'rotate(0deg)' },
           to: { transform: 'rotate(-360deg)' },
         },
@@ -177,11 +194,24 @@ const config = {
         'fade-bottom-up-slow': 'fade-bottom-up 0.6s ease-out',
         'fade-in-down-slow': 'fade-in-down 0.6s ease-out',
         'rotate360': 'rotate360 0.5s linear',
-        'preloader': 'round 1.7s infinite ease, load 1.7s infinite ease'
+        'preloader': 'round 1.7s infinite ease, load 1.7s infinite ease',
+        'spotlight': 'spotlight 2s ease .75s 1 forwards',
+        'scroll': 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), addVariablesForColors],
 } satisfies Config
+
+function addVariablesForColors({ addBase, theme }: any) {
+  let allColors = flattenColorPalette(theme('colors'));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+
+  addBase({
+    ':root': newVars,
+  });
+}
 
 export default config

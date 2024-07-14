@@ -768,7 +768,7 @@ export default function Page() {
                                 <FormItem>
                                     <FormLabel>Send welcome email to</FormLabel>
                                     <FormControl>
-                                        <Input {...field} className='border-white' placeholder='Send welcome email to' />
+                                        <Input {...field} className='dark:border-white' placeholder='Send welcome email to' />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
