@@ -198,7 +198,7 @@ export default function Swap() {
                             bit10tokenBoughtAt: new Date().toISOString(),
                         }),
                     });
-                    
+
                     if (result === 'Token swap added successfully') {
                         toast.success('Token swap was successful!');
                     } else {

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Loader2 } from 'lucide-react'
 
 export default function Navbar() {
     const [isHidden, setIsHidden] = useState(false);
@@ -134,6 +135,7 @@ export default function Navbar() {
                                         <Dialog open={open} onOpenChange={setOpen}>
                                             <DialogTrigger asChild>
                                                 <Button disabled={isConnecting}>
+                                                    {isConnecting && <Loader2 className='animate-spin mr-2' size={15} />}
                                                     {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                                                 </Button>
                                             </DialogTrigger>

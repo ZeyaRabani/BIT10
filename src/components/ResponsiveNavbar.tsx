@@ -7,6 +7,7 @@ import { Menu, X, ArrowRightLeft, BriefcaseBusiness, Home, Users, BookCopy, User
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
 
 export default function ResponsiveNavbar() {
@@ -147,15 +148,16 @@ export default function ResponsiveNavbar() {
                                             <>
                                                 {isConnected ? (
                                                     <div className='border-y-2 py-2 px-2 cursor-pointer w-full'>
-                                                        <Button variant='destructive' className='text-md w-full' onClick={handleDisconnect}>
+                                                        <Button variant='destructive' className='w-full' onClick={handleDisconnect}>
                                                             Disconnect Wallet
                                                         </Button>
                                                     </div>
                                                 ) : (
                                                     <div className='border-y-2 w-full p-2'>
                                                         <Dialog open={open} onOpenChange={setOpen}>
-                                                            <DialogTrigger disabled={isConnecting}>
-                                                                <Button className='text-md w-full'>
+                                                            <DialogTrigger className='w-full'>
+                                                                <Button disabled={isConnecting} className='w-full'>
+                                                                    {isConnecting && <Loader2 className='animate-spin mr-2' size={15} />}
                                                                     {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                                                                 </Button>
                                                             </DialogTrigger>
