@@ -11,12 +11,13 @@ import ResponsiveNavbar from './ResponsiveNavbar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 export default function Navbar() {
     const [isHidden, setIsHidden] = useState(false);
     const [prevScrollPos, setPrevScrollPos] = useState(0);
     const [open, setOpen] = useState<boolean>(false);
+    const [isConnecting, setIsConnecting] = useState(false);
 
     const { isConnected, connectWallet, disconnectWallet, principalId } = useWallet();
     const pathname = usePathname();
@@ -55,8 +56,10 @@ export default function Navbar() {
     }, [principalId]);
 
     const handleWalletSelect = async () => {
-        connectWallet();
+        setIsConnecting(true);
         setOpen(false);
+        await connectWallet();
+        setIsConnecting(false);
     }
 
     const handleDisconnect = async () => {
@@ -130,54 +133,54 @@ export default function Navbar() {
                                     ) : (
                                         <Dialog open={open} onOpenChange={setOpen}>
                                             <DialogTrigger asChild>
-                                                <Button>
-                                                    Connect Wallet
+                                                <Button disabled={isConnecting}>
+                                                    {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                                                 </Button>
                                             </DialogTrigger>
                                             <DialogContent className='max-w-[90vw] md:max-w-[400px]'>
-                                                <div className='flex flex-col space-y-4'>
-                                                    <p className='text-lg text-center'>Connect your wallet to get started</p>
-                                                    <div className='flex flex-col space-y-2'>
-                                                        <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent' onClick={handleWalletSelect}>
-                                                            <Image height='30' width='30' src='/assets/wallet/plug.svg' alt='Plug' className='rounded' />
+                                                <DialogHeader>
+                                                    <DialogTitle className='tracking-wide pt-2 md:pt-0'>Connect your wallet to get started</DialogTitle>
+                                                </DialogHeader>
+                                                <div className='flex flex-col space-y-2'>
+                                                    <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent' onClick={handleWalletSelect}>
+                                                        <Image height='30' width='30' src='/assets/wallet/plug.svg' alt='Plug' className='rounded' />
+                                                        <div className='text-lg md:text-xl'>
+                                                            Plug
+                                                        </div>
+                                                    </Button>
+                                                    <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
+                                                        <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
+                                                            <Image height='30' width='30' src='/assets/wallet/xverse.svg' alt='Xverse' className='rounded' />
                                                             <div className='text-lg md:text-xl'>
-                                                                Plug
+                                                                Xverse
                                                             </div>
-                                                        </Button>
-                                                        <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
-                                                            <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                                <Image height='30' width='30' src='/assets/wallet/xverse.svg' alt='Xverse' className='rounded' />
-                                                                <div className='text-lg md:text-xl'>
-                                                                    Xverse
-                                                                </div>
+                                                        </div>
+                                                        <div className='text-sm text-accent-foreground/80'>
+                                                            Available soon
+                                                        </div>
+                                                    </Button>
+                                                    <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
+                                                        <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
+                                                            <Image height='30' width='30' src='/assets/wallet/unisat.svg' alt='UniSat' className='rounded' />
+                                                            <div className='text-lg md:text-xl'>
+                                                                UniSat
                                                             </div>
-                                                            <div className='text-sm text-accent-foreground/80'>
-                                                                Available soon
+                                                        </div>
+                                                        <div className='text-sm text-accent-foreground/80'>
+                                                            Available soon
+                                                        </div>
+                                                    </Button>
+                                                    <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
+                                                        <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
+                                                            <Image height='30' width='30' src='/assets/wallet/phantom.svg' alt='Phantom' className='rounded' />
+                                                            <div className='text-lg md:text-xl'>
+                                                                Phantom
                                                             </div>
-                                                        </Button>
-                                                        <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
-                                                            <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                                <Image height='30' width='30' src='/assets/wallet/unisat.svg' alt='UniSat' className='rounded' />
-                                                                <div className='text-lg md:text-xl'>
-                                                                    UniSat
-                                                                </div>
-                                                            </div>
-                                                            <div className='text-sm text-accent-foreground/80'>
-                                                                Available soon
-                                                            </div>
-                                                        </Button>
-                                                        <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
-                                                            <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                                <Image height='30' width='30' src='/assets/wallet/phantom.svg' alt='Phantom' className='rounded' />
-                                                                <div className='text-lg md:text-xl'>
-                                                                    Phantom
-                                                                </div>
-                                                            </div>
-                                                            <div className='text-sm text-accent-foreground/80'>
-                                                                Available soon
-                                                            </div>
-                                                        </Button>
-                                                    </div>
+                                                        </div>
+                                                        <div className='text-sm text-accent-foreground/80'>
+                                                            Available soon
+                                                        </div>
+                                                    </Button>
                                                 </div>
 
                                                 <p className='py-2 text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
