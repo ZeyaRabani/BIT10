@@ -58,12 +58,16 @@ const companySocial: SocialLinkType[] = [
         link: 'https://x.com/bit10startup',
         imageName: 'x.svg',
     },
+    {
+        link: 'https://t.me/zr00083',
+        imageName: 'telegram.svg',
+    },
     // {
     //     link: '#',
     //     imageName: 'discord.svg',
     // },
     // {
-    //     link: 'https://www.youtube.com/watch?v=q-ztce2YfTI',
+    //     link: 'https://www.youtube.com/@Bit10Startup',
     //     imageName: 'youtube.svg',
     // },
     // {
