@@ -55,7 +55,7 @@ export default function Page() {
                 <CardHeader>
                     <CardTitle className='text-4xl md:text-5xl text-center'>BIT10</CardTitle>
                     <CardDescription className='text-lg py-2'>
-                        <p className='py-0.5'>Sign up to become our Phase 2 <a href='https://twitter.com/bit10startup/status/1764954854965821729' target='_blank' className='underline'>testnet user</a> of BIT10.</p>
+                        <p className='py-0.5'>Sign up to become our Phase 2 <a href='https://x.com/bit10startup/status/1812843218247041507' target='_blank' className='underline'>testnet user</a> of BIT10.</p>
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
