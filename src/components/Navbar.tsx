@@ -206,34 +206,37 @@ export default function Navbar() {
                                                         Plug
                                                     </div>
                                                 </Button>
-                                                <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent'>
-                                                    <Image height='30' width='30' src='/assets/wallet/stoic.svg' alt='Stoic' className='rounded' />
-                                                    <div className='text-lg md:text-xl'>
-                                                        Stoic
+                                                <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
+                                                    <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
+                                                        <Image height='30' width='30' src='/assets/wallet/xverse.svg' alt='Xverse' className='rounded' />
+                                                        <div className='text-lg md:text-xl'>
+                                                            Xverse
+                                                        </div>
+                                                    </div>
+                                                    <div className='text-sm text-accent-foreground/80'>
+                                                        Available soon
                                                     </div>
                                                 </Button>
-                                                <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent'>
-                                                    <Image height='30' width='30' src='/assets/wallet/infinity.svg' alt='Infinity' className='rounded' />
-                                                    <div className='text-lg md:text-xl'>
-                                                        Infinity
+                                                <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
+                                                    <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
+                                                        <Image height='30' width='30' src='/assets/wallet/unisat.svg' alt='UniSat' className='rounded' />
+                                                        <div className='text-lg md:text-xl'>
+                                                            UniSat
+                                                        </div>
+                                                    </div>
+                                                    <div className='text-sm text-accent-foreground/80'>
+                                                        Available soon
                                                     </div>
                                                 </Button>
-                                                <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent'>
-                                                    <Image height='30' width='30' src='/assets/wallet/xverse.svg' alt='Xverse' className='rounded' />
-                                                    <div className='text-lg md:text-xl'>
-                                                        Xverse
+                                                <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
+                                                    <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
+                                                        <Image height='30' width='30' src='/assets/wallet/phantom.svg' alt='Phantom' className='rounded' />
+                                                        <div className='text-lg md:text-xl'>
+                                                            Phantom
+                                                        </div>
                                                     </div>
-                                                </Button>
-                                                <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent'>
-                                                    <Image height='30' width='30' src='/assets/wallet/unisat.svg' alt='UniSat' className='rounded' />
-                                                    <div className='text-lg md:text-xl'>
-                                                        UniSat
-                                                    </div>
-                                                </Button>
-                                                <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent'>
-                                                    <Image height='30' width='30' src='/assets/wallet/phantom.svg' alt='Phantom' className='rounded' />
-                                                    <div className='text-lg md:text-xl'>
-                                                        Phantom
+                                                    <div className='text-sm text-accent-foreground/80'>
+                                                        Available soon
                                                     </div>
                                                 </Button>
                                             </div>
