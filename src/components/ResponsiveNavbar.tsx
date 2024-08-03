@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useWallet } from '@/context/WalletContext'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ArrowRightLeft, BriefcaseBusiness, Home, Users, BookCopy, User } from 'lucide-react'
+import { Menu, X, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, User } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -114,10 +114,10 @@ export default function ResponsiveNavbar() {
                                         ) : (
                                             <>
                                                 <div className='pt-2 px-2 cursor-pointer w-full'>
-                                                    <Link onClick={() => closeOnCurrent('/team')} href='/team'>
+                                                    <Link onClick={() => closeOnCurrent('/faqs')} href='/faqs'>
                                                         <div className='flex flex-row justify-between items-center'>
-                                                            Team
-                                                            <Users />
+                                                            FAQs
+                                                            <MessageCircleQuestion />
                                                         </div>
                                                     </Link>
                                                 </div>

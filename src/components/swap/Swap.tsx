@@ -10,7 +10,7 @@ import { newTokenSwap } from '@/actions/dbActions'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { RotateCw, Loader2 } from 'lucide-react'
+import { RotateCw, Loader2, Info } from 'lucide-react'
 import { toast } from 'sonner'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
@@ -74,7 +74,7 @@ export default function Swap() {
 
     useEffect(() => {
         const fetchCoinbaseData = async () => {
-            const assets = ['STX', 'MAPO', 'ICP', 'RIF'];
+            const assets = ['STX', 'MAPO', 'ICP'];
             try {
                 const coinbaseRequests = assets.map(async (asset) => {
                     const response = await fetch(`https://api.coinbase.com/v2/prices/${asset}-USD/buy`);
@@ -95,7 +95,8 @@ export default function Swap() {
 
                 const prices = [
                     data.data.CFX[0].quote.USD.price,
-                    data.data.SOV[0].quote.USD.price
+                    data.data.SOV[0].quote.USD.price,
+                    data.data.RIF[0].quote.USD.price
                 ];
 
                 setCoinMarketCapData(prices);
@@ -257,7 +258,7 @@ export default function Swap() {
                                         <p>Pay with</p>
                                         <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                             <div className='text-4xl text-center md:text-start'>
-                                                {((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)).toFixed(6)}
+                                                {(((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) * 1.03).toFixed(6)}
                                             </div>
                                             <div className='flex flex-row items-center'>
                                                 <div className='py-1 px-2 mr-6 border-2 rounded-l-full z-10 w-full'>
@@ -271,7 +272,20 @@ export default function Swap() {
                                             </div>
                                         </div>
                                         <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                                            <div>$ {(parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))).toFixed(4)}</div>
+                                            <TooltipProvider>
+                                                <Tooltip delayDuration={300}>
+                                                    <TooltipTrigger asChild>
+                                                        <div className='flex flex-row space-x-1'>
+                                                            $ {((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) * 1.03).toFixed(4)}
+                                                            <Info className='w-5 h-5 cursor-pointer ml-1' />
+                                                        </div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                        Price in BIT10.BTC + 3% Platform fee <br />
+                                                        $ {(parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))).toFixed(4)} + $ {(0.03 * (parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4)))).toFixed(4)} = $ {((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) + (0.03 * (parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))))).toFixed(4)}
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                             <div>
                                                 1 BIT10.BTC = $ {parseFloat(btcAmount).toLocaleString(undefined, { minimumFractionDigits: 3 })}
                                             </div>

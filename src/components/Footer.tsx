@@ -33,8 +33,8 @@ const forCompany: FooterLinkType[] = [
         link: '/contact-us'
     },
     {
-        title: 'Frequently Asked Questions',
-        link: '/faqs'
+        title: 'Team',
+        link: '/team'
     }
 ]
 

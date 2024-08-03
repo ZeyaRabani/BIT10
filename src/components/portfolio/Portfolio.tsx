@@ -10,12 +10,11 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Tooltip as ShadcnTooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Badge } from '@/components/ui/badge'
-import { Label, Pie, PieChart, Area, AreaChart, CartesianGrid, XAxis, YAxis, ReferenceArea } from 'recharts'
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
+import { Label, Pie, PieChart, Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { bit10Allocation } from '@/data/bit10TokenAllocation'
 import clsx from 'clsx'
-import { performanceDataMonthly, performanceDataWeekly } from '@/data/performanceData'
-import { RotateCcw } from 'lucide-react'
+import { performanceDataMonth, performanceDataMonth3, performanceDataMonth6 } from '@/data/performanceData'
 import { PortfolioTableDataType, portfolioTableColumns } from './columns'
 import { DataTable } from '@/components/ui/data-table-portfolio'
 
@@ -28,34 +27,10 @@ interface UserPortfolioType {
     bit10_token_name: string;
 }
 
-type Tab = 'monthly' | 'weekly';
+type Tab = 'month' | 'month3' | 'month6';
 
 const chartConfig: ChartConfig = {
-    'BIT10.DEFI': {
-        label: 'BIT10.DEFI',
-    },
-    'BIT10.BRC20': {
-        label: 'BIT10.BRC20',
-    },
-    'ICP': {
-        label: 'ICP',
-    },
-    'STX': {
-        label: 'STX',
-    },
-    'CFX': {
-        label: 'CFX',
-    },
-    'MAPO': {
-        label: 'MAPO',
-    },
-    'RIF': {
-        label: 'RIF',
-    },
-    'SOV': {
-        label: 'SOV',
-    },
-    'bit10': {
+    'bit10DeFi': {
         label: 'BIT10.DEFI',
     },
     'icp': {
@@ -93,10 +68,7 @@ export default function Portfolio() {
     const [coinMarketCapData, setCoinMarketCapData] = useState<number[]>([]);
     const [totalSum, setTotalSum] = useState<number>(0);
     const [innerRadius, setInnerRadius] = useState<number>(80);
-    const [activeTab, setActiveTab] = useState<Tab>('monthly');
-    const [selection, setSelection] = useState<{ startX: string | null, endX: string | null }>({ startX: null, endX: null });
-    const [data, setData] = useState(performanceDataWeekly);
-    const [rotate, setRotate] = useState(false);
+    const [activeTab, setActiveTab] = useState<Tab>('month');
     const [recentActivityLoading, setRecentActivityLoading] = useState(true);
     const [portfolioData, setPortfolioData] = useState<PortfolioTableDataType[]>([]);
 
@@ -104,7 +76,7 @@ export default function Portfolio() {
 
     useEffect(() => {
         const fetchCoinbaseData = async () => {
-            const assets = ['STX', 'MAPO', 'ICP', 'RIF'];
+            const assets = ['STX', 'MAPO', 'ICP'];
             try {
                 const coinbaseRequests = assets.map(async (asset) => {
                     const response = await fetch(`https://api.coinbase.com/v2/prices/${asset}-USD/buy`);
@@ -125,7 +97,8 @@ export default function Portfolio() {
 
                 const prices = [
                     data.data.CFX[0].quote.USD.price,
-                    data.data.SOV[0].quote.USD.price
+                    data.data.SOV[0].quote.USD.price,
+                    data.data.RIF[0].quote.USD.price
                 ];
 
                 setCoinMarketCapData(prices);
@@ -262,34 +235,6 @@ export default function Portfolio() {
 
     const handleTabClick = (tab: Tab) => {
         setActiveTab(tab);
-    };
-
-    const handleMouseDown = (e: any) => {
-        if (e && e.activeLabel) {
-            setSelection({ startX: e.activeLabel as string, endX: e.activeLabel as string });
-        }
-    };
-
-    const handleMouseMove = (e: any) => {
-        if (selection.startX !== null && e && e.activeLabel) {
-            setSelection(prev => ({ ...prev, endX: e.activeLabel as string }));
-        }
-    };
-
-    const handleMouseUp = () => {
-        if (selection.startX !== null && selection.endX !== null) {
-            const startIndex = performanceDataWeekly.findIndex(data => data.week === selection.startX);
-            const endIndex = performanceDataWeekly.findIndex(data => data.week === selection.endX);
-            const zoomedData = performanceDataWeekly.slice(Math.min(startIndex, endIndex), Math.max(startIndex, endIndex) + 1);
-            setData(zoomedData);
-        }
-        setSelection({ startX: null, endX: null });
-    };
-
-    const handleZoomOut = () => {
-        setData(performanceDataWeekly);
-        setRotate(true);
-        setTimeout(() => setRotate(false), 1000);
     };
 
     return (
@@ -532,135 +477,71 @@ export default function Portfolio() {
                             <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
                                 <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Performance</div>
                                 <div className='flex flex-row space-x-2 items-center justify-center'>
-                                    {activeTab === 'weekly' &&
-                                        <TooltipProvider>
-                                            <ShadcnTooltip delayDuration={300}>
-                                                <TooltipTrigger asChild>
-                                                    <RotateCcw className={`w-5 h-5 cursor-pointer transition-transform ${rotate ? 'animate-rotate360' : ''}`} onClick={handleZoomOut} />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    Reset Zoom
-                                                </TooltipContent>
-                                            </ShadcnTooltip>
-                                        </TooltipProvider>
-                                    }
-                                    <div className='relative flex flex-row justify-end bg-accent border px-2 py-1 rounded'>
+                                    <div className='relative flex flex-row justify-between bg-accent border px-2 py-1 rounded'>
                                         <div
                                             className={clsx(
-                                                'absolute top-0 bottom-0 w-[45%] m-1 bg-primary rounded shadow-md transition-all duration-300 ease-in-out',
-                                                activeTab === 'monthly' ? 'left-1' : 'left-[calc(50%-0.25rem)]'
+                                                'absolute top-0 bottom-0 w-[30%] m-1 bg-primary rounded shadow-md transition-all duration-300 ease-in-out',
+                                                activeTab === 'month' ? 'left-1' : activeTab === 'month3' ? 'left-[calc(33%-0.25rem)]' : 'left-[calc(66%-0.25rem)]'
                                             )}
                                         />
-                                        <div onClick={() => handleTabClick('monthly')} className={`relative z-10 w-1/2 px-4 py-1 text-sm cursor-pointer text-center font-medium focus:outline-none ${activeTab === 'monthly' && 'text-white'}`}>Monthly</div>
-                                        <div onClick={() => handleTabClick('weekly')} className={`relative z-10 w-1/2 px-4 py-1 text-sm cursor-pointer text-center font-medium focus:outline-none ${activeTab === 'weekly' && 'text-white'}`}>Weekly</div>
+                                        <div onClick={() => handleTabClick('month')} className={`relative z-10 w-1/3 px-4 py-1 text-sm cursor-pointer text-center font-medium focus:outline-none ${activeTab === 'month' && 'text-white'}`}>1M</div>
+                                        <div onClick={() => handleTabClick('month3')} className={`relative z-10 w-1/3 px-4 py-1 text-sm cursor-pointer text-center font-medium focus:outline-none ${activeTab === 'month3' && 'text-white'}`}>3M</div>
+                                        <div onClick={() => handleTabClick('month6')} className={`relative z-10 w-1/3 px-4 py-1 text-sm cursor-pointer text-center font-medium focus:outline-none ${activeTab === 'month6' && 'text-white'}`}>6M</div>
                                     </div>
                                 </div>
                             </CardHeader>
                             <CardContent className='select-none -ml-12 md:-ml-8'>
-                                {activeTab === 'monthly' &&
+                                {
+                                    activeTab === 'month' &&
                                     <ChartContainer config={chartConfig} className='max-h-[300px] w-full'>
-                                        <AreaChart accessibilityLayer data={performanceDataMonthly}>
+                                        <AreaChart accessibilityLayer data={performanceDataMonth}>
                                             <CartesianGrid vertical={false} />
-                                            <XAxis dataKey='month' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)} />
+                                            <XAxis dataKey='month' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, value.indexOf(','))} />
                                             <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <defs>
-                                                <linearGradient id='bit10' x1='0' y1='0' x2='0' y2='1'>
+                                                <linearGradient id='bit10DeFi' x1='0' y1='0' x2='0' y2='1'>
                                                     <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
                                                     <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
                                                 </linearGradient>
-                                                <linearGradient id='icp' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#ff0066' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#ff0066' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='stx' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#ff8c1a' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#ff8c1a' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='cfx' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#1a1aff' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#1a1aff' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='mapo' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#ff1aff' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#ff1aff' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='rif' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#3385ff' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#3385ff' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='sov' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#ffa366' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#ffa366' stopOpacity={0.1} />
-                                                </linearGradient>
                                             </defs>
-                                            <Area dataKey='bit10' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
-
-                                            <Area dataKey='mapo' type='natural' fill='#ff1aff' fillOpacity={0.4} stroke='#ff1aff' stackId='a' />
-                                            <Area dataKey='rif' type='natural' fill='#3385ff' fillOpacity={0.4} stroke='#3385ff' stackId='a' />
-                                            <Area dataKey='cfx' type='natural' fill='#1a1aff' fillOpacity={0.4} stroke='#1a1aff' stackId='a' />
-                                            <Area dataKey='sov' type='natural' fill='#ffa366' fillOpacity={0.4} stroke='#ffa366' stackId='a' />
-                                            <Area dataKey='stx' type='natural' fill='#ff8c1a' fillOpacity={0.4} stroke='#ff8c1a' stackId='a' />
-                                            <Area dataKey='icp' type='natural' fill='#ff0066' fillOpacity={0.4} stroke='#ff0066' stackId='a' />
-                                            <ChartLegend content={<ChartLegendContent />} />
+                                            <Area dataKey='bit10DeFi' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
                                         </AreaChart>
                                     </ChartContainer>
                                 }
-                                {activeTab === 'weekly' &&
+                                {
+                                    activeTab === 'month3' &&
                                     <ChartContainer config={chartConfig} className='max-h-[300px] w-full'>
-                                        <AreaChart
-                                            accessibilityLayer
-                                            data={data}
-                                            onMouseDown={handleMouseDown}
-                                            onMouseMove={handleMouseMove}
-                                            onMouseUp={handleMouseUp}
-                                        >
+                                        <AreaChart accessibilityLayer data={performanceDataMonth3}>
                                             <CartesianGrid vertical={false} />
-                                            <XAxis dataKey='week' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)} />
+                                            <XAxis dataKey='month3' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, value.indexOf(','))} />
                                             <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <defs>
-                                                <linearGradient id='bit10' x1='0' y1='0' x2='0' y2='1'>
+                                                <linearGradient id='bit10DeFi' x1='0' y1='0' x2='0' y2='1'>
                                                     <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
                                                     <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
                                                 </linearGradient>
-                                                <linearGradient id='icp' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#ff0066' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#ff0066' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='stx' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#ff8c1a' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#ff8c1a' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='cfx' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#1a1aff' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#1a1aff' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='mapo' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#ff1aff' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#ff1aff' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='rif' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#3385ff' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#3385ff' stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id='sov' x1='0' y1='0' x2='0' y2='1'>
-                                                    <stop offset='5%' stopColor='#ffa366' stopOpacity={0.8} />
-                                                    <stop offset='95%' stopColor='#ffa366' stopOpacity={0.1} />
+                                            </defs>
+                                            <Area dataKey='bit10DeFi' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
+                                        </AreaChart>
+                                    </ChartContainer>
+                                }
+                                {
+                                    activeTab === 'month6' &&
+                                    <ChartContainer config={chartConfig} className='max-h-[300px] w-full'>
+                                        <AreaChart accessibilityLayer data={performanceDataMonth6}>
+                                            <CartesianGrid vertical={false} />
+                                            <XAxis dataKey='month6' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, value.indexOf(','))} />
+                                            <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
+                                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                            <defs>
+                                                <linearGradient id='bit10DeFi' x1='0' y1='0' x2='0' y2='1'>
+                                                    <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
+                                                    <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
                                                 </linearGradient>
                                             </defs>
-                                            <Area dataKey='bit10' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
-
-                                            <Area dataKey='mapo' type='natural' fill='#ff1aff' fillOpacity={0.4} stroke='#ff1aff' stackId='a' />
-                                            <Area dataKey='rif' type='natural' fill='#3385ff' fillOpacity={0.4} stroke='#3385ff' stackId='a' />
-                                            <Area dataKey='cfx' type='natural' fill='#1a1aff' fillOpacity={0.4} stroke='#1a1aff' stackId='a' />
-                                            <Area dataKey='sov' type='natural' fill='#ffa366' fillOpacity={0.4} stroke='#ffa366' stackId='a' />
-                                            <Area dataKey='stx' type='natural' fill='#ff8c1a' fillOpacity={0.4} stroke='#ff8c1a' stackId='a' />
-                                            <Area dataKey='icp' type='natural' fill='#ff0066' fillOpacity={0.4} stroke='#ff0066' stackId='a' />
-                                            {selection.startX !== null && selection.endX !== null && (
-                                                <ReferenceArea x1={selection.startX} x2={selection.endX} strokeOpacity={0.3} />
-                                            )}
-                                            <ChartLegend content={<ChartLegendContent />} />
+                                            <Area dataKey='bit10DeFi' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
                                         </AreaChart>
                                     </ChartContainer>
                                 }

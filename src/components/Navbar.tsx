@@ -137,16 +137,16 @@ export default function Navbar() {
                             </>
                         ) : (
                             <>
-                                <Link href='/team' passHref>
+                                <Link href='/faqs' passHref>
                                     <span
                                         ref={(el) => {
-                                            linkRefs.current['/team'] = el;
+                                            linkRefs.current['/faqs'] = el;
                                         }}
-                                        onClick={() => handleLinkClick('/team')}
-                                        // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/team' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
+                                        onClick={() => handleLinkClick('/faqs')}
+                                        // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/faqs' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
                                         className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
                                     >
-                                        Team
+                                        FAQs
                                     </span>
                                 </Link>
 
