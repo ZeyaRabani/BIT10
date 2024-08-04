@@ -161,7 +161,7 @@ export default function Page() {
                     </AccordionTrigger>
                     <AccordionContent className='flex flex-col space-y-2 w-full h-full'>
                         <p>{t('testnetLaunch')}</p>
-                        <div className='relative flex flex-col w-full h-full'>
+                        {/* <div className='relative flex flex-col w-full h-full'>
                             <div className='text-xl font-semibold'>{t('volume')}</div>
                             <RotateCcw className={`absolute top-0 right-0 w-5 h-5 cursor-pointer transition-transform ${rotate ? 'animate-rotate360' : ''}`} onClick={handleZoomOut} />
 
@@ -189,7 +189,7 @@ export default function Page() {
                                     <ChartLegend content={<ChartLegendContent />} />
                                 </AreaChart>
                             </ChartContainer>
-                        </div>
+                        </div> */}
 
                         <div className='relative flex flex-col w-full h-full'>
                             <div className='text-xl font-semibold'>{t('revenue')}</div>
