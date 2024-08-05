@@ -195,7 +195,7 @@ export default function Page() {
                             <div className='text-xl font-semibold'>{t('revenue')}</div>
                             <ChartContainer config={chartConfig} className='max-h-[300px] w-full'>
                                 <AreaChart accessibilityLayer data={revenue}>
-                                    <XAxis dataKey='week' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)} />
+                                    <XAxis dataKey='week' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, value.indexOf(','))} />
                                     <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
                                     <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                     <defs>
