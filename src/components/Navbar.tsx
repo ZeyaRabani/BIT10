@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Loader2 } from 'lucide-react'
+import AnimatedBackground from '@/components/ui/animated-background'
 
 export default function Navbar() {
     const [isHidden, setIsHidden] = useState(false);
@@ -25,6 +26,8 @@ export default function Navbar() {
 
     const { isConnected, connectWallet, disconnectWallet, principalId } = useWallet();
     const pathname = usePathname();
+
+    const TABS = ['about', 'swap', 'portfolio'];
 
     useEffect(() => {
         const handleScroll = () => {
@@ -95,89 +98,102 @@ export default function Navbar() {
 
                 <div className='hidden w-full md:inline-flex md:flex-grow md:w-auto'>
                     <div className='md:inline-flex md:flex-row md:ml-auto md:w-auto md:pl-16 lg:pl-28 w-full md:items-center items-start flex flex-col md:h-auto space-x-2'>
-                        <Link href='/' passHref>
-                            <span
-                                ref={(el) => {
-                                    linkRefs.current['/'] = el;
-                                }}
-                                onClick={() => handleLinkClick('/')}
-                                // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
-                                className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
-                            >
-                                About
-                            </span>
-                        </Link>
+                        <AnimatedBackground
+                            defaultValue={TABS[0]}
+                            className='rounded-lg bg-primary'
+                            transition={{
+                                type: 'spring',
+                                bounce: 0.2,
+                                duration: 0.3,
+                            }}
+                            enableHover
+                        >
+                            <Link href='/' passHref>
+                                <span
+                                    ref={(el) => {
+                                        linkRefs.current['/'] = el;
+                                    }}
+                                    onClick={() => handleLinkClick('/')}
+                                    data-id='about'
+                                    // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
+                                    className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
+                                >
+                                    About
+                                </span>
+                            </Link>
 
-                        {pathname === '/swap' || pathname === '/portfolio' ? (
-                            <>
-                                <Link href='/swap' passHref>
-                                    <span
-                                        ref={(el) => {
-                                            linkRefs.current['/swap'] = el;
-                                        }}
-                                        onClick={() => handleLinkClick('/swap')}
-                                        // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/swap' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
-                                        className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
-                                    >
-                                        Swap
-                                    </span>
-                                </Link>
-                                <Link href='/portfolio' passHref>
-                                    <span
-                                        ref={(el) => {
-                                            linkRefs.current['/portfolio'] = el;
-                                        }}
-                                        onClick={() => handleLinkClick('/portfolio')}
-                                        // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/portfolio' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
-                                        className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
-                                    >
-                                        Portfolio
-                                    </span>
-                                </Link>
-                            </>
-                        ) : (
-                            <>
-                                <Link href='/faqs' passHref>
-                                    <span
-                                        ref={(el) => {
-                                            linkRefs.current['/faqs'] = el;
-                                        }}
-                                        onClick={() => handleLinkClick('/faqs')}
-                                        // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/faqs' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
-                                        className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
-                                    >
-                                        FAQs
-                                    </span>
-                                </Link>
+                            {pathname === '/swap' || pathname === '/portfolio' ? (
+                                <>
+                                    <Link href='/swap' passHref>
+                                        <span
+                                            ref={(el) => {
+                                                linkRefs.current['/swap'] = el;
+                                            }}
+                                            onClick={() => handleLinkClick('/swap')}
+                                            data-id='swap'
+                                            // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/swap' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
+                                            className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
+                                        >
+                                            Swap
+                                        </span>
+                                    </Link>
+                                    <Link href='/portfolio' passHref>
+                                        <span
+                                            ref={(el) => {
+                                                linkRefs.current['/portfolio'] = el;
+                                            }}
+                                            onClick={() => handleLinkClick('/portfolio')}
+                                            // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/portfolio' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
+                                            className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
+                                        >
+                                            Portfolio
+                                        </span>
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href='/faqs' passHref>
+                                        <span
+                                            ref={(el) => {
+                                                linkRefs.current['/faqs'] = el;
+                                            }}
+                                            onClick={() => handleLinkClick('/faqs')}
+                                            // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/faqs' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
+                                            className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
+                                        >
+                                            FAQs
+                                        </span>
+                                    </Link>
 
-                                <Link href='/resources' passHref>
-                                    <span
-                                        ref={(el) => {
-                                            linkRefs.current['/resources'] = el;
-                                        }}
-                                        onClick={() => handleLinkClick('/resources')}
-                                        // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/resources' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
-                                        className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
-                                    >
-                                        Resources
-                                    </span>
-                                </Link>
+                                    <Link href='/resources' passHref>
+                                        <span
+                                            ref={(el) => {
+                                                linkRefs.current['/resources'] = el;
+                                            }}
+                                            onClick={() => handleLinkClick('/resources')}
+                                            // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/resources' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
+                                            className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
+                                        >
+                                            Resources
+                                        </span>
+                                    </Link>
 
-                                <Link href='/sign-up' passHref>
-                                    <span
-                                        ref={(el) => {
-                                            linkRefs.current['/sign-up'] = el;
-                                        }}
-                                        onClick={() => handleLinkClick('/sign-up')}
-                                        // className={`relative group md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/sign-up' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
-                                        className={`relative group md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
-                                    >
-                                        Sign Up
-                                        <Badge variant='outline' className='border-primary text-primary absolute top-0 -right-[4.5rem]'>Testnet</Badge>
-                                    </span>
-                                </Link>
-                            </>
-                        )}
+                                    <Link href='/sign-up' passHref>
+                                        <span
+                                            ref={(el) => {
+                                                linkRefs.current['/sign-up'] = el;
+                                            }}
+                                            onClick={() => handleLinkClick('/sign-up')}
+                                            // className={`relative group md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/sign-up' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
+                                            className={`relative group md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
+                                        >
+                                            Sign Up
+                                            <Badge variant='outline' className='border-primary text-primary absolute top-0 -right-[4.5rem]'>Testnet</Badge>
+                                        </span>
+                                    </Link>
+                                </>
+                            )}
+                        </AnimatedBackground>
                     </div>
                 </div>
 

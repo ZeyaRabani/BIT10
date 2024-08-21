@@ -12,7 +12,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@dfinity/principal": "^1.4.0",
+    "@dfinity/agent": "^2.0.0",
+    "@dfinity/principal": "^2.0.0",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-checkbox": "^1.1.1",
@@ -36,6 +37,7 @@
     "next-themes": "^0.3.0",
     "nodemailer": "^6.9.14",
     "postgres": "^3.4.4",
+    "posthog-js": "^1.157.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.52.1",
