@@ -80,23 +80,6 @@ export const newTokenSwap = async ({ newTokenSwapId, principalId, paymentAmount,
     }
 };
 
-export const userPortfolioDetails = async ({ paymentAddress }: { paymentAddress: string }) => {
-    try {
-        const data = await db.select({
-            token_purchase_amount: te_token_swap.token_purchase_amount,
-            token_purchase_name: te_token_swap.token_purchase_name,
-            token_purchase_usd_amount: te_token_swap.token_purchase_usd_amount,
-            bit10_token_quantity: te_token_swap.bit10_token_quantity,
-            bit10_token_name: te_token_swap.bit10_token_name,
-        })
-            .from(te_token_swap)
-            .where(eq(te_token_swap.user_principal_id, paymentAddress)).orderBy(te_token_swap.bit10_token_name);
-        return data;
-    } catch (error) {
-        return 'Error fetching user portfolio details';
-    }
-}
-
 export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: string }) => {
     try {
         const data = await db.select({
