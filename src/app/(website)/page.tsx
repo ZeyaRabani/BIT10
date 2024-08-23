@@ -6,7 +6,6 @@ import { Spotlight } from '@/components/ui/spotlight'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
-import { ContainerScroll } from '@/components/ui/container-scroll-animation'
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards'
 import Image from 'next/image'
 
@@ -142,27 +141,21 @@ export default function Page() {
             </div>
 
             <MaxWidthWrapper>
-                <div className='flex flex-col overflow-hidden'>
-                    <ContainerScroll
-                        titleComponent={
-                            <>
-                                <h1 className='text-4xl font-semibold text-black dark:text-white'>
-                                    Discover how<br />
-                                    <span className='text-4xl md:text-[6rem] font-bold mt-1 leading-none'>
-                                        BIT10 works
-                                    </span>
-                                </h1>
-                            </>
-                        }>
-                        <iframe
-                            src='https://www.youtube.com/embed/XBAx1-Py9Oo'
-                            // height={720}
-                            // width={1400}
-                            allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                            allowFullScreen
-                            className='mx-auto rounded-2xl object-cover w-full h-full object-left-top'
-                        ></iframe>
-                    </ContainerScroll>
+                <div className='flex flex-col items-center space-y-2 pt-2 pb-8'>
+                    <h1 className='text-3xl md:text-4xl text-center font-semibold text-black dark:text-white'>
+                        Discover how<br />
+                        <span className='text-4xl md:text-[5rem] font-bold mt-1 leading-none'>
+                            BIT10 works
+                        </span>
+                    </h1>
+                    <iframe
+                        src='https://www.youtube.com/embed/XBAx1-Py9Oo'
+                        // height={1720}
+                        // width={1400}
+                        allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                        allowFullScreen
+                        className='mx-auto rounded-2xl object-cover w-full md:w-3/4 h-56 md:h-[36rem]'
+                    ></iframe>
                 </div>
 
                 <div className='flex flex-col antialiased items-center justify-center relative overflow-hidden'>
