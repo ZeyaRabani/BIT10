@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useWallet } from '@/context/WalletContext'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, User } from 'lucide-react'
+import { Menu, X, ArrowRightLeft, CircleDollarSign, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, User } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -91,13 +91,22 @@ export default function ResponsiveNavbar() {
                                     </div>
 
                                     {
-                                        pathname === '/swap' || pathname === '/portfolio' || pathname === '/send' ? (
+                                        pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' ? (
                                             <>
                                                 <div className='pt-2 px-2 cursor-pointer w-full'>
-                                                    <Link onClick={() => closeOnCurrent('/')} href='/'>
+                                                    <Link onClick={() => closeOnCurrent('/swap')} href='/swap'>
                                                         <div className='flex flex-row justify-between items-center'>
                                                             Swap
                                                             <ArrowRightLeft />
+                                                        </div>
+                                                    </Link>
+                                                </div>
+
+                                                <div className='border-t-2 pt-2 px-2 cursor-pointer w-full'>
+                                                    <Link onClick={() => closeOnCurrent('/send')} href='/send'>
+                                                        <div className='flex flex-row justify-between items-center'>
+                                                            Send
+                                                            <CircleDollarSign />
                                                         </div>
                                                     </Link>
                                                 </div>
@@ -144,7 +153,7 @@ export default function ResponsiveNavbar() {
                                     }
 
                                     {
-                                        pathname === '/swap' || pathname === '/portfolio' ? (
+                                        pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' ? (
                                             <>
                                                 {isConnected ? (
                                                     <div className='border-y-2 py-2 px-2 cursor-pointer w-full'>
