@@ -91,7 +91,7 @@ export default function ResponsiveNavbar() {
                                     </div>
 
                                     {
-                                        pathname === '/swap' || pathname === '/portfolio' ? (
+                                        pathname === '/swap' || pathname === '/portfolio' || pathname === '/send' ? (
                                             <>
                                                 <div className='pt-2 px-2 cursor-pointer w-full'>
                                                     <Link onClick={() => closeOnCurrent('/')} href='/'>

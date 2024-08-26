@@ -156,7 +156,9 @@ export default function Portfolio() {
             setTotalSum(bit10DeFi);
         }
         setLoading(false);
-    }, [coinbaseData, coinMarketCapData]); useEffect(() => {
+    }, [coinbaseData, coinMarketCapData]); 
+    
+    useEffect(() => {
         const fetchCoinbaseData = async () => {
             const assets = ['STX', 'MAPO', 'ICP'];
             try {
