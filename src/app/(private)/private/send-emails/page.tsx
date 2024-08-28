@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import BIT10BTCApprovalEmail from './BIT10BTCApprovalEmail'
 import ICPInterview from './ICPInterview'
+import BIT10Review from './BIT10Review'
 
 const FormSchema = z.object({
     email: z.string({
@@ -786,6 +787,8 @@ export default function Page() {
             <BIT10BTCApprovalEmail />
 
             <ICPInterview />
+
+            <BIT10Review />
 
         </div>
     )
