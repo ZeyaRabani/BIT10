@@ -267,7 +267,7 @@ export default function Page() {
                                     <a href='https://www.linkedin.com/in/harshal0902' target='_blank' rel='noreferrer noopener'>
                                         <Image src='/assets/footer/linkedin.svg' alt='LinedIn' width={20} height={20} />
                                     </a>
-                                    <a href='https://x.com/HarshalRaikwar6' target='_blank' rel='noreferrer noopener'>
+                                    <a href='https://x.com/Harshal_0902' target='_blank' rel='noreferrer noopener'>
                                         <Image src='/assets/footer/x_white.svg' alt='Twitter' width={18} height={18} />
                                     </a>
                                     <a href='mailto:harshalraikwar07@gmail.com ' rel='noreferrer noopener'>

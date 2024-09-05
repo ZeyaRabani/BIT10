@@ -38,7 +38,7 @@ export default function Page() {
                         <a href='https://www.linkedin.com/in/harshal0902' target='_blank' rel='noreferrer noopener' className='p-2 flex items-center justify-center rounded-full bg-gray-100 border-2 border-primary'>
                             <Image src='/assets/footer/linkedin.svg' alt='LinedIn' width={20} height={20} />
                         </a>
-                        <a href='https://x.com/HarshalRaikwar6' target='_blank' rel='noreferrer noopener' className='p-2 flex items-center justify-center rounded-full bg-gray-100 border-2 border-primary'>
+                        <a href='https://x.com/Harshal_0902' target='_blank' rel='noreferrer noopener' className='p-2 flex items-center justify-center rounded-full bg-gray-100 border-2 border-primary'>
                             <Image src='/assets/footer/x.svg' alt='Twitter' width={20} height={20} />
                         </a>
                     </div>
@@ -72,7 +72,7 @@ export default function Page() {
                             <a href='https://www.linkedin.com/in/harshal0902' target='_blank' rel='noreferrer noopener' className='p-2 flex items-center justify-center rounded-full bg-gray-100 border-2 border-primary'>
                                 <Image src='/assets/footer/linkedin.svg' alt='LinedIn' width={24} height={24} />
                             </a>
-                            <a href='https://x.com/HarshalRaikwar6' target='_blank' rel='noreferrer noopener' className='p-2 flex items-center justify-center rounded-full bg-gray-100 border-2 border-primary'>
+                            <a href='https://x.com/HarshalHarshal_0902Raikwar6' target='_blank' rel='noreferrer noopener' className='p-2 flex items-center justify-center rounded-full bg-gray-100 border-2 border-primary'>
                                 <Image src='/assets/footer/x.svg' alt='Twitter' width={24} height={24} />
                             </a>
                         </div>

@@ -35,8 +35,8 @@ export function ICPInterview({ name }: { name: string }) {
                                 <Link href='https://x.com/zeyathezeya' className='text-blue-500'>
                                     @zeyathezeya
                                 </Link> or {''}
-                                <Link href='https://x.com/HarshalRaikwar6' className='text-blue-500'>
-                                    @HarshalRaikwar6
+                                <Link href='https://x.com/Harshal_0902' className='text-blue-500'>
+                                    @Harshal_0902
                                 </Link> {''}
                                 for support.
                             </Text>
