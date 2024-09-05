@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import BIT10BTCApprovalEmail from './BIT10BTCApprovalEmail'
 import ICPInterview from './ICPInterview'
 import BIT10Review from './BIT10Review'
+import BIT10TestnetWelcome from './BIT10TestnetWelcome'
 
 const FormSchema = z.object({
     email: z.string({
@@ -790,6 +791,7 @@ export default function Page() {
 
             <BIT10Review />
 
+            <BIT10TestnetWelcome />
         </div>
     )
 }

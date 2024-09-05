@@ -23,6 +23,10 @@ const nextConfig = {
                 destination: `/api/bit10-testnet-welcome/:slug*`,
             },
             {
+                source: '/bit10-testnet-welcome-single/:slug*',
+                destination: `/api/bit10-testnet-welcome-single/:slug*`,
+            },
+            {
                 source: '/bit10-review/:slug*',
                 destination: `/api/bit10-review/:slug*`,
             },
