@@ -5,8 +5,8 @@ import { render } from '@react-email/render'
 import { Welcome } from '@/emails/Welcome'
 
 export async function POST(request: NextRequest) {
-    const myEmail = process.env.NEXT_PUBLIC_PERSONAL_EMAIL;
-    const password = process.env.NEXT_PUBLIC_EMAIL_PASSWORD;
+    const myEmail = process.env.PERSONAL_EMAIL;
+    const password = process.env.EMAIL_PASSWORD;
     const email2 = 'harshalraikwar07@gmail.com'
 
     const { email } = await request.json();
@@ -47,7 +47,6 @@ export async function POST(request: NextRequest) {
         await sendMailPromise();
         return NextResponse.json({ message: 'Email sent successfully!' });
     } catch (err) {
-        // return NextResponse.json({ error: err }, { status: 500 });
-        return NextResponse.json({ message: err });
+        return NextResponse.json({ error: err }, { status: 500 });
     }
 }

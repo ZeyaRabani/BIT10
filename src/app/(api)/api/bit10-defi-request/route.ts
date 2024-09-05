@@ -5,8 +5,8 @@ import { render } from '@react-email/render'
 import { BIT10DEFIRequest } from '@/emails/BIT10.DEFIRequest'
 
 export async function POST(request: NextRequest) {
-    const myEmail = process.env.NEXT_PUBLIC_PERSONAL_EMAIL;
-    const password = process.env.NEXT_PUBLIC_EMAIL_PASSWORD;
+    const myEmail = process.env.PERSONAL_EMAIL;
+    const password = process.env.EMAIL_PASSWORD;
     const email2 = 'harshalraikwar07@gmail.com'
 
     const { newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenBoughtAt } = await request.json();
