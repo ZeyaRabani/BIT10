@@ -33,7 +33,7 @@ export function Welcome() {
 
                         <Section className='flex flex-col space-y-4 p-4 bg-white rounded-b-md'>
                             <Heading as='h2' className='m-0 mb-3.5 font-bold text-xl text-[#0c0d0e]'>
-                            Thank you for signing up to BIT10&apso;s testnet, here&apos;s what you can expect and how to get started
+                                Thank you for signing up to BIT10&apos;s testnet, here&apos;s what you can expect and how to get started
                             </Heading>
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
                                 <span className='font-bold'>BIT10</span> is an innovative asset manager designed to give you the opportunity to buy our Index, which tracks the biggest crypto tokens, ordinals, and BRC-20&apos;s in the Bitcoin DeFi ecosystem. With BIT10, you can hold a pre-picked basket of assets simply by purchasing one token.
