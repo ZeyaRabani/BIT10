@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 "use client"
 
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
@@ -12,10 +14,9 @@ interface DataTableViewOptionsProps<TData> {
 
 const formatColumnName = (columnName: string): string => {
     return columnName
-        .replace(/([a-z])([A-Z])/g, '$1 $2')
-        .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
-        .toLowerCase()
-        .replace(/^\w/, (c) => c.toUpperCase());
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
 };
 
 export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
@@ -25,13 +26,13 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                 <Button
                     variant='outline'
                     size='sm'
-                    className='ml-auto hidden h-8 lg:flex'
+                    className='ml-auto hidden h-8 lg:flex dark:border-white'
                 >
                     <Settings2 className='mr-2 h-4 w-4' />
                     View
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-[150px]'>
+            <DropdownMenuContent align='end' className='w-[200px]'>
                 <DropdownMenuLabel>View columns</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {table
@@ -46,7 +47,7 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                                 key={column.id}
                                 className='capitalize'
                                 checked={column.getIsVisible()}
-                                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                                onCheckedChange={(value: any) => column.toggleVisibility(!!value)}
                             >
                                 {formatColumnName(column.id)}
                             </DropdownMenuCheckboxItem>

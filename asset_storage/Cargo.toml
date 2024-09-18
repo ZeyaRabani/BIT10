@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "src/asset_storage_backend"
+]
+resolver = "2"
+
+[dependencies]
+ic-cdk = "0.15"
+candid = "0.10"

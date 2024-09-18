@@ -1,56 +1,44 @@
 "use client"
 
-import React, { useState } from 'react'
-import { addUserNewsletter } from '@/lib/supabaseRequests'
+import React from 'react'
+import { addUserSignUps } from '@/actions/dbActions'
+import MaxWidthWrapper from './MaxWidthWrapper'
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useToast } from "@/components/ui/use-toast"
-import { Form, FormControl, FormField, FormItem, FormDescription, FormMessage } from './ui/form'
+import * as z from 'zod'
+import { toast } from 'sonner'
+import { Form, FormControl, FormField, FormItem, FormDescription, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Button } from './ui/button'
-import { Input } from './ui/input'
-import { Linkedin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react'
+import Image from 'next/image'
 
-const FormSchema = z.object({
-    email: z.string().email({
-        message: 'Invalid email format.',
-    }),
-})
-
-interface FooterLinks {
+interface FooterLinkType {
     title: string;
     link: string;
 }
 
-const quickLinks: FooterLinks[] = [
-    {
-        title: 'Dashboard',
-        link: '/dashboard'
-    },
-    {
-        title: 'Portfolio',
-        link: '/portfolio'
-    },
-    {
-        title: 'Regulatory Compliance',
-        link: '/regulatory-compliance'
-    }
-]
+interface SocialLinkType {
+    link: string;
+    imageName: string;
+}
 
-const forCompany: FooterLinks[] = [
+const forCompany: FooterLinkType[] = [
     {
         title: 'About Us',
         link: '/'
     },
     {
         title: 'Contact Us',
-        link: 'contact'
+        link: '/contact-us'
     },
     {
-        title: 'Frequently Asked Questions',
-        link: 'faqs'
-    },
+        title: 'Team',
+        link: '/team'
+    }
+]
+
+const forLegal: FooterLinkType[] = [
     {
         title: 'Terms of Service',
         link: 'tos'
@@ -58,137 +46,155 @@ const forCompany: FooterLinks[] = [
     {
         title: 'Privacy Policy',
         link: 'privacy'
+    },
+    {
+        title: 'Audit',
+        link: 'audit'
     }
 ]
 
-export default function Footer() {
-    const [waitlist, setWaitlist] = useState([]);
+const companySocial: SocialLinkType[] = [
+    {
+        link: 'https://x.com/bit10startup',
+        imageName: 'x.svg',
+    },
+    {
+        link: 'https://t.me/zr00083',
+        imageName: 'telegram.svg',
+    },
+    // {
+    //     link: '#',
+    //     imageName: 'discord.svg',
+    // },
+    // {
+    //     link: 'https://www.youtube.com/@Bit10Startup',
+    //     imageName: 'youtube.svg',
+    // },
+    // {
+    //     link: '#',
+    //     imageName: 'linkedin.svg',
+    // },
+    {
+        link: 'https://github.com/ZeyaRabani/BIT10',
+        imageName: 'github.svg',
+    },
+    // {
+    //     link: '#',
+    //     imageName: 'reddit.svg',
+    // }
+]
 
-    const currentYear = new Date().getFullYear()
-    const { toast } = useToast()
+const FormSchema = z.object({
+    email: z.string({
+        required_error: 'Email is required',
+    }).email({
+        message: 'Invalid email format',
+    })
+})
+
+export default function Footer() {
+    const currentYear = new Date().getFullYear();
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            email: "",
-        },
-    });
+            email: '',
+        }
+    })
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         const email = data.email;
 
         if (email) {
-            const result = await addUserNewsletter({ email });
+            const result = await addUserSignUps({ email });
 
             if (result) {
-                // @ts-ignore
-                if (result.error === '409') {
-                    toast({
-                        title: "User already added to the newsletter",
-                    })
+                if (result === 'Error adding user to signups') {
+                    toast.info('User already added to the newsletter.');
                 } else {
-                    // @ts-ignore
-                    setWaitlist((prevWaitlist) => [...prevWaitlist, email]);
-                    toast({
-                        title: "User added to newslette!",
-                    })
+                    toast.success('User added to newsletter successfully!');
                     form.reset();
                 }
             }
         }
-    };
+    }
 
     return (
-        <footer className="bg-gray-100 dark:bg-gray-900">
-            <div className="container px-6 py-12 mx-auto">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4">
-                    <div className="sm:col-span-2">
-                        <h1 className="max-w-lg text-xl font-semibold tracking-tight text-gray-800 xl:text-2xl dark:text-white">Subscribe our newsletter to get update.</h1>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col mx-auto mt-6 md:space-x-2 space-y-3 md:space-y-0 md:flex-row'>
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <Input {...field} className="w-full" placeholder='Email Address' />
-                                            </FormControl>
-                                            <FormDescription>
-                                                Don&apos;t worry we will not send you spam emails.
-                                            </FormDescription>
-                                            <FormMessage className='text-destructive' />
-                                        </FormItem>
-                                    )}
-                                />
+        <MaxWidthWrapper>
+            <footer className='bg-blue-100/80 dark:bg-accent my-2.5 md:my-6 rounded backdrop-blur-0'>
+                <div className='container p-6 mx-auto'>
 
-                                <Button type='submit' className='text-white bg-primary hover:bg-primary/90'>
-                                    Subscribe
-                                </Button>
-                            </form>
-                        </Form>
-                    </div>
+                    <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4'>
+                        <div className='sm:col-span-2'>
+                            <h1 className='max-w-lg text-xl font-semibold tracking-wide text-black dark:text-white'>Subscribe to Our Newsletter to Get Updates:</h1>
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off' className='flex flex-col mx-auto mt-6 md:space-x-2 space-y-3 md:space-y-0 md:flex-row'>
+                                    <FormField
+                                        control={form.control}
+                                        name='email'
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Input {...field} className='w-full' placeholder='Email Address' />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    Don&apos;t worry we will not send you spam emails.
+                                                </FormDescription>
+                                                <FormMessage className='text-destructive tracking-wide' />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                    <div>
-                        <p className="font-semibold text-gray-800 dark:text-white">Quick Link</p>
+                                    <Button type='submit'>
+                                        Subscribe
+                                    </Button>
+                                </form>
+                            </Form>
+                        </div>
 
-                        <div className="flex flex-col items-start mt-5 space-y-2">
-                            {quickLinks.map((link, index) => (
-                                <Link href={link.link} key={index} passHref>
-                                    <div className='text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:text-blue-500'>{link.title}</div>
-                                </Link>
-                            ))}
+                        <div>
+                            <p className='font-semibold tracking-wide'>Platform</p>
+
+                            <div className='flex flex-col items-start mt-5 space-y-2'>
+                                {forCompany.map((link, index) => (
+                                    <Link href={link.link} key={index} passHref>
+                                        <p className='transition-colors duration-300 hover:text-primary hover:cursor-pointer'>{link.title}</p>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <p className='font-semibold tracking-wide'>Legal</p>
+
+                            <div className='flex flex-col items-start mt-5 space-y-2'>
+                                {forLegal.map((link, index) => (
+                                    <Link href={link.link} key={index} passHref>
+                                        <p className='transition-colors duration-300 hover:text-primary hover:cursor-pointer'>{link.title}</p>
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
-                    <div>
-                        <p className="font-semibold text-gray-800 dark:text-white">About Company</p>
+                    <hr className='my-6 border-gray-200 dark:border-gray-700 h-2' />
 
-                        <div className="flex flex-col items-start mt-5 space-y-2">
-                            {forCompany.map((link, index) => (
-                                <Link href={link.link} key={index} passHref>
-                                    <div className='text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:text-blue-500'>{link.title}</div>
-                                </Link>
-                            ))}
+                    <div className='sm:flex sm:items-center sm:justify-between'>
+                        <div className='flex flex-col space-y-2'>
+                            <h1 className='text-lg'>Connect with us on:</h1>
+                            <div className='flex gap-2 hover:cursor-pointer items-center'>
+                                {companySocial.map((social, index) => (
+                                    <a href={social.link} target='_blank' rel='noopener noreferrer' key={index} className='p-2 flex items-center justify-center rounded-full bg-gray-100 border-2 border-primary'>
+                                        <Image src={`/assets/footer/${social.imageName}`} height={20} width={20} quality={100} alt={social.imageName} />
+                                    </a>
+                                ))}
+                            </div>
                         </div>
                     </div>
+
+                    <p className='flex flex-wrap justify-center items-center py-2 text-center text-xl w-full mx-auto'>&copy; {currentYear} BIT10, Inc. All rights reserved.</p>
                 </div>
-
-                <hr className="my-6 border-gray-200 md:my-8 dark:border-gray-700" />
-
-                <div className="flex items-center justify-between">
-                    <Link href='/' passHref>
-                        <div className="text-3xl font-semibold text-gray-800 dark:text-white">BIT10</div>
-                    </Link>
-
-                    <div className="flex md:-mx-2">
-                        {/* <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
-                            <Linkedin />
-                        </a>
-
-                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
-                            <Facebook />
-                        </a>
-
-                        <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
-                            <Instagram />
-                        </a> */}
-
-                        <a href="https://twitter.com/bit10startup" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
-                            <Twitter />
-                        </a>
-
-                        {/* <a href="#" className="mx-0.5 md:mx-2 text-gray-600 transition-colors duration-300 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" aria-label="Reddit">
-                            <Youtube />
-                        </a> */}
-
-                    </div>
-                </div>
-            </div>
-
-            <div className='flex flex-wrap justify-center items-center py-2 text-center text-xl w-full mx-auto z-[48]'>
-                &copy; {currentYear} BIT10, Inc. All rights reserved.
-            </div>
-        </footer>
+            </footer>
+        </MaxWidthWrapper>
     )
 }

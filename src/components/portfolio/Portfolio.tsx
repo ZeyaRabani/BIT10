@@ -1,212 +1,511 @@
-import React from 'react'
-import MaxWidthWrapper from '../MaxWidthWrapper'
-import { Button } from '../ui/button'
-import Link from 'next/link'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Badge } from '../ui/badge'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { PreformanceTableDataType, preformanceTableColumns } from './columns'
-import Bit10Preformance from '@/components/bit10Preformance'
-import { DataTable } from '@/components/ui/data-table'
+"use client"
 
-interface PreformanceDataType {
-  month: string;
-  preformance: number;
+import React, { useState, useEffect } from 'react'
+import { userRecentActivity } from '@/actions/dbActions'
+import { useWallet } from '@/context/WalletContext'
+import { toast } from 'sonner'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Actor, HttpAgent } from '@dfinity/agent'
+import { Principal } from '@dfinity/principal'
+import { idlFactory } from '@/lib/bit10_btc.did'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { Label, Pie, PieChart } from 'recharts'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import type { ChartConfig } from '@/components/ui/chart'
+import { bit10Allocation } from '@/data/bit10TokenAllocation'
+import Performance from './performance'
+import type { PortfolioTableDataType } from './columns'
+import { portfolioTableColumns } from './columns'
+import { DataTable } from '@/components/ui/data-table-portfolio'
+
+const chartConfig: ChartConfig = {
+    'bit10DeFi': {
+        label: 'BIT10.DEFI',
+    },
+    'icp': {
+        label: 'ICP',
+    },
+    'stx': {
+        label: 'STX',
+    },
+    'cfx': {
+        label: 'CFX',
+    },
+    'mapo': {
+        label: 'MAPO',
+    },
+    'rif': {
+        label: 'RIF',
+    },
+    'sov': {
+        label: 'SOV',
+    },
 }
 
-const preformanceData: PreformanceDataType[] = [
-  { month: 'Jan', preformance: 30000 },
-  { month: 'Feb', preformance: 40050 },
-  { month: 'Mar', preformance: 30660 },
-  { month: 'Apr', preformance: 40600 },
-  { month: 'May', preformance: 58667 },
-  { month: 'Jun', preformance: 70009 },
-  { month: 'Jul', preformance: 96660 },
-];
-
-const preformanceTableData: PreformanceTableDataType[] = [
-  {
-    settelment: '26 Dec, 2023',
-    tradeDate: '25 Dec, 2023',
-    symbol: 'BIT10',
-    name: 'From Bit10',
-    quantity: 4,
-    type: 'Fund Recieved',
-    price: 1000,
-    fees: 0.01,
-  },
-  {
-    settelment: '28 Dec, 2023',
-    tradeDate: '27 Dec, 2023',
-    symbol: 'BTC',
-    name: 'Bitcoin Purchase',
-    quantity: 2,
-    type: 'Buy',
-    price: 3000,
-    fees: 0.02,
-  },
-  {
-    settelment: '30 Dec, 2023',
-    tradeDate: '29 Dec, 2023',
-    symbol: 'BTC',
-    name: 'Bitcoin Dividend',
-    quantity: 1,
-    type: 'Divident',
-    price: 50000,
-    fees: 0.005,
-  },
-  {
-    settelment: '2 Jan, 2024',
-    tradeDate: '1 Jan, 2024',
-    symbol: 'BIT10',
-    name: 'From Bit10',
-    quantity: 5,
-    type: 'Reinested',
-    price: 150,
-    fees: 0.015,
-  },
-  {
-    settelment: '4 Jan, 2024',
-    tradeDate: '3 Jan, 2024',
-    symbol: 'BIT10-G',
-    name: 'From Bit10 Gold',
-    quantity: 3,
-    type: 'Buy',
-    price: 2500,
-    fees: 0.025,
-  },
-  {
-    settelment: '6 Jan, 2024',
-    tradeDate: '5 Jan, 2024',
-    symbol: 'BTC',
-    name: 'Bitcoin Purchase',
-    quantity: 2,
-    type: 'Fund Recieved',
-    price: 3500,
-    fees: 0.03,
-  },
-  {
-    settelment: '8 Jan, 2024',
-    tradeDate: '7 Jan, 2024',
-    symbol: 'BTC',
-    name: 'Bitcoin Dividend',
-    quantity: 3,
-    type: 'Divident',
-    price: 500,
-    fees: 0.015,
-  },
-  {
-    settelment: '10 Jan, 2024',
-    tradeDate: '9 Jan, 2024',
-    symbol: 'BTC',
-    name: 'Bitcoin Purchase',
-    quantity: 2,
-    type: 'Reinested',
-    price: 800,
-    fees: 0.02,
-  },
-];
-
 export default function Portfolio() {
+    const [loading, setLoading] = useState(true);
+    const [bit10DEFI, setBit10DEFI] = useState<bigint>(BigInt(0));
+    const [innerRadius, setInnerRadius] = useState<number>(80);
+    const [coinbaseData, setCoinbaseData] = useState<number[]>([]);
+    const [coinMarketCapData, setCoinMarketCapData] = useState<number[]>([]);
+    const [totalSum, setTotalSum] = useState<number>(0);
+    const [recentActivityLoading, setRecentActivityLoading] = useState(true);
+    const [portfolioData, setPortfolioData] = useState<PortfolioTableDataType[]>([]);
 
-  const CustomTooltip = ({ active, payload, label, payloadTitle }: { active: boolean, payload: any[], label?: string, payloadTitle: string[] }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className='bg-white p-2 rounded'>
-          <div className='text-gray-800'>{`${label}`}</div>
-          <div className='text-[#8884d8]'>{`${payloadTitle[0]}`}: {`${payload[0].value}`}</div>
+    const { principalId } = useWallet();
+
+    // BIT10.DEFI Canister
+    const canisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
+    const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
+
+    const agent = new HttpAgent({ host });
+    const actor = Actor.createActor(idlFactory, {
+        agent,
+        canisterId,
+    });
+
+    useEffect(() => {
+        const fetchBalance = async () => {
+            if (principalId) {
+                const account = {
+                    owner: Principal.fromText(principalId),
+                    subaccount: [],
+                };
+                try {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    const balance = await actor.icrc1_balance_of(account);
+                    setBit10DEFI(balance as bigint);
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (error) {
+                    toast.error('An error occurred while fetching user portfolio. Please try again!');
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setLoading(false);
+                toast.error('An error occurred while fetching user portfolio. Please try again!');
+            }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        fetchBalance();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [principalId]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1200) {
+                setInnerRadius(90);
+            } else if (window.innerWidth >= 768) {
+                setInnerRadius(70);
+            } else {
+                setInnerRadius(70);
+            }
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    useEffect(() => {
+        const fetchCoinbaseData = async () => {
+            const assets = ['STX', 'MAPO', 'ICP'];
+            try {
+                const coinbaseRequests = assets.map(async (asset) => {
+                    const response = await fetch(`https://api.coinbase.com/v2/prices/${asset}-USD/buy`);
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    const data = await response.json();
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+                    return parseFloat(data.data.amount);
+                });
+                const result = await Promise.all(coinbaseRequests);
+                setCoinbaseData(result);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (error) {
+                toast.error('Error fetching BIT10 price. Please try again!');
+            }
+        };
+
+        const fetchCoinMarketCapData = async () => {
+            try {
+                const response = await fetch('/coinmarketcap')
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const data = await response.json();
+
+                const prices = [
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    data.data.CFX[0].quote.USD.price, data.data.SOV[0].quote.USD.price, data.data.RIF[0].quote.USD.price
+                ];
+
+                setCoinMarketCapData(prices);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (error) {
+                toast.error('Error fetching BIT10 price. Please try again!');
+            }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        fetchCoinbaseData();
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        fetchCoinMarketCapData();
+    }, []);
+
+    useEffect(() => {
+        if (coinbaseData.length > 0 && coinMarketCapData.length > 0) {
+            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0) + coinMarketCapData.reduce((acc, curr) => acc + curr, 0);
+            const bit10DeFi = sum / 6;
+            setTotalSum(bit10DeFi);
+        } else {
+            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0);
+            const bit10DeFi = sum / 4;
+            setTotalSum(bit10DeFi);
+        }
+        setLoading(false);
+    }, [coinbaseData, coinMarketCapData]);
+
+    useEffect(() => {
+        const fetchCoinbaseData = async () => {
+            const assets = ['STX', 'MAPO', 'ICP'];
+            try {
+                const coinbaseRequests = assets.map(async (asset) => {
+                    const response = await fetch(`https://api.coinbase.com/v2/prices/${asset}-USD/buy`);
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    const data = await response.json();
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+                    return parseFloat(data.data.amount);
+                });
+                const result = await Promise.all(coinbaseRequests);
+                setCoinbaseData(result);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (error) {
+                toast.error('Error fetching BIT10 price. Please try again!');
+            }
+        };
+
+        const fetchCoinMarketCapData = async () => {
+            try {
+                const response = await fetch('/coinmarketcap')
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const data = await response.json();
+
+                const prices = [
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    data.data.CFX[0].quote.USD.price, data.data.SOV[0].quote.USD.price, data.data.RIF[0].quote.USD.price
+                ];
+
+                setCoinMarketCapData(prices);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (error) {
+                toast.error('Error fetching BIT10 price. Please try again!');
+            }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        fetchCoinbaseData();
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        fetchCoinMarketCapData();
+    }, []);
+
+    useEffect(() => {
+        if (coinbaseData.length > 0 && coinMarketCapData.length > 0) {
+            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0) + coinMarketCapData.reduce((acc, curr) => acc + curr, 0);
+            const bit10DeFi = sum / 6;
+            setTotalSum(bit10DeFi);
+        } else {
+            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0);
+            const bit10DeFi = sum / 4;
+            setTotalSum(bit10DeFi);
+        }
+        setLoading(false);
+    }, [coinbaseData, coinMarketCapData]);
+
+    useEffect(() => {
+        const fetchRecentActivityData = async () => {
+            if (principalId) {
+                const result = await userRecentActivity({ paymentAddress: principalId });
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                setPortfolioData(result as PortfolioTableDataType[]);
+                setRecentActivityLoading(false);
+                if (result === 'Error fetching user recent activity') {
+                    toast.error('An error occurred while fetching user recent activity. Please try again!');
+                    setRecentActivityLoading(false);
+                }
+            }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        fetchRecentActivityData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const formatPrincipalId = (id: string | undefined) => {
+        if (!id) return '';
+        if (id.length <= 7) return id;
+        return `${id.slice(0, 4)}...${id.slice(-3)}`;
+    };
+
+    const formatBit10DEFI = (amount: bigint) => {
+        const num = Number(amount) / 100000000;
+        const rounded = num.toFixed(5);
+        return rounded.replace(/\.?0+$/, '');
+    };
+
+    const currentBalanceChartData = Number(formatBit10DEFI(bit10DEFI)) === 0
+        ? [{ tokenName: 'No Data', tokenQuantity: 1, fill: '#ebebe0' }]
+        : [{ tokenName: 'BIT10.DEFI', tokenQuantity: Number(formatBit10DEFI(bit10DEFI)), fill: '#D5520E' }]
+
+    const showChartTooltip = Number(formatBit10DEFI(bit10DEFI)) > 0;
+
+    return (
+        <div className='py-4'>
+            {loading ? (
+                <div className='flex flex-col space-y-4'>
+                    <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
+                        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow'>
+                            <CardContent>
+                                <div className='flex flex-col h-full space-y-2 pt-8'>
+                                    {['h-10 w-3/4', 'h-44'].map((classes, index) => (
+                                        <Skeleton key={index} className={classes} />
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-in-down-slow'>
+                            <CardContent>
+                                <div className='flex flex-col h-full space-y-2 pt-8'>
+                                    {['h-10 w-3/4', 'h-44'].map((classes, index) => (
+                                        <Skeleton key={index} className={classes} />
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                    <Card className='dark:border-white w-full animate-fade-right-slow'>
+                        <CardContent>
+                            <div className='flex flex-col h-full space-y-2 pt-8'>
+                                {['h-10 w-3/4', 'h-44'].map((classes, index) => (
+                                    <Skeleton key={index} className={classes} />
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className='dark:border-white w-full animate-fade-bottom-up-slow'>
+                        <CardContent>
+                            <div className='flex flex-col h-full space-y-2 pt-8'>
+                                {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
+                                    <Skeleton key={index} className={classes} />
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            ) : (
+                <div className='flex flex-col space-y-4'>
+                    <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
+                        <h1 className='text-center md:text-start text-3xl font-bold animate-fade-left-slow'>Welcome back {formatPrincipalId(principalId)}</h1>
+                        <Button className='animate-fade-right-slow' asChild>
+                            <Link href='/swap'>Buy BIT10 Token</Link>
+                        </Button>
+                    </div>
+
+                    <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
+                        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow'>
+                            <CardHeader>
+                                <div className='text-2xl md:text-4xl text-center md:text-start'>Your Current Balance</div>
+                            </CardHeader>
+                            <CardContent className='grid md:grid-cols-2 gap-4 items-center'>
+                                <div className='flex-1 pb-0'>
+                                    <ChartContainer
+                                        config={chartConfig}
+                                        className='aspect-square max-h-[300px]'
+                                    >
+                                        <PieChart>
+                                            {showChartTooltip && (
+                                                <ChartTooltip
+                                                    cursor={false}
+                                                    content={<ChartTooltipContent hideLabel />}
+                                                />
+                                            )}
+                                            <Pie
+                                                data={currentBalanceChartData}
+                                                dataKey='tokenQuantity'
+                                                nameKey='tokenName'
+                                                innerRadius={innerRadius}
+                                                strokeWidth={5}
+                                            >
+                                                <Label
+                                                    content={({ viewBox }) => {
+                                                        if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                            return (
+                                                                <text
+                                                                    x={viewBox.cx}
+                                                                    y={viewBox.cy}
+                                                                    textAnchor='middle'
+                                                                    dominantBaseline='middle'
+                                                                >
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={viewBox.cy}
+                                                                        className='fill-foreground text-3xl font-bold'
+                                                                    >
+                                                                        {formatBit10DEFI(bit10DEFI)}
+                                                                    </tspan>
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={(viewBox.cy ?? 0) + 24}
+                                                                        className='fill-muted-foreground'
+                                                                    >
+                                                                        BIT10.DEFI Balance
+                                                                    </tspan>
+                                                                </text>
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                            </Pie>
+                                        </PieChart>
+                                    </ChartContainer>
+                                </div>
+                                <div className='flex w-full flex-col space-y-3'>
+                                    <div className='flex flex-row items-center justify-start space-x-2'>
+                                        <p className='text-3xl font-semibold'>{formatBit10DEFI(bit10DEFI)} BIT10.DEFI</p>
+                                    </div>
+                                    {Number(formatBit10DEFI(bit10DEFI)) > 0 && (
+                                        <div>
+                                            <p className='text-xl font-semibold'>~ $ {(Number(formatBit10DEFI(bit10DEFI)) * totalSum).toFixed(9)}</p>
+                                        </div>
+                                    )}
+                                    <div>
+                                        <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
+                                        <div className='flex flex-col space-y-1 py-1'>
+                                            <div className='flex flex-row justify-between items-center px-2'>
+                                                <div>Token Name</div>
+                                                <div>No. of Tokens</div>
+                                            </div>
+                                            {Number(formatBit10DEFI(bit10DEFI)) <= 0 ? (
+                                                <div className='text-center'>You currently own no BIT10 tokens</div>
+                                            ) : (
+                                                <div className='flex flex-row justify-between items-center hover:bg-accent p-2 rounded'>
+                                                    <div>BIT10.DEFI</div>
+                                                    <div>{formatBit10DEFI(bit10DEFI)}</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-in-down-slow'>
+                            <CardHeader>
+                                <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Allocations</div>
+                            </CardHeader>
+                            <CardContent className='grid md:grid-cols-2 gap-4 items-center'>
+                                <div className='flex-1'>
+                                    <ChartContainer
+                                        config={chartConfig}
+                                        className='aspect-square max-h-[300px]'
+                                    >
+                                        <PieChart>
+                                            <ChartTooltip
+                                                cursor={false}
+                                                content={<ChartTooltipContent hideLabel />}
+                                            />
+                                            <Pie
+                                                data={bit10Allocation}
+                                                dataKey='value'
+                                                nameKey='name'
+                                                innerRadius={innerRadius}
+                                                strokeWidth={5}
+                                            >
+                                                <Label
+                                                    content={({ viewBox }) => {
+                                                        if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                            return (
+                                                                <text
+                                                                    x={viewBox.cx}
+                                                                    y={viewBox.cy}
+                                                                    textAnchor='middle'
+                                                                    dominantBaseline='middle'
+                                                                >
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={viewBox.cy}
+                                                                        className='fill-foreground text-xl font-bold'
+                                                                    >
+                                                                        BIT10.DEFI
+                                                                    </tspan>
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={(viewBox.cy ?? 0) + 24}
+                                                                        className='fill-muted-foreground'
+                                                                    >
+                                                                        Allocations
+                                                                    </tspan>
+                                                                </text>
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                            </Pie>
+                                        </PieChart>
+                                    </ChartContainer>
+                                </div>
+                                <div className='flex w-full flex-col space-y-3'>
+                                    <h1 className='text-2xl'>BIT10.DEFI Allocations</h1>
+                                    <div className='flex flex-col'>
+                                        {bit10Allocation.map(({ name, value, fill }) => (
+                                            <div key={name} className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'>
+                                                <div className='flex flex-row items-center space-x-1'>
+                                                    <div className='w-3 h-3 rounded' style={{ backgroundColor: fill }}></div>
+                                                    <div>{name}</div>
+                                                </div>
+                                                <div>{value} %</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Performance />
+                    </div>
+
+                    {recentActivityLoading ? (
+                        <Card className='dark:border-white animate-fade-bottom-up-slow'>
+                            <CardContent>
+                                <div className='flex flex-col h-full space-y-2 pt-8'>
+                                    {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
+                                        <Skeleton key={index} className={classes} />
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <Card className='dark:border-white animate-fade-bottom-up-slow'>
+                            <CardHeader>
+                                <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent activity</div>
+                            </CardHeader>
+                            <CardContent>
+                                <DataTable
+                                    columns={portfolioTableColumns}
+                                    data={portfolioData}
+                                    userSearchColumn='bit10TokenName'
+                                    inputPlaceHolder='Search by BIT10 token name'
+                                />
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
+            )}
         </div>
-      );
-    }
-
-    return null;
-  };
-
-  return (
-    <MaxWidthWrapper>
-      <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
-        <h1 className='text-3xl font-bold'>Welcome back</h1>
-        <Button className='text-white' asChild>
-          <Link href='/dashboard'>Buy & Sell</Link>
-        </Button>
-      </div>
-
-      <div className='py-4 flex flex-col md:flex-row space-y-2 md:space-y-0 space-x-0 md:space-x-4 md:justify-between items-center'>
-        <div className='w-full'>
-          <Card>
-            <CardHeader>
-              <h1 className='text-3xl font-bold'>Your Current Balance</h1>
-            </CardHeader>
-            <hr className='w-full h-0.5 bg-accent' />
-            <div className='flex flex-row items-center justify-start'>
-              <p className='font-display text-4xl font-semibold py-3 px-6'>
-                $ 155,666
-              </p>
-              <Badge className='bg-green-500 text-white'>+ 2.5%</Badge>
-            </div>
-            <p className='px-6 pb-1'>Total assets</p>
-            <hr className='w-full h-0.5 bg-accent' />
-            <CardContent className='py-2'>
-              <div className='flex flex-row items-center justify-between'>
-                <p className='font-display text-xl font-semibold p-3'>
-                  BIT 10
-                </p>
-                <p>$ 6555</p>
-              </div>
-              <hr className='w-full h-0.5 bg-accent my-2' />
-              <div className='flex flex-row items-center justify-between'>
-                <p className='font-display text-xl font-semibold p-3'>
-                  BIT 10 Gold
-                </p>
-                <p>$ 96555</p>
-              </div>
-              <hr className='w-full h-0.5 bg-accent my-2' />
-              <div className='flex flex-row items-center justify-between'>
-                <p className='font-display text-xl font-semibold p-3'>
-                  Outside Investment
-                </p>
-                <p>$ 555</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className='bg-accent rounded w-full py-6'>
-          <h2 className='p-2 md:text-xl'>Your personal preformance</h2>
-          <ResponsiveContainer width='100%' height={300}>
-            <LineChart data={preformanceData} margin={{ top: 5, right: 15, left: 8, bottom: 5 }}>
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='month' />
-              <YAxis />
-              <Legend className='black' />
-              <Tooltip content={<CustomTooltip active={false} payload={[]} payloadTitle={['Token Preformance']} />} />
-              <Line type='monotone' dataKey='preformance' name='Token Preformance(in USD)' stroke='#8884d8' />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-      <div>
-        <Bit10Preformance />
-      </div>
-      <div className='py-4 w-full'>
-        <Card className='relative'>
-          <CardHeader>
-            <div className='flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0'>
-              <div className='w-full text-2xl md:text-4xl'>Your recent activity</div>
-              <div className='flex flex-col justify-center md:justify-end items-center md:items-stretch w-full md:flex-row space-x-0 md:space-x-2 space-y-2 md:space-y-0'>
-                <p className='underline'>All transaction history</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <DataTable
-              columns={preformanceTableColumns}
-              data={preformanceTableData}
-              userSearchColumn='name'
-              inputPlaceHolder='Search by name'
-            />
-          </CardContent>
-        </Card>
-      </div>
-    </MaxWidthWrapper>
-  )
+    )
 }
