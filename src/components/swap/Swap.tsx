@@ -152,7 +152,7 @@ export default function Swap() {
             setSwaping(true);
             // const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
             const ckBTCLegerCanisterId = 'mxzaz-hqaaa-aaaar-qaada-cai'
-            const bit10DEFICanisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
+            const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
 
             const hasAllowed = await window.ic.plug.requestConnect({
                 whitelist: [ckBTCLegerCanisterId, bit10DEFICanisterId]

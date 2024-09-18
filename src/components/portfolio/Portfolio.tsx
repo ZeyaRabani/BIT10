@@ -57,7 +57,7 @@ export default function Portfolio() {
     const { principalId } = useWallet();
 
     // BIT10.DEFI Canister
-    const canisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
+    const canisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
     const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
 
     const agent = new HttpAgent({ host });

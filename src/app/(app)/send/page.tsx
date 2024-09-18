@@ -45,7 +45,7 @@ export default function Page() {
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
             setSending(true);
-            const bit10DEFICanisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
+            const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
 
             const hasAllowed = await window.ic.plug.requestConnect({
                 whitelist: [bit10DEFICanisterId]
