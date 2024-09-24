@@ -11,7 +11,7 @@ const tabs = ['1M', '3M', '6M']
 
 const chartConfig: ChartConfig = {
     'bit10DeFi': {
-        label: 'BIT10.DEFI',
+        label: 'Test BIT10.DEFI',
     }
 }
 

@@ -1,9 +1,33 @@
 import createNextIntlPlugin from 'next-intl/plugin';
- 
+
 const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    async redirects() {
+        return [
+            {
+                source: '/gitbook',
+                destination: 'https://gitbook.bit10.app',
+                permanent: true,
+            },
+            {
+                source: '/twitter',
+                destination: 'https://twitter.com/bit10startup',
+                permanent: true,
+            },
+            {
+                source: '/telegram',
+                destination: 'https://t.me/zr00083',
+                permanent: true,
+            },
+            {
+                source: '/github',
+                destination: 'https://github.com/ZeyaRabani/BIT10',
+                permanent: true,
+            }
+        ]
+    },
     async rewrites() {
         return [
             {

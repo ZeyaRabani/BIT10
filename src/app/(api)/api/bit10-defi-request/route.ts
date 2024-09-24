@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
         to: myEmail,
         cc: email2,
         // replyTo: email,
-        subject: `BIT10.DEFI token request from ${principalId}`,
+        subject: `Test BIT10.DEFI token request from ${principalId}`,
         html: emailHtml
     };
 

@@ -44,7 +44,7 @@ export default function Page() {
 
     const chartConfig: ChartConfig = {
         'bit10DeFi': {
-            label: 'BIT10.DEFI',
+            label: 'Test BIT10.DEFI',
         },
         'total': {
             label: `${t('total')}`,

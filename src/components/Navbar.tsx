@@ -90,7 +90,10 @@ export default function Navbar() {
         <div className={`backdrop-blur-3xl fixed top-0 z-50 w-full transition-all duration-200 ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}>
             <nav className='relative flex items-center py-2 flex-wrap px-2.5 md:px-12 tracking-wider justify-between'>
                 <Link href='/' passHref>
-                    <Image src='/logo/logo-circle.png' alt='logo' width={60} height={60} />
+                    <div className='flex flex-row space-x-1 items-center justify-center'>
+                        <Image src='/logo/logo-circle.png' alt='logo' width={60} height={60} />
+                        <Badge variant='outline' className='border-primary text-primary'>Testnet</Badge>
+                    </div>
                 </Link>
 
                 <div className='hidden w-full md:inline-flex md:flex-grow md:w-auto'>

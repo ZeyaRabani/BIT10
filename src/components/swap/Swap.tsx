@@ -184,7 +184,7 @@ export default function Swap() {
                         paymentName: 'BIT10.BTC',
                         paymentAmountUSD: (parseInt(values.bit10_amount) * parseFloat(totalSum.toFixed(4))).toFixed(4),
                         bit10tokenQuantity: (values.bit10_amount).toString(),
-                        bit10tokenName: 'BIT10.DEFI'
+                        bit10tokenName: 'Test BIT10.DEFI'
                     });
 
                     await fetch('/bit10-defi-request', {
@@ -248,7 +248,7 @@ export default function Swap() {
                             </CardTitle>
                             <CardDescription>BIT10 exchange</CardDescription>
                             <div className='text-center'>
-                                Current BIT10.DEFI token price is $ {totalSum.toFixed(6)}
+                                Current Test BIT10.DEFI token price is $ {totalSum.toFixed(6)}
                             </div>
                         </CardHeader>
                         <Form {...form}>
@@ -323,7 +323,7 @@ export default function Swap() {
                                             <div className='flex flex-row items-center'>
                                                 <div className='py-1 px-2 mr-6 border-2 rounded-l-full z-10 w-full'>
                                                     <div className='pl-4 py-1'>
-                                                        BIT10.DEFI
+                                                        Test BIT10.DEFI
                                                     </div>
                                                 </div>
                                                 <div className='-ml-12 z-20'>
@@ -334,7 +334,7 @@ export default function Swap() {
                                         <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
                                             <div>$ {(parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))).toFixed(4)}</div>
                                             <div>
-                                                1 BIT10.DEFI = $ {totalSum?.toFixed(4)}
+                                                1 Test BIT10.DEFI = $ {totalSum?.toFixed(4)}
                                             </div>
                                         </div>
                                     </div>

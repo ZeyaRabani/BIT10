@@ -120,7 +120,7 @@ export function Welcome() {
                                 Standard: ICRC-1
                             </Text>
                             <Text className='text-[17px] leading-[17px] pl-3 text-[#3c3f44]'>
-                                ii. BIT10.DEFI:
+                                ii. Test BIT10.DEFI:
                             </Text>
                             <Text className='text-[17px] leading-[17px] pl-6 text-[#3c3f44]'>
                                 Canister ID: hbs3g-xyaaa-aaaap-qhmna-cai
@@ -136,7 +136,7 @@ export function Welcome() {
                                 1. Navigate to <Link href='https://www.bit10.app' className='text-blue-500'>BIT10 Swap</Link>.
                             </Text>
                             <Text className='text-[17px] leading-[17px] pl-1 text-[#3c3f44]'>
-                                2. Select the number of BIT10.DEFI tokens you want to receive.
+                                2. Select the number of Test BIT10.DEFI tokens you want to receive.
                             </Text>
                             <Text className='text-[17px] leading-[17px] pl-1 text-[#3c3f44]'>
                                 3.  Click on the &quot;Trade&quot; button and approve the connection request for the ICP token canister

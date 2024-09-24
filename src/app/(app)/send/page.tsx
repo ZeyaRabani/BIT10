@@ -22,7 +22,7 @@ const FormSchema = z.object({
         required_error: 'Receiver address is required.',
     }).min(8, 'Receiver address is required.'),
     bit10_amount: z.preprocess((value) => parseFloat(value as string), z.number({
-        required_error: 'Please enter the number of BIT10.DEFI tokens you wish to transfer.',
+        required_error: 'Please enter the number of Test BIT10.DEFI tokens you wish to transfer.',
     })
         .positive('The amount must be a positive number.')
         .max(99999999, 'Amount cannot exceed 8 decimal places.')
@@ -96,9 +96,9 @@ export default function Page() {
                 <Card className='w-[300px] md:w-[550px] animate-fade-bottom-up'>
                     <CardHeader>
                         <CardTitle className='flex flex-row items-center justify-between'>
-                            <div>Send BIT10.DEFI</div>
+                            <div>Send Test BIT10.DEFI</div>
                         </CardTitle>
-                        <CardDescription>Send BIT10.DEFI token</CardDescription>
+                        <CardDescription>Send Test BIT10.DEFI token</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Form {...form}>
@@ -142,11 +142,11 @@ export default function Page() {
                                     name='bit10_amount'
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>BIT10.DEFI Amount</FormLabel>
+                                            <FormLabel>Test BIT10.DEFI Amount</FormLabel>
                                             <FormControl>
                                                 <div className='flex'>
                                                     <div className='w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center'><CircleDollarSign height={20} width={20} /></div>
-                                                    <Input className='w-full -ml-10 pl-10 pr-3 py-2 dark:border-white' type='number' placeholder='BIT10.DEFI amount to send' {...field} />
+                                                    <Input className='w-full -ml-10 pl-10 pr-3 py-2 dark:border-white' type='number' placeholder='Test BIT10.DEFI amount to send' {...field} />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />

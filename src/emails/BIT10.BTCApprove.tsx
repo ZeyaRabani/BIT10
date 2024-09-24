@@ -15,7 +15,7 @@ export function BIT10BTCApprove({ email, principalId }: { email: string, princip
                         <Section className='flex flex-col px-4 py-2 text-[#0c0d0e]'>
                             <Text className='text-[17px] leading-6'>Hi {email},</Text>
                             <Text className='text-[17px] leading-6'>
-                                Your request for BIT10.BTC tokens for Principal ID: {principalId} on the BIT10 app has been approved. We have sent you 0.000168 BIT10.BTC tokens for buying BIT10.DEFI tokens and testing our app. If you encounter any issues or have questions, please don&apos;t hesitate to reach out to {''}
+                                Your request for BIT10.BTC tokens for Principal ID: {principalId} on the BIT10 app has been approved. We have sent you 0.000168 BIT10.BTC tokens for buying Test BIT10.DEFI tokens and testing our app. If you encounter any issues or have questions, please don&apos;t hesitate to reach out to {''}
                                 <Link href='https://x.com/zeyathezeya' className='text-blue-500'>
                                     @zeyathezeya
                                 </Link> or {''}

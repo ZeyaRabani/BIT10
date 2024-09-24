@@ -20,7 +20,7 @@ import { DataTable } from '@/components/ui/data-table-portfolio'
 
 const chartConfig: ChartConfig = {
     'bit10DeFi': {
-        label: 'BIT10.DEFI',
+        label: 'Test BIT10.DEFI',
     },
     'icp': {
         label: 'ICP',
@@ -54,7 +54,7 @@ export default function Portfolio() {
 
     const { principalId } = useWallet();
 
-    // BIT10.DEFI Canister
+    // Test BIT10.DEFI Canister
     const canisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
     const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
 
@@ -156,8 +156,8 @@ export default function Portfolio() {
             setTotalSum(bit10DeFi);
         }
         setLoading(false);
-    }, [coinbaseData, coinMarketCapData]); 
-    
+    }, [coinbaseData, coinMarketCapData]);
+
     useEffect(() => {
         const fetchCoinbaseData = async () => {
             const assets = ['STX', 'MAPO', 'ICP'];
@@ -239,7 +239,7 @@ export default function Portfolio() {
 
     const currentBalanceChartData = Number(formatBit10DEFI(bit10DEFI)) === 0
         ? [{ tokenName: 'No Data', tokenQuantity: 1, fill: '#ebebe0' }]
-        : [{ tokenName: 'BIT10.DEFI', tokenQuantity: Number(formatBit10DEFI(bit10DEFI)), fill: '#D5520E' }]
+        : [{ tokenName: 'Test BIT10.DEFI', tokenQuantity: Number(formatBit10DEFI(bit10DEFI)), fill: '#D5520E' }]
 
     const showChartTooltip = Number(formatBit10DEFI(bit10DEFI)) > 0;
 
@@ -342,7 +342,7 @@ export default function Portfolio() {
                                                                         y={(viewBox.cy || 0) + 24}
                                                                         className='fill-muted-foreground'
                                                                     >
-                                                                        BIT10.DEFI Balance
+                                                                        Test BIT10.DEFI Balance
                                                                     </tspan>
                                                                 </text>
                                                             )
@@ -355,7 +355,7 @@ export default function Portfolio() {
                                 </div>
                                 <div className='flex w-full flex-col space-y-3'>
                                     <div className='flex flex-row items-center justify-start space-x-2'>
-                                        <p className='text-3xl font-semibold'>{formatBit10DEFI(bit10DEFI)} BIT10.DEFI</p>
+                                        <p className='text-3xl font-semibold'>{formatBit10DEFI(bit10DEFI)} Test BIT10.DEFI</p>
                                     </div>
                                     {Number(formatBit10DEFI(bit10DEFI)) > 0 && (
                                         <div>
@@ -373,7 +373,7 @@ export default function Portfolio() {
                                                 <div className='text-center'>You currently own no BIT10 tokens</div>
                                             ) : (
                                                 <div className='flex flex-row justify-between items-center hover:bg-accent p-2 rounded'>
-                                                    <div>BIT10.DEFI</div>
+                                                    <div>Test BIT10.DEFI</div>
                                                     <div>{formatBit10DEFI(bit10DEFI)}</div>
                                                 </div>
                                             )}
@@ -420,7 +420,7 @@ export default function Portfolio() {
                                                                         y={viewBox.cy}
                                                                         className='fill-foreground text-xl font-bold'
                                                                     >
-                                                                        BIT10.DEFI
+                                                                        Test BIT10.DEFI
                                                                     </tspan>
                                                                     <tspan
                                                                         x={viewBox.cx}
@@ -439,7 +439,7 @@ export default function Portfolio() {
                                     </ChartContainer>
                                 </div>
                                 <div className='flex w-full flex-col space-y-3'>
-                                    <h1 className='text-2xl'>BIT10.DEFI Allocations</h1>
+                                    <h1 className='text-2xl'>Test BIT10.DEFI Allocations</h1>
                                     <div className='flex flex-col'>
                                         {bit10Allocation.map(({ name, value, fill }) => (
                                             <div key={name} className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'>

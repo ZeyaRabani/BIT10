@@ -76,7 +76,7 @@ export default function Page() {
                 <CardHeader>
                     <CardTitle className='text-4xl text-center'>BIT10.BTC Faucet</CardTitle>
                     <CardDescription className='text-center'>
-                        Request BIT10.BTC for testing. BIT10.BTC is a test token representing BTC, allowing you to buy BIT10.DEFI tokens with it.
+                        Request BIT10.BTC for testing. BIT10.BTC is a test token representing BTC, allowing you to buy Test BIT10.DEFI tokens with it.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
