@@ -10,6 +10,30 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import("next").NextConfig} */
 const config = {
+    async redirects() {
+        return [
+            {
+                source: '/gitbook',
+                destination: 'https://gitbook.bit10.app',
+                permanent: true,
+            },
+            {
+                source: '/twitter',
+                destination: 'https://twitter.com/bit10startup',
+                permanent: true,
+            },
+            {
+                source: '/telegram',
+                destination: 'https://t.me/zr00083',
+                permanent: true,
+            },
+            {
+                source: '/github',
+                destination: 'https://github.com/ZeyaRabani/BIT10',
+                permanent: true,
+            }
+        ]
+    },
     async rewrites() {
         return [
             {
@@ -59,12 +83,12 @@ const config = {
             {
                 source: '/ingest/decide',
                 destination: 'https://eu.i.posthog.com/decide',
-            },
+            }
         ]
     },
     compiler: {
         removeConsole: process.env.NODE_ENV === 'production',
-    },
+    }
 };
 
 export default withNextIntl(config);
