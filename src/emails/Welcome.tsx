@@ -62,23 +62,23 @@ export function Welcome() {
                             </Heading>
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                1. Visit the <Link href='https://bit10.app' className='text-blue-500'>BIT10 website</Link> and connect your Plug wallet. Learn more about Installing and Setting Up Plug Wallet <Link href='https://gitbook.bit10.app/testnet/installing-and-setting-up-plug-wallet' className='text-blue-500'>here</Link>.
+                                1. Visit the <Link href='https://bit10.app/swap' className='text-blue-500'>BIT10 website</Link> and connect your Plug wallet. Learn more about Installing and Setting Up Plug Wallet <Link href='https://gitbook.bit10.app/fundamentals/testnet/1_installing-and-setting-up-plug-wallet' className='text-blue-500'>here</Link>.
                             </Text>
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                2. Visit the <Link href='https://www.bit10.app/faucet' className='text-blue-500'>BIT10 Faucet</Link> and request BIT10.BTC tokens. Learn more about BIT10.BTC tokens <Link href='https://gitbook.bit10.app/testnet/obtaining-bit10.btc-tokens' className='text-blue-500'>here</Link>.
+                                2. Visit the <Link href='https://www.bit10.app/faucet' className='text-blue-500'>BIT10 Faucet</Link> and request BIT10.BTC tokens. Learn more about BIT10.BTC tokens <Link href='https://gitbook.bit10.app/fundamentals/testnet/2_obtaining-bit10btc-tokens' className='text-blue-500'>here</Link>.
                             </Text>
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
                                 3. Follow the steps on this <Link href='https://gitbook.bit10.app/testnet/adding-tokens-to-display-in-your-wallet' className='text-blue-500'>page</Link> to show balance of BIT10.BTC and BIT.DEFI tokens in your Plug Wallet.
                             </Text>
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                4.  Start trading on the <Link href='https://www.bit10.app' className='text-blue-500'>BIT10 Exchange</Link> and explore the BIT10 Index. Follow the steps on this <Link href='https://gitbook.bit10.app/testnet/swap' className='text-blue-500'>page</Link> to learn more about trading on BIT10 Exchange.
+                                4.  Start trading on the <Link href='https://www.bit10.app' className='text-blue-500'>BIT10 Exchange</Link> and explore the BIT10 Index. Follow the steps on this <Link href='https://gitbook.bit10.app/fundamentals/testnet/4_swap' className='text-blue-500'>page</Link> to learn more about trading on BIT10 Exchange.
                             </Text>
 
                             {/* <Text className='text-[17px] leading-[17px] text-[#3c3f44] font-bold'>
                                 Install the Plug Wallet:
                             </Text>
                             <Text className='text-[17px] leading-[17px] pl-1 text-[#3c3f44]'>
-                                1. Visit <Link href='https://plugwallet.ooo' className='text-blue-500'>BIT10 website</Link> and install the extension in your browser. Know more about Installing and Setting Up Plug Wallet <Link href='https://gitbook.bit10.app/testnet/installing-and-setting-up-plug-wallet' className='text-blue-500'>here</Link>.
+                                1. Visit <Link href='https://plugwallet.ooo' className='text-blue-500'>BIT10 website</Link> and install the extension in your browser. Know more about Installing and Setting Up Plug Wallet <Link href='https://gitbook.bit10.app/fundamentals/testnet/1_installing-and-setting-up-plug-wallet' className='text-blue-500'>here</Link>.
                             </Text>
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44] font-bold'>
@@ -156,7 +156,7 @@ export function Welcome() {
                             </Text> */}
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                Learn more about the Testnet <Link href='https://gitbook.bit10.app/testnet' className='text-blue-500'>here</Link>. We are excited to have you join us on this journey and can&apos;t wait to hear your feedback. If you encounter any issues or have questions, please don&apos;t hesitate to reach out to {''}
+                                Learn more about the Testnet <Link href='https://gitbook.bit10.app/fundamentals/testnet' className='text-blue-500'>here</Link>. We are excited to have you join us on this journey and can&apos;t wait to hear your feedback. If you encounter any issues or have questions, please don&apos;t hesitate to reach out to {''}
                                 <Link href='https://x.com/zeyathezeya' className='text-blue-500'>
                                     @zeyathezeya
                                 </Link> or {''}
