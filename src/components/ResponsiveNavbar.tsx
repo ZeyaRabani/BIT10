@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useWallet } from '@/context/WalletContext'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ArrowRightLeft, CircleDollarSign, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy } from 'lucide-react'
+import { Menu, X, ArrowRightLeft, CircleDollarSign, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -91,7 +91,7 @@ export default function ResponsiveNavbar() {
                                     </div>
 
                                     {
-                                        pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' ? (
+                                        pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' || pathname === '/collateral' ? (
                                             <>
                                                 <div className='pt-2 px-2 cursor-pointer w-full'>
                                                     <Link onClick={() => closeOnCurrent('/swap')} href='/swap'>
@@ -116,6 +116,15 @@ export default function ResponsiveNavbar() {
                                                         <div className='flex flex-row justify-between items-center'>
                                                             Portfolio
                                                             <BriefcaseBusiness />
+                                                        </div>
+                                                    </Link>
+                                                </div>
+
+                                                <div className='border-t-2 pt-2 px-2 cursor-pointer w-full'>
+                                                    <Link onClick={() => closeOnCurrent('/collateral')} href='/collateral'>
+                                                        <div className='flex flex-row justify-between items-center'>
+                                                            Collateral
+                                                            <Landmark />
                                                         </div>
                                                     </Link>
                                                 </div>

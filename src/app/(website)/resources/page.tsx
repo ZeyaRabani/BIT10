@@ -1,10 +1,12 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Input } from '@/components/ui/input'
 import { Search, X } from 'lucide-react'
 import { HoverEffect } from '@/components/ui/card-hover-effect'
+import Preloader from '@/components/Preloader'
 
 type Project = {
     image_url: string;
@@ -186,18 +188,19 @@ const projects: Project[] = [
     // },
 ];
 
-
 export default function Page() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects);
 
-    useEffect(() => {
-        const filtered = projects.filter(project =>
-            project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            project.description.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setFilteredProjects(filtered);
-    }, [searchQuery]);
+    const { data: filteredProjects = [], isLoading } = useQuery({
+        queryKey: ['projects', searchQuery],
+        queryFn: () => {
+            return projects.filter(project =>
+                project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                project.description.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        },
+        enabled: true,
+    });
 
     const clearSearch = () => {
         setSearchQuery('');
@@ -227,7 +230,11 @@ export default function Page() {
             </div>
 
             <div>
-                <HoverEffect items={filteredProjects} />
+                {isLoading ? (
+                    <Preloader />
+                ) : (
+                    <HoverEffect items={filteredProjects} />
+                )}
             </div>
         </MaxWidthWrapper>
     );

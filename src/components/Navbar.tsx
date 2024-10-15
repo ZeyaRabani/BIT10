@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from 'react'
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { useWallet } from '@/context/WalletContext'
 import { addNewUser } from '@/actions/dbActions'
 import { toast } from 'sonner'
@@ -15,8 +16,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from 
 import { Loader2 } from 'lucide-react'
 
 export default function Navbar() {
-    const [isHidden, setIsHidden] = useState(false);
-    const [prevScrollPos, setPrevScrollPos] = useState(0);
+    const [visible, setVisible] = useState(true);
     const [open, setOpen] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
     const [activeLink, setActiveLink] = useState<string>('');
@@ -24,20 +24,9 @@ export default function Navbar() {
     const [linkPosition, setLinkPosition] = useState<number>(0);
     const linkRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
+    const { scrollY } = useScroll();
     const { isConnected, connectWallet, disconnectWallet, principalId } = useWallet();
     const pathname = usePathname();
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollPos = window.scrollY;
-            setIsHidden(currentScrollPos > prevScrollPos && currentScrollPos > 0);
-            setPrevScrollPos(currentScrollPos);
-        };
-
-        window.addEventListener('scroll', handleScroll);
-
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [prevScrollPos]);
 
     useEffect(() => {
         const addUserToDB = async () => {
@@ -74,6 +63,21 @@ export default function Navbar() {
         }
     }, [activeLink]);
 
+    useMotionValueEvent(scrollY, 'change', (latest) => {
+        if (latest > 50) {
+            const previousScrollY = scrollY.getPrevious();
+            if (previousScrollY !== undefined) {
+                setVisible(latest < previousScrollY ? true : false);
+            }
+        }
+    });
+
+    const navbarVariants = {
+        hidden: { y: '-100%', opacity: 0 },
+        visible: { y: '0%', opacity: 1 },
+    };
+
+
     const handleWalletSelect = async () => {
         setIsConnecting(true);
         setOpen(false);
@@ -90,7 +94,13 @@ export default function Navbar() {
     };
 
     return (
-        <div className={`backdrop-blur-3xl fixed top-0 z-50 w-full transition-all duration-200 ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}>
+        <motion.div
+            initial='visible'
+            animate={visible ? 'visible' : 'hidden'}
+            variants={navbarVariants}
+            transition={{ duration: 0.3 }}
+            className='backdrop-blur-3xl fixed top-0 z-50 w-full'
+        >
             <nav className='relative flex items-center py-2 flex-wrap px-2.5 md:px-12 tracking-wider justify-between'>
                 <Link href='/' passHref>
                     <div className='flex flex-row items-center justify-start'>
@@ -115,7 +125,7 @@ export default function Navbar() {
                         </Link>
 
                         {
-                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' ? (
+                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' || pathname === '/collateral' ? (
                                 <>
                                     <Link href='/swap' passHref>
                                         <span
@@ -151,6 +161,18 @@ export default function Navbar() {
                                             className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
                                         >
                                             Portfolio
+                                        </span>
+                                    </Link>
+                                    <Link href='/collateral' passHref>
+                                        <span
+                                            ref={(el) => {
+                                                linkRefs.current['/collateral'] = el;
+                                            }}
+                                            onClick={() => handleLinkClick('/collateral')}
+                                            // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/collateral' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
+                                            className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
+                                        >
+                                            Collateral
                                         </span>
                                     </Link>
                                 </>
@@ -270,6 +292,6 @@ export default function Navbar() {
                     style={{ width: linkRefs.current[activeLink]?.offsetWidth ?? 0, transform: `translateX(${linkRefs.current[activeLink]?.offsetLeft ?? 0}px)` }}
                 />
             </nav>
-        </div>
+        </motion.div>
     );
 }

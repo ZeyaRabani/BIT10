@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useWallet } from '@/context/WalletContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10_btc.did'
+import { useQuery, useQueries } from '@tanstack/react-query'
 import crypto from 'crypto'
 import { newTokenSwap } from '@/actions/dbActions'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
@@ -30,6 +29,20 @@ interface BTCnSTXPriceResponse {
     };
 }
 
+interface CoinbasePriceResponse {
+    data: {
+        amount: string;
+    };
+};
+
+interface CoinMarketCapResponse {
+    data: {
+        CFX: Array<{ quote: { USD: { price: number } } }>;
+        SOV: Array<{ quote: { USD: { price: number } } }>;
+        RIF: Array<{ quote: { USD: { price: number } } }>;
+    };
+};
+
 const bit10Amount = [
     '1',
     '2',
@@ -45,93 +58,98 @@ const FormSchema = z.object({
 })
 
 export default function Swap() {
-    const [btcAmount, setbtcAmount] = useState<string>('');
-    const [coinbaseData, setCoinbaseData] = useState<number[]>([]);
-    const [coinMarketCapData, setCoinMarketCapData] = useState<number[]>([]);
-    const [totalSum, setTotalSum] = useState<number>(0);
     const [rotate, setRotate] = useState(false);
-    const [loading, setLoading] = useState<boolean>(true);
     const [swaping, setSwaping] = useState<boolean>(false);
 
     const { isConnected, principalId } = useWallet();
 
     const fetchBTCPrice = async () => {
-        try {
-            const response = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/buy');
-            const data: BTCnSTXPriceResponse = await response.json();
-            setbtcAmount(data.data.amount);
-        } catch (error) {
+        const response = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/buy');
+        if (!response.ok) {
             toast.error('Error fetching BTC price. Please try again!');
         }
+        const data: BTCnSTXPriceResponse = await response.json();
+        return data.data.amount;
     };
 
-    useEffect(() => {
-        const fetchData = () => {
-            fetchBTCPrice().catch(error => {
+    const { data: btcAmount } = useQuery({
+        queryKey: ['btcPrice'],
+        queryFn: async () => {
+            try {
+                return await fetchBTCPrice();
+            } catch (error) {
                 toast.error('Error fetching BTC price. Please try again!');
-            });
+                throw error;
+            }
+        },
+        refetchInterval: 30000,
+    });
+
+    const fetchCoinbaseData = async (asset: string): Promise<number> => {
+        const response = await fetch(`https://api.coinbase.com/v2/prices/${asset}-USD/buy`);
+        if (!response.ok) {
+            toast.error('Error fetching BIT10 price. Please try again!');
+        }
+        const data: CoinbasePriceResponse = await response.json();
+        return parseFloat(data.data.amount);
+    };
+
+    const fetchCoinMarketCapData = async (): Promise<number[]> => {
+        const response = await fetch('/coinmarketcap');
+        if (!response.ok) {
+            toast.error('Error fetching BIT10 price. Please try again!');
+        }
+        const data: CoinMarketCapResponse = await response.json();
+        return [
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            data.data.CFX[0].quote.USD.price,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            data.data.SOV[0].quote.USD.price,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            data.data.RIF[0].quote.USD.price,
+        ];
+    };
+
+    const assets = ['STX', 'MAPO', 'ICP'];
+
+    // Fetching Coinbase prices using useQueries
+    const coinbaseQueries = useQueries({
+        queries: assets.map(asset => ({
+            queryKey: ['coinbase', asset],
+            queryFn: () => fetchCoinbaseData(asset),
+            onError: () => {
+                toast.error('Error fetching BIT10 price. Please try again!');
+            },
+        })),
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { data: coinMarketCapData, error: coinMarketCapError, isLoading: isCoinMarketCapLoading } = useQuery({
+        queryKey: ['coinMarketCap'],
+        queryFn: fetchCoinMarketCapData,
+        // onError: () => {
+        //     toast.error('Error fetching CoinMarketCap prices. Please try again!');
+        // },
+    });
+
+    const coinbaseData = coinbaseQueries.map(query => query.data ?? 0);
+
+    const totalSum = React.useMemo(() => {
+        const coinbaseTotal = coinbaseData.reduce((acc, curr) => acc + curr, 0);
+        const coinMarketCapTotal = coinMarketCapData ? coinMarketCapData.reduce((acc, curr) => acc + curr, 0) : 0;
+
+        if (coinbaseData.length > 0 && coinMarketCapData && coinMarketCapData.length > 0) {
+            return (coinbaseTotal + coinMarketCapTotal) / 6;
         }
 
-        fetchData();
-
-        const intervalId = setInterval(fetchData, 30000);
-        return () => clearInterval(intervalId);
-    }, []);
-
-    useEffect(() => {
-        const fetchCoinbaseData = async () => {
-            const assets = ['STX', 'MAPO', 'ICP'];
-            try {
-                const coinbaseRequests = assets.map(async (asset) => {
-                    const response = await fetch(`https://api.coinbase.com/v2/prices/${asset}-USD/buy`);
-                    const data = await response.json();
-                    return parseFloat(data.data.amount);
-                });
-                const result = await Promise.all(coinbaseRequests);
-                setCoinbaseData(result);
-            } catch (error) {
-                toast.error('Error fetching BIT10 price. Please try again!');
-            }
-        };
-
-        const fetchCoinMarketCapData = async () => {
-            try {
-                const response = await fetch('/coinmarketcap')
-                const data = await response.json();
-
-                const prices = [
-                    data.data.CFX[0].quote.USD.price,
-                    data.data.SOV[0].quote.USD.price,
-                    data.data.RIF[0].quote.USD.price
-                ];
-
-                setCoinMarketCapData(prices);
-            } catch (error) {
-                toast.error('Error fetching BIT10 price. Please try again!');
-            }
-        };
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        fetchCoinbaseData();
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        fetchCoinMarketCapData();
-    }, []);
-
-    useEffect(() => {
-        if (coinbaseData.length > 0 && coinMarketCapData.length > 0) {
-            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0) + coinMarketCapData.reduce((acc, curr) => acc + curr, 0);
-            const bit10DeFi = sum / 6;
-            setTotalSum(bit10DeFi);
-        } else {
-            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0);
-            const bit10DeFi = sum / 4;
-            setTotalSum(bit10DeFi);
-        }
-        setLoading(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        return coinbaseTotal / 4;
     }, [coinbaseData, coinMarketCapData]);
 
     const refreshData = () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         fetchBTCPrice().catch(error => {
             toast.error('Error fetching BTC price. Please try again!');
         });
@@ -160,7 +178,7 @@ export default function Swap() {
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            if (hasAllowed) {
+            if (hasAllowed && btcAmount) {
                 const actor = await window.ic.plug.createActor({
                     canisterId: ckBTCLegerCanisterId,
                     interfaceFactory: idlFactory
@@ -227,6 +245,7 @@ export default function Swap() {
                     toast.error('Transfer failed.');
                 }
             }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             setSwaping(false);
             toast.error('An error occurred while processing your request. Please try again!');
@@ -238,7 +257,7 @@ export default function Swap() {
     return (
         <MaxWidthWrapper>
             <div className='flex flex-col py-4 md:py-8 h-full items-center justify-center'>
-                {loading ? (
+                {isCoinMarketCapLoading ? (
                     <Card className='w-[300px] md:w-[450px] px-2 pt-6 animate-fade-bottom-up'>
                         <CardContent className='flex flex-col space-y-2'>
                             {['h-24', 'h-32', 'h-32', 'h-12'].map((classes, index) => (
@@ -276,7 +295,10 @@ export default function Swap() {
                                         <p>Pay with</p>
                                         <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                             <div className='text-4xl text-center md:text-start'>
-                                                {(((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) * 1.03).toFixed(6)}
+                                                {
+                                                    btcAmount &&
+                                                    (((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) * 1.03).toFixed(6)
+                                                }
                                             </div>
                                             <div className='flex flex-row items-center'>
                                                 <div className='py-1 px-2 mr-6 border-2 rounded-l-full z-10 w-full'>
@@ -306,7 +328,10 @@ export default function Swap() {
                                                 </Tooltip>
                                             </TooltipProvider>
                                             <div>
-                                                1 ckBTC = $ {parseFloat(btcAmount).toLocaleString(undefined, { minimumFractionDigits: 3 })}
+                                                1 ckBTC = $ {
+                                                    btcAmount &&
+                                                    parseFloat(btcAmount).toLocaleString(undefined, { minimumFractionDigits: 3 })
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -359,7 +384,7 @@ export default function Swap() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className='flex flex-row space-x-2 w-full items-center'>
-                                    <Button className='w-full' disabled={!isConnected || swaping || ((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) < 0.00002 || Number.isNaN((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount))} >
+                                    <Button className='w-full' disabled={!isConnected || swaping || !btcAmount || ((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) < 0.00002 || Number.isNaN((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount))} >
                                         {swaping && <Loader2 className='animate-spin mr-2' size={15} />}
                                         {swaping ? 'Swaping...' : 'Swap'}
                                     </Button>
