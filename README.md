@@ -1,45 +1,60 @@
 # BIT10
 
-Welcome to the first ever Fully Decentralized ETF.
+BIT10 is pioneering the concept of the "S&P500 of Bitcoin DeFi assets." It offers users a simplified way to diversify their exposure to DeFi assets by tracking the biggest crypto tokens, ordinals, BRC-20s, and ERC-20s in the DeFi ecosystem.
 
-## Build with
+## 🚀 The Problem
 
-- Next Js
-- Nodemailer
-- Zod
-- Drizzle
-- tRPC
-- Dfinity
-- NextAuth
-- Recharts
-- shadcn/ui
-- Aceternity UI
-- motion-primitives
+Investing in DeFi requires extensive research, and buying individual tokens often incurs high fees. Many users end up with an unbalanced portfolio, increasing risk and exposing them to poor-performing assets.
 
-## ICP Canisters
+## 💡 The Solution
+
+BIT10 provides a pre-selected basket of assets, reducing research time and cost. By buying one token, users invest in a diversified set of assets. With an auto-rebalancing mechanism, BIT10 optimizes portfolio performance by replacing poorly performing tokens with better ones.
+
+### 🌐 **Features**
+
+- **Diversified Exposure**: Gain exposure to multiple DeFi assets with a single token.
+- **Auto-Rebalancing**: Regularly updates asset allocations to optimize performance.
+- **Decentralized ETF**: Fully decentralized structure powered by the Internet Computer (ICP).
+
+### 🛠 **Tech Stack**
+
+- **Frontend**: Next.js, Shadcn/ui, Aceternity UI, motion-primitives
+- **Backend**: tRPC, Drizzle, Nodemailer, Dfinity
+- **Auth**: NextAuth
+- **Data Visualization**: Recharts
+
+### 🔗 **ICP Canisters**
 
 - Oracle: [fg5vt-paaaa-aaaap-qhhra-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=fg5vt-paaaa-aaaap-qhhra-cai)
 - BIT10.BTC: [eegan-kqaaa-aaaap-qhmgq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=eegan-kqaaa-aaaap-qhmgq-cai)
 - Test BIT10.DEFI: [hbs3g-xyaaa-aaaap-qhmna-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=hbs3g-xyaaa-aaaap-qhmna-cai)
 - BIT10.DEFI: [bin4j-cyaaa-aaaap-qh7tq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=bin4j-cyaaa-aaaap-qh7tq-cai)
+- Asset Storage: [yymp3-uaaaa-aaaap-qklqa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=yymp3-uaaaa-aaaap-qklqa-cai)
 
-## Prerequisites
+### 🏁 **Getting Started**
 
-Required to install and run the software:
+To start using BIT10, follow these steps:
 
-- [npm](https://www.npmjs.com/get-npm)
+1. **Install Dependencies**:
+    ```bash
+    npm install
+    ```
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+2. **Run the App**:
+    ```bash
+    npm run dev
+    ```
 
-## Getting Started
+3. **Access** the app at [http://localhost:3000](http://localhost:3000).
 
-From the project folder, run these commands in console (terminal) to install dependencies and run the app:
+---
 
-```bash
-# Install the dependencies
-npm install
-# Run the app
-npm run dev
-```
+### 📐 **Architecture Overview**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+BIT10 is structured using:
+
+- **Next.js** for the frontend framework.
+- **Dfinity** for decentralized canister management.
+- **Drizzle ORM** for efficient database interaction.
+- **tRPC** for type-safe API routing.
+  
