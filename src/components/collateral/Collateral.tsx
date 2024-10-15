@@ -299,7 +299,7 @@ export default function Collateral() {
                                                 <div className='w-3 h-3 rounded' style={{ backgroundColor: fill }}></div>
                                                 <span>{name}</span>
                                                 <span>({address})</span>
-                                                <a href='https://dashboard.internetcomputer.org/account/ee4145f960e036f842accfbc0764e42f982138ccf10965e29338388978d33d91' target='_blank'>
+                                                <a href='https://dashboard.internetcomputer.org/account/60a182a30efd8324fea20cdc0e97527c07894d68967423b7d1caaf547cc70480' target='_blank'>
                                                     <ExternalLink size={16} className='text-primary' />
                                                 </a>
                                             </td>
