@@ -1,0 +1,17 @@
+[package]
+name = "erc20_asset_storage"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+serde = "1"
+candid = "0.10.2"
+ic-cdk = "0.12.0"
+hex = "0.4.3"
+sha2 = "0.10.6"
+k256 = { version = "0.12.0", features = ["ecdsa"] }
+getrandom = { version = "0.2", features = ["custom"] }

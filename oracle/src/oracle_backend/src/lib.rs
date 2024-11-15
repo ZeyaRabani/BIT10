@@ -9,9 +9,13 @@ use ic_cdk_macros::{self, query, update};
 use serde::{Serialize, Deserialize};
 use serde_json::{self, Value};
 
-//Update method using the HTTPS outcalls feature
+use ic_cdk::api::call::call_with_payment;
+use ic_cdk::call;
+use candid::{Nat, Principal, candid_method};
+
+//Update method using the HTTPS outcalls feature 
 #[ic_cdk::update]
-async fn bit_10_oracle() -> String {
+async fn bit10_oracle() -> String {
     //2. SETUP ARGUMENTS FOR HTTP GET request
 
     // 2.1 Setup the URL for CoinGecko API
@@ -154,4 +158,30 @@ fn transform(raw: TransformArgs) -> HttpResponse {
     };
 
     res
+}
+
+#[ic_cdk::query]
+async fn bit10_defi_total_supply_of_token_available() -> u64 {
+    // 7100000000 // 71 Tokens
+    2785216926 // 27.85216926 Tokens
+}
+
+#[ic_cdk::update]
+async fn bit10_defi_total_token_bought() -> Result<Nat, String> {
+    let canister_id = Principal::from_text("bin4j-cyaaa-aaaap-qh7tq-cai").map_err(|e| e.to_string())?;
+    
+    match call::<(), (Nat,)>(canister_id, "icrc1_total_supply", ()).await {
+        Ok((total_supply,)) => Ok(total_supply),
+        Err((code, msg)) => Err(format!("Error calling icrc1_total_supply: {:?} - {}", code, msg)),
+    }
+}
+
+#[ic_cdk::update]
+async fn bit10_defi_total_token_available_for_buying() -> Result<Nat, String> {
+    let canister_id = Principal::from_text("bin4j-cyaaa-aaaap-qh7tq-cai").map_err(|e| e.to_string())?;
+    
+    match call::<(), (Nat,)>(canister_id, "icrc1_total_supply", ()).await {
+        Ok((total_supply,)) => Ok(Nat::from(2785216926u64) - total_supply),
+        Err((code, msg)) => Err(format!("Error calling icrc1_total_supply: {:?} - {}", code, msg)),
+    }
 }

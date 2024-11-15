@@ -1,3 +1,9 @@
 service : {
-    "bit_10_oracle": () -> (text);
+    "bit10_oracle": () -> (text);
+
+    "bit10_defi_total_supply_of_token_available" : () -> (nat64) query;
+
+    "bit10_defi_total_token_bought": () -> (variant { Ok: nat; Err: text });
+
+    "bit10_defi_total_token_available_for_buying": () -> (variant { Ok: nat; Err: text });
 }

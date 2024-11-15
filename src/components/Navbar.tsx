@@ -211,7 +211,7 @@ export default function Navbar() {
                 <div className='hidden w-full md:inline-flex md:flex-grow md:w-auto'>
                     <div className='md:inline-flex md:flex-row md:ml-auto md:w-auto w-full md:items-center items-start flex flex-col md:h-auto space-x-2'>
                         {
-                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' ? (
+                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' || pathname === '/collateral' ? (
                                 <>
                                     {isConnected ? (
                                         <Button variant='destructive' onClick={handleDisconnect}>Disconnect wallet</Button>

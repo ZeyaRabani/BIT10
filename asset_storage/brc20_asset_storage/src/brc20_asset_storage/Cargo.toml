@@ -1,7 +1,7 @@
 [package]
-name = "asset_storage_backend"
+name = "brc20_asset_storage"
 version = "0.1.0"
-edition = "2021"
+edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -9,6 +9,9 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-candid = "0.10"
-ic-cdk = "0.15"
-ic-cdk-timers = "0.7" # Feel free to remove this dependency if you don't need timers
+hex = "0.4.3"
+bitcoin = "0.30.2"
+candid = "0.9.10"
+ic-cdk = "0.10.0"
+ic-cdk-macros = "0.7.1"
+serde = "1.0.132"
