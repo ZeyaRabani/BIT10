@@ -384,7 +384,7 @@ export default function Swap() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className='flex flex-row space-x-2 w-full items-center'>
-                                    <Button className='w-full' disabled={!isConnected || swaping || !btcAmount || ((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) < 0.00002 || Number.isNaN((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount))} >
+                                    <Button className='w-full' disabled={!isConnected || swaping || !btcAmount || ((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) < 0 || Number.isNaN((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount))} >
                                         {swaping && <Loader2 className='animate-spin mr-2' size={15} />}
                                         {swaping ? 'Swaping...' : 'Swap'}
                                     </Button>
