@@ -103,6 +103,7 @@ function Type1() {
     )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function Type2() {
     return (
         <Card className='w-[300px] md:w-[450px] animate-fade-bottom-up'>

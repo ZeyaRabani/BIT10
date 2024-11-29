@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image'
 import { Skeleton } from '@/components/ui/skeleton'
 
-interface BTCnSTXPriceResponse {
+interface BuyingTokenPriceResponse {
     data: {
         amount: string;
         base: string;
@@ -43,6 +43,12 @@ interface CoinMarketCapResponse {
     };
 };
 
+const paymentMethod = [
+    'ckBTC',
+    'ckETH',
+    'ICP'
+]
+
 const bit10Amount = [
     '1',
     '2',
@@ -52,6 +58,9 @@ const bit10Amount = [
 ]
 
 const FormSchema = z.object({
+    payment_method: z.string({
+        required_error: 'Please select a payment method',
+    }),
     bit10_amount: z.string({
         required_error: 'Please select the number of BIT10 tokens to receive',
     }),
@@ -63,12 +72,30 @@ export default function Swap() {
 
     const { isConnected, principalId } = useWallet();
 
-    const fetchBTCPrice = async () => {
+    const fetchckBTCPrice = async () => {
         const response = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/buy');
         if (!response.ok) {
-            toast.error('Error fetching BTC price. Please try again!');
+            toast.error('Error fetching ckBTC price. Please try again!');
         }
-        const data: BTCnSTXPriceResponse = await response.json();
+        const data: BuyingTokenPriceResponse = await response.json();
+        return data.data.amount;
+    };
+
+    const fetchckETHPrice = async () => {
+        const response = await fetch('https://api.coinbase.com/v2/prices/ETH-USD/buy');
+        if (!response.ok) {
+            toast.error('Error fetching ckETH price. Please try again!');
+        }
+        const data: BuyingTokenPriceResponse = await response.json();
+        return data.data.amount;
+    };
+
+    const fetchICPPrice = async () => {
+        const response = await fetch('https://api.coinbase.com/v2/prices/ICP-USD/buy');
+        if (!response.ok) {
+            toast.error('Error fetching ICP price. Please try again!');
+        }
+        const data: BuyingTokenPriceResponse = await response.json();
         return data.data.amount;
     };
 
@@ -76,9 +103,35 @@ export default function Swap() {
         queryKey: ['btcPrice'],
         queryFn: async () => {
             try {
-                return await fetchBTCPrice();
+                return await fetchckBTCPrice();
             } catch (error) {
-                toast.error('Error fetching BTC price. Please try again!');
+                toast.error('Error fetching ckBTC price. Please try again!');
+                throw error;
+            }
+        },
+        refetchInterval: 30000,
+    });
+
+    const { data: ethAmount } = useQuery({
+        queryKey: ['ethPrice'],
+        queryFn: async () => {
+            try {
+                return await fetchckETHPrice();
+            } catch (error) {
+                toast.error('Error fetching ckETH price. Please try again!');
+                throw error;
+            }
+        },
+        refetchInterval: 30000,
+    });
+
+    const { data: icpAmount } = useQuery({
+        queryKey: ['icpPrice'],
+        queryFn: async () => {
+            try {
+                return await fetchICPPrice();
+            } catch (error) {
+                toast.error('Error fetching ICP price. Please try again!');
                 throw error;
             }
         },
@@ -150,7 +203,7 @@ export default function Swap() {
 
     const refreshData = () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        fetchBTCPrice().catch(error => {
+        fetchckBTCPrice().catch(error => {
             toast.error('Error fetching BTC price. Please try again!');
         });
         toast.info('Data refreshed');
@@ -161,6 +214,7 @@ export default function Swap() {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
+            payment_method: 'ckBTC',
             bit10_amount: '1'
         },
     });
@@ -169,30 +223,61 @@ export default function Swap() {
         try {
             setSwaping(true);
             // const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
-            const ckBTCLegerCanisterId = 'mxzaz-hqaaa-aaaar-qaada-cai'
+            const ckBTCLegerCanisterId = 'mxzaz-hqaaa-aaaar-qaada-cai';
+            const ckETHLegerCanisterId = 'ss2fx-dyaaa-aaaar-qacoq-cai';
+            const ICPLegerCanisterId = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
             const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
 
             const hasAllowed = await window.ic.plug.requestConnect({
-                whitelist: [ckBTCLegerCanisterId, bit10DEFICanisterId]
+                whitelist: [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, bit10DEFICanisterId]
             });
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (hasAllowed && btcAmount) {
+                let selectedCanisterId;
+
+                if (values.payment_method === 'ckBTC') {
+                    selectedCanisterId = ckBTCLegerCanisterId;
+                } else if (values.payment_method === 'ckETH') {
+                    selectedCanisterId = ckETHLegerCanisterId;
+                } else if (values.payment_method === 'ICP') {
+                    selectedCanisterId = ICPLegerCanisterId;
+                } else {
+                    throw new Error('Invalid payment method');
+                }
+
                 const actor = await window.ic.plug.createActor({
-                    canisterId: ckBTCLegerCanisterId,
-                    interfaceFactory: idlFactory
+                    canisterId: selectedCanisterId,
+                    interfaceFactory: idlFactory,
                 });
 
-                // ckBTC address
-                const receiverAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+                const receiverckBTCAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+                const recieverckETHAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+                const recieverICPAccountId = 'fabe4c4c67f30d57fa7376089b263ed9a4701f8c1b137fd1d7166701986d5bbd';
 
-                const price = ((parseInt(values.bit10_amount) * totalSum) / parseFloat(btcAmount));
+                let selectedRecieverAccountId;
+                let selectedAmount;
+
+                if (values.payment_method === 'ckBTC') {
+                    selectedRecieverAccountId = receiverckBTCAccountId;
+                    selectedAmount = ((parseInt(values.bit10_amount) * totalSum) / parseFloat(btcAmount));
+                } else if (values.payment_method === 'ckETH') {
+                    selectedRecieverAccountId = recieverckETHAccountId;
+                    selectedAmount = ((parseInt(values.bit10_amount) * totalSum) / parseFloat(ethAmount ?? '0'));
+                } else if (values.payment_method === 'ICP') {
+                    selectedRecieverAccountId = recieverICPAccountId;
+                    selectedAmount = ((parseInt(values.bit10_amount) * totalSum) / parseFloat(icpAmount ?? '0'));
+                } else {
+                    throw new Error('Invalid payment method');
+                }
+
+                const price = selectedAmount;
                 const amount = Math.round(price * 100000000).toFixed(0);
 
                 const args = {
                     to: {
-                        owner: Principal.fromText(receiverAccountId),
+                        owner: Principal.fromText(selectedRecieverAccountId),
                         subaccount: []
                     },
                     memo: [],
@@ -213,8 +298,8 @@ export default function Swap() {
                     const result = await newTokenSwap({
                         newTokenSwapId: newTokenSwapId,
                         principalId: principalId,
-                        paymentAmount: ((parseInt(values.bit10_amount) * totalSum) / parseFloat(btcAmount)).toString(),
-                        paymentName: 'ckBTC',
+                        paymentAmount: selectedAmount.toString(),
+                        paymentName: values.payment_method,
                         paymentAmountUSD: (parseInt(values.bit10_amount) * totalSum).toString(),
                         bit10tokenQuantity: (values.bit10_amount).toString(),
                         bit10tokenName: 'BIT10.DEFI',
@@ -245,7 +330,7 @@ export default function Swap() {
                     toast.error('Transfer failed.');
                 }
             }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             setSwaping(false);
             toast.error('An error occurred while processing your request. Please try again!');
@@ -296,18 +381,45 @@ export default function Swap() {
                                         <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                             <div className='text-4xl text-center md:text-start'>
                                                 {
-                                                    btcAmount &&
-                                                    (((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) * 1.03).toFixed(6)
+                                                    (() => {
+                                                        const paymentMethod = form.watch('payment_method');
+                                                        const amount = paymentMethod === 'ckBTC' ? btcAmount :
+                                                            paymentMethod === 'ckETH' ? ethAmount :
+                                                                paymentMethod === 'ICP' ? icpAmount : null;
+
+                                                        return amount &&
+                                                            (((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(amount)) * 1.03).toFixed(6);
+                                                    })()
                                                 }
                                             </div>
                                             <div className='flex flex-row items-center'>
-                                                <div className='py-1 px-2 mr-6 border-2 rounded-l-full z-10 w-full'>
-                                                    <div className='pl-4 py-1'>
-                                                        ckBTC
-                                                    </div>
+                                                <div className='px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name='payment_method'
+                                                        render={({ field }) => (
+                                                            <FormItem className='w-full px-2'>
+                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                    <FormControl>
+                                                                        <SelectTrigger className='border-none focus:border-none px-8 md:px-2'>
+                                                                            <SelectValue placeholder='Select payment method' />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent className='focus:border-none'>
+                                                                        {paymentMethod.map((name) => (
+                                                                            <SelectItem key={name} value={name} className='focus:border-none'>
+                                                                                {name}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
                                                 </div>
                                                 <div className='-ml-12 z-20'>
-                                                    <Image src='/assets/swap/ckbtc.png' alt='ckBTC' width={75} height={75} className='z-20 border-2 rounded-full' />
+                                                    <Image src={`/assets/swap/${form.watch('payment_method')}.png`} alt={form.watch('payment_method')} width={75} height={75} className='z-20 border-2 rounded-full bg-white' />
                                                 </div>
                                             </div>
                                         </div>
@@ -321,16 +433,23 @@ export default function Swap() {
                                                         </div>
                                                     </TooltipTrigger>
                                                     <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                        Price in ckBTC + 3% Platform fee <br />
+                                                        Price in {form.watch('payment_method')} + 3% Platform fee <br />
                                                         {/* $ {(parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))).toFixed(4)} + $ {(0.03 * (parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4)))).toFixed(4)} = $ {((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) + (0.03 * (parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))))).toFixed(4)} */}
                                                         $ {(parseFloat(form.watch('bit10_amount')) * totalSum)} + $ {(0.03 * (parseInt(form.watch('bit10_amount')) * totalSum))} = $ {((parseInt(form.watch('bit10_amount')) * totalSum) + (0.03 * (parseInt(form.watch('bit10_amount')) * totalSum)))}
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
                                             <div>
-                                                1 ckBTC = $ {
-                                                    btcAmount &&
-                                                    parseFloat(btcAmount).toLocaleString(undefined, { minimumFractionDigits: 3 })
+                                                1 {form.watch('payment_method')} = $ {
+                                                    (() => {
+                                                        const paymentMethod = form.watch('payment_method');
+                                                        const amount = paymentMethod === 'ckBTC' ? btcAmount :
+                                                            paymentMethod === 'ckETH' ? ethAmount :
+                                                                paymentMethod === 'ICP' ? icpAmount : null;
+
+                                                        return amount &&
+                                                            parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 3 })
+                                                    })()
                                                 }
                                             </div>
                                         </div>

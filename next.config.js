@@ -41,6 +41,10 @@ const config = {
                 destination: `/api/coinmarketcap/:slug*`,
             },
             {
+                source: '/bit10-defi-price/:slug*',
+                destination: `/api/bit10-defi-price/:slug*`,
+            },
+            {
                 source: '/bit10-defi-request/:slug*',
                 destination: `/api/bit10-defi-request/:slug*`,
             },
