@@ -54,7 +54,19 @@ export const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
             const order = row.original
 
             return (
-                <a href={`https://dashboard.internetcomputer.org/bitcoin/transaction/${order.transactionIndex}`} target='_blank'>
+                <a
+                    href={
+                        order.tokenPurchaseName === 'ckBTC'
+                            ? `https://dashboard.internetcomputer.org/bitcoin/transaction/${order.transactionIndex}`
+                            : order.tokenPurchaseName === 'ckETH'
+                                ? `https://dashboard.internetcomputer.org/ethereum/transaction/${order.transactionIndex}`
+                                : order.tokenPurchaseName === 'ICP'
+                                    ? `https://dashboard.internetcomputer.org/icp/transaction/${order.transactionIndex}`
+                                    : '#'
+                    }
+                    target='_blank'
+                    rel='noopener noreferrer'
+                >
                     <Button>
                         View Transaction
                         <ExternalLink className='ml-1 w-4 h-4' />

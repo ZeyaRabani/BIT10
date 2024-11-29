@@ -26,10 +26,12 @@ export const WalletProvider: React.FC<React.PropsWithChildren<{}>> = ({ children
     const connectWallet = async () => {
         try {
             // const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
-            const ckBTCLegerCanisterId = 'mxzaz-hqaaa-aaaar-qaada-cai'
-            const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai'
+            const ckBTCLegerCanisterId = 'mxzaz-hqaaa-aaaar-qaada-cai';
+            const ckETHLegerCanisterId = 'ss2fx-dyaaa-aaaar-qacoq-cai';
+            const ICPLegerCanisterId = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
+            const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
 
-            const whitelist = [ckBTCLegerCanisterId, bit10DEFICanisterId];
+            const whitelist = [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, bit10DEFICanisterId];
 
             await window.ic.plug.requestConnect({
                 whitelist,

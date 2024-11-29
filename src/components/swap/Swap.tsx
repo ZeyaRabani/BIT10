@@ -254,7 +254,7 @@ export default function Swap() {
 
                 const receiverckBTCAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
                 const recieverckETHAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
-                const recieverICPAccountId = 'fabe4c4c67f30d57fa7376089b263ed9a4701f8c1b137fd1d7166701986d5bbd';
+                const recieverICPAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
 
                 let selectedRecieverAccountId;
                 let selectedAmount;
@@ -333,6 +333,7 @@ export default function Swap() {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             setSwaping(false);
+            console.error('Error swapping tokens: ', error);
             toast.error('An error occurred while processing your request. Please try again!');
         } finally {
             setSwaping(false);
