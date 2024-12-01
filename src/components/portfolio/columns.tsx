@@ -61,7 +61,7 @@ export const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
                             : order.tokenPurchaseName === 'ckETH'
                                 ? `https://dashboard.internetcomputer.org/ethereum/transaction/${order.transactionIndex}`
                                 : order.tokenPurchaseName === 'ICP'
-                                    ? `https://dashboard.internetcomputer.org/icp/transaction/${order.transactionIndex}`
+                                    ? `https://dashboard.internetcomputer.org/transaction/${order.transactionIndex}`
                                     : '#'
                     }
                     target='_blank'
