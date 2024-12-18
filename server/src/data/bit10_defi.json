@@ -1,0 +1,1348 @@
+{
+  "bit10_defi": [
+    {
+      "timestmpz": "2024-12-18T10:25:23.610Z",
+      "tokenPrice": 2.4584384781758084,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.893226805147536,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.1760936189328057,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.18738674847293849,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010430252742051564,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.12079610976946424,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3626973339900538,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T10:25:18.718Z",
+      "tokenPrice": 2.4584384781758084,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.893226805147536,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.1760936189328057,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.18738674847293849,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010430252742051564,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.12079610976946424,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3626973339900538,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T10:25:13.708Z",
+      "tokenPrice": 2.4584384781758084,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.893226805147536,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.1760936189328057,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.18738674847293849,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010430252742051564,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.12079610976946424,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3626973339900538,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T10:25:07.862Z",
+      "tokenPrice": 2.4584384781758084,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.893226805147536,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.1760936189328057,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.18738674847293849,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010430252742051564,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.12079610976946424,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3626973339900538,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T10:25:02.980Z",
+      "tokenPrice": 2.4584384781758084,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.893226805147536,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.1760936189328057,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.18738674847293849,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010430252742051564,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.12079610976946424,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3626973339900538,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T10:24:57.561Z",
+      "tokenPrice": 2.4584384781758084,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.893226805147536,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.1760936189328057,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.18738674847293849,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010430252742051564,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.12079610976946424,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3626973339900538,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T10:24:52.100Z",
+      "tokenPrice": 2.4584384781758084,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.893226805147536,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.1760936189328057,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.18738674847293849,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010430252742051564,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.12079610976946424,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3626973339900538,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T09:44:15.779Z",
+      "tokenPrice": 2.4749535583085787,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.992218358612766,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.173911823608737,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.1885013492246078,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010479488733279176,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.1214736034901018,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.36313672618198023,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T09:44:10.651Z",
+      "tokenPrice": 2.4749535583085787,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.992218358612766,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.173911823608737,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.1885013492246078,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010479488733279176,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.1214736034901018,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.36313672618198023,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T09:44:05.495Z",
+      "tokenPrice": 2.4749535583085787,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.992218358612766,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.173911823608737,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.1885013492246078,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010479488733279176,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.1214736034901018,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.36313672618198023,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T09:44:00.334Z",
+      "tokenPrice": 2.4749535583085787,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.992218358612766,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.173911823608737,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.1885013492246078,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010479488733279176,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.1214736034901018,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.36313672618198023,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-18T09:43:55.154Z",
+      "tokenPrice": 2.474994721426116,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 11.992218358612766,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.1741588023139595,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.1885013492246078,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010479488733279176,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.1214736034901018,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.36313672618198023,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-17T13:57:42.844Z",
+      "tokenPrice": 2.6399830411391823,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.730909604094975,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.387775871966044,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.20323568504404216,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.011117192584129118,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.13230246403882445,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3745574291070777,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-17T13:07:40.304Z",
+      "tokenPrice": 2.6419697513474394,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.755755141095666,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.3738548296828066,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.20314343174746835,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.011023948866001563,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.1326279114091437,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3754132452835504,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-17T12:17:40.732Z",
+      "tokenPrice": 2.6298629998212055,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.69874580217839,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.3621036328793745,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.20275583292738242,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.011017051594150349,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.1320219802070337,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.3725336991409031,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-11T12:31:17.597Z",
+      "tokenPrice": 2.561640556697215,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.380915476818302,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.2384105441397693,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2024390870557702,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010418944067087908,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.125983932515506,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.41167535558685564,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-11T12:31:12.647Z",
+      "tokenPrice": 2.561640556697215,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.380915476818302,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.2384105441397693,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2024390870557702,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010418944067087908,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.125983932515506,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.41167535558685564,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-11T12:31:07.255Z",
+      "tokenPrice": 2.561640556697215,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.380915476818302,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.2384105441397693,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2024390870557702,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010418944067087908,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.125983932515506,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.41167535558685564,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-11T12:31:02.116Z",
+      "tokenPrice": 2.561640556697215,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.380915476818302,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.2384105441397693,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2024390870557702,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010418944067087908,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.125983932515506,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.41167535558685564,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-11T12:30:57.099Z",
+      "tokenPrice": 2.561640556697215,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.380915476818302,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.2384105441397693,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2024390870557702,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010418944067087908,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.125983932515506,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.41167535558685564,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-11T12:30:52.063Z",
+      "tokenPrice": 2.561640556697215,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.380915476818302,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.2384105441397693,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2024390870557702,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010418944067087908,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.125983932515506,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.41167535558685564,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-11T12:30:46.569Z",
+      "tokenPrice": 2.561640556697215,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 12.380915476818302,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.2384105441397693,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2024390870557702,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010418944067087908,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.125983932515506,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.41167535558685564,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-03T07:32:43.729Z",
+      "tokenPrice": 2.824546095230611,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 13.692023357234092,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.3888034430923484,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.23361411988267672,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010352017081675002,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.14209222468452223,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.48039140940835084,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-03T07:32:38.571Z",
+      "tokenPrice": 2.8245262101345836,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 13.692023357234092,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.3888034430923484,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2334948093065087,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010352017081675002,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.14209222468452223,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.48039140940835084,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-03T07:32:33.601Z",
+      "tokenPrice": 2.824105718553042,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 13.692023357234092,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.3862804936030995,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2334948093065087,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010352017081675002,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.14209222468452223,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.48039140940835084,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-03T07:32:28.166Z",
+      "tokenPrice": 2.824105718553042,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 13.692023357234092,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.3862804936030995,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2334948093065087,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010352017081675002,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.14209222468452223,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.48039140940835084,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-03T07:32:22.709Z",
+      "tokenPrice": 2.824123942616293,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 13.692023357234092,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.3862804936030995,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2334948093065087,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010352017081675002,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.14220156906403086,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.48039140940835084,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    },
+    {
+      "timestmpz": "2024-12-03T07:32:16.328Z",
+      "tokenPrice": 2.824123942616293,
+      "data": [
+        {
+          "id": 8916,
+          "name": "Internet Computer",
+          "symbol": "ICP",
+          "price": 13.692023357234092,
+          "address": "60a182a......547cc70480"
+        },
+        {
+          "id": 4847,
+          "name": "Stacks",
+          "symbol": "STX",
+          "price": 2.3862804936030995,
+          "address": "SP1P4R......KMG4WN3E55"
+        },
+        {
+          "id": 7334,
+          "name": "Conflux",
+          "symbol": "CFX",
+          "price": 0.2334948093065087,
+          "address": "0x9f9........dbc3fac035"
+        },
+        {
+          "id": 4956,
+          "name": "MAP Protocol",
+          "symbol": "MAPO",
+          "price": 0.010352017081675002,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 3701,
+          "name": "Rootstock Infrastructure Framework",
+          "symbol": "RIF",
+          "price": 0.14220156906403086,
+          "address": "0x0D15.......2735133E79"
+        },
+        {
+          "id": 8669,
+          "name": "Sovryn",
+          "symbol": "SOV",
+          "price": 0.48039140940835084,
+          "address": "0x0D15.......2735133E79"
+        }
+      ]
+    }
+  ]
+}

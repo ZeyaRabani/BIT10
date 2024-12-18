@@ -11,6 +11,7 @@ import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/oracle.did'
 import { bit10Allocation } from '@/data/bit10TokenAllocation'
 import { ExternalLink } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 interface TokenData {
     id: string;
@@ -55,6 +56,8 @@ export default function Collateral() {
 
     const canisterId = 'fg5vt-paaaa-aaaap-qhhra-cai';
     const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
+
+    const totalUSDCollateralBITDEFI = 78;
 
     useEffect(() => {
         const handleResize = () => {
@@ -207,9 +210,17 @@ export default function Collateral() {
                             </div>
                             <div className='flex w-full flex-col space-y-3 col-span-2'>
                                 <h1 className='text-2xl'>BIT10.DEFI</h1>
-                                <p className='text-xl'>Total Collateral: {totalCollateralSum.toFixed(2)} USD</p>
+                                <div className='text-xl'>
+                                    <div className='flex flex-1 flex-row items-center justify-start'>
+                                        Total Collateral: {totalCollateralSum.toFixed(2)} USD
+                                        {totalCollateralSum !== totalUSDCollateralBITDEFI && (
+                                            <Badge className='ml-1 text-white' style={{ backgroundColor: totalCollateralSum > totalUSDCollateralBITDEFI ? 'green' : 'red' }}>
+                                                {`${totalCollateralSum > totalUSDCollateralBITDEFI ? '+ ' : '- '}${((totalCollateralSum - totalUSDCollateralBITDEFI) / totalUSDCollateralBITDEFI * 100).toFixed(4)}%`}</Badge>
+                                        )}
+                                    </div>
+                                </div>
                                 <h1 className='text-lg'>BIT10.DEFI Price: {bit10defiPrice.toFixed(4)} USD</h1>
-                                <p className='text-lg'>Token Supply (150% Collateral Coverage): {bit10DEFITokenSupply} BIT10.DEFI</p>
+                                <p className='text-lg'>Token Supply (100% Collateral Coverage): {bit10DEFITokenSupply} BIT10.DEFI</p>
                                 <table className='w-full table-auto text-lg'>
                                     <thead>
                                         <tr className='hover:bg-accent p-1 rounded'>
@@ -246,6 +257,6 @@ export default function Collateral() {
                     </CardContent>
                 </Card>
             )}
-        </div>
+        </div >
     );
 }

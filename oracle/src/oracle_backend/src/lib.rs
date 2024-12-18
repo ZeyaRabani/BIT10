@@ -163,7 +163,8 @@ fn transform(raw: TransformArgs) -> HttpResponse {
 #[ic_cdk::query]
 async fn bit10_defi_total_supply_of_token_available() -> u64 {
     // 7100000000 // 71 Tokens
-    2785216926 // 27.85216926 Tokens
+    // 2785216926 // 27.85216926 Tokens
+    4177825388 // 41.77825388 Tokens
 }
 
 #[ic_cdk::update]
@@ -181,7 +182,7 @@ async fn bit10_defi_total_token_available_for_buying() -> Result<Nat, String> {
     let canister_id = Principal::from_text("bin4j-cyaaa-aaaap-qh7tq-cai").map_err(|e| e.to_string())?;
     
     match call::<(), (Nat,)>(canister_id, "icrc1_total_supply", ()).await {
-        Ok((total_supply,)) => Ok(Nat::from(2785216926u64) - total_supply),
+        Ok((total_supply,)) => Ok(Nat::from(4177825388u64) - total_supply),
         Err((code, msg)) => Err(format!("Error calling icrc1_total_supply: {:?} - {}", code, msg)),
     }
 }

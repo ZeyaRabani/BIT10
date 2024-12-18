@@ -13,6 +13,7 @@ use bitcoin::{Address, Script};
 use bitcoin::blockdata::transaction::{Transaction, TxOut, TxIn};
 use bitcoin::consensus::encode;
 use bitcoin::absolute::LockTime;
+use serde_json::json;
 
 thread_local! {
     static NETWORK: Cell<BitcoinNetwork> = Cell::new(BitcoinNetwork::Testnet);
@@ -95,6 +96,52 @@ pub async fn send_from_p2pkh(request: SendRequest) -> String {
     .await;
 
     tx_id.to_string()
+}
+
+#[update]
+pub async fn quote_brc20_swap(amount: u64, from_token: String, to_token: String) -> Result<String, String> {
+    let url = "https://open-api.unisat.io/v1/brc20-swap/quote_swap";
+    let client = reqwest::Client::new();
+    
+    let response = client.post(url)
+        .json(&json!({
+            "amount": amount,
+            "from": from_token,
+            "to": to_token,
+        }))
+        .send()
+        .await.map_err(|e| e.to_string())?;
+
+    if response.status().is_success() {
+        let result: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
+        Ok(result.to_string())
+    } else {
+        Err(format!("Error: {}", response.status()))
+    }
+}
+
+#[update]
+pub async fn get_transferable_inscriptions(address: String, ticker: String) -> Result<Vec<String>, String> {
+    let url = format!("https://open-api.unisat.io/v1/indexer/address/{}/brc20/{}/transferable-inscriptions", address, ticker);
+    let client = reqwest::Client::new();
+
+    let response = client.get(&url)
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if response.status().is_success() {
+        let result: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
+        let inscriptions = result["inscriptions"]
+            .as_array()
+            .ok_or("Failed to parse inscriptions")?
+            .iter()
+            .filter_map(|v| v.as_str().map(String::from))
+            .collect();
+        Ok(inscriptions)
+    } else {
+        Err(format!("Error: {}", response.status()))
+    }
 }
 
 #[update]

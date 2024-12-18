@@ -55,4 +55,6 @@ service : (network) -> {
       amount_in_satoshi : satoshi;
     }
   ) -> (transaction_id);
+
+  "quote_brc20_swap": (amount: nat, from_token: text, to_token: text) -> async text;
 };
