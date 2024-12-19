@@ -17,7 +17,7 @@ export const bit10DeFi: DataType[] = [
     { name: 'SOV', id: 8669, tokenAddress: '0x0D15.......2735133E79' },
 ];
 
-const jsonFilePath = path.join(__dirname, '../data/bit10_defi.json')
+const jsonFilePath = path.join(__dirname, '../../data/bit10_defi.json')
 
 async function fetchAndUpdateData() {
     const coinmarket_cap_key = process.env.COINMARKETCAP_API_KEY;

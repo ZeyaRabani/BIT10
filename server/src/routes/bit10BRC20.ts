@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
 
-const jsonFilePath = path.join(__dirname, '../data/bit10_brc20.json');
+const jsonFilePath = path.join(__dirname, '../../data/bit10_brc20.json');
 
 async function fetchAndUpdateData() {
     const coinmarket_cap_key = process.env.COINMARKETCAP_API_KEY;

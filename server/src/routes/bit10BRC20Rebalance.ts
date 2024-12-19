@@ -2,8 +2,8 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import fs from 'fs'
 import path from 'path'
 
-const DATA_PATH = path.join(__dirname, '../data/bit10_brc20_test.json');
-const REBALANCE_PATH = path.join(__dirname, '../data/bit10_brc20_rebalance.json');
+const DATA_PATH = path.join(__dirname, '../../data/bit10_brc20.json');
+const REBALANCE_PATH = path.join(__dirname, '../../data/bit10_brc20_rebalance.json');
 
 interface Token {
     id: number;
