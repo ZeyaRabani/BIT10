@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import http from 'http'
 import dotenv from 'dotenv'
-import { handleBit10DeFi } from './routes/bit10DeFi'
+import { handleBit10DeFi } from './routes/bit10DEFI'
 import { handleBit10BRC20 } from './routes/bit10BRC20'
-import { handleBit10BRC20Rebalance } from './routes/bit10BRC20Rebalance'
+import { handleBit10BRC20HistoricalData } from './routes/bit10BRC20HistoricalData'
+import { handleBit10TOPHistoricalData } from './routes/bit10TOPHistoricalData'
 
 dotenv.config();
 
@@ -21,8 +23,14 @@ const requestHandler = (request: http.IncomingMessage, response: http.ServerResp
             response.writeHead(500);
             response.end('Internal Server Error');
         });
-    } else if (request.url === '/bit10-brc20-rebalance') {
-        handleBit10BRC20Rebalance(request, response).catch((error) => {
+    } else if (request.url === '/bit10-brc20-historical-data') {
+        handleBit10BRC20HistoricalData(request, response).catch((error) => {
+            response.setHeader('Content-Type', 'text/plain');
+            response.writeHead(500);
+            response.end('Internal Server Error');
+        });
+    } else if (request.url === '/bit10-top-historical-data') {
+        handleBit10TOPHistoricalData(request, response).catch((error) => {
             response.setHeader('Content-Type', 'text/plain');
             response.writeHead(500);
             response.end('Internal Server Error');

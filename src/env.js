@@ -24,7 +24,9 @@ export const env = createEnv({
     ),
     COINMARKETCAP_API_KEY: z.string().min(8),
     PERSONAL_EMAIL: z.string().email(),
-    EMAIL_PASSWORD: z.string()
+    EMAIL_PASSWORD: z.string(),
+    // NODE_SERVER: z.string().url(),
+    UNISAT_SWAP_KEY: z.string().min(8)
   },
 
   /**
@@ -51,7 +53,9 @@ export const env = createEnv({
     PERSONAL_EMAIL: process.env.PERSONAL_EMAIL,
     EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
     NEXT_PUBLIC_PRIVATE_PASS: process.env.NEXT_PUBLIC_PRIVATE_PASS,
-    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY
+    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+    // NODE_SERVER: process.env.NODE_SERVER,
+    UNISAT_SWAP_KEY: process.env.UNISAT_SWAP_KEY
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

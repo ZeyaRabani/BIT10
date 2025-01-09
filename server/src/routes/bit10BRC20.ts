@@ -6,43 +6,45 @@ import axios from 'axios'
 const jsonFilePath = path.join(__dirname, '../../data/bit10_brc20.json');
 
 async function fetchAndUpdateData() {
-    const coinmarket_cap_key = process.env.COINMARKETCAP_API_KEY;
-    const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/category?id=654a0c87ba37f269c8016129&limit=10&CMC_PRO_API_KEY=${coinmarket_cap_key}`;
-
     try {
-        const result = await axios.get(url, {
-            headers: {
-                'X-CMC_PRO_API_KEY': coinmarket_cap_key,
-            },
-        });
+        const jsonRebalanceFilePath = path.join(__dirname, '../../data/bit10_brc20_rebalance.json');
+        const rebalanceData = JSON.parse(fs.readFileSync(jsonRebalanceFilePath, 'utf-8'));
 
-        interface Coin {
+        const changes = rebalanceData.bit10_brc20_rebalance[0].changes;
+        const addedIds = changes.added.map((token: { id: number }) => token.id);
+        const retainedIds = changes.retained.map((token: { id: number }) => token.id);
+
+        const combinedIds = [...addedIds, ...retainedIds];
+
+        const coinmarket_cap_key = process.env.COINMARKETCAP_API_KEY;
+        const url = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${combinedIds.join(',')}&CMC_PRO_API_KEY=${coinmarket_cap_key}`;
+
+        const result = await axios.get(url);
+
+        const dataEntries = Object.values(result.data.data) as {
             id: number;
             name: string;
             symbol: string;
+            platform: {
+                token_address: string;
+            }
             quote: {
                 USD: {
                     price: number;
                 };
             };
-        }
+        }[];
 
-        interface ApiResponse {
-            data: {
-                coins: Coin[];
-            };
-        }
+        const coinsData = dataEntries.map(entry => ({
+            id: entry.id,
+            name: entry.name,
+            symbol: entry.symbol,
+            tokenAddress: entry.platform.token_address,
+            price: entry.quote.USD.price
+        }))
 
-        const apiResponse: ApiResponse = result.data as ApiResponse;
-        const coinsData = apiResponse.data.coins.map((coin) => ({
-            id: coin.id,
-            name: coin.name,
-            symbol: coin.symbol,
-            price: coin.quote.USD.price
-        }));
-
-        const totalPrice = coinsData.reduce((sum, token) => sum + (token?.price ?? 0), 0);
-        const tokenPrice = coinsData.length > 0 ? totalPrice / coinsData.length : 0;
+        const totalPrice = dataEntries.reduce((sum, entry) => sum + entry.quote.USD.price, 0);
+        const tokenPrice = totalPrice / dataEntries.length;
 
         const newEntry = {
             timestmpz: new Date().toISOString(),
@@ -52,7 +54,7 @@ async function fetchAndUpdateData() {
 
         let existingData;
         try {
-            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
+            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, tokenAddress: string, price: number }> }> };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             existingData = { bit10_brc20: [] };
@@ -61,7 +63,6 @@ async function fetchAndUpdateData() {
         existingData.bit10_brc20.unshift(newEntry);
 
         fs.writeFileSync(jsonFilePath, JSON.stringify(existingData, null, 2));
-
     } catch (error) {
         console.error('Error fetching data:', error);
     }

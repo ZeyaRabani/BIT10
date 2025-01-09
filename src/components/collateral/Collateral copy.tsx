@@ -312,6 +312,84 @@ export default function Collateral() {
                                 </div>
                             </div>
                         </div>
+
+                        <div>
+                            <div className='text-2xl'>BIT10.BRC20</div>
+                            <div className='grid md:grid-cols-3 gap-4 items-center'>
+                                <div className='flex-1'>
+                                    <ChartContainer
+                                        config={bit10brc20ChartConfig}
+                                        className='aspect-square max-h-[300px]'
+                                    >
+                                        <PieChart>
+                                            <ChartTooltip
+                                                cursor={false}
+                                                content={<ChartTooltipContent hideLabel />}
+                                            />
+                                            <Pie
+                                                data={pieChartData}
+                                                dataKey='value'
+                                                nameKey='name'
+                                                innerRadius={innerRadius}
+                                                strokeWidth={5}
+                                            >
+                                                <Label
+                                                    content={({ viewBox }) => {
+                                                        if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                            return (
+                                                                <text
+                                                                    x={viewBox.cx}
+                                                                    y={viewBox.cy}
+                                                                    textAnchor='middle'
+                                                                    dominantBaseline='middle'
+                                                                >
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={viewBox.cy}
+                                                                        className='fill-foreground text-xl font-bold'
+                                                                    >
+                                                                        BIT10.BRC20
+                                                                    </tspan>
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={(viewBox.cy ?? 0) + 24}
+                                                                        className='fill-muted-foreground'
+                                                                    >
+                                                                        Allocations
+                                                                    </tspan>
+                                                                </text>
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                            </Pie>
+                                        </PieChart>
+                                    </ChartContainer>
+                                </div>
+                                <div className='flex w-full flex-col space-y-3 col-span-2'>
+                                    <h1 className='text-2xl'>BIT10.BRC20</h1>
+                                    <div className='text-xl'>
+                                        <div className='flex flex-1 flex-row items-center justify-start'>
+                                            Total Collateral:
+                                        </div>
+                                    </div>
+                                    {/* @ts-ignore */}
+                                    <h1 className='text-lg'>BIT10.BRC20 Price: {bit10brc20Price.toFixed(4)} USD</h1>
+                                    <p className='text-lg'>Token Supply (100% Collateral Coverage):</p>
+                                    <table className='w-full table-auto text-lg'>
+                                        <thead>
+                                            <tr className='hover:bg-accent p-1 rounded'>
+                                                <th className='text-left'>Collateral Token</th>
+                                                <th className='text-left'>Total Collateral</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             )}

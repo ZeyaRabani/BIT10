@@ -70,7 +70,7 @@ export default function Performance() {
                                     <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
                                 </linearGradient>
                             </defs>
-                            <Area dataKey='bit10DeFi' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
+                            <Area dataKey='bit10DeFi' type='linear' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
                         </AreaChart>
                     </ChartContainer>
                 }
@@ -88,7 +88,7 @@ export default function Performance() {
                                     <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
                                 </linearGradient>
                             </defs>
-                            <Area dataKey='bit10DeFi' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
+                            <Area dataKey='bit10DeFi' type='linear' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
                         </AreaChart>
                     </ChartContainer>
                 }
@@ -106,7 +106,7 @@ export default function Performance() {
                                     <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
                                 </linearGradient>
                             </defs>
-                            <Area dataKey='bit10DeFi' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
+                            <Area dataKey='bit10DeFi' type='linear' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
                         </AreaChart>
                     </ChartContainer>
                 }

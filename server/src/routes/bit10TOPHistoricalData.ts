@@ -3,11 +3,12 @@ import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
 
-const jsonFilePath = path.join(__dirname, '../../data/bit10_defi.json');
+const jsonFilePath = path.join(__dirname, '../../data/bit10_top_historical_data.json');
 
 async function fetchAndUpdateData() {
     const coinmarket_cap_key = process.env.COINMARKETCAP_API_KEY;
-    const url = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=8916,4847,7334,4956,3701,8669&CMC_PRO_API_KEY=${coinmarket_cap_key}`;
+    // limit is 15
+    const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=15&CMC_PRO_API_KEY=${coinmarket_cap_key}`;
 
     try {
         const result = await axios.get(url, {
@@ -16,26 +17,39 @@ async function fetchAndUpdateData() {
             },
         });
 
-        const dataEntries = Object.values(result.data.data) as {
+        interface Coin {
             id: number;
             name: string;
             symbol: string;
+            tags: string[];
+            platform: {
+                token_address: string;
+            } | null;
             quote: {
                 USD: {
                     price: number;
                 };
             };
-        }[];
+        }
 
-        const coinsData = dataEntries.map(entry => ({
-            id: entry.id,
-            name: entry.name,
-            symbol: entry.symbol,
-            price: entry.quote.USD.price
-        }))
+        interface ApiResponse {
+            data: Coin[];
+        }
 
-        const totalPrice = dataEntries.reduce((sum, entry) => sum + entry.quote.USD.price, 0);
-        const tokenPrice = totalPrice / dataEntries.length;
+        const apiResponse: ApiResponse = result.data as ApiResponse;
+
+        const filteredCoins = apiResponse.data.filter(coin => !coin.tags.includes('stablecoin')).slice(0, 10);
+
+        const coinsData = filteredCoins.map((coin) => ({
+            id: coin.id,
+            name: coin.name,
+            symbol: coin.symbol,
+            tokenAddress: coin.platform?.token_address,
+            price: coin.quote.USD.price
+        }));
+
+        const totalPrice = coinsData.reduce((sum, token) => sum + (token?.price ?? 0), 0);
+        const tokenPrice = coinsData.length > 0 ? totalPrice / coinsData.length : 0;
 
         const newEntry = {
             timestmpz: new Date().toISOString(),
@@ -45,13 +59,13 @@ async function fetchAndUpdateData() {
 
         let existingData;
         try {
-            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_defi: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
+            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_top_historical_data: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, tokenAddress?: string, price: number }> }> };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
-            existingData = { bit10_defi: [] };
+            existingData = { bit10_top_historical_data: [] };
         }
 
-        existingData.bit10_defi.unshift(newEntry);
+        existingData.bit10_top_historical_data.unshift(newEntry);
 
         fs.writeFileSync(jsonFilePath, JSON.stringify(existingData, null, 2));
     } catch (error) {
@@ -65,7 +79,7 @@ setInterval(() => {
 }, 3000000);
 // }, 3000);
 
-export const handleBit10DeFi = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBit10TOPHistoricalData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(405);
@@ -74,7 +88,7 @@ export const handleBit10DeFi = async (request: IncomingMessage, response: Server
     }
 
     try {
-        const existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_defi: Array<{ timestmpz: string, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
+        const existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_top_historical_data: Array<{ timestmpz: string, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(200);
         response.end(JSON.stringify(existingData));

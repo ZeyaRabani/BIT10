@@ -57,6 +57,11 @@ const bit10Amount = [
     '5'
 ]
 
+// const bit10Token = [
+//     'BIT10.DEFI',
+//     'BIT10.BRC20'
+// ]
+
 const FormSchema = z.object({
     payment_method: z.string({
         required_error: 'Please select a payment method',
@@ -64,6 +69,9 @@ const FormSchema = z.object({
     bit10_amount: z.string({
         required_error: 'Please select the number of BIT10 tokens to receive',
     }),
+    // bit10_token: z.string({
+    //     required_error: 'Please select the BIT10 token to receive',
+    // }),
 })
 
 export default function Swap() {
@@ -215,7 +223,8 @@ export default function Swap() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             payment_method: 'ckBTC',
-            bit10_amount: '1'
+            bit10_amount: '1',
+            // bit10_token: 'BIT10.DEFI'
         },
     });
 
@@ -344,7 +353,7 @@ export default function Swap() {
         <MaxWidthWrapper>
             <div className='flex flex-col py-4 md:py-8 h-full items-center justify-center'>
                 {isCoinMarketCapLoading ? (
-                    <Card className='w-[300px] md:w-[450px] px-2 pt-6 animate-fade-bottom-up'>
+                    <Card className='w-[300px] md:w-[500px] px-2 pt-6 animate-fade-bottom-up'>
                         <CardContent className='flex flex-col space-y-2'>
                             {['h-24', 'h-32', 'h-32', 'h-12'].map((classes, index) => (
                                 <Skeleton key={index} className={classes} />
@@ -352,7 +361,7 @@ export default function Swap() {
                         </CardContent>
                     </Card>
                 ) : (
-                    <Card className='w-[300px] md:w-[450px] animate-fade-bottom-up'>
+                    <Card className='w-[300px] md:w-[500px] animate-fade-bottom-up'>
                         <CardHeader>
                             <CardTitle className='flex flex-row items-center justify-between'>
                                 <div>Swap</div>
@@ -484,11 +493,35 @@ export default function Swap() {
                                                     )}
                                                 />
                                             </div>
+                                            {/* Use grid 5 or 4 for the select and image */}
                                             <div className='flex flex-row items-center'>
                                                 <div className='py-1 px-2 mr-6 border-2 rounded-l-full z-10 w-full'>
                                                     <div className='pl-4 py-1'>
                                                         BIT10.DEFI
                                                     </div>
+                                                    {/* <FormField
+                                                        control={form.control}
+                                                        name='bit10_token'
+                                                        render={({ field }) => (
+                                                            <FormItem className='w-full px-2'>
+                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                    <FormControl>
+                                                                        <SelectTrigger className='border-none focus:border-none px-8 md:px-2'>
+                                                                            <SelectValue placeholder='Select payment method' />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent className='focus:border-none'>
+                                                                        {bit10Token.map((name) => (
+                                                                            <SelectItem key={name} value={name} className='focus:border-none'>
+                                                                                {name}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    /> */}
                                                 </div>
                                                 <div className='-ml-12 z-20'>
                                                     <Image src='/assets/swap/bit10.svg' alt='bit10' width={75} height={75} className='z-20' />

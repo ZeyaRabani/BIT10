@@ -38,43 +38,51 @@ const config = {
         return [
             {
                 source: '/coinmarketcap/:slug*',
-                destination: `/api/coinmarketcap/:slug*`,
+                destination: '/api/coinmarketcap/:slug*',
+            },
+            {
+                source: '/bit10-defi-server',
+                destination: '/api/bit10-defi-server',
+            },
+            {
+                source: '/bit10-brc20-server',
+                destination: '/api/bit10-brc20-server',
             },
             {
                 source: '/bit10-defi-price/:slug*',
-                destination: `/api/bit10-defi-price/:slug*`,
+                destination: '/api/bit10-defi-price/:slug*',
             },
             {
                 source: '/bit10-defi-request/:slug*',
-                destination: `/api/bit10-defi-request/:slug*`,
+                destination: '/api/bit10-defi-request/:slug*',
             },
             {
                 source: '/bit10-btc-request/:slug*',
-                destination: `/api/bit10-btc-request/:slug*`,
+                destination: '/api/bit10-btc-request/:slug*',
             },
             {
                 source: '/bit10-testnet-welcome/:slug*',
-                destination: `/api/bit10-testnet-welcome/:slug*`,
+                destination: '/api/bit10-testnet-welcome/:slug*',
             },
             {
                 source: '/bit10-testnet-welcome-single/:slug*',
-                destination: `/api/bit10-testnet-welcome-single/:slug*`,
+                destination: '/api/bit10-testnet-welcome-single/:slug*',
             },
             {
                 source: '/bit10-review/:slug*',
-                destination: `/api/bit10-review/:slug*`,
+                destination: '/api/bit10-review/:slug*',
             },
             {
                 source: '/bit10-btc-request-approve/:slug*',
-                destination: `/api/bit10-btc-request-approve/:slug*`,
+                destination: '/api/bit10-btc-request-approve/:slug*',
             },
             {
                 source: '/icp-interview/:slug*',
-                destination: `/api/icp-interview/:slug*`,
+                destination: '/api/icp-interview/:slug*',
             },
             {
                 source: '/contact-form/:slug*',
-                destination: `/api/contact-form/:slug*`,
+                destination: '/api/contact-form/:slug*',
             },
             {
                 source: '/ingest/static/:path*',
