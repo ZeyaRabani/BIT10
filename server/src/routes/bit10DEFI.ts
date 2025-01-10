@@ -48,14 +48,16 @@ async function fetchAndUpdateData() {
             existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_defi: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
+            console.error('Error fetching data for BIT10.DEFI:', err);
             existingData = { bit10_defi: [] };
         }
 
         existingData.bit10_defi.unshift(newEntry);
 
         fs.writeFileSync(jsonFilePath, JSON.stringify(existingData, null, 2));
+        console.log('Adding data for BIT10.DEFI');
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data for BIT10.DEFI:', error);
     }
 }
 
@@ -68,7 +70,7 @@ export const handleBit10DEFI = async (request: IncomingMessage, response: Server
     if (request.method !== 'GET') {
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(405);
-        response.end(JSON.stringify({ error: 'Method Not Allowed' }));
+        response.end(JSON.stringify({ error: 'Method Not Allowed for BIT10.DEFI' }));
         return;
     }
 
@@ -81,6 +83,6 @@ export const handleBit10DEFI = async (request: IncomingMessage, response: Server
         console.error('Error reading data:', error);
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(500);
-        response.end(JSON.stringify({ error: 'Error reading data' }));
+        response.end(JSON.stringify({ error: 'Error reading data for BIT10.DEFI' }));
     }
 };

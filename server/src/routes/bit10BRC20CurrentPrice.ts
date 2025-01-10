@@ -12,7 +12,7 @@ const refreshData = () => {
         latestData = JSON.parse(fileContent);
         console.log('BIT10.BRC20 Current Data refreshed at:', new Date().toISOString());
     } catch (error) {
-        console.error('Error reading JSON file:', error);
+        console.error('Error reading JSON file for BIT10.BRC20 Current Data:', error);
         latestData = null;
     }
 };
@@ -27,7 +27,7 @@ export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, res
     if (request.method !== 'GET') {
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(405);
-        response.end(JSON.stringify({ error: 'Method Not Allowed' }));
+        response.end(JSON.stringify({ error: 'Method Not Allowed for BIT10.BRC20 Current Price' }));
         return;
     }
 
@@ -35,7 +35,7 @@ export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, res
         if (!latestData || !latestData.bit10_brc20?.length) {
             response.setHeader('Content-Type', 'application/json');
             response.writeHead(404);
-            response.end(JSON.stringify({ error: 'No data available' }));
+            response.end(JSON.stringify({ error: 'No data available for BIT10.BRC20 Current Data' }));
             return;
         }
 
@@ -47,6 +47,6 @@ export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, res
         console.error('Error serving data:', error);
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(500);
-        response.end(JSON.stringify({ error: 'Error serving data' }));
+        response.end(JSON.stringify({ error: 'Error serving data for BIT10.BRC20 Current Data' }));
     }
 };

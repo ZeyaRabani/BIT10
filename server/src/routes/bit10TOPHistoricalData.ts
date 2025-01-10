@@ -22,9 +22,6 @@ async function fetchAndUpdateData() {
             name: string;
             symbol: string;
             tags: string[];
-            platform: {
-                token_address: string;
-            } | null;
             quote: {
                 USD: {
                     price: number;
@@ -44,7 +41,6 @@ async function fetchAndUpdateData() {
             id: coin.id,
             name: coin.name,
             symbol: coin.symbol,
-            tokenAddress: coin.platform?.token_address,
             price: coin.quote.USD.price
         }));
 
@@ -59,22 +55,24 @@ async function fetchAndUpdateData() {
 
         let existingData;
         try {
-            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_top_historical_data: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, tokenAddress?: string, price: number }> }> };
+            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_top_historical_data: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
+            console.error('Error fetching historical data for BIT10.TOP:', err);
             existingData = { bit10_top_historical_data: [] };
         }
 
         existingData.bit10_top_historical_data.unshift(newEntry);
 
         fs.writeFileSync(jsonFilePath, JSON.stringify(existingData, null, 2));
+        console.log('Adding historical data for BIT10.TOP');
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching historical data for BIT10.TOP:', error);
     }
 }
 
 setInterval(() => {
-    fetchAndUpdateData().catch(error => console.error('Error in fetchAndUpdateData:', error));
+    fetchAndUpdateData().catch(error => console.error('Error in fetchAndUpdateData for BIT10.TOP:', error));
 }, 30 * 60 * 1000); // 30 * 60 * 1000 = 1800000 milliseconds = 30 min
 // }, 3 * 1000); // 3 * 1000 = 3000 milliseconds = 3 seconds
 
@@ -82,7 +80,7 @@ export const handleBit10TOPHistoricalData = async (request: IncomingMessage, res
     if (request.method !== 'GET') {
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(405);
-        response.end(JSON.stringify({ error: 'Method Not Allowed' }));
+        response.end(JSON.stringify({ error: 'Method Not Allowed for BIT10.TOP Historical Data' }));
         return;
     }
 
@@ -95,6 +93,6 @@ export const handleBit10TOPHistoricalData = async (request: IncomingMessage, res
         console.error('Error reading data:', error);
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(500);
-        response.end(JSON.stringify({ error: 'Error reading data' }));
+        response.end(JSON.stringify({ error: 'Error reading data for BIT10.TOP Historical Data' }));
     }
 };
