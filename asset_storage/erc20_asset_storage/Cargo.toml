@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "src/erc20_asset_storage",
+]
+
+[profile.release]
+lto = true
+opt-level = 'z'
+panic = 'abort'
+
+

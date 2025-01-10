@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/icp_asset_storage"
+]
+resolver = "2"
