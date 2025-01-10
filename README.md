@@ -10,20 +10,20 @@ Investing in DeFi requires extensive research, and buying individual tokens ofte
 
 BIT10 provides a pre-selected basket of assets, reducing research time and cost. By buying one token, users invest in a diversified set of assets. With an auto-rebalancing mechanism, BIT10 optimizes portfolio performance by replacing poorly performing tokens with better ones.
 
-### 🌐 **Features**
+## 🌐 Features
 
 - **Diversified Exposure**: Gain exposure to multiple DeFi assets with a single token.
 - **Auto-Rebalancing**: Regularly updates asset allocations to optimize performance.
 - **Decentralized ETF**: Fully decentralized structure powered by the Internet Computer (ICP).
 
-### 🛠 **Tech Stack**
+## 🛠 Tech Stack
 
 - **Frontend**: Next.js, Shadcn/ui, Aceternity UI, motion-primitives
 - **Backend**: tRPC, Drizzle, Nodemailer, Dfinity
 - **Auth**: NextAuth
 - **Data Visualization**: Recharts
 
-### 🔗 **ICP Canisters**
+## 🔗 ICP Canisters
 
 - Oracle: [fg5vt-paaaa-aaaap-qhhra-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=fg5vt-paaaa-aaaap-qhhra-cai)
 - BIT10.BTC: [eegan-kqaaa-aaaap-qhmgq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=eegan-kqaaa-aaaap-qhmgq-cai)
@@ -36,7 +36,7 @@ BIT10 provides a pre-selected basket of assets, reducing research time and cost.
 <!-- - BRC20 Asset Storage: [2tbj4-6yaaa-aaaap-qkmba-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=2tbj4-6yaaa-aaaap-qkmba-cai) -->
 <!-- - OLD ERROR BRC20 Asset Storage: [2xxwk-lyaaa-aaaap-qkl4q-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=2xxwk-lyaaa-aaaap-qkl4q-cai) -->
 
-### 🏁 **Getting Started**
+## 🏁 Getting Started
 
 To start using BIT10, follow these steps:
 
@@ -52,7 +52,7 @@ To start using BIT10, follow these steps:
 
 3. **Access** the app at [http://localhost:3000](http://localhost:3000).
 
-### 📐 **Architecture Overview**
+## 📐 Architecture Overview
 
 BIT10 is structured using:
 
@@ -60,4 +60,3 @@ BIT10 is structured using:
 - **Dfinity** for decentralized canister management.
 - **Drizzle ORM** for efficient database interaction.
 - **tRPC** for type-safe API routing.
-  
