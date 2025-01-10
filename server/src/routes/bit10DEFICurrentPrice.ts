@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import fs from 'fs'
 import path from 'path'
 
-const jsonFilePath = path.join(__dirname, '../../data/bit10_defi.json');
+const jsonFilePath = path.join(__dirname, '../../../data/bit10_defi.json');
 
 let latestData: { bit10_defi: Array<{ timestmpz: string; data: Array<{ id: number; name: string; symbol: string; price: number }> }> } | null = null;
 

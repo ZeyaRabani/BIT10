@@ -3,11 +3,11 @@ import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
 
-const jsonFilePath = path.join(__dirname, '../../data/bit10_brc20.json');
+const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20.json');
 
 async function fetchAndUpdateData() {
     try {
-        const jsonRebalanceFilePath = path.join(__dirname, '../../data/bit10_brc20_rebalance.json');
+        const jsonRebalanceFilePath = path.join(__dirname, '../../../data/bit10_brc20_rebalance.json');
         const rebalanceData = JSON.parse(fs.readFileSync(jsonRebalanceFilePath, 'utf-8'));
 
         const changes = rebalanceData.bit10_brc20_rebalance[0].changes;
