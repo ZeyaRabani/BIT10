@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 "use server"
 
 import { cookies } from 'next/headers'
-import { Locale, defaultLocale } from '@/config'
+import type { Locale } from '@/config'
+import { defaultLocale } from '@/config'
 
 const COOKIE_NAME = 'en';
 

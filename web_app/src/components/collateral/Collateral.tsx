@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 
 import React, { useState, useEffect } from 'react'
@@ -14,10 +8,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
-import { Actor, HttpAgent } from '@dfinity/agent'
-import { idlFactory } from '@/lib/oracle.did'
 import { Badge } from '@/components/ui/badge'
 import { LoaderCircle, ExternalLink } from 'lucide-react'
+import { Actor, HttpAgent } from '@dfinity/agent'
+import { idlFactory } from '@/lib/oracle.did'
 
 interface AllocationDataType {
     symbol: string;
@@ -26,9 +20,6 @@ interface AllocationDataType {
     totalCollateralToken: number;
     walletAddress: string;
 }
-
-// temp
-const totalUSDCollateralB1010DEFI = 78;
 
 // temp
 const bit10Allocation: AllocationDataType[] = [
@@ -40,16 +31,13 @@ const bit10Allocation: AllocationDataType[] = [
     { symbol: 'ICP', id: 8916, address: '60a182a......547cc70480', totalCollateralToken: 1.63, walletAddress: 'https://dashboard.internetcomputer.org/account/60a182a30efd8324fea20cdc0e97527c07894d68967423b7d1caaf547cc70480' }
 ];
 
+// temp
+const totalUSDCollateralB1010DEFI = 78;
+
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
 
 export default function Collateral() {
     const [innerRadius, setInnerRadius] = useState<number>(80);
-
-    const canisterId = 'fg5vt-paaaa-aaaap-qhhra-cai';
-    const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
-
-    const agent = new HttpAgent({ host });
-    const actor = Actor.createActor(idlFactory, { agent, canisterId });
 
     const fetchBit10Price = async (tokenPriceAPI: string) => {
         const response = await fetch(tokenPriceAPI);
@@ -70,19 +58,24 @@ export default function Collateral() {
         return returnData;
     };
 
+    const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
+    const canisterId = 'fg5vt-paaaa-aaaap-qhhra-cai';
+
+    const agent = new HttpAgent({ host });
+    const actor = Actor.createActor(idlFactory, { agent, canisterId });
+
     const fetchBit10DEFISupply = async () => {
-        // @ts-ignore
-        const totalSupply = await actor.bit10_defi_total_supply_of_token_available();
+        const totalSupply = actor.bit10_defi_total_supply_of_token_available ? await actor.bit10_defi_total_supply_of_token_available() : undefined;
 
         if (!totalSupply) {
             toast.error('Error fetching BIT10 supply. Please try again!');
         }
 
         if (totalSupply && typeof totalSupply === 'bigint') {
-            const scaledTotalSupply = BigInt(totalSupply) / BigInt(100000000);
-            return scaledTotalSupply.toLocaleString();
+            const scaledTotalSupply = Number(totalSupply) / 100000000;
+            return scaledTotalSupply;
         } else {
-            return 'N/A';
+            return 0;
         }
     }
 
@@ -96,11 +89,13 @@ export default function Collateral() {
         let data;
         let returnData;
         if (tokenPriceAPI === 'bit10-defi-latest-price') {
-            data = await response.json() as { bit10_defi: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }> }
-            returnData = data.bit10_defi[0]?.data ?? 0;
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            returnData = data.data ?? 0;
         } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
-            data = await response.json() as { bit10_brc20: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }> }
-            returnData = data.bit10_brc20[0]?.data ?? 0;
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            returnData = data.data ?? 0;
+        } else {
+            returnData = 0;
         }
         return returnData;
     };
@@ -118,15 +113,14 @@ export default function Collateral() {
             {
                 queryKey: ['bit10DEFITokenList'],
                 queryFn: () => fetchBit10Tokens('bit10-defi-latest-price')
-            },
+            }
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10DEFIPrice = bit10Queries[0].data;
     const bit10DEFITotalSupply = bit10Queries[1].data;
-    const bit10DEFITokens = bit10Queries[2].data;
-    // const bit10BRC20Price = bit10Queries[3].data;
+    const bit10DEFITokens = bit10Queries[2].data as { id: number, name: string, symbol: string, price: number }[];
 
     useEffect(() => {
         const handleResize = () => {
@@ -149,32 +143,21 @@ export default function Collateral() {
 
     const bit10DEFIChartConfig: ChartConfig = {
         ...Object.fromEntries(
-            // @ts-ignore
             bit10DEFITokens?.map((token, index) => [
                 token.symbol,
                 {
                     label: token.symbol,
                     color: color[index % color.length],
                 }
-            ]) || []
+            ]) ?? []
         )
     };
 
-    // @ts-ignore
     const bit10DEFIPieChartData = bit10DEFITokens?.map((token, index) => ({
-        // @ts-ignore
         name: token.symbol,
-        // @ts-ignore
         value: (100 / bit10DEFITokens.length) - 0.01, // 0.01% is kept in reserve
         fill: color[index % color.length],
     }));
-
-    const totalBit10DEFICollateralValue = bit10DEFITokens ? bit10Allocation.reduce((acc, allocation) => {
-        // @ts-ignore
-        const token = bit10DEFITokens.find(token => token.id === allocation.id);
-        const value = token ? (token.price * allocation.totalCollateralToken) : 0;
-        return acc + value;
-    }, 0).toFixed(2) : '0.00';
 
     return (
         <div>
@@ -249,19 +232,51 @@ export default function Collateral() {
                                 </div>
                                 <div className='flex w-full flex-col space-y-3 col-span-2'>
                                     <h1 className='text-2xl'>BIT10.DEFI</h1>
-                                    <div className='text-xl'>
-                                        <div className='flex flex-1 flex-row items-center justify-start'>
-                                            Total Collateral: {totalBit10DEFICollateralValue} USD
-                                            {
-                                                parseFloat(totalBit10DEFICollateralValue) !== totalUSDCollateralB1010DEFI && (
-                                                    <Badge className='ml-1 text-white' style={{ backgroundColor: parseFloat(totalBit10DEFICollateralValue) > totalUSDCollateralB1010DEFI ? 'green' : 'red' }}>
-                                                        {`${parseFloat(totalBit10DEFICollateralValue) > totalUSDCollateralB1010DEFI ? '+ ' : '- '}${((parseFloat(totalBit10DEFICollateralValue) - totalUSDCollateralB1010DEFI) / totalUSDCollateralB1010DEFI * 100).toFixed(4)}%`}
-                                                    </Badge>
-                                                )}
-                                        </div>
+                                    <div className='text-lg flex flex-1 flex-row items-center justify-start'>
+                                        Total Collateral: {''}
+                                        {bit10Allocation.reduce((total, allocation) => {
+                                            const matchingData = bit10DEFITokens.find((data) => data.symbol === allocation.symbol);
+                                            if (matchingData) {
+                                                return total + matchingData.price * allocation.totalCollateralToken;
+                                            }
+                                            return total;
+                                        }, 0).toFixed(6)} USD
+
+                                        {bit10Allocation.reduce((total, allocation) => {
+                                            const matchingData = bit10DEFITokens.find((data) => data.symbol === allocation.symbol);
+                                            if (matchingData) {
+                                                return total + matchingData.price * allocation.totalCollateralToken;
+                                            }
+                                            return total;
+                                        }, 0) !== totalUSDCollateralB1010DEFI && (
+                                                <Badge className='ml-1 text-white' style={{
+                                                    backgroundColor: bit10Allocation.reduce((total, allocation) => {
+                                                        const matchingData = bit10DEFITokens.find((data) => data.symbol === allocation.symbol);
+                                                        if (matchingData) {
+                                                            return total + matchingData.price * allocation.totalCollateralToken;
+                                                        }
+                                                        return total;
+                                                    }, 0) > totalUSDCollateralB1010DEFI ? 'green' : 'red'
+                                                }}>
+                                                    {`${bit10Allocation.reduce((total, allocation) => {
+                                                        const matchingData = bit10DEFITokens.find((data) => data.symbol === allocation.symbol);
+                                                        if (matchingData) {
+                                                            return total + matchingData.price * allocation.totalCollateralToken;
+                                                        }
+                                                        return total;
+                                                    }, 0) > totalUSDCollateralB1010DEFI ? '+ ' : '- '}${((bit10Allocation.reduce((total, allocation) => {
+                                                        const matchingData = bit10DEFITokens.find((data) => data.symbol === allocation.symbol);
+                                                        if (matchingData) {
+                                                            return total + matchingData.price * allocation.totalCollateralToken;
+                                                        }
+                                                        return total;
+                                                    }, 0) - totalUSDCollateralB1010DEFI) / totalUSDCollateralB1010DEFI * 100).toFixed(4)}%`}
+                                                </Badge>
+                                            )
+                                        }
                                     </div>
                                     <h1 className='text-lg flex flex-row items-center'>BIT10.DEFI Price: {bit10DEFIPrice ? bit10DEFIPrice.toFixed(4) : <LoaderCircle className='animate-spin ml-1 h-5 w-5' />} USD</h1>
-                                    <p className='text-lg'>Token Supply (100% Collateral Coverage): {bit10DEFITotalSupply} BIT10.DEFI</p>
+                                    <h1 className='text-lg'>Token Supply (100% Collateral Coverage): {bit10DEFITotalSupply} BIT10.DEFI</h1>
                                     <table className='w-full table-auto text-lg'>
                                         <thead>
                                             <tr className='hover:bg-accent p-1 rounded'>
@@ -271,21 +286,20 @@ export default function Collateral() {
                                         </thead>
                                         <tbody>
                                             {bit10Allocation.map((allocation, index) => {
-                                                // @ts-ignore
-                                                const token = bit10DEFITokens.find(token => token.id === allocation.id);
-                                                const totalCollateralValue = token ? (token.price * allocation.totalCollateralToken) : 0;
-
+                                                const matchingData = bit10DEFITokens.find((data) => data.symbol === allocation.symbol);
                                                 return (
                                                     <tr key={allocation.id} className='hover:bg-accent p-1 rounded'>
                                                         <td className='flex items-center space-x-1'>
                                                             <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
                                                             <span>{allocation.symbol}</span>
                                                             <span>({allocation.address})</span>
-                                                            <a href={allocation.walletAddress} target='_blank'>
+                                                            <a href={allocation.walletAddress} target='_blank' rel='noopener noreferrer'>
                                                                 <ExternalLink size={16} className='text-primary' />
                                                             </a>
                                                         </td>
-                                                        <td>{totalCollateralValue.toFixed(2)} USD</td>
+                                                        <td>
+                                                            {matchingData && `${(matchingData.price * allocation.totalCollateralToken).toFixed(2)} USD`}
+                                                        </td>
                                                     </tr>
                                                 );
                                             })}

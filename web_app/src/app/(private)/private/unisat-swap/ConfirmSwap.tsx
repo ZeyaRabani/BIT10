@@ -42,7 +42,8 @@ export function ConfirmSwap({
                 slippage,
                 exactType: ExactType.exactIn,
                 ts,
-                feeTick: 'test_sats'
+                feeTick: 'test_sats',
+                payType: 'tick',
             }
             swapApi.preSwap(params).then(res => {
                 setSwapReqParams(params);

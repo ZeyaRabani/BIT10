@@ -1,18 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import { env } from './env'
 
-export async function middleware(req: NextRequest) {
+
+export default async function middleware(req: NextRequest) {
     const res = NextResponse.next();
-    // @ts-ignore
-    const country = req.geo?.country ?? req.headers.get('x-vercel-ip-country');
+    const nodeEnv = env.NODE_ENV;
+    const pathname = req.nextUrl.pathname;
 
-    if (country === 'US') {
-        return NextResponse.redirect(new URL('/not-for-us', req.url));
+    if (nodeEnv !== 'development' && pathname !== '/not-for-us') {
+        const geo = (req as NextRequest & { geo: { country: string } }).geo;
+        const country = geo?.country ?? req.headers.get('x-vercel-ip-country')
+        if (['US'].includes(country ?? '')) {
+            return NextResponse.redirect(new URL('/not-for-us', req.url))
+        }
     }
-
     return res;
 }
 

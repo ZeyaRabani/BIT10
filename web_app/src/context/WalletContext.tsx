@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-empty-object-type */
 "use client"
 
 import React, { createContext, useContext } from 'react'
@@ -18,7 +13,7 @@ interface WalletContextType {
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
-export const WalletProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+export const WalletProvider: React.FC<React.PropsWithChildren<object>> = ({ children }) => {
     const [principalId, setPrincipalId] = useLocalStorage<string>('principalId');
 
     const isConnected = !!principalId;
@@ -41,7 +36,7 @@ export const WalletProvider: React.FC<React.PropsWithChildren<{}>> = ({ children
             const getPrincipalId = await window.ic.plug.agent.getPrincipal();
             setPrincipalId(getPrincipalId.toString());
             toast.success('Wallet connected successfully!')
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             toast.error('Wallet connect request cancelled!')
         }

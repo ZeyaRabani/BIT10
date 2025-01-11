@@ -1,12 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 "use client"
 
 import * as React from 'react'
-import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
+import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
@@ -67,8 +62,8 @@ export function DataTable<TData, TValue>({
         table.getColumn(userSearchColumn)?.setFilterValue('');
     };
 
-    const formatDate = (dateString: string): string => {
-        const date = new Date(dateString);
+    const formatDate = (dateInput: Date | string): string => {
+        const date = new Date(dateInput);
         const addOrdinalSuffix = (day: number): string => {
             if (day >= 11 && day <= 13) {
                 return day + 'th';
@@ -93,7 +88,7 @@ export function DataTable<TData, TValue>({
         return formattedDate;
     };
 
-    const renderCellContent = (cell: any, row: any) => {
+    const renderCellContent = (cell: CellContext<PortfolioTableDataType, unknown>, row: { original: PortfolioTableDataType }) => {
         switch (cell.column.id) {
             case 'paymentAmount':
                 return (
@@ -136,7 +131,7 @@ export function DataTable<TData, TValue>({
                     )
                 }
             default:
-                return flexRender(cell.column.columnDef.cell, cell.getContext());
+                return cell.column.columnDef.cell ? flexRender(cell.column.columnDef.cell, cell) : null;
         }
     };
 
@@ -147,7 +142,7 @@ export function DataTable<TData, TValue>({
                     <div className='w-10 z-20 pl-1 text-center pointer-events-none flex items-center justify-center'><Search height={20} width={20} /></div>
                     <Input className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 dark:border-white' placeholder={inputPlaceHolder}
                         value={(table.getColumn(userSearchColumn)?.getFilterValue() as string) ?? ''}
-                        onChange={(event: { target: { value: any } }) =>
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                             table.getColumn(userSearchColumn)?.setFilterValue(event.target.value)
                         } />
                     <div
@@ -186,7 +181,7 @@ export function DataTable<TData, TValue>({
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
-                                            {renderCellContent(cell, row)}
+                                            {renderCellContent(cell.getContext(), row)}
                                         </TableCell>
                                     ))}
                                 </TableRow>

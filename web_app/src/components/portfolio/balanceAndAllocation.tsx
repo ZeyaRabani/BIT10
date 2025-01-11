@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 
 import React, { useState, useEffect } from 'react'
@@ -52,17 +46,18 @@ export default function BalanceAndAllocation() {
                 owner: Principal.fromText(principalId),
                 subaccount: [],
             };
-            try {
-                // @ts-ignore
-                const balance = await actor.icrc1_balance_of(account);
-                return balance;
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            } catch (error) {
+            if (actor && actor.icrc1_balance_of) {
+                try {
+                    const balance = await actor.icrc1_balance_of(account);
+                    return balance;
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (error) {
+                    toast.error('An error occurred while fetching user portfolio. Please try again!');
+                }
+            } else {
                 toast.error('An error occurred while fetching user portfolio. Please try again!');
                 return 0n;
             }
-        } else {
-            toast.error('An error occurred while fetching user portfolio. Please try again!');
         }
     }
 
@@ -107,13 +102,11 @@ export default function BalanceAndAllocation() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10DEFITokens = bit10Queries[0].data;
-    const bit10BRC20Tokens = bit10Queries[1].data;
-    const bit10DEFITokenBalance = bit10Queries[2].data;
-    const bit10BRC20TokenBalance = bit10Queries[3].data;
+    const bit10DEFITokens = bit10Queries[0].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
+    const bit10BRC20Tokens = bit10Queries[1].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
+    const bit10DEFITokenBalance = bit10Queries[2].data as bigint | undefined;
+    const bit10BRC20TokenBalance = bit10Queries[3].data as bigint | undefined;
 
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     const totalBit10Tokens = (bit10DEFITokenBalance ?? 0n) + (bit10BRC20TokenBalance ?? 0n);
 
     const selectedBit10Token = () => {
@@ -177,7 +170,7 @@ export default function BalanceAndAllocation() {
     };
 
     const bit10BalancePieChartData =
-        Number(formatBit10DEFI(totalBit10Tokens)) == 0
+        Number(formatBit10DEFI(Number(totalBit10Tokens))) == 0
             ?
             [{ name: 'No Data', value: 1, fill: '#ebebe0' }]
             :
@@ -189,7 +182,6 @@ export default function BalanceAndAllocation() {
 
     const bit10AllocationChartConfig: ChartConfig = {
         ...Object.fromEntries(
-            // @ts-ignore
             tokens?.map((token, index) => [
                 token.symbol,
                 {
@@ -200,11 +192,8 @@ export default function BalanceAndAllocation() {
         )
     };
 
-    // @ts-ignore
     const bit10AllocationPieChartData = tokens?.map((token, index) => ({
-        // @ts-ignore
         name: token.symbol,
-        // @ts-ignore
         value: (100 / tokens.length) - 0.01, // 0.01% is kept in reserve
         fill: color[index % color.length],
     }));
@@ -252,7 +241,7 @@ export default function BalanceAndAllocation() {
                                     className='aspect-square max-h-[300px]'
                                 >
                                     <PieChart>
-                                        {Number(formatBit10DEFI(totalBit10Tokens)) > 0 && (
+                                        {Number(formatBit10DEFI(Number(totalBit10Tokens))) > 0 && (
                                             <ChartTooltip
                                                 cursor={false}
                                                 content={<ChartTooltipContent hideLabel />}
@@ -280,7 +269,7 @@ export default function BalanceAndAllocation() {
                                                                     y={viewBox.cy}
                                                                     className='fill-foreground text-3xl font-bold'
                                                                 >
-                                                                    {formatBit10DEFI(totalBit10Tokens)}
+                                                                    {formatBit10DEFI(Number(totalBit10Tokens))}
                                                                 </tspan>
                                                                 <tspan
                                                                     x={viewBox.cx}
@@ -300,7 +289,7 @@ export default function BalanceAndAllocation() {
                             </div>
                             <div className='flex w-full flex-col space-y-3'>
                                 <div className='flex flex-row items-center justify-start space-x-2'>
-                                    <p className='text-3xl font-semibold'>{formatBit10DEFI(totalBit10Tokens)} BIT10</p>
+                                    <p className='text-3xl font-semibold'>{formatBit10DEFI(Number(totalBit10Tokens))} BIT10</p>
                                 </div>
                                 {/* {Number(formatBit10DEFI(bit10DEFI)) > 0 && (
                                     <div>
@@ -314,7 +303,7 @@ export default function BalanceAndAllocation() {
                                             <div>Token Name</div>
                                             <div>No. of Tokens</div>
                                         </div>
-                                        {Number(formatBit10DEFI(totalBit10Tokens)) == 0 ? (
+                                        {Number(formatBit10DEFI(Number(totalBit10Tokens))) == 0 ? (
                                             <div className='text-center'>You currently own no BIT10 tokens</div>
                                         ) : (
                                             <>
@@ -404,14 +393,12 @@ export default function BalanceAndAllocation() {
                             <div className='flex w-full flex-col space-y-3'>
                                 <h1 className='text-2xl'>{selectedAllocationToken} Allocations</h1>
                                 <div className='flex flex-col'>
-                                    {/* @ts-ignore */}
                                     {tokens?.map((token, index) => (
                                         <div key={index} className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'>
                                             <div className='flex flex-row items-center space-x-1'>
                                                 <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
                                                 <div>{token.symbol}</div>
                                             </div>
-                                            {/* @ts-ignore */}
                                             <div>{((100 / tokens.length) - 0.01).toFixed(3)} %</div>
                                         </div>
                                     ))}

@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 export type UnisatWalletInterface = {
     getAccounts(): Promise<string[]>;
     requestAccounts(): Promise<string[]>;
     getNetwork(): Promise<string>;
     switchNetwork(network: string): Promise<void>;
-    sendBitcoin(address: string, amount: number, options: any): Promise<string>;
-    on(event: string, listener: (event: any) => void): void;
-    removeListener(event: string, listener: (event: any) => void): void;
+    sendBitcoin(address: string, amount: number, options: { fee?: number; memo?: string }): Promise<string>;
+    on(event: string, listener: (event: Event) => void): void;
+    removeListener(event: string, listener: (event: Event) => void): void;
     signMessage(message: string, type?: string): Promise<string>;
     signPsbt(psbt: string, opt: { autoFinalized: boolean }): Promise<string>;
     getPublicKey(): Promise<string>;
@@ -35,9 +33,9 @@ declare global {
                 agent: {
                     getPrincipal: () => Promise<string>;
                 };
-                requestBalance?: () => Promise<any>;
-                requestTransfer?: (args: { to: string; amount: number }) => Promise<any>;
-                createActor: (args: { canisterId: string; interfaceFactory: any }) => Promise<any>;
+                requestBalance?: () => Promise<{ amount: number; currency: string }>;
+                requestTransfer?: (args: { to: string; amount: number }) => Promise<{ success: boolean; transactionId: string }>;
+                createActor: (args: { canisterId: string; interfaceFactory: InterfaceFactory }) => Promise<Actor>;
             };
         };
     }

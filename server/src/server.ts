@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import http from 'http'
 import dotenv from 'dotenv'
 import { handleBit10DEFI } from './routes/bit10DEFI'

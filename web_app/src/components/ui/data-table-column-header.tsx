@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
-import { Column } from '@tanstack/react-table'
+import type { Column } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Info } from 'lucide-react'

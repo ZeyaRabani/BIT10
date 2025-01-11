@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 "use client"
 
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { Settings2 } from 'lucide-react'
-import { Table } from '@tanstack/react-table'
+import type { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 
@@ -59,7 +57,7 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                                 key={column.id}
                                 className='capitalize'
                                 checked={column.getIsVisible()}
-                                onCheckedChange={(value: any) => column.toggleVisibility(!!value)}
+                                onCheckedChange={(value: boolean) => column.toggleVisibility(value)}
                             >
                                 {formatColumnName(column.id)}
                             </DropdownMenuCheckboxItem>

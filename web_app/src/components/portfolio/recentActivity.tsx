@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 
 import React from 'react'
@@ -102,14 +101,13 @@ export default function RecentActivity() {
         queries: [
             {
                 queryKey: ['bit10RecentActivity'],
-                // @ts-ignore
-                queryFn: () => fetchRecentActivity(principalId)
+                queryFn: () => principalId ? fetchRecentActivity(principalId) : toast.error('Principal ID is undefined')
             },
         ]
     })
 
     const isLoading = recentActivityQuery.some(query => query.isLoading);
-    const recentActivityData = recentActivityQuery[0].data;
+    const recentActivityData = recentActivityQuery[0].data as PortfolioTableDataType[] | undefined;
 
     return (
         <div>
@@ -131,8 +129,7 @@ export default function RecentActivity() {
                     <CardContent>
                         <DataTable
                             columns={portfolioTableColumns}
-                            // @ts-ignore
-                            data={recentActivityData}
+                            data={recentActivityData ?? []}
                             userSearchColumn='bit10TokenName'
                             inputPlaceHolder='Search by BIT10 token name'
                         />

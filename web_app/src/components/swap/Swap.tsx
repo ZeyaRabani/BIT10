@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client"
 
 import React, { useState } from 'react'
@@ -36,6 +33,17 @@ interface BuyingTokenPriceResponse {
     currency: string;
   };
 }
+
+type ActorType = {
+  icrc1_transfer: (args: {
+    to: { owner: Principal; subaccount: [] };
+    memo: [];
+    fee: [];
+    from_subaccount: [];
+    created_at_time: [];
+    amount: bigint;
+  }) => Promise<{ Ok?: number; Err?: { InsufficientFunds?: null } }>;
+};
 
 // const tabs = ['Quick Swap', 'Advanced Trading']
 
@@ -92,10 +100,10 @@ export default function Swap() {
     let data;
     let returnData;
     if (tokenPriceAPI === 'bit10-defi-latest-price') {
-      data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number } > }
+      data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
       returnData = data.tokenPrice ?? 0;
     } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
-      data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number } > }
+      data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
       returnData = data.tokenPrice ?? 0;
     }
     return returnData;
@@ -106,12 +114,12 @@ export default function Swap() {
       {
         queryKey: ['bit10DEFITokenPrice'],
         queryFn: () => fetchBit10Price('bit10-defi-latest-price'),
-        refetchInterval: 3000000, // 30 min.
+        refetchInterval: 1800000, // 30 min.
       },
       {
         queryKey: ['bit10BRC20TokenPrice'],
         queryFn: () => fetchBit10Price('bit10-brc20-latest-price'),
-        refetchInterval: 3000000,
+        refetchInterval: 1800000,
       },
     ],
   });
@@ -239,7 +247,7 @@ export default function Swap() {
         const actor = await window.ic.plug.createActor({
           canisterId: selectedCanisterId,
           interfaceFactory: idlFactory,
-        });
+        }) as ActorType;
 
         const receiverckBTCAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
         const recieverckETHAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
@@ -267,12 +275,12 @@ export default function Swap() {
         const args = {
           to: {
             owner: Principal.fromText(selectedRecieverAccountId),
-            subaccount: []
+            subaccount: [] as []
           },
-          memo: [],
-          fee: [],
-          from_subaccount: [],
-          created_at_time: [],
+          memo: [] as [],
+          fee: [] as [],
+          from_subaccount: [] as [],
+          created_at_time: [] as [],
           amount: BigInt(amount)
         }
 
@@ -290,7 +298,7 @@ export default function Swap() {
             paymentAmountUSD: (parseInt(values.bit10_amount) * selectedBit10TokenPrice).toString(),
             bit10tokenQuantity: (values.bit10_amount).toString(),
             bit10tokenName: values.bit10_token,
-            transactionIndex: transfer.Ok
+            transactionIndex: transfer.Ok.toString()
           });
 
           await fetch('/bit10-token-request', {
@@ -312,7 +320,7 @@ export default function Swap() {
           } else {
             toast.error('An error occurred while processing your request. Please try again!');
           }
-        } else if (transfer.Err.InsufficientFunds) {
+        } else if (transfer.Err?.InsufficientFunds) {
           toast.error('Insufficient funds');
         } else {
           toast.error('Transfer failed.');
