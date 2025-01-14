@@ -47,7 +47,7 @@ export function BIT10BTCRequest({ email, principalId }: { email: string, princip
 
                     <Section className='w-[680px] max-w-full mx-auto mt-4'>
                         <Text className='text-gray-500'>
-                            You&apos;re receiving this email because someone requested BIT10.BTC tokens on the BIT10 Faucet page.
+                            You&apos;re receiving this email because someone requested BIT10.BTC tokens on the BIT10 testnet Faucet page.
                         </Text>
                     </Section>
                 </Body>

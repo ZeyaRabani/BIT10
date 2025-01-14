@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
+import Image, { type StaticImageData } from 'next/image'
 
 export const InfiniteMovingCards = ({
     items,
@@ -14,7 +14,7 @@ export const InfiniteMovingCards = ({
     items: {
         x_link: string;
         tweet: string;
-        profile_pic: string;
+        profile_pic: StaticImageData;
         name: string;
         username: string;
     }[];
@@ -92,25 +92,26 @@ export const InfiniteMovingCards = ({
                 )}
             >
                 {items.map((item, idx) => (
-                    <a href={item.x_link} target='_blank' rel='noreferrer noopener' key={item.name}>
+                    <a href={item.x_link} target='_blank' rel='noreferrer noopener' key={idx}>
                         <li
-                            className='w-[350px] max-w-full relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 px-8 py-6 md:w-[450px]'
-                            style={{
-                                background:
-                                    'linear-gradient(180deg, var(--slate-800), var(--slate-900)',
-                            }}
+                            // className='w-[350px] max-w-full relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 px-8 py-6 md:w-[450px]'
+                            className='w-[350px] max-w-full relative rounded-2xl flex-shrink-0 border dark:border-white px-8 py-6 md:w-[450px] bg-card'
+                        // style={{
+                        //     background:
+                        //         'linear-gradient(180deg, var(--slate-800), var(--slate-900)',
+                        // }}
                         >
                             <blockquote>
                                 <div
                                     aria-hidden='true'
                                     className='user-select-none -z-1 pointer-events-none absolute -left-0.5 -top-0.5 h-[calc(100%_+_4px)] w-[calc(100%_+_4px)]'
                                 ></div>
-                                <div className='relative text-sm leading-[1.6] text-gray-100 font-normal'>
+                                <div className='relative text-sm leading-[1.6] text-gray-800 dark:text-gray-100 font-normal'>
                                     {item.tweet}
                                 </div>
                                 <div className='flex flex-row items-center space-x-1 pt-4'>
                                     <div>
-                                        <Image src={`/assets/home/${item.profile_pic}`} alt='parterner' height='50' width='50' className='rounded-full' />
+                                        <Image src={item.profile_pic} alt='parterner' height='50' width='50' className='rounded-full border dark:border-white' />
                                     </div>
                                     <div className='flex flex-col'>
                                         <h1 className='text-sm leading-[1.6] text-gray-400 font-normal'>{item.name}</h1>

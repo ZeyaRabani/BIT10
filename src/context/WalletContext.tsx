@@ -13,17 +13,21 @@ interface WalletContextType {
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
-export const WalletProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+export const WalletProvider: React.FC<React.PropsWithChildren<object>> = ({ children }) => {
     const [principalId, setPrincipalId] = useLocalStorage<string>('principalId');
 
     const isConnected = !!principalId;
 
     const connectWallet = async () => {
         try {
-            const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
-            const bit10DEFICanisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai'
+            // const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
+            const ckBTCLegerCanisterId = 'mxzaz-hqaaa-aaaar-qaada-cai';
+            const ckETHLegerCanisterId = 'ss2fx-dyaaa-aaaar-qacoq-cai';
+            const ICPLegerCanisterId = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
+            const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
+            const bit10BRC20CanisterId = '7bi3r-piaaa-aaaap-qpnrq-cai';
 
-            const whitelist = [bit10BTCCanisterId, bit10DEFICanisterId];
+            const whitelist = [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, bit10DEFICanisterId, bit10BRC20CanisterId];
 
             await window.ic.plug.requestConnect({
                 whitelist,

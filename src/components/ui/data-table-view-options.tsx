@@ -2,7 +2,7 @@
 
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { Settings2 } from 'lucide-react'
-import { Table } from '@tanstack/react-table'
+import type { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 
@@ -11,6 +11,18 @@ interface DataTableViewOptionsProps<TData> {
 }
 
 const formatColumnName = (columnName: string): string => {
+    if (columnName === 'tokenSwapId') {
+        return 'Swap ID';
+    } else if (columnName === 'paymentAmount') {
+        return 'Purchase Amount';
+    } else if (columnName === 'bit10TokenName') {
+        return 'BIT10 Token';
+    } else if (columnName === 'tokenBoughtAt') {
+        return 'Token Bought at';
+    } else if (columnName === 'view_transaction') {
+        return 'Ciew Transaction';
+    }
+
     return columnName
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
@@ -45,7 +57,7 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                                 key={column.id}
                                 className='capitalize'
                                 checked={column.getIsVisible()}
-                                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                                onCheckedChange={(value: boolean) => column.toggleVisibility(value)}
                             >
                                 {formatColumnName(column.id)}
                             </DropdownMenuCheckboxItem>

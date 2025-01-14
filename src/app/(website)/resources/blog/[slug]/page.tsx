@@ -3,8 +3,8 @@ import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import Preloader from '@/components/Preloader'
 import InformationCard from '@/components/InformationCard'
 
-export default function Page({ params }: { params: { slug: string } }) {
-    const slug = params.slug;
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+    const slug = (await params).slug;
 
     return (
         <MaxWidthWrapper>

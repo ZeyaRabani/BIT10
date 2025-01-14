@@ -78,6 +78,18 @@ const nextConfig = {
                 source: '/ingest/decide',
                 destination: 'https://eu.i.posthog.com/decide',
             },
+            {
+                source: '/bit10-defi-latest-price',
+                destination: '/api/bit10-defi-latest-price',
+            },
+            {
+                source: '/bit10-brc20-latest-price',
+                destination: '/api/bit10-brc20-latest-price',
+            },
+            {
+                source: '/bit10-token-request/:slug*',
+                destination: '/api/bit10-token-request/:slug*',
+            }
         ]
     },
     compiler: {

@@ -1,17 +1,21 @@
 "use client"
 
-import React, { useTransition, useState } from 'react'
+import React, { useTransition } from 'react'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
-import { Locale } from '@/config'
+import type { Locale } from '@/config'
 import { setUserLocale } from '@/services/locale'
+import { toast } from 'sonner'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Languages, RotateCcw, Mail } from 'lucide-react'
+import { Languages, Mail } from 'lucide-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { Area, AreaChart, XAxis, YAxis, ReferenceArea } from 'recharts'
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
-import { volume, revenue } from '@/data/dataroomData'
+import { Area, AreaChart, XAxis, YAxis } from 'recharts'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
+import type { ChartConfig } from '@/components/ui/chart'
+import { revenue } from '@/data/dataroomData'
+import LinkedinImg from '@/assets/footer/linkedin.svg'
+import XImg from '@/assets/footer/x.svg'
 
 interface Language {
     value: string;
@@ -27,9 +31,9 @@ const languages: Language[] = [
 ];
 
 export default function Page() {
-    const [selection, setSelection] = useState<{ startX: string | null, endX: string | null }>({ startX: null, endX: null });
-    const [data, setData] = useState(volume);
-    const [rotate, setRotate] = useState(false);
+    // const [selection, setSelection] = useState<{ startX: string | null, endX: string | null }>({ startX: null, endX: null });
+    // const [data, setData] = useState(volume);
+    // const [rotate, setRotate] = useState(false);
     const [isPending, startTransition] = useTransition();
 
     const t = useTranslations('dataroom');
@@ -38,13 +42,15 @@ export default function Page() {
     function handleLanguageChange(value: string) {
         const locale = value as Locale;
         startTransition(() => {
-            setUserLocale(locale);
+            setUserLocale(locale).catch((error) => {
+                toast.error('Failed to set user locale. Please try again!');
+            });
         });
     };
 
     const chartConfig: ChartConfig = {
         'bit10DeFi': {
-            label: 'Test BIT10.DEFI',
+            label: 'BIT10.DEFI',
         },
         'total': {
             label: `${t('total')}`,
@@ -57,33 +63,33 @@ export default function Page() {
         },
     }
 
-    const handleMouseDown = (e: any) => {
-        if (e && e.activeLabel) {
-            setSelection({ startX: e.activeLabel as string, endX: e.activeLabel as string });
-        }
-    };
+    // const handleMouseDown = (e: any) => {
+    //     if (e && e.activeLabel) {
+    //         setSelection({ startX: e.activeLabel as string, endX: e.activeLabel as string });
+    //     }
+    // };
 
-    const handleMouseMove = (e: any) => {
-        if (selection.startX !== null && e && e.activeLabel) {
-            setSelection(prev => ({ ...prev, endX: e.activeLabel as string }));
-        }
-    };
+    // const handleMouseMove = (e: any) => {
+    //     if (selection.startX !== null && e && e.activeLabel) {
+    //         setSelection(prev => ({ ...prev, endX: e.activeLabel as string }));
+    //     }
+    // };
 
-    const handleMouseUp = () => {
-        if (selection.startX !== null && selection.endX !== null) {
-            const startIndex = volume.findIndex(data => data.week === selection.startX);
-            const endIndex = volume.findIndex(data => data.week === selection.endX);
-            const zoomedData = volume.slice(Math.min(startIndex, endIndex), Math.max(startIndex, endIndex) + 1);
-            setData(zoomedData);
-        }
-        setSelection({ startX: null, endX: null });
-    };
+    // const handleMouseUp = () => {
+    //     if (selection.startX !== null && selection.endX !== null) {
+    //         const startIndex = volume.findIndex(data => data.week === selection.startX);
+    //         const endIndex = volume.findIndex(data => data.week === selection.endX);
+    //         const zoomedData = volume.slice(Math.min(startIndex, endIndex), Math.max(startIndex, endIndex) + 1);
+    //         setData(zoomedData);
+    //     }
+    //     setSelection({ startX: null, endX: null });
+    // };
 
-    const handleZoomOut = () => {
-        setData(volume);
-        setRotate(true);
-        setTimeout(() => setRotate(false), 1000);
-    };
+    // const handleZoomOut = () => {
+    //     setData(volume);
+    //     setRotate(true);
+    //     setTimeout(() => setRotate(false), 1000);
+    // };
 
     return (
         <MaxWidthWrapper className='md:px-[20vw]'>
@@ -195,7 +201,7 @@ export default function Page() {
                             <div className='text-xl font-semibold'>{t('revenue')}</div>
                             <ChartContainer config={chartConfig} className='max-h-[300px] w-full'>
                                 <AreaChart accessibilityLayer data={revenue}>
-                                    <XAxis dataKey='week' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, value.indexOf(','))} />
+                                    <XAxis dataKey='week' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} />
                                     <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
                                     <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                     <defs>
@@ -251,12 +257,12 @@ export default function Page() {
                                 {t('ceo')}
                                 <span className='md:pl-2 flex flex-1 flex-wrap flex-row items-center justify-start space-x-1'>
                                     <a href='https://www.linkedin.com/in/zeya-rabani' target='_blank' rel='noreferrer noopener'>
-                                        <Image src='/assets/footer/linkedin.svg' alt='LinedIn' width={20} height={20} />
+                                        <Image src={LinkedinImg} alt='LinedIn' width={20} height={20} />
                                     </a>
                                     <a href='https://x.com/ZeyaTheZeya' target='_blank' rel='noreferrer noopener'>
-                                        <Image src='/assets/footer/x_white.svg' alt='Twitter' width={18} height={18} />
+                                        <Image src={XImg} alt='Twitter' width={18} height={18} />
                                     </a>
-                                    <a href='mailto:ziyarabani@gmail.com ' rel='noreferrer noopener'>
+                                    <a href='mailto:zeyarabani@bit10.app' rel='noreferrer noopener'>
                                         <Mail className='h-5 w-5' />
                                     </a>
                                 </span>
@@ -265,12 +271,12 @@ export default function Page() {
                                 {t('cto')}
                                 <span className='md:pl-2 flex flex-1 flex-wrap flex-row items-center justify-start space-x-1'>
                                     <a href='https://www.linkedin.com/in/harshal0902' target='_blank' rel='noreferrer noopener'>
-                                        <Image src='/assets/footer/linkedin.svg' alt='LinedIn' width={20} height={20} />
+                                        <Image src={LinkedinImg} alt='LinedIn' width={20} height={20} />
                                     </a>
                                     <a href='https://x.com/Harshal_0902' target='_blank' rel='noreferrer noopener'>
-                                        <Image src='/assets/footer/x_white.svg' alt='Twitter' width={18} height={18} />
+                                        <Image src={XImg} alt='Twitter' width={18} height={18} />
                                     </a>
-                                    <a href='mailto:harshalraikwar07@gmail.com ' rel='noreferrer noopener'>
+                                    <a href='mailto:harshalraikwar@bit10.app' rel='noreferrer noopener'>
                                         <Mail className='h-5 w-5' />
                                     </a>
                                 </span>

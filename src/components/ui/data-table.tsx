@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from 'react'
-import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
+import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/react-table'
+import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
@@ -60,7 +61,7 @@ export function DataTable<TData, TValue>({
                     <div className='w-10 z-20 pl-1 text-center pointer-events-none flex items-center justify-center'><Search height={20} width={20} /></div>
                     <Input className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 dark:border-white' placeholder={inputPlaceHolder}
                         value={(table.getColumn(userSearchColumn)?.getFilterValue() as string) ?? ''}
-                        onChange={(event) =>
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                             table.getColumn(userSearchColumn)?.setFilterValue(event.target.value)
                         } />
                     <div

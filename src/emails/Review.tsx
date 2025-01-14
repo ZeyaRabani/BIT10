@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tailwind, Body, Column, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text, Row } from '@react-email/components'
+import { Tailwind, Body, Container, Head, Heading, Html, Img, Link, Preview, Section, Text } from '@react-email/components'
 
 export function Review() {
     return (

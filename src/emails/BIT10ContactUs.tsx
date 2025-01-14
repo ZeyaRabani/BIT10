@@ -49,7 +49,7 @@ export function BIT10ContactUs({ email, name, message }: { email: string, name: 
 
                     <Section className='w-[680px] max-w-full mx-auto mt-4'>
                         <Text className='text-gray-500'>
-                            You&apos;re receiving this email because someone contacted you through the BIT10 Contact Us page.
+                            You&apos;re receiving this email because someone contacted you through the BIT10 testnet Contact Us page.
                         </Text>
                     </Section>
                 </Body>

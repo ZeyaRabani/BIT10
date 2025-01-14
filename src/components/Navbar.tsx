@@ -11,6 +11,10 @@ import ResponsiveNavbar from './ResponsiveNavbar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
+import PlugImg from '@/assets/wallet/plug.svg'
+import XverseImg from '@/assets/wallet/xverse.svg'
+import UnisatImg from '@/assets/wallet/unisat.svg'
+import PhantomImg from '@/assets/wallet/phantom.svg'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Loader2 } from 'lucide-react'
 
@@ -112,7 +116,7 @@ export default function Navbar() {
                         </Link>
 
                         {
-                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' ? (
+                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' || pathname === '/collateral' ? (
                                 <>
                                     <Link href='/swap' passHref>
                                         <span
@@ -218,14 +222,14 @@ export default function Navbar() {
                                                 </DialogHeader>
                                                 <div className='flex flex-col space-y-2'>
                                                     <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent' onClick={handleWalletSelect}>
-                                                        <Image height='30' width='30' src='/assets/wallet/plug.svg' alt='Plug' className='rounded' />
+                                                        <Image height='30' width='30' src={PlugImg} alt='Plug' className='rounded' />
                                                         <div className='text-lg md:text-xl'>
                                                             Plug
                                                         </div>
                                                     </Button>
                                                     <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
                                                         <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                            <Image height='30' width='30' src='/assets/wallet/xverse.svg' alt='Xverse' className='rounded' />
+                                                            <Image height='30' width='30' src={XverseImg} alt='Xverse' className='rounded' />
                                                             <div className='text-lg md:text-xl'>
                                                                 Xverse
                                                             </div>
@@ -236,7 +240,7 @@ export default function Navbar() {
                                                     </Button>
                                                     <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
                                                         <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                            <Image height='30' width='30' src='/assets/wallet/unisat.svg' alt='UniSat' className='rounded' />
+                                                            <Image height='30' width='30' src={UnisatImg} alt='UniSat' className='rounded' />
                                                             <div className='text-lg md:text-xl'>
                                                                 UniSat
                                                             </div>
@@ -247,7 +251,7 @@ export default function Navbar() {
                                                     </Button>
                                                     <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
                                                         <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                            <Image height='30' width='30' src='/assets/wallet/phantom.svg' alt='Phantom' className='rounded' />
+                                                            <Image height='30' width='30' src={PhantomImg} alt='Phantom' className='rounded' />
                                                             <div className='text-lg md:text-xl'>
                                                                 Phantom
                                                             </div>

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Principal } from '@dfinity/principal'
-import { idlFactory } from '@/lib/bit10_btc.did'
+import { idlFactory } from '@/lib/bit10.did'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -44,16 +44,16 @@ export default function Page() {
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
             setSending(true);
-            const bit10DEFITokenId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
+            const bit10DEFICanisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
 
             const hasAllowed = await window.ic.plug.requestConnect({
-                whitelist: [bit10DEFITokenId]
+                whitelist: [bit10DEFICanisterId]
             });
 
             // @ts-ignore
             if (hasAllowed) {
                 const actor = await window.ic.plug.createActor({
-                    canisterId: bit10DEFITokenId,
+                    canisterId: bit10DEFICanisterId,
                     interfaceFactory: idlFactory
                 });
 

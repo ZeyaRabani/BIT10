@@ -2,14 +2,14 @@ import { type NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import Mail from 'nodemailer/lib/mailer'
 import { render } from '@react-email/render'
-import { BIT10DEFIRequest } from '@/emails/BIT10.DEFIRequest'
+import { BIT10DEFIRequest } from '@/emails/BIT10Request'
 
 export async function POST(request: NextRequest) {
     const myEmail = process.env.PERSONAL_EMAIL;
     const password = process.env.EMAIL_PASSWORD;
     const email2 = 'harshalraikwar07@gmail.com'
 
-    const { newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenBoughtAt } = await request.json();
+    const { newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenName, bit10tokenBoughtAt } = await request.json();
 
     const transport = nodemailer.createTransport({
         service: 'gmail',
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         },
     });
 
-    const emailHtml = render(BIT10DEFIRequest({ newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenBoughtAt }));
+    const emailHtml = render(BIT10DEFIRequest({ newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenName, bit10tokenBoughtAt }));
 
     const mailOptions: Mail.Options = {
         from: {

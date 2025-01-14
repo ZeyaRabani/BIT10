@@ -1,11 +1,11 @@
 import React from 'react'
 import { Tailwind, Body, Container, Head, Heading, Hr, Html, Preview, Section, Text } from '@react-email/components'
 
-export function BIT10DEFIRequest({ newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenBoughtAt }: { newTokenSwapId: string, principalId: string, bit10tokenQuantity: string, bit10tokenBoughtAt: string }) {
+export function BIT10DEFIRequest({ newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenName, bit10tokenBoughtAt }: { newTokenSwapId: string, principalId: string, bit10tokenQuantity: string, bit10tokenName: string, bit10tokenBoughtAt: string }) {
     return (
         <Html>
             <Head />
-            <Preview>Test BIT10.DEFI token request</Preview>
+            <Preview>{bit10tokenName} token request</Preview>
             <Tailwind>
                 <Body className='bg-[#f3f3f5] font-sansSerif'>
                     <Container className='w-[680px] max-w-full mx-auto'>
@@ -23,7 +23,7 @@ export function BIT10DEFIRequest({ newTokenSwapId, principalId, bit10tokenQuanti
 
                         <Section className='flex flex-col space-y-4 p-4 bg-white rounded-b-md'>
                             <Heading as='h2' className='m-0 mb-3.5 font-bold text-xl text-[#0c0d0e]'>
-                                Request from {principalId} on BIT10 Swap page for {bit10tokenQuantity} Test BIT10.DEFI tokens
+                                Request from {principalId} on BIT10 Swap page for {bit10tokenQuantity} {bit10tokenName} tokens
                             </Heading>
 
                             <Hr className='my-5' />
@@ -37,7 +37,7 @@ export function BIT10DEFIRequest({ newTokenSwapId, principalId, bit10tokenQuanti
                             </Text>
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                BIT10 Token Quantity: {bit10tokenQuantity}
+                                BIT10 Token Quantity: {bit10tokenQuantity} {bit10tokenName}
                             </Text>
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
@@ -55,7 +55,7 @@ export function BIT10DEFIRequest({ newTokenSwapId, principalId, bit10tokenQuanti
 
                     <Section className='w-[680px] max-w-full mx-auto mt-4'>
                         <Text className='text-gray-500'>
-                            You&apos;re receiving this email because someone requested Test BIT10.DEFI tokens on the BIT10 Swap page.
+                            You&apos;re receiving this email because someone requested {bit10tokenName} tokens on the BIT10 testnet Swap page.
                         </Text>
                     </Section>
                 </Body>

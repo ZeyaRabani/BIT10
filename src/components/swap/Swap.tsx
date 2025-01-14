@@ -1,30 +1,52 @@
-import React, { useState, useEffect } from 'react'
+"use client"
+
+import React, { useState } from 'react'
+import * as z from 'zod'
 import { useWallet } from '@/context/WalletContext'
+import { useQueries } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import MaxWidthWrapper from '@/components/MaxWidthWrapper'
+// import AnimatedBackground from '@/components/ui/animated-background'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Loader2, Info } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import Image, { type StaticImageData } from 'next/image'
+import BIT10Img from '@/assets/swap/bit10.svg'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Principal } from '@dfinity/principal'
-import { idlFactory } from '@/lib/bit10_btc.did'
+import { idlFactory } from '@/lib/bit10.did'
 import crypto from 'crypto'
 import { newTokenSwap } from '@/actions/dbActions'
-import MaxWidthWrapper from '@/components/MaxWidthWrapper'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { RotateCw, Loader2, Info } from 'lucide-react'
-import { toast } from 'sonner'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import Image from 'next/image'
-import { Skeleton } from '@/components/ui/skeleton'
 
-interface BTCnSTXPriceResponse {
+interface BuyingTokenPriceResponse {
     data: {
         amount: string;
         base: string;
         currency: string;
     };
 }
+
+type ActorType = {
+    icrc1_transfer: (args: {
+        to: { owner: Principal; subaccount: [] };
+        memo: [];
+        fee: [];
+        from_subaccount: [];
+        created_at_time: [];
+        amount: bigint;
+    }) => Promise<{ Ok?: number; Err?: { InsufficientFunds?: null } }>;
+};
+
+// const tabs = ['Quick Swap', 'Advanced Trading']
+
+const paymentMethod = [
+    'BIT10.BTC',
+]
 
 const bit10Amount = [
     '1',
@@ -34,140 +56,167 @@ const bit10Amount = [
     '5'
 ]
 
+const bit10Token = [
+    'Test BIT10.DEFI'
+]
+
 const FormSchema = z.object({
+    payment_method: z.string({
+        required_error: 'Please select a payment method',
+    }),
     bit10_amount: z.string({
         required_error: 'Please select the number of BIT10 tokens to receive',
+    }),
+    bit10_token: z.string({
+        required_error: 'Please select the BIT10 token to receive',
     }),
 })
 
 export default function Swap() {
-    const [btcAmount, setbtcAmount] = useState<string>('');
-    const [coinbaseData, setCoinbaseData] = useState<number[]>([]);
-    const [coinMarketCapData, setCoinMarketCapData] = useState<number[]>([]);
-    const [totalSum, setTotalSum] = useState<number>(0);
-    const [rotate, setRotate] = useState(false);
-    const [loading, setLoading] = useState<boolean>(true);
+    // const [activeTab, setActiveTab] = useState('Quick Swap');
     const [swaping, setSwaping] = useState<boolean>(false);
 
     const { isConnected, principalId } = useWallet();
 
-    const fetchBTCPrice = async () => {
-        try {
-            const response = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/buy');
-            const data: BTCnSTXPriceResponse = await response.json();
-            setbtcAmount(data.data.amount);
-        } catch (error) {
-            toast.error('Error fetching BTC price. Please try again!');
+    // const handleTabChange = (label: string | null) => {
+    //   if (label) {
+    //     setActiveTab(label)
+    //   }
+    // }
+
+    const fetchBit10Price = async (tokenPriceAPI: string) => {
+        const response = await fetch(tokenPriceAPI);
+
+        if (!response.ok) {
+            toast.error('Error fetching BIT10 price. Please try again!');
         }
+
+        let data;
+        let returnData;
+        if (tokenPriceAPI === 'bit10-defi-latest-price') {
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            returnData = data.tokenPrice ?? 0;
+        }
+        return returnData;
     };
 
-    useEffect(() => {
-        const fetchData = () => {
-            fetchBTCPrice();
-        }
-
-        fetchData();
-
-        const intervalId = setInterval(fetchData, 30000);
-        return () => clearInterval(intervalId);
-    }, []);
-
-    useEffect(() => {
-        const fetchCoinbaseData = async () => {
-            const assets = ['STX', 'MAPO', 'ICP'];
-            try {
-                const coinbaseRequests = assets.map(async (asset) => {
-                    const response = await fetch(`https://api.coinbase.com/v2/prices/${asset}-USD/buy`);
-                    const data = await response.json();
-                    return parseFloat(data.data.amount);
-                });
-                const result = await Promise.all(coinbaseRequests);
-                setCoinbaseData(result);
-            } catch (error) {
-                toast.error('Error fetching BIT10 price. Please try again!');
+    const bit10PriceQueries = useQueries({
+        queries: [
+            {
+                queryKey: ['tbit10DEFITokenPrice'],
+                queryFn: () => fetchBit10Price('bit10-defi-latest-price'),
+                refetchInterval: 1800000, // 30 min.
             }
-        };
+        ],
+    });
 
-        const fetchCoinMarketCapData = async () => {
-            try {
-                const response = await fetch('/coinmarketcap')
-                const data = await response.json();
+    const isLoading = bit10PriceQueries.some(query => query.isLoading);
+    const bit10DEFIPrice = bit10PriceQueries[0].data;
 
-                const prices = [
-                    data.data.CFX[0].quote.USD.price,
-                    data.data.SOV[0].quote.USD.price,
-                    data.data.RIF[0].quote.USD.price
-                ];
-
-                setCoinMarketCapData(prices);
-            } catch (error) {
-                toast.error('Error fetching BIT10 price. Please try again!');
-            }
-        };
-
-        fetchCoinbaseData();
-        fetchCoinMarketCapData();
-    }, []);
-
-    useEffect(() => {
-        if (coinbaseData.length > 0 && coinMarketCapData.length > 0) {
-            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0) + coinMarketCapData.reduce((acc, curr) => acc + curr, 0);
-            const bit10DeFi = sum / 6;
-            setTotalSum(bit10DeFi);
-        } else {
-            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0);
-            const bit10DeFi = sum / 4;
-            setTotalSum(bit10DeFi);
+    const fetchPayWithPrice = async (currency: string) => {
+        const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);
+        if (!response.ok) {
+            toast.error(`Error fetching ${currency} price. Please try again!`);
         }
-        setLoading(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [coinbaseData, coinMarketCapData]);
+        const data = await response.json() as BuyingTokenPriceResponse;
+        return data.data.amount;
+    };
 
-    const refreshData = () => {
-        fetchBTCPrice();
-        toast.info('Data refreshed');
-        setRotate(true);
-        setTimeout(() => setRotate(false), 1000);
-    }
+    const payWithPriceQueries = useQueries({
+        queries: [
+            {
+                queryKey: ['btcPrice'],
+                queryFn: () => fetchPayWithPrice('BTC'),
+                refetchInterval: 10000, // 10 src.
+            },
+        ],
+    });
+
+    const bit10BTCAmount = payWithPriceQueries[0].data;
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            bit10_amount: '1'
+            payment_method: 'BIT10.BTC',
+            bit10_amount: '1',
+            bit10_token: 'Test BIT10.DEFI'
         },
     });
+
+    const payWithTokenImg = (): StaticImageData => {
+        return BIT10Img;
+    };
+
+    const payingTokenImg = payWithTokenImg();
+
+    const payWithTokenPrice = (): string => {
+        return bit10BTCAmount ?? '0';
+    };
+
+    const payingTokenPrice = payWithTokenPrice();
+
+    const bit10TokenPrice = (): number => {
+        const bit10Token = form.watch('bit10_token');
+        if (bit10Token === 'Test BIT10.DEFI') {
+            return bit10DEFIPrice ?? 0;
+        } else {
+            return 0;
+        }
+    };
+
+    const selectedBit10TokenPrice = bit10TokenPrice();
+
+    const swapDisabledConditions = !isConnected || swaping || !bit10BTCAmount || payingTokenPrice == '0' || selectedBit10TokenPrice == 0
 
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
             setSwaping(true);
-            const bit10BTCTokenId = 'eegan-kqaaa-aaaap-qhmgq-cai';
-            const bit10DEFITokenId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
+            const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
+            const tbit10DEFICanisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
 
             const hasAllowed = await window.ic.plug.requestConnect({
-                whitelist: [bit10BTCTokenId, bit10DEFITokenId]
+                whitelist: [bit10BTCCanisterId, tbit10DEFICanisterId]
             });
 
             // @ts-ignore
-            if (hasAllowed) {
+            if (hasAllowed && bit10BTCAmount) {
+                const selectedCanisterId = bit10BTCCanisterId;
+
                 const actor = await window.ic.plug.createActor({
-                    canisterId: bit10BTCTokenId,
-                    interfaceFactory: idlFactory
-                });
+                    canisterId: selectedCanisterId,
+                    interfaceFactory: idlFactory,
+                }) as ActorType;
 
-                const receiverAccountId = 'eam3c-zvqkv-blrno-3qztd-qjp2g-222mt-m4ekx-yquch-ds2rm-oraij-sqe';
+                const selectedRecieverAccountId = 'eam3c-zvqkv-blrno-3qztd-qjp2g-222mt-m4ekx-yquch-ds2rm-oraij-sqe';
+                const selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(bit10BTCAmount));
+                // let selectedRecieverAccountId;
+                // let selectedAmount;
 
-                const price = ((parseInt(values.bit10_amount) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)).toFixed(6);
-                const amount = Math.round(parseFloat(price) * 100000000).toFixed(0);
+                // if (values.payment_method === 'ckBTC') {
+                //     selectedRecieverAccountId = receiverckBTCAccountId;
+                //     selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(bit10BTCAmount));
+                // } else if (values.payment_method === 'ckETH') {
+                //     selectedRecieverAccountId = recieverckETHAccountId;
+                //     selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount));
+                // } else if (values.payment_method === 'ICP') {
+                //     selectedRecieverAccountId = recieverICPAccountId;
+                //     selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount));
+                // } else {
+                //     throw new Error('Invalid payment method');
+                // }
+
+                const price = selectedAmount;
+                const amount = Math.round(price * 100000000).toFixed(0);
 
                 const args = {
                     to: {
-                        owner: Principal.fromText(receiverAccountId),
-                        subaccount: []
+                        owner: Principal.fromText(selectedRecieverAccountId),
+                        subaccount: [] as []
                     },
-                    memo: [],
-                    fee: [],
-                    from_subaccount: [],
-                    created_at_time: [],
+                    memo: [] as [],
+                    fee: [] as [],
+                    from_subaccount: [] as [],
+                    created_at_time: [] as [],
                     amount: BigInt(amount)
                 }
 
@@ -180,14 +229,14 @@ export default function Swap() {
                     const result = await newTokenSwap({
                         newTokenSwapId: newTokenSwapId,
                         principalId: principalId,
-                        paymentAmount: ((parseInt(values.bit10_amount) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)).toFixed(6),
-                        paymentName: 'BIT10.BTC',
-                        paymentAmountUSD: (parseInt(values.bit10_amount) * parseFloat(totalSum.toFixed(4))).toFixed(4),
+                        paymentAmount: selectedAmount.toString(),
+                        paymentName: values.payment_method,
+                        paymentAmountUSD: (parseInt(values.bit10_amount) * selectedBit10TokenPrice).toString(),
                         bit10tokenQuantity: (values.bit10_amount).toString(),
-                        bit10tokenName: 'Test BIT10.DEFI'
+                        bit10tokenName: values.bit10_token,
                     });
 
-                    await fetch('/bit10-defi-request', {
+                    await fetch('/bit10-token-request', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -196,6 +245,7 @@ export default function Swap() {
                             newTokenSwapId: newTokenSwapId,
                             principalId: principalId,
                             bit10tokenQuantity: (values.bit10_amount).toString(),
+                            bit10tokenName: values.bit10_token,
                             bit10tokenBoughtAt: new Date().toISOString(),
                         }),
                     });
@@ -205,6 +255,8 @@ export default function Swap() {
                     } else {
                         toast.error('An error occurred while processing your request. Please try again!');
                     }
+                } else if (transfer.Err?.InsufficientFunds) {
+                    toast.error('Insufficient funds');
                 } else {
                     toast.error('Transfer failed.');
                 }
@@ -219,9 +271,37 @@ export default function Swap() {
 
     return (
         <MaxWidthWrapper>
+            {/* <div className='grid place-content-center'>
+        <div className='relative flex flex-row space-x-2 items-center justify-center border rounded px-2 py-1'>
+          <AnimatedBackground
+            defaultValue='Quick Swap'
+            className='rounded bg-primary'
+            transition={{
+              ease: 'easeInOut',
+              duration: 0.2,
+            }}
+            onValueChange={(newActiveId) => handleTabChange(newActiveId)}
+          >
+            {tabs.map((label, index) => (
+              <button
+                key={index}
+                data-id={label}
+                type='button'
+                className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}
+              >
+                {label}
+              </button>
+            ))}
+          </AnimatedBackground>
+        </div>
+      </div>
+
+      {activeTab === 'Quick Swap' && <div> Quick Swap </div>}
+      {activeTab === 'Advanced Trading' && <div> Advanced Trading </div>} */}
+
             <div className='flex flex-col py-4 md:py-8 h-full items-center justify-center'>
-                {loading ? (
-                    <Card className='w-[300px] md:w-[450px] px-2 pt-6 animate-fade-bottom-up'>
+                {isLoading ? (
+                    <Card className='w-[300px] md:w-[580px] px-2 pt-6 animate-fade-bottom-up'>
                         <CardContent className='flex flex-col space-y-2'>
                             {['h-24', 'h-32', 'h-32', 'h-12'].map((classes, index) => (
                                 <Skeleton key={index} className={classes} />
@@ -229,27 +309,12 @@ export default function Swap() {
                         </CardContent>
                     </Card>
                 ) : (
-                    <Card className='w-[300px] md:w-[450px] animate-fade-bottom-up'>
+                    <Card className='w-[300px] md:w-[580px] animate-fade-bottom-up'>
                         <CardHeader>
                             <CardTitle className='flex flex-row items-center justify-between'>
                                 <div>Swap</div>
-                                <div className='flex flex-row space-x-1'>
-                                    <TooltipProvider>
-                                        <Tooltip delayDuration={300}>
-                                            <TooltipTrigger asChild>
-                                                <RotateCw className={`w-5 h-5 cursor-pointer transition-transform ${rotate ? 'animate-spin-fast' : ''}`} onClick={refreshData} />
-                                            </TooltipTrigger>
-                                            <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                Refresh data
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </div>
                             </CardTitle>
                             <CardDescription>BIT10 exchange</CardDescription>
-                            <div className='text-center'>
-                                Current Test BIT10.DEFI token price is $ {totalSum.toFixed(6)}
-                            </div>
                         </CardHeader>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
@@ -258,16 +323,37 @@ export default function Swap() {
                                         <p>Pay with</p>
                                         <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                             <div className='text-4xl text-center md:text-start'>
-                                                {(((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) * 1.03).toFixed(6)}
+                                                {selectedBit10TokenPrice ? ((parseInt(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.03).toFixed(6) : '0'}
                                             </div>
-                                            <div className='flex flex-row items-center'>
-                                                <div className='py-1 px-2 mr-6 border-2 rounded-l-full z-10 w-full'>
-                                                    <div className='pl-4 py-1'>
-                                                        BIT10.BTC
-                                                    </div>
+
+                                            <div className='grid grid-cols-5 items-center'>
+                                                <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name='payment_method'
+                                                        render={({ field }) => (
+                                                            <FormItem className='w-full px-2'>
+                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                    <FormControl>
+                                                                        <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
+                                                                            <SelectValue placeholder='Select payment method' />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent>
+                                                                        {paymentMethod.map((name) => (
+                                                                            <SelectItem key={name} value={name}>
+                                                                                {name}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
                                                 </div>
-                                                <div className='-ml-12 z-20'>
-                                                    <Image src='/assets/swap/bit10.svg' alt='BIT10.BTC' width={75} height={75} className='z-20' />
+                                                <div className='col-span-1 -ml-6 z-20'>
+                                                    <Image src={payingTokenImg} alt={form.watch('payment_method')} width={75} height={75} className='z-20' />
                                                 </div>
                                             </div>
                                         </div>
@@ -276,18 +362,18 @@ export default function Swap() {
                                                 <Tooltip delayDuration={300}>
                                                     <TooltipTrigger asChild>
                                                         <div className='flex flex-row space-x-1'>
-                                                            $ {((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) * 1.03).toFixed(4)}
+                                                            $ {selectedBit10TokenPrice ? ((parseInt(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))) * 1.03).toFixed(4) : '0'}
                                                             <Info className='w-5 h-5 cursor-pointer ml-1' />
                                                         </div>
                                                     </TooltipTrigger>
                                                     <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                        Price in BIT10.BTC + 3% Platform fee <br />
-                                                        $ {(parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))).toFixed(4)} + $ {(0.03 * (parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4)))).toFixed(4)} = $ {((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) + (0.03 * (parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))))).toFixed(4)}
+                                                        Price in {form.watch('payment_method')} + 3% Platform fee <br />
+                                                        $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))} = $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))}
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
                                             <div>
-                                                1 BIT10.BTC = $ {parseFloat(btcAmount).toLocaleString(undefined, { minimumFractionDigits: 3 })}
+                                                1 {form.watch('payment_method')} = $ {payingTokenPrice}
                                             </div>
                                         </div>
                                     </div>
@@ -295,7 +381,7 @@ export default function Swap() {
                                     <div className='rounded-lg border-2 py-2 px-6'>
                                         <p>Receive</p>
                                         <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
-                                            <div>
+                                            <div className='w-full md:w-3/4'>
                                                 <FormField
                                                     control={form.control}
                                                     name='bit10_amount'
@@ -320,27 +406,49 @@ export default function Swap() {
                                                     )}
                                                 />
                                             </div>
-                                            <div className='flex flex-row items-center'>
-                                                <div className='py-1 px-2 mr-6 border-2 rounded-l-full z-10 w-full'>
-                                                    <div className='pl-4 py-1'>
-                                                        Test BIT10.DEFI
-                                                    </div>
+
+                                            <div className='grid grid-cols-5 items-center'>
+                                                <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name='bit10_token'
+                                                        render={({ field }) => (
+                                                            <FormItem className='w-full px-2'>
+                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                    <FormControl>
+                                                                        <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
+                                                                            <SelectValue placeholder='Select BIT10 token' />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent>
+                                                                        {bit10Token.map((name) => (
+                                                                            <SelectItem key={name} value={name}>
+                                                                                {name}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
                                                 </div>
-                                                <div className='-ml-12 z-20'>
-                                                    <Image src='/assets/swap/bit10.svg' alt='bit10' width={75} height={75} className='z-20' />
+                                                <div className='col-span-1 -ml-6 z-20'>
+                                                    <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                                            <div>$ {(parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))).toFixed(4)}</div>
+                                            <div>$ {(parseInt(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))).toFixed(4)}</div>
                                             <div>
-                                                1 Test BIT10.DEFI = $ {totalSum?.toFixed(4)}
+                                                1 {form.watch('bit10_token')} = $ {selectedBit10TokenPrice.toFixed(4)}
                                             </div>
                                         </div>
                                     </div>
                                 </CardContent>
                                 <CardFooter className='flex flex-row space-x-2 w-full items-center'>
-                                    <Button className='w-full' disabled={!isConnected || swaping || ((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)) < 0.00002 || Number.isNaN((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount))} >
+                                    <Button className='w-full' disabled={swapDisabledConditions}>
                                         {swaping && <Loader2 className='animate-spin mr-2' size={15} />}
                                         {swaping ? 'Swaping...' : 'Swap'}
                                     </Button>
@@ -350,6 +458,7 @@ export default function Swap() {
                     </Card>
                 )}
             </div>
+
         </MaxWidthWrapper>
     )
 }

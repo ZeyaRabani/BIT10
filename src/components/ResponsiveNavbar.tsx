@@ -3,12 +3,16 @@
 import React, { useState, useEffect } from 'react'
 import { useWallet } from '@/context/WalletContext'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ArrowRightLeft, CircleDollarSign, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, User } from 'lucide-react'
+import { Menu, X, ArrowRightLeft, CircleDollarSign, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, User, Landmark } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
+import PlugImg from '@/assets/wallet/plug.svg'
+import XverseImg from '@/assets/wallet/xverse.svg'
+import UnisatImg from '@/assets/wallet/unisat.svg'
+import PhantomImg from '@/assets/wallet/phantom.svg'
 
 export default function ResponsiveNavbar() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -91,7 +95,7 @@ export default function ResponsiveNavbar() {
                                     </div>
 
                                     {
-                                        pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' ? (
+                                        pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' || pathname === '/collateral' ? (
                                             <>
                                                 <div className='pt-2 px-2 cursor-pointer w-full'>
                                                     <Link onClick={() => closeOnCurrent('/swap')} href='/swap'>
@@ -116,6 +120,15 @@ export default function ResponsiveNavbar() {
                                                         <div className='flex flex-row justify-between items-center'>
                                                             Portfolio
                                                             <BriefcaseBusiness />
+                                                        </div>
+                                                    </Link>
+                                                </div>
+
+                                                <div className='border-t-2 pt-2 px-2 cursor-pointer w-full'>
+                                                    <Link onClick={() => closeOnCurrent('/collateral')} href='/collateral'>
+                                                        <div className='flex flex-row justify-between items-center'>
+                                                            Collateral
+                                                            <Landmark />
                                                         </div>
                                                     </Link>
                                                 </div>
@@ -177,14 +190,14 @@ export default function ResponsiveNavbar() {
                                                                 </DialogHeader>
                                                                 <div className='flex flex-col space-y-2'>
                                                                     <Button variant='ghost' className='flex flex-row space-x-1 md:space-x-2 w-full justify-start items-center hover:bg-accent' onClick={handleWalletSelect}>
-                                                                        <Image height='30' width='30' src='/assets/wallet/plug.svg' alt='Plug' className='rounded' />
+                                                                        <Image height='30' width='30' src={PlugImg} alt='Plug' className='rounded' />
                                                                         <div className='text-lg md:text-xl'>
                                                                             Plug
                                                                         </div>
                                                                     </Button>
                                                                     <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
                                                                         <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                                            <Image height='30' width='30' src='/assets/wallet/xverse.svg' alt='Xverse' className='rounded' />
+                                                                            <Image height='30' width='30' src={XverseImg} alt='Xverse' className='rounded' />
                                                                             <div className='text-lg md:text-xl'>
                                                                                 Xverse
                                                                             </div>
@@ -195,7 +208,7 @@ export default function ResponsiveNavbar() {
                                                                     </Button>
                                                                     <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
                                                                         <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                                            <Image height='30' width='30' src='/assets/wallet/unisat.svg' alt='UniSat' className='rounded' />
+                                                                            <Image height='30' width='30' src={UnisatImg} alt='UniSat' className='rounded' />
                                                                             <div className='text-lg md:text-xl'>
                                                                                 UniSat
                                                                             </div>
@@ -206,7 +219,7 @@ export default function ResponsiveNavbar() {
                                                                     </Button>
                                                                     <Button variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent'>
                                                                         <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                                            <Image height='30' width='30' src='/assets/wallet/phantom.svg' alt='Phantom' className='rounded' />
+                                                                            <Image height='30' width='30' src={PhantomImg} alt='Phantom' className='rounded' />
                                                                             <div className='text-lg md:text-xl'>
                                                                                 Phantom
                                                                             </div>

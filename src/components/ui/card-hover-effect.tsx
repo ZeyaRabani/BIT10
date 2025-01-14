@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-import Image from 'next/image'
+import Image, { type StaticImageData } from 'next/image'
 
 type Project = {
-    image_url: string;
+    image_url: StaticImageData;
     title: string;
     description: string;
     link: string;
@@ -18,7 +18,7 @@ export const HoverEffect = ({
     items: Project[];
     className?: string;
 }) => {
-    let [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
     return (
         <motion.div layout className={cn('grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3', className)}>
@@ -43,7 +43,7 @@ export const HoverEffect = ({
                     </AnimatePresence>
                     <Card>
                         <div className='flex flex-col items-center justify-center'>
-                            <Image src={`/assets/signup/${item.image_url}`} alt={item.title} height='200' width='400' className='rounded-xl' />
+                            <Image src={item.image_url} alt={item.title} height='200' width='400' className='rounded-xl' />
                             <CardTitle>{item.title}</CardTitle>
                         </div>
                     </Card>
@@ -61,7 +61,8 @@ export const Card = ({
     children: React.ReactNode;
 }) => {
     return (
-        <div className={cn('rounded-xl h-full w-full p-2 overflow-hidden bg-gray-200 border border-transparent dark:border-white/[0.2] group-hover:border-slate-700 relative z-20', className)}>
+        // <div className={cn('rounded-xl h-full w-full p-2 overflow-hidden bg-gray-200 border border-transparent dark:border-white/[0.2] group-hover:border-slate-700 relative z-20', className)}>
+        <div className={cn('rounded-xl h-full w-full p-2 overflow-hidden border dark:border-white/[0.2] group-hover:border-slate-700 relative z-20', className)}>
             <div className='relative z-30'>
                 <div className='p-4'>{children}</div>
             </div>
@@ -77,7 +78,8 @@ export const CardTitle = ({
     children: React.ReactNode;
 }) => {
     return (
-        <h4 className={cn('text-gray-800 font-bold tracking-wide mt-4', className)}>
+        // <h4 className={cn('text-gray-800 font-bold tracking-wide mt-4', className)}>
+        <h4 className={cn('font-bold tracking-wide mt-4', className)}>
             {children}
         </h4>
     );

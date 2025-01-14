@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from 'react'
-import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
+import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
@@ -9,14 +9,14 @@ import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { Search, X, CircleCheck, Timer, CircleX } from 'lucide-react'
 
 export type PortfolioTableDataType = {
-    token_swap_id: string;
-    user_principal_id: string;
-    token_purchase_amount: string;
-    token_purchase_name: string;
-    bit10_token_quantity: string;
-    bit10_token_name: string;
-    token_transaction_status: string;
-    token_bought_at: Date | string;
+    tokenSwapId: string;
+    tokenPurchaseAmount: string;
+    tokenPurchaseName: string;
+    bit10TokenQuantity: string;
+    bit10TokenName: string;
+    tokenTransactionStatus: string;
+    tokenBoughtAt: Date | string;
+    transactionIndex: string;
 }
 
 interface DataTableProps<TData> {
@@ -61,8 +61,8 @@ export function DataTable<TData, TValue>({
         table.getColumn(userSearchColumn)?.setFilterValue('');
     };
 
-    const formatDate = (dateString: string): string => {
-        const date = new Date(dateString);
+    const formatDate = (dateInput: Date | string): string => {
+        const date = new Date(dateInput);
         const addOrdinalSuffix = (day: number): string => {
             if (day >= 11 && day <= 13) {
                 return day + 'th';
@@ -87,37 +87,37 @@ export function DataTable<TData, TValue>({
         return formattedDate;
     };
 
-    const renderCellContent = (cell: any, row: any) => {
+    const renderCellContent = (cell: CellContext<PortfolioTableDataType, unknown>, row: { original: PortfolioTableDataType }) => {
         switch (cell.column.id) {
-            case 'token_purchase_amount':
+            case 'paymentAmount':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{row.original.token_purchase_amount}</div>
-                        <div>{row.original.token_purchase_name}</div>
+                        <div>{row.original.tokenPurchaseAmount}</div>
+                        <div>{row.original.tokenPurchaseName}</div>
                     </div>
                 );
-            case 'token_bought_at':
-                return formatDate(row.original.token_bought_at);
-            case 'bit10_token_name':
+            case 'tokenBoughtAt':
+                return formatDate(row.original.tokenBoughtAt);
+            case 'bit10TokenName':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{row.original.bit10_token_quantity}</div>
-                        <div>{row.original.bit10_token_name}</div>
+                        <div>{row.original.bit10TokenQuantity}</div>
+                        <div>{row.original.bit10TokenName}</div>
                     </div>
                 );
-            case 'token_transaction_status':
-                if (row.original.token_transaction_status === 'Confirmed') {
+            case 'tokenTransactionStatus':
+                if (row.original.tokenTransactionStatus === 'Confirmed') {
                     return (
                         <div className='flex flex-row space-x-1 items-center'>
                             <div><CircleCheck className='w-4 h-4 pb-0.5' /></div>
-                            <div>{row.original.token_transaction_status}</div>
+                            <div>{row.original.tokenTransactionStatus}</div>
                         </div>
                     )
-                } else if (row.original.token_transaction_status === 'Failed') {
+                } else if (row.original.tokenTransactionStatus === 'Failed') {
                     return (
                         <div className='flex flex-row space-x-1 items-center'>
                             <div><CircleX className='w-4 h-4 pb-0.5' /></div>
-                            <div>{row.original.token_transaction_status}</div>
+                            <div>{row.original.tokenTransactionStatus}</div>
                         </div>
                     )
                 }
@@ -125,12 +125,12 @@ export function DataTable<TData, TValue>({
                     return (
                         <div className='flex flex-row space-x-1 items-center'>
                             <div><Timer className='w-4 h-4 pb-0.5' /></div>
-                            <div>{row.original.token_transaction_status}</div>
+                            <div>{row.original.tokenTransactionStatus}</div>
                         </div>
                     )
                 }
             default:
-                return flexRender(cell.column.columnDef.cell, cell.getContext());
+                return cell.column.columnDef.cell ? flexRender(cell.column.columnDef.cell, cell) : null;
         }
     };
 
@@ -141,7 +141,7 @@ export function DataTable<TData, TValue>({
                     <div className='w-10 z-20 pl-1 text-center pointer-events-none flex items-center justify-center'><Search height={20} width={20} /></div>
                     <Input className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 dark:border-white' placeholder={inputPlaceHolder}
                         value={(table.getColumn(userSearchColumn)?.getFilterValue() as string) ?? ''}
-                        onChange={(event) =>
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                             table.getColumn(userSearchColumn)?.setFilterValue(event.target.value)
                         } />
                     <div
@@ -180,7 +180,7 @@ export function DataTable<TData, TValue>({
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
-                                            {renderCellContent(cell, row)}
+                                            {renderCellContent(cell.getContext(), row)}
                                         </TableCell>
                                     ))}
                                 </TableRow>

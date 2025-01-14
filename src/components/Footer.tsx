@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react'
+import { motion } from 'framer-motion'
 import { addUserSignUps } from '@/actions/dbActions'
 import MaxWidthWrapper from './MaxWidthWrapper'
 import { useForm } from 'react-hook-form'
@@ -11,7 +12,10 @@ import { Form, FormControl, FormField, FormItem, FormDescription, FormMessage } 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import Image from 'next/image'
+import Image, { type StaticImageData } from 'next/image'
+import XImg from '@/assets/footer/x.svg'
+import TelegramImg from '@/assets/footer/telegram.svg'
+import GitHubImg from '@/assets/footer/github.svg'
 
 interface FooterLinkType {
     title: string;
@@ -20,7 +24,7 @@ interface FooterLinkType {
 
 interface SocialLinkType {
     link: string;
-    imageName: string;
+    imageName: StaticImageData;
 }
 
 const forCompany: FooterLinkType[] = [
@@ -56,11 +60,11 @@ const forLegal: FooterLinkType[] = [
 const companySocial: SocialLinkType[] = [
     {
         link: 'https://x.com/bit10startup',
-        imageName: 'x.svg',
+        imageName: XImg as StaticImageData,
     },
     {
         link: 'https://t.me/zr00083',
-        imageName: 'telegram.svg',
+        imageName: TelegramImg as StaticImageData,
     },
     // {
     //     link: '#',
@@ -76,7 +80,7 @@ const companySocial: SocialLinkType[] = [
     // },
     {
         link: 'https://github.com/ZeyaRabani/BIT10',
-        imageName: 'github.svg',
+        imageName: GitHubImg as StaticImageData,
     },
     // {
     //     link: '#',
@@ -121,7 +125,11 @@ export default function Footer() {
 
     return (
         <MaxWidthWrapper>
-            <footer className='bg-blue-100/80 dark:bg-accent my-2.5 md:my-6 rounded backdrop-blur-0'>
+            <motion.footer
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
+                className='bg-blue-100/80 dark:bg-accent my-2.5 md:my-6 rounded backdrop-blur-0'>
                 <div className='container p-6 mx-auto'>
 
                     <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4'>
@@ -185,7 +193,7 @@ export default function Footer() {
                             <div className='flex gap-2 hover:cursor-pointer items-center'>
                                 {companySocial.map((social, index) => (
                                     <a href={social.link} target='_blank' rel='noopener noreferrer' key={index} className='p-2 flex items-center justify-center rounded-full bg-gray-100 border-2 border-primary'>
-                                        <Image src={`/assets/footer/${social.imageName}`} height={20} width={20} quality={100} alt={social.imageName} />
+                                        <Image src={social.imageName} height={20} width={20} quality={100} alt={social.link} />
                                     </a>
                                 ))}
                             </div>
@@ -194,7 +202,7 @@ export default function Footer() {
 
                     <p className='flex flex-wrap justify-center items-center py-2 text-center text-xl w-full mx-auto'>&copy; {currentYear} BIT10, Inc. All rights reserved.</p>
                 </div>
-            </footer>
+            </motion.footer>
         </MaxWidthWrapper>
     )
 }

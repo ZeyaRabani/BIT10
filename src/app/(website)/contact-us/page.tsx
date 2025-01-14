@@ -9,6 +9,7 @@ import * as z from 'zod'
 import { toast } from 'sonner'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import Image from 'next/image'
+import ContactImg from '@/assets/contact/contact.svg'
 import { Card, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -54,8 +55,8 @@ export default function Page() {
             body: JSON.stringify(values),
         })
             .then((res) => res.json())
-            .then((response) => {
-                toast.success(response.message)
+            .then((response: { message: React.ReactNode }) => {
+                toast.success(response.message);
                 form.reset();
             })
             .catch((error) => {
@@ -70,7 +71,6 @@ export default function Page() {
         <Suspense fallback={<Preloader />}>
             <MaxWidthWrapper className='md:px-36 pt-4'>
                 <Card className='animate-fade-in-down grid md:grid-cols-2 p-4 md:p-10 shadow-2xl gap-6'>
-
                     <div className='flex flex-col justify-between'>
                         <div>
                             <CardTitle className='text-2xl font-semibold leading-tight tracking-wider lg:text-3xl'>Let&apos;s talk about everything!</CardTitle>
@@ -79,7 +79,7 @@ export default function Page() {
                             </div>
                         </div>
                         <div className='mt-2 text-center p-2 md:p-8'>
-                            <Image className='w-full' src='/assets/contact/contact.svg' width='200' height='200' alt='Contact Us' />
+                            <Image className='w-full' src={ContactImg} width='200' height='200' alt='Contact Us' />
                         </div>
                     </div>
 
@@ -140,7 +140,6 @@ export default function Page() {
                             </Button>
                         </form>
                     </Form>
-
                 </Card>
             </MaxWidthWrapper>
         </Suspense>
