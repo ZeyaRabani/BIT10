@@ -1,6 +1,6 @@
 import React from 'react'
-import RecentActivity from './recentActivity'
 import BalanceAndAllocation from './balanceAndAllocation'
+import RecentActivity from './recentActivity'
 
 export default function Portfolio() {
     return (

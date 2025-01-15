@@ -111,6 +111,10 @@ export const tokenSwap = pgTable('token_swap', {
 		}
 	});
 
+export const mbPrincipalIdWhitelist = pgTable('mb_principal_id_whitelist', {
+	userPrincipalId: text('user_principal_id').primaryKey().notNull(),
+});
+
 export const mbUsers = pgTable('mb_users', {
 	userId: text('user_id').primaryKey().notNull(),
 	userPrincipalId: text('user_principal_id').notNull(),

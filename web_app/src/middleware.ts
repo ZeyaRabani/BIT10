@@ -2,7 +2,6 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { env } from './env'
 
-
 export default async function middleware(req: NextRequest) {
     const res = NextResponse.next();
     const nodeEnv = env.NODE_ENV;
@@ -19,5 +18,5 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/', '/((?!_next|_vercel|.*\\..*|api|api-route|ingest|static).*)'],
+    matcher: ['/swap'],
 };

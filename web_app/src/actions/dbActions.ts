@@ -2,7 +2,7 @@
 "use server"
 
 import { db } from '@/server/db'
-import { mbUsers, userSignups, mbTokenSwap } from '@/server/db/schema'
+import { mbUsers, userSignups, mbPrincipalIdWhitelist, mbTokenSwap } from '@/server/db/schema'
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
 
@@ -47,6 +47,15 @@ export const addUserSignUps = async ({ email }: { email: string }) => {
         return 'Error adding user to signups';
     }
 };
+
+export const whitelistedPrincipalIds = async () => {
+    try {
+        const data = await db.select().from(mbPrincipalIdWhitelist)
+        return data;
+    } catch (error) {
+        return 'Error fetching whitelisted users';
+    }
+}
 
 export const newTokenSwap = async ({ newTokenSwapId, principalId, paymentAmount, paymentName, paymentAmountUSD, bit10tokenQuantity, bit10tokenName, transactionIndex }: NewTokenSwap) => {
     try {
