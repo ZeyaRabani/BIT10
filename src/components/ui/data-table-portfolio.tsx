@@ -9,14 +9,14 @@ import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { Search, X, CircleCheck, Timer, CircleX } from 'lucide-react'
 
 export type PortfolioTableDataType = {
-    tokenSwapId: string;
-    tokenPurchaseAmount: string;
-    tokenPurchaseName: string;
-    bit10TokenQuantity: string;
-    bit10TokenName: string;
-    tokenTransactionStatus: string;
-    tokenBoughtAt: Date | string;
-    transactionIndex: string;
+    token_swap_id: string;
+    user_principal_id: string;
+    token_purchase_amount: string;
+    token_purchase_name: string;
+    bit10_token_quantity: string;
+    bit10_token_name: string;
+    token_transaction_status: string;
+    token_bought_at: Date | string;
 }
 
 interface DataTableProps<TData> {
@@ -89,35 +89,35 @@ export function DataTable<TData, TValue>({
 
     const renderCellContent = (cell: CellContext<PortfolioTableDataType, unknown>, row: { original: PortfolioTableDataType }) => {
         switch (cell.column.id) {
-            case 'paymentAmount':
+            case 'token_purchase_amount':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{row.original.tokenPurchaseAmount}</div>
-                        <div>{row.original.tokenPurchaseName}</div>
+                        <div>{row.original.token_purchase_amount}</div>
+                        <div>{row.original.token_purchase_name}</div>
                     </div>
                 );
-            case 'tokenBoughtAt':
-                return formatDate(row.original.tokenBoughtAt);
-            case 'bit10TokenName':
+            case 'token_bought_at':
+                return formatDate(row.original.token_bought_at);
+            case 'token_purchase_name':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{row.original.bit10TokenQuantity}</div>
-                        <div>{row.original.bit10TokenName}</div>
+                        <div>{row.original.bit10_token_quantity}</div>
+                        <div>{row.original.token_purchase_name}</div>
                     </div>
                 );
-            case 'tokenTransactionStatus':
-                if (row.original.tokenTransactionStatus === 'Confirmed') {
+            case 'token_transaction_status':
+                if (row.original.token_transaction_status === 'Confirmed') {
                     return (
                         <div className='flex flex-row space-x-1 items-center'>
                             <div><CircleCheck className='w-4 h-4 pb-0.5' /></div>
-                            <div>{row.original.tokenTransactionStatus}</div>
+                            <div>{row.original.token_transaction_status}</div>
                         </div>
                     )
-                } else if (row.original.tokenTransactionStatus === 'Failed') {
+                } else if (row.original.token_transaction_status === 'Failed') {
                     return (
                         <div className='flex flex-row space-x-1 items-center'>
                             <div><CircleX className='w-4 h-4 pb-0.5' /></div>
-                            <div>{row.original.tokenTransactionStatus}</div>
+                            <div>{row.original.token_transaction_status}</div>
                         </div>
                     )
                 }
@@ -125,7 +125,7 @@ export function DataTable<TData, TValue>({
                     return (
                         <div className='flex flex-row space-x-1 items-center'>
                             <div><Timer className='w-4 h-4 pb-0.5' /></div>
-                            <div>{row.original.tokenTransactionStatus}</div>
+                            <div>{row.original.token_transaction_status}</div>
                         </div>
                     )
                 }
