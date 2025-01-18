@@ -11,39 +11,23 @@ dotenv.config();
 
 const PORT = 8080;
 
+const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void>> = {
+    '/bit10-defi': handleBit10DEFI,
+    '/bit10-defi?day=1': handleBit10DEFI,
+    '/bit10-defi?day=7': handleBit10DEFI,
+    '/bit10-defi-current-price': handleBit10DEFICurrentPrice,
+    '/bit10-brc20': handleBit10BRC20,
+    '/bit10-brc20-current-price': handleBit10BRC20CurrentPrice,
+    '/bit10-brc20-historical-data': handleBit10BRC20HistoricalData,
+    '/bit10-top-historical-data': handleBit10TOPHistoricalData,
+};
+
 const requestHandler = (request: http.IncomingMessage, response: http.ServerResponse) => {
-    if (request.url === '/bit10-defi') {
-        handleBit10DEFI(request, response).catch((error) => {
-            response.setHeader('Content-Type', 'text/plain');
-            response.writeHead(500);
-            response.end('Internal Server Error');
-        });
-    } else if (request.url === '/bit10-defi-current-price') {
-        handleBit10DEFICurrentPrice(request, response).catch((error) => {
-            response.setHeader('Content-Type', 'text/plain');
-            response.writeHead(500);
-            response.end('Internal Server Error');
-        });
-    } else if (request.url === '/bit10-brc20') {
-        handleBit10BRC20(request, response).catch((error) => {
-            response.setHeader('Content-Type', 'text/plain');
-            response.writeHead(500);
-            response.end('Internal Server Error');
-        });
-    } else if (request.url === '/bit10-brc20-current-price') {
-        handleBit10BRC20CurrentPrice(request, response).catch((error) => {
-            response.setHeader('Content-Type', 'text/plain');
-            response.writeHead(500);
-            response.end('Internal Server Error');
-        });
-    } else if (request.url === '/bit10-brc20-historical-data') {
-        handleBit10BRC20HistoricalData(request, response).catch((error) => {
-            response.setHeader('Content-Type', 'text/plain');
-            response.writeHead(500);
-            response.end('Internal Server Error');
-        });
-    } else if (request.url === '/bit10-top-historical-data') {
-        handleBit10TOPHistoricalData(request, response).catch((error) => {
+    const handler = routeHandlers[request.url || ''];
+
+    if (handler) {
+        handler(request, response).catch((error) => {
+            console.error(`Error handling ${request.url}:`, error);
             response.setHeader('Content-Type', 'text/plain');
             response.writeHead(500);
             response.end('Internal Server Error');

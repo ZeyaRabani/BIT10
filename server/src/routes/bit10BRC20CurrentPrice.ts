@@ -1,27 +1,30 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import fs from 'fs'
 import path from 'path'
+import NodeCache from 'node-cache'
 
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20.json');
+const cache = new NodeCache();
 
 let latestData: { bit10_brc20: Array<{ timestmpz: string; data: Array<{ id: number; name: string; symbol: string; tokenAddress: string; price: number }> }> } | null = null;
 
-const refreshData = () => {
+async function fetchData() {
     try {
         const fileContent = fs.readFileSync(jsonFilePath, 'utf-8');
         latestData = JSON.parse(fileContent);
         console.log('BIT10.BRC20 Current Data refreshed at:', new Date().toISOString());
+
+        cache.set('bit10_brc20_current_price_data', latestData);
     } catch (error) {
         console.error('Error reading JSON file for BIT10.BRC20 Current Data:', error);
         latestData = null;
     }
-};
+}
 
-// Initial data load
-refreshData();
-
-setInterval(refreshData, 30 * 60 * 1000); // 30 * 60 * 1000 = 1800000 milliseconds = 30 min
-// setInterval(refreshData, 3 * 1000); // 3 * 1000 = 3000 milliseconds = 3 seconds
+setInterval(() => {
+    fetchData().catch(error => console.error('Error in fetchData:', error));
+}, 30 * 60 * 1000); // 30 * 60 * 1000 = 1800000 milliseconds = 30 min
+// }, 3 * 1000); // 3 * 1000 = 3000 milliseconds = 3 seconds
 
 export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
@@ -32,6 +35,15 @@ export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, res
     }
 
     try {
+        const cachedData = cache.get('bit10_brc20_current_price_data') as { bit10_brc20: Array<{ timestmpz: string; data: Array<{ id: number; name: string; symbol: string; tokenAddress: string; price: number }> }> };
+        if (cachedData) {
+            const firstElement = cachedData.bit10_brc20[0];
+            response.setHeader('Content-Type', 'application/json');
+            response.writeHead(200);
+            response.end(JSON.stringify(firstElement));
+            return;
+        }
+
         if (!latestData || !latestData.bit10_brc20?.length) {
             response.setHeader('Content-Type', 'application/json');
             response.writeHead(404);

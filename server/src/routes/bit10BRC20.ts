@@ -2,8 +2,10 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
+import NodeCache from 'node-cache'
 
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20.json');
+const cache = new NodeCache();
 
 async function fetchAndUpdateData() {
     try {
@@ -63,6 +65,8 @@ async function fetchAndUpdateData() {
 
         existingData.bit10_brc20.unshift(newEntry);
 
+        cache.set('bit10_brc20_data', existingData);
+
         fs.writeFileSync(jsonFilePath, JSON.stringify(existingData, null, 2));
         console.log('Adding data for BIT10.BRC20');
     } catch (error) {
@@ -84,7 +88,12 @@ export const handleBit10BRC20 = async (request: IncomingMessage, response: Serve
     }
 
     try {
-        const existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20: Array<{ timestmpz: string, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
+        let existingData = cache.get('bit10_brc20_data');
+        if (!existingData) {
+            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20: Array<{ timestmpz: string, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
+            cache.set('bit10_brc20_data', existingData);
+        }
+
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(200);
         response.end(JSON.stringify(existingData));

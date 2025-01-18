@@ -2,17 +2,32 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
+import NodeCache from 'node-cache'
+
+type CoinData = {
+    id: number;
+    name: string;
+    symbol: string;
+    price: number;
+};
+
+type Bit10DefiEntry = {
+    timestmpz: string;
+    tokenPrice: number;
+    data: CoinData[];
+};
 
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_defi.json');
+const cache = new NodeCache();
 
-async function fetchAndUpdateData() {
-    const coinmarket_cap_key = process.env.COINMARKETCAP_API_KEY;
-    const url = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=8916,4847,7334,4956,3701,8669&CMC_PRO_API_KEY=${coinmarket_cap_key}`;
+const fetchAndUpdateData = async () => {
+    const coinmarketCapKey = process.env.COINMARKETCAP_API_KEY;
+    const url = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=8916,4847,7334,4956,3701,8669&CMC_PRO_API_KEY=${coinmarketCapKey}`;
 
     try {
         const result = await axios.get(url, {
             headers: {
-                'X-CMC_PRO_API_KEY': coinmarket_cap_key,
+                'X-CMC_PRO_API_KEY': coinmarketCapKey,
             },
         });
 
@@ -20,51 +35,50 @@ async function fetchAndUpdateData() {
             id: number;
             name: string;
             symbol: string;
-            quote: {
-                USD: {
-                    price: number;
-                };
-            };
+            quote: { USD: { price: number } };
         }[];
 
-        const coinsData = dataEntries.map(entry => ({
+        const coinsData = dataEntries.map((entry) => ({
             id: entry.id,
             name: entry.name,
             symbol: entry.symbol,
-            price: entry.quote.USD.price
-        }))
+            price: entry.quote.USD.price,
+        }));
 
-        const totalPrice = dataEntries.reduce((sum, entry) => sum + entry.quote.USD.price, 0);
-        const tokenPrice = totalPrice / dataEntries.length;
+        const totalPrice = coinsData.reduce((sum, coin) => sum + coin.price, 0);
+        const tokenPrice = totalPrice / coinsData.length;
 
-        const newEntry = {
+        const newEntry: Bit10DefiEntry = {
             timestmpz: new Date().toISOString(),
             tokenPrice,
-            data: coinsData
+            data: coinsData,
         };
 
-        let existingData;
+        let existingData: { bit10_defi: Bit10DefiEntry[] } = { bit10_defi: [] };
+
         try {
-            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_defi: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            if (fs.existsSync(jsonFilePath)) {
+                existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
+            }
         } catch (err) {
-            console.error('Error fetching data for BIT10.DEFI:', err);
-            existingData = { bit10_defi: [] };
+            console.error('Error reading existing BIT10.DEFI data:', err);
         }
 
         existingData.bit10_defi.unshift(newEntry);
+        cache.set('bit10_defi_data', existingData);
 
         fs.writeFileSync(jsonFilePath, JSON.stringify(existingData, null, 2));
-        console.log('Adding data for BIT10.DEFI');
+        console.log('BIT10.DEFI data updated successfully.');
     } catch (error) {
-        console.error('Error fetching data for BIT10.DEFI:', error);
+        console.error('Error fetching BIT10.DEFI data:', error);
     }
-}
+};
 
-setInterval(() => {
-    fetchAndUpdateData().catch(error => console.error('Error in fetchAndUpdateData:', error));
-}, 30 * 60 * 1000); // 30 * 60 * 1000 = 1800000 milliseconds = 30 min
-// }, 3 * 1000); // 3 * 1000 = 3000 milliseconds = 3 seconds
+const filterDataByDays = (data: Bit10DefiEntry[], days: number): Bit10DefiEntry[] => {
+    const currentTime = Date.now();
+    const cutoffTime = currentTime - days * 24 * 60 * 60 * 1000;
+    return data.filter((entry) => new Date(entry.timestmpz).getTime() >= cutoffTime);
+};
 
 export const handleBit10DEFI = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
@@ -75,14 +89,38 @@ export const handleBit10DEFI = async (request: IncomingMessage, response: Server
     }
 
     try {
-        const existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_defi: Array<{ timestmpz: string, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
+        let existingData = cache.get<{ bit10_defi: Bit10DefiEntry[] }>('bit10_defi_data');
+
+        if (!existingData) {
+            if (fs.existsSync(jsonFilePath)) {
+                existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
+                cache.set('bit10_defi_data', existingData);
+            } else {
+                existingData = { bit10_defi: [] };
+            }
+        }
+
+        const url = new URL(request.url || '', `http://${request.headers.host}`);
+        const dayParam = url.searchParams.get('day');
+
+        let responseData = existingData?.bit10_defi || [];
+        if (dayParam === '1') {
+            responseData = filterDataByDays(responseData, 1);
+        } else if (dayParam === '7') {
+            responseData = filterDataByDays(responseData, 7);
+        }
+
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(200);
-        response.end(JSON.stringify(existingData));
+        response.end(JSON.stringify({ bit10_defi: responseData }));
     } catch (error) {
-        console.error('Error reading data:', error);
+        console.error('Error handling BIT10.DEFI request:', error);
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(500);
-        response.end(JSON.stringify({ error: 'Error reading data for BIT10.DEFI' }));
+        response.end(JSON.stringify({ error: 'Internal Server Error' }));
     }
 };
+
+setInterval(() => {
+    fetchAndUpdateData().catch((error) => console.error('Error in fetchAndUpdateData:', error));
+}, 30 * 60 * 1000);
