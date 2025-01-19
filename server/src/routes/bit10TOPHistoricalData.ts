@@ -5,6 +5,35 @@ import axios from 'axios'
 
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_top_historical_data.json');
 
+interface Coin {
+    id: number;
+    name: string;
+    symbol: string;
+    tags: string[];
+    quote: {
+        USD: {
+            price: number;
+        };
+    };
+}
+
+interface ApiResponse {
+    data: Coin[];
+}
+
+type CoinData = {
+    id: number;
+    name: string;
+    symbol: string;
+    price: number;
+};
+
+type Bit10TOPEntry = {
+    timestmpz: string;
+    tokenPrice: number;
+    data: CoinData[];
+};
+
 async function fetchAndUpdateData() {
     const coinmarket_cap_key = process.env.COINMARKETCAP_API_KEY;
     // limit is 15
@@ -16,22 +45,6 @@ async function fetchAndUpdateData() {
                 'X-CMC_PRO_API_KEY': coinmarket_cap_key,
             },
         });
-
-        interface Coin {
-            id: number;
-            name: string;
-            symbol: string;
-            tags: string[];
-            quote: {
-                USD: {
-                    price: number;
-                };
-            };
-        }
-
-        interface ApiResponse {
-            data: Coin[];
-        }
 
         const apiResponse: ApiResponse = result.data as ApiResponse;
 
@@ -55,7 +68,7 @@ async function fetchAndUpdateData() {
 
         let existingData;
         try {
-            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_top_historical_data: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
+            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_top_historical_data: Bit10TOPEntry[] };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             console.error('Error fetching historical data for BIT10.TOP:', err);
@@ -85,7 +98,7 @@ export const handleBit10TOPHistoricalData = async (request: IncomingMessage, res
     }
 
     try {
-        const existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_top_historical_data: Array<{ timestmpz: string, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
+        const existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_top_historical_data: Bit10TOPEntry[] };
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(200);
         response.end(JSON.stringify(existingData));

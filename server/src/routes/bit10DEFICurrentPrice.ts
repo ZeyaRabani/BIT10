@@ -3,10 +3,23 @@ import fs from 'fs'
 import path from 'path'
 import NodeCache from 'node-cache'
 
+type CoinData = {
+    id: number;
+    name: string;
+    symbol: string;
+    price: number;
+};
+
+type Bit10DEFIEntry = {
+    timestmpz: string;
+    tokenPrice: number;
+    data: CoinData[];
+};
+
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_defi.json');
 const cache = new NodeCache();
 
-let latestData: { bit10_defi: Array<{ timestmpz: string; data: Array<{ id: number; name: string; symbol: string; price: number }> }> } | null = null;
+let latestData: { bit10_defi: Bit10DEFIEntry[] } | null = null;
 
 async function fetchData() {
     try {
@@ -35,7 +48,8 @@ export const handleBit10DEFICurrentPrice = async (request: IncomingMessage, resp
     }
 
     try {
-        const cachedData = cache.get('bit10_defi_current_price_data') as { bit10_defi: Array<{ timestmpz: string; data: Array<{ id: number; name: string; symbol: string; price: number }> }> };
+        const cachedData = cache.get('bit10_defi_current_price_data') as { bit10_defi: Bit10DEFIEntry[] };
+        
         if (cachedData) {
             const firstElement = cachedData.bit10_defi[0];
             response.setHeader('Content-Type', 'application/json');

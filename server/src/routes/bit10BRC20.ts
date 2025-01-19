@@ -4,6 +4,20 @@ import path from 'path'
 import axios from 'axios'
 import NodeCache from 'node-cache'
 
+type CoinData = {
+    id: number;
+    name: string;
+    symbol: string;
+    tokenAddress: string;
+    price: number;
+};
+
+type Bit10BRC20Entry = {
+    timestmpz: string;
+    tokenPrice: number;
+    data: CoinData[];
+};
+
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20.json');
 const cache = new NodeCache();
 
@@ -56,7 +70,7 @@ async function fetchAndUpdateData() {
 
         let existingData;
         try {
-            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, tokenAddress: string, price: number }> }> };
+            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20: Bit10BRC20Entry[] };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             console.error('Error fetching data for BIT10.BRC20:', err);
@@ -79,6 +93,12 @@ setInterval(() => {
 }, 30 * 60 * 1000); // 30 * 60 * 1000 = 1800000 milliseconds = 30 min
 // }, 3 * 1000); // 3 * 1000 = 3000 milliseconds = 3 seconds
 
+const filterDataByDays = (data: Bit10BRC20Entry[], days: number): Bit10BRC20Entry[] => {
+    const currentTime = Date.now();
+    const cutoffTime = currentTime - days * 24 * 60 * 60 * 1000;
+    return data.filter((entry) => new Date(entry.timestmpz).getTime() >= cutoffTime);
+};
+
 export const handleBit10BRC20 = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.setHeader('Content-Type', 'application/json');
@@ -88,15 +108,31 @@ export const handleBit10BRC20 = async (request: IncomingMessage, response: Serve
     }
 
     try {
-        let existingData = cache.get('bit10_brc20_data');
+        let existingData = cache.get<{ bit10_brc20: Bit10BRC20Entry[] }>('bit10_brc20_data');
+
         if (!existingData) {
-            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20: Array<{ timestmpz: string, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
-            cache.set('bit10_brc20_data', existingData);
+            if (fs.existsSync(jsonFilePath)) {
+                existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
+                cache.set('bit10_brc20_data', existingData);
+            } else {
+                existingData = { bit10_brc20: [] };
+            }
+        }
+
+        const url = new URL(request.url || '', `http://${request.headers.host}`);
+        const dayParam = url.searchParams.get('day');
+
+        let responseData = existingData?.bit10_brc20 || [];
+
+        if (dayParam === '1') {
+            responseData = filterDataByDays(responseData, 1);
+        } else if (dayParam === '7') {
+            responseData = filterDataByDays(responseData, 7);
         }
 
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(200);
-        response.end(JSON.stringify(existingData));
+        response.end(JSON.stringify({ bit10_brc20: responseData }));
     } catch (error) {
         console.error('Error reading data:', error);
         response.setHeader('Content-Type', 'application/json');

@@ -3,6 +3,41 @@ import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
 
+interface Coin {
+    id: number;
+    name: string;
+    symbol: string;
+    platform: {
+        slug: string;
+        token_address: string;
+    }
+    quote: {
+        USD: {
+            price: number;
+        };
+    };
+}
+
+interface ApiResponse {
+    data: {
+        coins: Coin[];
+    };
+}
+
+type CoinData = {
+    id: number;
+    name: string;
+    symbol: string;
+    tokenAddress: string;
+    price: number;
+};
+
+type Bit10BRC20Entry = {
+    timestmpz: string;
+    tokenPrice: number;
+    data: CoinData[];
+};
+
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20_historical_data.json');
 
 async function fetchAndUpdateData() {
@@ -16,27 +51,6 @@ async function fetchAndUpdateData() {
                 'X-CMC_PRO_API_KEY': coinmarket_cap_key,
             },
         });
-
-        interface Coin {
-            id: number;
-            name: string;
-            symbol: string;
-            platform: {
-                slug: string;
-                token_address: string;
-            }
-            quote: {
-                USD: {
-                    price: number;
-                };
-            };
-        }
-
-        interface ApiResponse {
-            data: {
-                coins: Coin[];
-            };
-        }
 
         const apiResponse: ApiResponse = result.data as ApiResponse;
 
@@ -63,7 +77,7 @@ async function fetchAndUpdateData() {
 
         let existingData;
         try {
-            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20_historical_data: Array<{ timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, tokenAddress: string, price: number }> }> };
+            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20_historical_data: Bit10BRC20Entry[] };
         } catch (err) {
             console.error('Error fetching historical data for BIT10.BRC20:', err);
             existingData = { bit10_brc20_historical_data: [] };
@@ -92,7 +106,7 @@ export const handleBit10BRC20HistoricalData = async (request: IncomingMessage, r
     }
 
     try {
-        const existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20_historical_data: Array<{ timestmpz: string, data: Array<{ id: number, name: string, symbol: string, price: number }> }> };
+        const existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20_historical_data: Bit10BRC20Entry[] };
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(200);
         response.end(JSON.stringify(existingData));

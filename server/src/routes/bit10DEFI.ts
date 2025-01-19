@@ -11,7 +11,7 @@ type CoinData = {
     price: number;
 };
 
-type Bit10DefiEntry = {
+type Bit10DEFIEntry = {
     timestmpz: string;
     tokenPrice: number;
     data: CoinData[];
@@ -48,13 +48,13 @@ const fetchAndUpdateData = async () => {
         const totalPrice = coinsData.reduce((sum, coin) => sum + coin.price, 0);
         const tokenPrice = totalPrice / coinsData.length;
 
-        const newEntry: Bit10DefiEntry = {
+        const newEntry: Bit10DEFIEntry = {
             timestmpz: new Date().toISOString(),
             tokenPrice,
             data: coinsData,
         };
 
-        let existingData: { bit10_defi: Bit10DefiEntry[] } = { bit10_defi: [] };
+        let existingData: { bit10_defi: Bit10DEFIEntry[] } = { bit10_defi: [] };
 
         try {
             if (fs.existsSync(jsonFilePath)) {
@@ -74,7 +74,12 @@ const fetchAndUpdateData = async () => {
     }
 };
 
-const filterDataByDays = (data: Bit10DefiEntry[], days: number): Bit10DefiEntry[] => {
+setInterval(() => {
+    fetchAndUpdateData().catch((error) => console.error('Error in fetchAndUpdateData:', error));
+}, 30 * 60 * 1000); // 30 * 60 * 1000 = 1800000 milliseconds = 30 min
+// }, 3 * 1000); // 3 * 1000 = 3000 milliseconds = 3 seconds
+
+const filterDataByDays = (data: Bit10DEFIEntry[], days: number): Bit10DEFIEntry[] => {
     const currentTime = Date.now();
     const cutoffTime = currentTime - days * 24 * 60 * 60 * 1000;
     return data.filter((entry) => new Date(entry.timestmpz).getTime() >= cutoffTime);
@@ -89,7 +94,7 @@ export const handleBit10DEFI = async (request: IncomingMessage, response: Server
     }
 
     try {
-        let existingData = cache.get<{ bit10_defi: Bit10DefiEntry[] }>('bit10_defi_data');
+        let existingData = cache.get<{ bit10_defi: Bit10DEFIEntry[] }>('bit10_defi_data');
 
         if (!existingData) {
             if (fs.existsSync(jsonFilePath)) {
@@ -104,6 +109,7 @@ export const handleBit10DEFI = async (request: IncomingMessage, response: Server
         const dayParam = url.searchParams.get('day');
 
         let responseData = existingData?.bit10_defi || [];
+        
         if (dayParam === '1') {
             responseData = filterDataByDays(responseData, 1);
         } else if (dayParam === '7') {
@@ -120,7 +126,3 @@ export const handleBit10DEFI = async (request: IncomingMessage, response: Server
         response.end(JSON.stringify({ error: 'Internal Server Error' }));
     }
 };
-
-setInterval(() => {
-    fetchAndUpdateData().catch((error) => console.error('Error in fetchAndUpdateData:', error));
-}, 30 * 60 * 1000);

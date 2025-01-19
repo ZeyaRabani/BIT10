@@ -3,10 +3,24 @@ import fs from 'fs'
 import path from 'path'
 import NodeCache from 'node-cache'
 
+type CoinData = {
+    id: number;
+    name: string;
+    symbol: string;
+    tokenAddress: string;
+    price: number;
+};
+
+type Bit10BRC20Entry = {
+    timestmpz: string;
+    tokenPrice: number;
+    data: CoinData[];
+};
+
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20.json');
 const cache = new NodeCache();
 
-let latestData: { bit10_brc20: Array<{ timestmpz: string; data: Array<{ id: number; name: string; symbol: string; tokenAddress: string; price: number }> }> } | null = null;
+let latestData: { bit10_brc20: Bit10BRC20Entry[] } | null = null;
 
 async function fetchData() {
     try {
@@ -35,7 +49,8 @@ export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, res
     }
 
     try {
-        const cachedData = cache.get('bit10_brc20_current_price_data') as { bit10_brc20: Array<{ timestmpz: string; data: Array<{ id: number; name: string; symbol: string; tokenAddress: string; price: number }> }> };
+        const cachedData = cache.get('bit10_brc20_current_price_data') as { bit10_brc20: Bit10BRC20Entry[] };
+        
         if (cachedData) {
             const firstElement = cachedData.bit10_brc20[0];
             response.setHeader('Content-Type', 'application/json');

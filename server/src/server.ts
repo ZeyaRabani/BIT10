@@ -17,6 +17,8 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/bit10-defi?day=7': handleBit10DEFI,
     '/bit10-defi-current-price': handleBit10DEFICurrentPrice,
     '/bit10-brc20': handleBit10BRC20,
+    '/bit10-brc20?day=1': handleBit10BRC20,
+    '/bit10-brc20?day=7': handleBit10BRC20,
     '/bit10-brc20-current-price': handleBit10BRC20CurrentPrice,
     '/bit10-brc20-historical-data': handleBit10BRC20HistoricalData,
     '/bit10-top-historical-data': handleBit10TOPHistoricalData,
