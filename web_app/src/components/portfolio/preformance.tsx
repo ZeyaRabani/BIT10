@@ -27,7 +27,7 @@ type Bit10Entry = {
 };
 
 export default function Preformance() {
-    const [selectedPreformanceToken, setSelectedPreformanceToken] = useState('BIT10.BRC20');
+    const [selectedPreformanceToken, setSelectedPreformanceToken] = useState('BIT10.DEFI');
     const [activeTab, setActiveTab] = useState('24H')
 
     const handleTabChange = (label: string | null) => {

@@ -74,7 +74,7 @@ export default function BalanceAndAllocation() {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, tokenAddress: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         }
         return returnData;
@@ -103,7 +103,7 @@ export default function BalanceAndAllocation() {
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10DEFITokens = bit10Queries[0].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const bit10BRC20Tokens = bit10Queries[1].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
+    const bit10BRC20Tokens = bit10Queries[1].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
     const bit10DEFITokenBalance = bit10Queries[2].data as bigint | undefined;
     const bit10BRC20TokenBalance = bit10Queries[3].data as bigint | undefined;
 

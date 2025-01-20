@@ -16,7 +16,7 @@ import PlugImg from '@/assets/wallet/plug.svg'
 import XverseImg from '@/assets/wallet/xverse.svg'
 import UnisatImg from '@/assets/wallet/unisat.svg'
 import PhantomImg from '@/assets/wallet/phantom.svg'
-import { Badge } from '@/components/ui/badge'
+// import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Loader2 } from 'lucide-react'
 
@@ -110,7 +110,7 @@ export default function Navbar() {
                 <Link href='/' passHref>
                     <div className='flex flex-row items-center justify-start'>
                         <Image src='/logo/logo-circle.png' alt='logo' width={60} height={60} />
-                        <Badge variant='outline' className='ml-2 border-primary'>Mainnet Beta</Badge>
+                        {/* <Badge variant='outline' className='ml-2 border-primary'>Mainnet Beta</Badge> */}
                     </div>
                 </Link>
 
@@ -280,7 +280,7 @@ export default function Navbar() {
                                     )}
                                 </>
                             ) : (
-                                <Link href='/swap' passHref>
+                                <Link href='/launch' passHref>
                                     <Button className='rounded-full'>Launch App</Button>
                                 </Link>
                             )}

@@ -230,7 +230,7 @@ export default function ResponsiveNavbar() {
                                             </>
                                         ) : (
                                             <div className='border-y-2 py-2 px-2 cursor-pointer w-full'>
-                                                <Link href='/swap' passHref>
+                                                <Link href='/launch' passHref>
                                                     <Button className='rounded-full w-full'>Launch App</Button>
                                                 </Link>
                                             </div>
