@@ -264,7 +264,7 @@ export default function Collateral() {
                                                             return total + matchingData.price * allocation.totalCollateralToken;
                                                         }
                                                         return total;
-                                                    }, 0) > totalUSDCollateralB1010DEFI ? '+ ' : '- '}${((bit10Allocation.reduce((total, allocation) => {
+                                                    }, 0) > totalUSDCollateralB1010DEFI ? '+ ' : ''}${((bit10Allocation.reduce((total, allocation) => {
                                                         const matchingData = bit10DEFITokens.find((data) => data.symbol === allocation.symbol);
                                                         if (matchingData) {
                                                             return total + matchingData.price * allocation.totalCollateralToken;

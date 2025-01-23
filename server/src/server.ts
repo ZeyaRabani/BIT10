@@ -5,6 +5,8 @@ import { handleBit10DEFICurrentPrice } from './routes/bit10DEFICurrentPrice'
 import { handleBit10BRC20 } from './routes/bit10BRC20'
 import { handleBit10BRC20CurrentPrice } from './routes/bit10BRC20CurrentPrice'
 import { handleBit10BRC20HistoricalData } from './routes/bit10BRC20HistoricalData'
+import { handleTestBit10TOPCurrentPrice } from './routes/testBit10TOPCurrentPrice'
+import { handleTestBit10TOP } from './routes/testBit10TOP'
 import { handleBit10TOPHistoricalData } from './routes/bit10TOPHistoricalData'
 
 dotenv.config();
@@ -22,6 +24,10 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/bit10-brc20-current-price': handleBit10BRC20CurrentPrice,
     '/bit10-brc20-historical-data': handleBit10BRC20HistoricalData,
     '/bit10-top-historical-data': handleBit10TOPHistoricalData,
+    '/test-bit10-top': handleTestBit10TOP,
+    '/test-bit10-top?day=1': handleTestBit10TOP,
+    '/test-bit10-top?day=7': handleTestBit10TOP,
+    '/test-bit10-top-current-price': handleTestBit10TOPCurrentPrice,
 };
 
 const requestHandler = (request: http.IncomingMessage, response: http.ServerResponse) => {
