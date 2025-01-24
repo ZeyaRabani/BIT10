@@ -87,8 +87,28 @@ const nextConfig = {
                 destination: '/api/bit10-brc20-latest-price',
             },
             {
+                source: '/test-bit10-top-latest-price',
+                destination: '/api/test-bit10-top-latest-price',
+            },
+            {
                 source: '/bit10-token-request/:slug*',
                 destination: '/api/bit10-token-request/:slug*',
+            },
+            {
+                source: '/bit10-defi-24h',
+                destination: '/api/bit10-defi-24h',
+            },
+            {
+                source: '/bit10-defi-7d',
+                destination: '/api/bit10-defi-7d',
+            },
+            {
+                source: '/bit10-brc20-24h',
+                destination: '/api/bit10-brc20-24h',
+            },
+            {
+                source: '/bit10-brc20-7d',
+                destination: '/api/bit10-brc20-7d',
             }
         ]
     },

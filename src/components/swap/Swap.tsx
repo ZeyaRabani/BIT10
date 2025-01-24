@@ -57,7 +57,9 @@ const bit10Amount = [
 ]
 
 const bit10Token = [
-    'Test BIT10.DEFI'
+    'Test BIT10.DEFI',
+    'Test BIT10.BRC20',
+    'Test BIT10.TOP'
 ]
 
 const FormSchema = z.object({
@@ -96,6 +98,12 @@ export default function Swap() {
         if (tokenPriceAPI === 'bit10-defi-latest-price') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.tokenPrice ?? 0;
+        } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            returnData = data.tokenPrice ?? 0;
+        } else if (tokenPriceAPI === 'test-bit10-top-latest-price') {
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            returnData = (data.tokenPrice ?? 0) / 1000;
         }
         return returnData;
     };
@@ -106,12 +114,24 @@ export default function Swap() {
                 queryKey: ['tbit10DEFITokenPrice'],
                 queryFn: () => fetchBit10Price('bit10-defi-latest-price'),
                 refetchInterval: 1800000, // 30 min.
-            }
+            },
+            {
+                queryKey: ['bit10BRC20TokenPrice'],
+                queryFn: () => fetchBit10Price('bit10-brc20-latest-price'),
+                refetchInterval: 1800000,
+            },
+            {
+                queryKey: ['bit10TOPTokenPrice'],
+                queryFn: () => fetchBit10Price('test-bit10-top-latest-price'),
+                refetchInterval: 1800000,
+            },
         ],
     });
 
     const isLoading = bit10PriceQueries.some(query => query.isLoading);
     const bit10DEFIPrice = bit10PriceQueries[0].data;
+    const bit10BRC20Price = bit10PriceQueries[1].data;
+    const bit10TOPPrice = bit10PriceQueries[2].data;
 
     const fetchPayWithPrice = async (currency: string) => {
         const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);
@@ -159,23 +179,30 @@ export default function Swap() {
         const bit10Token = form.watch('bit10_token');
         if (bit10Token === 'Test BIT10.DEFI') {
             return bit10DEFIPrice ?? 0;
-        } else {
+        } else if (bit10Token === 'Test BIT10.BRC20') {
+            return bit10BRC20Price ?? 0;
+        } else if (bit10Token === 'Test BIT10.TOP') {
+            return bit10TOPPrice ?? 0;
+        } 
+        else {
             return 0;
         }
     };
 
     const selectedBit10TokenPrice = bit10TokenPrice();
 
-    const swapDisabledConditions = !isConnected || swaping || !bit10BTCAmount || payingTokenPrice == '0' || selectedBit10TokenPrice == 0
+    const swapDisabledConditions = !isConnected || swaping || payingTokenPrice == '0' || selectedBit10TokenPrice == 0
 
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
             setSwaping(true);
             const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
             const tbit10DEFICanisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
+            const tbit10BRC20CanisterId = 'uv4pt-4qaaa-aaaap-qpuxa-cai';
+            const tbit10TOPCanisterId = 'wbckh-zqaaa-aaaap-qpuza-cai';
 
             const hasAllowed = await window.ic.plug.requestConnect({
-                whitelist: [bit10BTCCanisterId, tbit10DEFICanisterId]
+                whitelist: [bit10BTCCanisterId, tbit10DEFICanisterId, tbit10BRC20CanisterId, tbit10TOPCanisterId]
             });
 
             // @ts-ignore
@@ -299,7 +326,7 @@ export default function Swap() {
       {activeTab === 'Quick Swap' && <div> Quick Swap </div>}
       {activeTab === 'Advanced Trading' && <div> Advanced Trading </div>} */}
 
-            <div className='flex flex-col py-4 md:py-8 h-full items-center justify-center'>
+            <div className='flex flex-col py-4 md:py-8 items-center justify-center'>
                 {isLoading ? (
                     <Card className='w-[300px] md:w-[580px] px-2 pt-6 animate-fade-bottom-up'>
                         <CardContent className='flex flex-col space-y-2'>

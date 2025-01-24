@@ -154,6 +154,18 @@ export default function Navbar() {
                                             Portfolio
                                         </span>
                                     </Link>
+                                    <Link href='/collateral' passHref>
+                                        <span
+                                            ref={(el) => {
+                                                linkRefs.current['/collateral'] = el;
+                                            }}
+                                            onClick={() => handleLinkClick('/collateral')}
+                                            // className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer ${pathname === '/collateral' && 'border-b-2 border-gray-800 dark:border-white hover:border-transparent dark:hover:border-transparent'}`}
+                                            className={`md:inline-flex md:w-auto w-full px-3 py-2 hover:rounded items-center justify-center hover:text-white hover:bg-primary cursor-pointer`}
+                                        >
+                                            Collateral
+                                        </span>
+                                    </Link>
                                 </>
                             ) : (
                                 <>
@@ -204,7 +216,7 @@ export default function Navbar() {
                 <div className='hidden w-full md:inline-flex md:flex-grow md:w-auto'>
                     <div className='md:inline-flex md:flex-row md:ml-auto md:w-auto w-full md:items-center items-start flex flex-col md:h-auto space-x-2'>
                         {
-                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' ? (
+                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' || pathname === '/collateral' ? (
                                 <>
                                     {isConnected ? (
                                         <Button variant='destructive' onClick={handleDisconnect}>Disconnect wallet</Button>

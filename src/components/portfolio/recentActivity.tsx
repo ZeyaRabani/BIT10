@@ -126,11 +126,9 @@ export default function RecentActivity() {
                     </CardHeader>
                     <CardContent>
                         <DataTable
-                            // @ts-ignore
                             columns={portfolioTableColumns}
-                            // @ts-ignore
                             data={recentActivityData ?? []}
-                            userSearchColumn='bit10TokenName'
+                            userSearchColumn='bit10_token_name'
                             inputPlaceHolder='Search by BIT10 token name'
                         />
                     </CardContent>

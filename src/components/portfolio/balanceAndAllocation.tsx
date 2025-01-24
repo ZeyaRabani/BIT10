@@ -16,7 +16,7 @@ import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 
-const bit10Tokens = ['Test BIT10.DEFI'];
+const bit10Tokens = ['Test BIT10.DEFI', 'Test BIT10.BRC20', 'Test BIT10.TOP'];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
 
@@ -76,6 +76,9 @@ export default function BalanceAndAllocation() {
         } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
+        } else if (tokenPriceAPI === 'test-bit10-top-latest-price') {
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            returnData = data.data ?? 0;
         }
         return returnData;
     };
@@ -87,22 +90,46 @@ export default function BalanceAndAllocation() {
                 queryFn: () => fetchBit10Tokens('bit10-defi-latest-price')
             },
             {
+                queryKey: ['tbit10BRC20TokenList'],
+                queryFn: () => fetchBit10Tokens('bit10-brc20-latest-price')
+            },
+            {
+                queryKey: ['tbit10TOPTokenList'],
+                queryFn: () => fetchBit10Tokens('test-bit10-top-latest-price')
+            },
+            {
                 queryKey: ['tbit10DEFIBalance'],
                 queryFn: () => fetchBit10Balance('hbs3g-xyaaa-aaaap-qhmna-cai')
+            },
+            {
+                queryKey: ['tbit10BRC20Balance'],
+                queryFn: () => fetchBit10Balance('uv4pt-4qaaa-aaaap-qpuxa-cai')
+            },
+            {
+                queryKey: ['tbit10TOPBalance'],
+                queryFn: () => fetchBit10Balance('wbckh-zqaaa-aaaap-qpuza-cai')
             }
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     const tbit10DEFITokens = bit10Queries[0].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const tbit10DEFITokenBalance = bit10Queries[1].data as bigint | undefined;
-    
+    const tbit10BRC20Tokens = bit10Queries[1].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
+    const tbit10TOPTokens = bit10Queries[2].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
+    const tbit10DEFITokenBalance = bit10Queries[3].data as bigint | undefined;
+    const tbit10BRC20TokenBalance = bit10Queries[4].data as bigint | undefined;
+    const tbit10TOPTokenBalance = bit10Queries[5].data as bigint | undefined;
+
     // @ts-ignore
-    const totalBit10Tokens = (tbit10DEFITokenBalance ?? 0n);
+    const totalBit10Tokens = (tbit10DEFITokenBalance ?? 0n) + (tbit10BRC20TokenBalance ?? 0n) + (tbit10TOPTokenBalance ?? 0n);
 
     const selectedBit10Token = () => {
         if (selectedAllocationToken === 'Test BIT10.DEFI') {
             return tbit10DEFITokens;
+        } else if (selectedAllocationToken === 'Test BIT10.BRC20') {
+            return tbit10BRC20Tokens;
+        } else if (selectedAllocationToken === 'Test BIT10.TOP') {
+            return tbit10TOPTokens;
         } else {
             return null;
         }
@@ -139,6 +166,14 @@ export default function BalanceAndAllocation() {
         {
             token: 'Test BIT10.DEFI',
             balance: `${formatBit10(Number(tbit10DEFITokenBalance))}`
+        },
+        {
+            token: 'Test BIT10.BRC20',
+            balance: `${formatBit10(Number(tbit10BRC20TokenBalance))}`
+        },
+        {
+            token: 'Test BIT10.TOP',
+            balance: `${formatBit10(Number(tbit10TOPTokenBalance))}`
         }
     ]
 
@@ -179,7 +214,7 @@ export default function BalanceAndAllocation() {
 
     const bit10AllocationPieChartData = tokens?.map((token, index) => ({
         name: token.symbol,
-        value: (100 / tokens.length) - 0.01, // 0.01% is kept in reserve
+        value: (100 / tokens.length),
         fill: color[index % color.length],
     }));
 
@@ -384,7 +419,7 @@ export default function BalanceAndAllocation() {
                                                 <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
                                                 <div>{token.symbol}</div>
                                             </div>
-                                            <div>{((100 / tokens.length) - 0.01).toFixed(3)} %</div>
+                                            <div>{(100 / tokens.length).toFixed(3)} %</div>
                                         </div>
                                     ))}
                                 </div>
