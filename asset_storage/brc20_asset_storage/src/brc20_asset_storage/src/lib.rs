@@ -205,52 +205,112 @@ pub async fn send_from_p2tr_raw_key_spend(request: SendRequest) -> String {
 }
 
 #[update]
-pub async fn send_brc(
+pub async fn send_brc20_swap(
     sender_address: String,
     recipient_address: String,
     brc_id: String,
+    amount: u64,
 ) -> Result<String, String> {
-    let utxos_response = get_utxos(sender_address).await.map_err(|e| e.to_string())?;
-    
-    let brc_utxo = utxos_response.utxos.iter()
-        .find(|utxo| utxo.outpoint.txid.to_vec() == brc_id.as_bytes())
-        .ok_or("BRC20 UTXO not found")?;
+    let url = "https://open-api.unisat.io/v1/brc20-swap/swap";
+    let client = reqwest::Client::new();
 
-    let tx_out = TxOut {
-        value: brc_utxo.value,
-        script_pubkey: Address::from_str(&recipient_address).map_err(|_| "Invalid recipient address")?.script_pubkey(),
-    };
+    let response = client.post(url)
+        .json(&json!( {
+            "sender_address": sender_address,
+            "recipient_address": recipient_address,
+            "brc_id": brc_id,
+            "amount": amount,
+        }))
+        .send()
+        .await.map_err(|e| e.to_string())?;
 
-    let tx_in = TxIn {
-        previous_output: brc_utxo.outpoint,
-        script_sig: Script::new(),
-        sequence: bitcoin::Sequence(0xFFFFFFFF),
-        witness: Vec::<Vec<u8>>::new().into(),
-    };
+    if response.status().is_success() {
+        let result: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
+        Ok(result.to_string())
+    } else {
+        Err(format!("Error: {}", response.status()))
+    }
+}
 
-    let mut transaction = Transaction {
-        version: 2,
-        lock_time: LockTime::from_height(0),
-        input: vec![tx_in],
-        output: vec![tx_out],
-    };
+#[update]
+pub async fn create_transfer_inscription(
+    address: String,
+    ticker: String,
+    inscription_data: String,
+) -> Result<String, String> {
+    let url = format!("https://open-api.unisat.io/v1/brc20-swap/create_deposit");
+    let client = reqwest::Client::new();
 
-    let key_name = KEY_NAME.with(|kn| kn.borrow().to_string());
-    let derivation_path = DERIVATION_PATH.with(|d| d.clone());
-    
-    let serialized_tx = encode::serialize(&transaction);
-    
-    let signed_tx = schnorr_api::sign_with_schnorr(key_name, derivation_path, serialized_tx).await.map_err(|e| e.to_string())?;
+    let response = client.post(&url)
+        .json(&json!( {
+            "address": address,
+            "ticker": ticker,
+            "data": inscription_data,
+        }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
 
-    let network = NETWORK.with(|n| n.get());
-    
-    let txid = bitcoin_api::send_transaction(network, &signed_tx).await.map_err(|e| e.to_string())?;
-
-    Ok(txid)
+    if response.status().is_success() {
+        let result: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
+        Ok(result.to_string())
+    } else {
+        Err(format!("Error: {}", response.status()))
+    }
 }
 
 #[derive(candid::CandidType, candid::Deserialize)]
 pub struct SendRequest {
     pub destination_address: String,
     pub amount_in_satoshi: u64,
+}
+
+#[update]
+pub async fn rebalance() -> Result<String, String> {
+    let url = std::env::var("REBALANCE_API_URL").map_err(|e| e.to_string())?;
+    let client = reqwest::Client::new();
+
+    let response = client.get(&url)
+        .send()
+        .await.map_err(|e| e.to_string())?;
+
+    if response.status().is_success() {
+        let result: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
+        
+        let price_of_token_to_buy = result["bit10_brc20_rebalance"][0]["priceOfTokenToBuy"].as_u64().ok_or("Missing priceOfTokenToBuy")?;
+        let previous_tokens = result["bit10_brc20_rebalance"][0]["changes"]["retained"].as_array().ok_or("Missing previousTokens")?;
+        
+        for previous_token in previous_tokens {
+            let token_address = previous_token["tokenAddress"].as_str().ok_or("Missing tokenAddress")?;
+            let new_tokens = result["bit10_brc20_rebalance"][0]["newTokens"].as_array().ok_or("Missing newTokens")?;
+            for new_token in new_tokens {
+                let new_token_address = new_token["tokenAddress"].as_str().ok_or("Missing newTokenAddress")?;
+                swap_tokens(token_address, new_token_address, price_of_token_to_buy).await?;
+            }
+        }
+
+        Ok("Rebalance completed successfully".to_string())
+    } else {
+        Err(format!("Error: {}", response.status()))
+    }
+}
+
+async fn swap_tokens(previous_token_address: &str, new_token_address: &str, amount: u64) -> Result<(), String> {
+    let url = "https://open-api.unisat.io/v1/brc20-swap/swap";
+    let client = reqwest::Client::new();
+
+    let response = client.post(url)
+        .json(&json!({
+            "previous_token_address": previous_token_address,
+            "new_token_address": new_token_address,
+            "amount": amount,
+        }))
+        .send()
+        .await.map_err(|e| e.to_string())?;
+
+    if response.status().is_success() {
+        Ok(())
+    } else {
+        Err(format!("Error swapping tokens: {}", response.status()))
+    }
 }

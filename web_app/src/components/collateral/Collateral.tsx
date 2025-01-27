@@ -48,10 +48,10 @@ export default function Collateral() {
 
         let data;
         let returnData;
-        if (tokenPriceAPI === 'bit10-defi-latest-price') {
+        if (tokenPriceAPI === 'bit10-latest-price-defi') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.tokenPrice ?? 0;
-        } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
+        } else if (tokenPriceAPI === 'bit10-latest-price-brc20') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.tokenPrice ?? 0;
         }
@@ -88,10 +88,10 @@ export default function Collateral() {
 
         let data;
         let returnData;
-        if (tokenPriceAPI === 'bit10-defi-latest-price') {
+        if (tokenPriceAPI === 'bit10-latest-price-defi') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
-        } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
+        } else if (tokenPriceAPI === 'bit10-latest-price-brc20') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         } else {
@@ -104,7 +104,7 @@ export default function Collateral() {
         queries: [
             {
                 queryKey: ['bit10DEFITokenPrice'],
-                queryFn: () => fetchBit10Price('bit10-defi-latest-price')
+                queryFn: () => fetchBit10Price('bit10-latest-price-defi')
             },
             {
                 queryKey: ['bit10DEFITokenTotalSupply'],
@@ -112,7 +112,7 @@ export default function Collateral() {
             },
             {
                 queryKey: ['bit10DEFITokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-defi-latest-price')
+                queryFn: () => fetchBit10Tokens('bit10-latest-price-defi')
             }
         ],
     });
@@ -155,7 +155,7 @@ export default function Collateral() {
 
     const bit10DEFIPieChartData = bit10DEFITokens?.map((token, index) => ({
         name: token.symbol,
-        value: (100 / bit10DEFITokens.length) - 0.01, // 0.01% is kept in reserve
+        value: 100 / bit10DEFITokens.length,
         fill: color[index % color.length],
     }));
 
@@ -285,22 +285,24 @@ export default function Collateral() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {bit10Allocation.map((allocation, index) => {
-                                                const matchingData = bit10DEFITokens.find((data) => data.symbol === allocation.symbol);
+                                            {bit10DEFITokens.map((token, index) => {
+                                                const allocation = bit10Allocation.find((alloc) => alloc.id === token.id); // can also be changed for symbol
                                                 return (
-                                                    <tr key={allocation.id} className='hover:bg-accent p-1 rounded'>
-                                                        <td className='flex items-center space-x-1'>
-                                                            <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
-                                                            <span>{allocation.symbol}</span>
-                                                            <span>({allocation.address})</span>
-                                                            <a href={allocation.walletAddress} target='_blank' rel='noopener noreferrer'>
-                                                                <ExternalLink size={16} className='text-primary' />
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            {matchingData && `${(matchingData.price * allocation.totalCollateralToken).toFixed(2)} USD`}
-                                                        </td>
-                                                    </tr>
+                                                    allocation && (
+                                                        <tr key={allocation.id} className='hover:bg-accent p-1 rounded'>
+                                                            <td className='flex items-center space-x-1'>
+                                                                <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
+                                                                <span>{allocation.symbol}</span>
+                                                                <span>({allocation.address})</span>
+                                                                <a href={allocation.walletAddress} target='_blank' rel='noopener noreferrer'>
+                                                                    <ExternalLink size={16} className='text-primary' />
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                {(token && `${(token.price * allocation.totalCollateralToken).toFixed(2)} USD`) || 'N/A'}
+                                                            </td>
+                                                        </tr>
+                                                    )
                                                 );
                                             })}
                                         </tbody>

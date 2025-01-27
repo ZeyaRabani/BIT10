@@ -70,10 +70,10 @@ export default function BalanceAndAllocation() {
 
         let data;
         let returnData;
-        if (tokenPriceAPI === 'bit10-defi-latest-price') {
+        if (tokenPriceAPI === 'bit10-latest-price-defi') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
-        } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
+        } else if (tokenPriceAPI === 'bit10-latest-price-brc20') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, tokenAddress: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         }
@@ -84,11 +84,11 @@ export default function BalanceAndAllocation() {
         queries: [
             {
                 queryKey: ['bit10DEFITokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-defi-latest-price')
+                queryFn: () => fetchBit10Tokens('bit10-latest-price-defi')
             },
             {
                 queryKey: ['bit10BRC20TokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-brc20-latest-price')
+                queryFn: () => fetchBit10Tokens('bit10-latest-price-brc20')
             },
             {
                 queryKey: ['bit10DEFIBalance'],
@@ -194,7 +194,7 @@ export default function BalanceAndAllocation() {
 
     const bit10AllocationPieChartData = tokens?.map((token, index) => ({
         name: token.symbol,
-        value: (100 / tokens.length) - 0.01, // 0.01% is kept in reserve
+        value: 100 / tokens.length,
         fill: color[index % color.length],
     }));
 
@@ -399,7 +399,7 @@ export default function BalanceAndAllocation() {
                                                 <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
                                                 <div>{token.symbol}</div>
                                             </div>
-                                            <div>{((100 / tokens.length) - 0.01).toFixed(3)} %</div>
+                                            <div>{(100 / tokens.length).toFixed(3)} %</div>
                                         </div>
                                     ))}
                                 </div>

@@ -45,10 +45,10 @@ export default function Preformance() {
 
         let data;
         let returnData;
-        if (tokenPreformance === 'bit10-defi-24h' || tokenPreformance === 'bit10-defi-7d') {
+        if (tokenPreformance === 'bit10-historic-data-defi-1' || tokenPreformance === 'bit10-historic-data-defi-7') {
             data = await response.json() as { bit10_defi: Bit10Entry[] }
             returnData = { bit10_defi: data.bit10_defi.reverse() };
-        } else if (tokenPreformance === 'bit10-brc20-24h' || tokenPreformance === 'bit10-brc20-7d') {
+        } else if (tokenPreformance === 'bit10-historic-data-brc20-1' || tokenPreformance === 'bit10-historic-data-brc20-7') {
             data = await response.json() as { bit10_brc20: Bit10Entry[] }
             returnData = { bit10_brc20: data.bit10_brc20.reverse() };
         }
@@ -59,19 +59,19 @@ export default function Preformance() {
         queries: [
             {
                 queryKey: ['bit10DEFITokenPreformance24h'],
-                queryFn: () => fetchBit10Preformance('bit10-defi-24h')
+                queryFn: () => fetchBit10Preformance('bit10-historic-data-defi-1')
             },
             {
                 queryKey: ['bit10DEFITokenPreformance7d'],
-                queryFn: () => fetchBit10Preformance('bit10-defi-7d')
+                queryFn: () => fetchBit10Preformance('bit10-historic-data-defi-7')
             },
             {
                 queryKey: ['bit10BRC20TokenPreformance24h'],
-                queryFn: () => fetchBit10Preformance('bit10-brc20-24h')
+                queryFn: () => fetchBit10Preformance('bit10-historic-data-brc20-1')
             },
             {
                 queryKey: ['bit10BRC20TokenPreformance7d'],
-                queryFn: () => fetchBit10Preformance('bit10-brc20-7d')
+                queryFn: () => fetchBit10Preformance('bit10-historic-data-brc20-7')
             }
         ],
     });

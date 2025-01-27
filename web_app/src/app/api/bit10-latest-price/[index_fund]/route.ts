@@ -1,8 +1,10 @@
 import { env } from '@/env'
+import { type NextRequest } from 'next/server'
 
-export async function GET() {
+export async function GET(request: NextRequest, context: { params: Promise<{ index_fund: string }> }) {
     const node_server = env.NODE_SERVER;
-    const url = `${node_server}/bit10-defi?day=7`;
+    const { index_fund } = await context.params;
+    const url = `${node_server}/bit10-${index_fund}-current-price`;
 
     try {
         const res = await fetch(url)

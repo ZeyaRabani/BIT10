@@ -48,45 +48,29 @@ const config = {
                 destination: 'https://eu.i.posthog.com/decide',
             },
             {
-                source: '/contact-form/:slug*',
-                destination: '/api/contact-form/:slug*',
+                source: '/contact-form',
+                destination: '/api/contact-form',
             },
             {
-                source: '/bit10-testnet-welcome/:slug*',
-                destination: '/api/bit10-testnet-welcome/:slug*',
+                source: '/bit10-testnet-welcome',
+                destination: '/api/bit10-testnet-welcome',
             },
             {
-                source: '/bit10-review/:slug*',
-                destination: '/api/bit10-review/:slug*',
+                source: '/bit10-review',
+                destination: '/api/bit10-review',
             },
             {
-                source: '/bit10-defi-latest-price',
-                destination: '/api/bit10-defi-latest-price',
+                source: '/bit10-token-request',
+                destination: '/api/bit10-token-request',
             },
             {
-                source: '/bit10-brc20-latest-price',
-                destination: '/api/bit10-brc20-latest-price',
+                source: '/bit10-latest-price-:index_fund',
+                destination: '/api/bit10-latest-price/:index_fund',
             },
             {
-                source: '/bit10-token-request/:slug*',
-                destination: '/api/bit10-token-request/:slug*',
+                source: '/bit10-historic-data-:index_fund-:time',
+                destination: '/api/bit10-historic-data/:index_fund/:time',
             },
-            {
-                source: '/bit10-defi-24h',
-                destination: '/api/bit10-defi-24h',
-            },
-            {
-                source: '/bit10-defi-7d',
-                destination: '/api/bit10-defi-7d',
-            },
-            {
-                source: '/bit10-brc20-24h',
-                destination: '/api/bit10-brc20-24h',
-            },
-            {
-                source: '/bit10-brc20-7d',
-                destination: '/api/bit10-brc20-7d',
-            }
         ]
     },
     compiler: {

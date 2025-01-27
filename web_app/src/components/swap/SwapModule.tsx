@@ -21,6 +21,8 @@ import CkETHImg from '@/assets/swap/ckETH.png'
 import ICPImg from '@/assets/swap/ICP.png'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import BIT10Img from '@/assets/swap/bit10.svg'
+import { Actor, HttpAgent } from '@dfinity/agent'
+import { idlFactory as OracleidfFactory } from '@/lib/oracle.did'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10.did'
 import crypto from 'crypto'
@@ -99,26 +101,71 @@ export default function SwapModule() {
 
     let data;
     let returnData;
-    if (tokenPriceAPI === 'bit10-defi-latest-price') {
+    if (tokenPriceAPI === 'bit10-latest-price-defi') {
       data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
       returnData = data.tokenPrice ?? 0;
-    } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
+    } else if (tokenPriceAPI === 'bit10-latest-price-brc20') {
       data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
       returnData = data.tokenPrice ?? 0;
     }
     return returnData;
   };
 
+  const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
+  const canisterId = 'fg5vt-paaaa-aaaap-qhhra-cai';
+
+  const agent = new HttpAgent({ host });
+  const oracleActor = Actor.createActor(OracleidfFactory, { agent, canisterId })
+
+  const fetchBit10DEFISupply = async () => {
+    const totalSupply = oracleActor.bit10_defi_total_supply_of_token_available ? await oracleActor.bit10_defi_total_supply_of_token_available() : undefined;
+
+    if (!totalSupply) {
+      toast.error('Error fetching BIT10 supply. Please try again!');
+    }
+
+    if (totalSupply && typeof totalSupply === 'bigint') {
+      const scaledTotalSupply = Number(totalSupply) / 100000000;
+      return scaledTotalSupply;
+    } else {
+      return 0;
+    }
+  }
+
+  const fetchBit10DEFITokenBought = async () => {
+    const totalSupply = oracleActor.bit10_defi_total_token_available_for_buying ? await oracleActor.bit10_defi_total_token_available_for_buying() : undefined;
+
+    if (!(totalSupply as { Ok?: bigint }).Ok) {
+      toast.error('Error fetching BIT10 token bought. Please try again!');
+    }
+
+    if ((totalSupply as { Ok?: bigint }).Ok && typeof (totalSupply as { Ok?: bigint }).Ok === 'bigint') {
+      const scaledTotalSupply = Number((totalSupply as { Ok: bigint }).Ok) / 100000000;
+      return scaledTotalSupply;
+    } else {
+      return 0;
+    }
+  }
+
   const bit10PriceQueries = useQueries({
     queries: [
       {
         queryKey: ['bit10DEFITokenPrice'],
-        queryFn: () => fetchBit10Price('bit10-defi-latest-price'),
+        queryFn: () => fetchBit10Price('bit10-latest-price-defi'),
         refetchInterval: 1800000, // 30 min.
       },
       {
+        queryKey: ['bit10DEFITokenTotalSupply'],
+        queryFn: () => fetchBit10DEFISupply()
+      },
+      {
+        queryKey: ['bit10DEFIBuyingTokenSupply'],
+        queryFn: () => fetchBit10DEFITokenBought(),
+        refetchInterval: 180000, // 3 miin.
+      },
+      {
         queryKey: ['bit10BRC20TokenPrice'],
-        queryFn: () => fetchBit10Price('bit10-brc20-latest-price'),
+        queryFn: () => fetchBit10Price('bit10-latest-price-brc20'),
         refetchInterval: 1800000,
       },
     ],
@@ -126,7 +173,9 @@ export default function SwapModule() {
 
   const isLoading = bit10PriceQueries.some(query => query.isLoading);
   const bit10DEFIPrice = bit10PriceQueries[0].data;
-  const bit10BRC20Price = bit10PriceQueries[1].data;
+  const bit10DEFITotalSupply = bit10PriceQueries[1].data;
+  const bit10DEFIBuyingSupply = bit10PriceQueries[2].data;
+  const bit10BRC20Price = bit10PriceQueries[3].data;
 
   const fetchPayWithPrice = async (currency: string) => {
     const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);
@@ -213,7 +262,17 @@ export default function SwapModule() {
 
   const selectedBit10TokenPrice = bit10TokenPrice();
 
-  const swapDisabledConditions = !isConnected || swaping || !btcAmount || !ethAmount || !icpAmount || payingTokenPrice == '0' || selectedBit10TokenPrice == 0
+  const bit10TokenSwapBtn = (): string => {
+    if (Number(form.watch('bit10_amount')) + Number(bit10DEFIBuyingSupply?.toFixed(8)) > Number(bit10DEFITotalSupply?.toFixed(8))) {
+      return 'Requested tokens exceed available supply'
+    } else {
+      return 'Swap'
+    }
+  }
+
+  const bit10TokenSwapBtnMessage = bit10TokenSwapBtn();
+
+  const swapDisabledConditions = !isConnected || swaping || !btcAmount || !ethAmount || !icpAmount || payingTokenPrice === '0' || selectedBit10TokenPrice === 0 || Number(form.watch('bit10_amount')) + Number(bit10DEFIBuyingSupply?.toFixed(8)) > Number(bit10DEFITotalSupply?.toFixed(8))
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     try {
@@ -406,8 +465,8 @@ export default function SwapModule() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    {paymentMethod.map((name) => (
-                                      <SelectItem key={name} value={name}>
+                                    {paymentMethod.map((name, index) => (
+                                      <SelectItem key={index} value={name}>
                                         {name}
                                       </SelectItem>
                                     ))}
@@ -460,8 +519,8 @@ export default function SwapModule() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {bit10Amount.map((number) => (
-                                    <SelectItem key={number} value={number}>
+                                  {bit10Amount.map((number, index) => (
+                                    <SelectItem key={index} value={number}>
                                       {number}
                                     </SelectItem>
                                   ))}
@@ -487,8 +546,8 @@ export default function SwapModule() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    {bit10Token.map((name) => (
-                                      <SelectItem key={name} value={name}>
+                                    {bit10Token.map((name, index) => (
+                                      <SelectItem key={index} value={name}>
                                         {name}
                                       </SelectItem>
                                     ))}
@@ -517,7 +576,7 @@ export default function SwapModule() {
                 <CardFooter className='flex flex-row space-x-2 w-full items-center'>
                   <Button className='w-full' disabled={swapDisabledConditions}>
                     {swaping && <Loader2 className='animate-spin mr-2' size={15} />}
-                    {swaping ? 'Swaping...' : 'Swap'}
+                    {swaping ? 'Swaping...' : bit10TokenSwapBtnMessage}
                   </Button>
                 </CardFooter>
               </form>

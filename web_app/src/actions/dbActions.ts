@@ -2,7 +2,7 @@
 "use server"
 
 import { db } from '@/server/db'
-import { mbUsers, userSignups, mbPrincipalIdWhitelist, mbTokenSwap } from '@/server/db/schema'
+import { mbUsers, userSignups, mbPrincipalIdWhitelist, mbTokenSwap, teTokenSwap } from '@/server/db/schema'
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
 
@@ -100,5 +100,19 @@ export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: s
         return data;
     } catch (error) {
         return 'Error fetching user recent activity';
+    }
+}
+
+export const testnetRevenue = async () => {
+    try {
+        const data = await db.select({
+            tokenPurchaseAmount: teTokenSwap.tokenPurchaseAmount,
+            tokenBoughtAt: teTokenSwap.tokenBoughtAt
+        })
+            .from(teTokenSwap)
+            .orderBy(teTokenSwap.tokenBoughtAt);
+        return data;
+    } catch (error) {
+        return 'Error fetching testnet revenue';
     }
 }

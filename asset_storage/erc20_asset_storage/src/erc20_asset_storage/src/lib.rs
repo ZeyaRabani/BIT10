@@ -16,6 +16,8 @@ use ic_cdk::{init, update};
 use ic_ethereum_types::Address;
 use num::{BigUint, Num};
 use std::str::FromStr;
+use std::env;
+use reqwest;
 
 use crate::{
     evm::utils::{get_rpc_service, get_signer},
@@ -231,10 +233,44 @@ pub async fn swap(
     }
 }
 
+#[update]
+pub async fn swap_tokens(
+    token_in: Address,
+    token_out: Address,
+    amount_in: U256,
+    fee: U24,
+) -> Result<String, String> {
+    let (signer, recipient) = get_signer();
+    let wallet = EthereumWallet::from(signer);
+    let rpc_service = get_rpc_service();
+    let config = IcpConfig::new(rpc_service);
+    let provider = ProviderBuilder::new()
+        .with_recommended_fillers()
+        .wallet(wallet)
+        .on_icp(config);
+
+    let args = IUniswapV3SwapRouter::ExactInputSingleParams {
+        tokenIn: token_in,
+        tokenOut: token_out,
+        fee,
+        recipient,
+        amountIn: amount_in,
+        amountOutMinimum: U256::from(0),
+        sqrtPriceLimitX96: U160::from(0),
+    };
+
+    let v3_swap_router = IUniswapV3SwapRouter::new(UNISWAP_V3_SWAP_ROUTER, provider.clone());
+
+    match v3_swap_router.exactInputSingle(args).send().await {
+        Ok(res) => Ok(format!("{}", res.tx_hash())),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
 fn estimate_transaction_fees() -> (u128, u128, u128) {
     /// Standard gas limit for an Ethereum transfer to an EOA.
     /// Other transactions, in particular ones interacting with a smart contract (e.g., ERC-20), would require a higher gas limit.
-    const GAS_LIMIT: u128 = 100_000;
+    const GAS_LIMIT: u128 = 700_000;
 
     /// Very crude estimates of max_fee_per_gas and max_priority_fee_per_gas.
     /// A real world application would need to estimate this more accurately by for example fetching the fee history from the last 5 blocks.
@@ -312,4 +348,123 @@ fn nat_to_u256(value: Nat) -> U256 {
     let mut value_u256 = [0u8; 32];
     value_u256[32 - value_bytes.len()..].copy_from_slice(&value_bytes);
     U256::from_be_bytes(value_u256)
+}
+
+#[update]
+pub async fn send_erc20(to: String, amount: Nat, token_address: String) -> String {
+    use alloy_eips::eip2718::Encodable2718;
+
+    let caller = validate_caller_not_anonymous();
+    let to_address = Address::from_str(&to).unwrap_or_else(|e| {
+        ic_cdk::trap(&format!("failed to parse the recipient address: {:?}", e))
+    });
+    let chain_id = read_state(|s| s.ethereum_network().chain_id());
+    let nonce = nat_to_u64(transaction_count(Some(caller), Some(BlockTag::Latest)).await);
+    let (gas_limit, max_fee_per_gas, max_priority_fee_per_gas) = estimate_transaction_fees();
+
+    let mut input_data = hex::decode("a9059cbb").unwrap();
+    
+    let to_address_str = to_address.to_string();
+    let to_address_bytes = hex::decode(&to_address_str[2..]).unwrap();
+    
+    let mut address_bytes = [0u8; 32];
+    address_bytes[12..32].copy_from_slice(&to_address_bytes);
+    input_data.extend_from_slice(&address_bytes);
+    
+    let amount_u256 = nat_to_u256(amount);
+    let amount_bytes = amount_u256.to_be_bytes::<32>();
+    input_data.extend_from_slice(&amount_bytes);
+
+    let transaction = TxEip1559 {
+        chain_id,
+        nonce,
+        gas_limit,
+        max_fee_per_gas,
+        max_priority_fee_per_gas,
+        to: TxKind::Call(token_address.parse().expect("failed to parse token address")),
+        value: U256::from(0),
+        access_list: Default::default(),
+        input: Bytes::from(input_data),
+    };
+
+    let wallet = EthereumWallet::new(caller).await;
+    let tx_hash = transaction.signature_hash().0;
+    let (raw_signature, recovery_id) = wallet.sign_with_ecdsa(tx_hash).await;
+    let signature = Signature::from_bytes_and_parity(&raw_signature, recovery_id.is_y_odd())
+        .expect("BUG: failed to create a signature");
+    let signed_tx = transaction.into_signed(signature);
+
+    let raw_transaction_hash = *signed_tx.hash();
+    let mut tx_bytes: Vec<u8> = vec![];
+    TxEnvelope::from(signed_tx).encode_2718(&mut tx_bytes);
+    let raw_transaction_hex = format!("0x{}", hex::encode(&tx_bytes));
+    ic_cdk::println!(
+        "Sending raw transaction hex {} with transaction hash {}",
+        raw_transaction_hex,
+        raw_transaction_hash
+    );
+    let single_rpc_service = read_state(|s| s.single_evm_rpc_service());
+    let (result,) = EVM_RPC
+        .eth_send_raw_transaction(
+            single_rpc_service,
+            None,
+            raw_transaction_hex.clone(),
+            2_000_000_000_u128,
+        )
+        .await
+        .unwrap_or_else(|e| {
+            panic!(
+                "failed to send raw transaction {}, error: {:?}",
+                raw_transaction_hex, e
+            )
+        });
+    ic_cdk::println!(
+        "Result of sending raw transaction {}: {:?}. \
+    Due to the replicated nature of HTTPs outcalls, an error such as transaction already known or nonce too low could be reported, \
+    even though the transaction was successfully sent. \
+    Check whether the transaction appears on Etherscan or check that the transaction count on \
+    that address at latest block height did increase.",
+        raw_transaction_hex,
+        result
+    );
+
+    raw_transaction_hash.to_string()
+}
+
+#[update]
+pub async fn rebalance() -> Result<(), String> {
+    let api_endpoint = env::var("REBALANCE_API_URL").map_err(|e| format!("Failed to read REBALANCE_API_URL: {}", e))?;
+    
+    let response = reqwest::get(&api_endpoint)
+        .await
+        .map_err(|e| format!("Failed to fetch data from API: {}", e))?
+        .json::<serde_json::Value>()
+        .await
+        .map_err(|e| format!("Failed to parse JSON response: {}", e))?;
+
+    let price_of_token_to_buy = response["test_bit10_top_rebalance"][0]["priceOfTokenToBuy"].as_f64().unwrap_or(0.0);
+    let previous_tokens = response["test_bit10_top_rebalance"][0]["previousTokens"].as_array().unwrap_or(&vec![]);
+    let new_tokens = response["test_bit10_top_rebalance"][0]["newTokens"].as_array().unwrap_or(&vec![]);
+
+    for previous_token in previous_tokens {
+        let token_id = previous_token["id"].as_u64().unwrap_or(0);
+        let token_name = previous_token["name"].as_str().unwrap_or("Unknown");
+        
+        let amount_to_swap = calculate_amount_to_swap(price_of_token_to_buy);
+
+        match swap_tokens(previous_token["address"].as_str().unwrap_or(""), new_tokens[0]["address"].as_str().unwrap_or(""), amount_to_swap).await {
+            Ok(tx_hash) => {
+                ic_cdk::println!("Successfully swapped {} (ID: {}) for amount: {}. Transaction Hash: {}", token_name, token_id, amount_to_swap, tx_hash);
+            }
+            Err(e) => {
+                ic_cdk::println!("Failed to swap {} (ID: {}): {}", token_name, token_id, e);
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn calculate_amount_to_swap(price_of_token_to_buy: f64) -> Nat {
+    Nat::from(price_of_token_to_buy as u64)
 }
