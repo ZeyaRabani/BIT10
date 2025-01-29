@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import * as z from 'zod'
 import { useWallet } from '@/context/WalletContext'
 import { useQueries } from '@tanstack/react-query'
@@ -9,11 +9,13 @@ import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 // import AnimatedBackground from '@/components/ui/animated-background'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Loader2, Info } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Loader2, Info, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image, { type StaticImageData } from 'next/image'
 import CkBTCImg from '@/assets/swap/ckBTC.png'
@@ -26,7 +28,7 @@ import { idlFactory as OracleidfFactory } from '@/lib/oracle.did'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10.did'
 import crypto from 'crypto'
-import { newTokenSwap } from '@/actions/dbActions'
+import { newTokenMint, newTokenSwap } from '@/actions/dbActions'
 
 interface BuyingTokenPriceResponse {
   data: {
@@ -47,6 +49,8 @@ type ActorType = {
   }) => Promise<{ Ok?: number; Err?: { InsufficientFunds?: null } }>;
 };
 
+type Mode = 'swap' | 'mint';
+
 // const tabs = ['Quick Swap', 'Advanced Trading']
 
 const paymentMethod = [
@@ -65,7 +69,11 @@ const bit10Amount = [
 
 const bit10Token = [
   'BIT10.DEFI',
-  'BIT10.BRC20'
+  // 'BIT10.BRC20'
+]
+
+const mintReciveToken = [
+  'ICP'
 ]
 
 const FormSchema = z.object({
@@ -78,13 +86,43 @@ const FormSchema = z.object({
   bit10_token: z.string({
     required_error: 'Please select the BIT10 token to receive',
   }),
+  minting_bit10_amount: z.preprocess((value) => parseFloat(value as string), z.number({
+    required_error: 'Please enter the number of BIT10 tokens you wish to transfer',
+  })
+    .positive('The amount must be a positive number')
+    .min(0.03, 'Minimum amount should be 0.03')
+    .refine(value => Number(value.toFixed(8)) === value, 'Amount cannot have more than 8 decimal places')),
+  minting_bit10_token: z.string({
+    required_error: 'Please select the BIT10 token to mint',
+  }),
+  recieving_token: z.string({
+    required_error: 'Please select the token to recieve after mint'
+  })
 })
 
 export default function SwapModule() {
   // const [activeTab, setActiveTab] = useState('Quick Swap');
-  const [swaping, setSwaping] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [isMintMode, setIsMintMode] = useState<Mode>('swap');
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const { isConnected, principalId } = useWallet();
+
+  useEffect(() => {
+    const roleParam = searchParams.get('mode') as Mode | null;
+    if (roleParam) {
+      setIsMintMode(roleParam);
+    }
+  }, [searchParams]);
+
+  const handleModeClick = () => {
+    setIsMintMode(prev => prev === 'swap' ? 'mint' : 'swap');
+    const search = isMintMode === 'swap' ? 'mint' : 'swap';
+    router.push(`${pathname}?mode=${search}`);
+  };
 
   // const handleTabChange = (label: string | null) => {
   //   if (label) {
@@ -215,7 +253,10 @@ export default function SwapModule() {
     defaultValues: {
       payment_method: 'ckBTC',
       bit10_amount: '1',
-      bit10_token: 'BIT10.DEFI'
+      bit10_token: 'BIT10.DEFI',
+      minting_bit10_amount: 0.03,
+      minting_bit10_token: 'BIT10.DEFI',
+      recieving_token: 'ICP'
     },
   });
 
@@ -262,9 +303,50 @@ export default function SwapModule() {
 
   const selectedBit10TokenPrice = bit10TokenPrice();
 
+  const mintingBit10TokenPrice = (): number => {
+    const bit10Token = form.watch('minting_bit10_token');
+    if (bit10Token === 'BIT10.DEFI') {
+      return bit10DEFIPrice ?? 0;
+    } else if (bit10Token === 'BIT10.BRC20') {
+      return bit10BRC20Price ?? 0;
+    } else {
+      return 0;
+    }
+  };
+
+  const selectedMintingBit10TokenPrice = mintingBit10TokenPrice();
+
+  const MintRecievingImg = (): StaticImageData => {
+    const paymentMethod = form.watch('recieving_token');
+    if (paymentMethod === 'ICP') {
+      return ICPImg;
+    } else {
+      return ICPImg;
+    }
+  };
+
+  const recievingTokenImg = MintRecievingImg();
+
+  const MintRecieveTokenPrice = (): string => {
+    const paymentMethod = form.watch('recieving_token');
+    if (paymentMethod === 'ICP') {
+      return icpAmount ?? '0';
+    } else if (paymentMethod === 'ckBTC') {
+      return btcAmount ?? '0';
+    } else if (paymentMethod === 'ckETH') {
+      return ethAmount ?? '0';
+    } else {
+      return '0';
+    }
+  };
+
+  const recieveingTokenPrice = MintRecieveTokenPrice();
+
   const bit10TokenSwapBtn = (): string => {
-    if (Number(form.watch('bit10_amount')) + Number(bit10DEFIBuyingSupply?.toFixed(8)) > Number(bit10DEFITotalSupply?.toFixed(8))) {
+    if (Number(form.watch('bit10_amount')) + Number(bit10DEFIBuyingSupply?.toFixed(8)) > Number(bit10DEFITotalSupply?.toFixed(8)) && isMintMode === 'swap') {
       return 'Requested tokens exceed available supply'
+    } else if (isMintMode === 'mint') {
+      return 'Revese Swap'
     } else {
       return 'Swap'
     }
@@ -272,11 +354,22 @@ export default function SwapModule() {
 
   const bit10TokenSwapBtnMessage = bit10TokenSwapBtn();
 
-  const swapDisabledConditions = !isConnected || swaping || !btcAmount || !ethAmount || !icpAmount || payingTokenPrice === '0' || selectedBit10TokenPrice === 0 || Number(form.watch('bit10_amount')) + Number(bit10DEFIBuyingSupply?.toFixed(8)) > Number(bit10DEFITotalSupply?.toFixed(8))
+  const bit10TokenProcessingBtn = (): string => {
+    if (isMintMode === 'mint') {
+      return 'Revese Swapping'
+    } else {
+      return 'Swapping'
+    }
+  }
+
+  const bit10TokenProcessingBtnMessage = bit10TokenProcessingBtn();
+
+  const swapDisabledConditions = !isConnected || processing || !btcAmount || !ethAmount || !icpAmount || payingTokenPrice === '0' || selectedBit10TokenPrice === 0 || selectedMintingBit10TokenPrice === 0 || recieveingTokenPrice === '0' || Number(form.watch('bit10_amount')) + Number(bit10DEFIBuyingSupply?.toFixed(8)) > Number(bit10DEFITotalSupply?.toFixed(8))
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     try {
-      setSwaping(true);
+      setProcessing(true);
+
       // const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
       const ckBTCLegerCanisterId = 'mxzaz-hqaaa-aaaar-qaada-cai';
       const ckETHLegerCanisterId = 'ss2fx-dyaaa-aaaar-qacoq-cai';
@@ -284,113 +377,200 @@ export default function SwapModule() {
       const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
       const bit10BRC20CanisterId = '7bi3r-piaaa-aaaap-qpnrq-cai';
 
-      const hasAllowed = await window.ic.plug.requestConnect({
-        whitelist: [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, bit10DEFICanisterId, bit10BRC20CanisterId]
-      });
+      if (isMintMode === 'mint') {
+        const hasAllowed = await window.ic.plug.requestConnect({
+          whitelist: [bit10DEFICanisterId, bit10BRC20CanisterId]
+        });
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      if (hasAllowed && btcAmount && ethAmount && icpAmount) {
-        let selectedCanisterId;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (hasAllowed) {
+          let selectedCanisterId;
 
-        if (values.payment_method === 'ckBTC') {
-          selectedCanisterId = ckBTCLegerCanisterId;
-        } else if (values.payment_method === 'ckETH') {
-          selectedCanisterId = ckETHLegerCanisterId;
-        } else if (values.payment_method === 'ICP') {
-          selectedCanisterId = ICPLegerCanisterId;
-        } else {
-          throw new Error('Invalid payment method');
-        }
+          if (values.minting_bit10_token === 'BIT10.DEFI') {
+            selectedCanisterId = bit10DEFICanisterId;
+          } else if (values.minting_bit10_token === 'BIT10.BRC20') {
+            selectedCanisterId = bit10BRC20CanisterId;
+          } else {
+            throw new Error('Invalid payment method');
+          }
 
-        const actor = await window.ic.plug.createActor({
-          canisterId: selectedCanisterId,
-          interfaceFactory: idlFactory,
-        }) as ActorType;
+          const actor = await window.ic.plug.createActor({
+            canisterId: selectedCanisterId,
+            interfaceFactory: idlFactory,
+          }) as ActorType;
 
-        const receiverckBTCAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
-        const recieverckETHAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
-        const recieverICPAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+          const mintingPrincipalId = '4lsko-jea7e-7cxs4-el2uz-2uzfq-emw2x-s2qfe-igrsy-y4zr3-ucgbz-5ae';
 
-        let selectedRecieverAccountId;
-        let selectedAmount;
+          const mintingAmount = (values.minting_bit10_amount * 1.01).toFixed(8);
+          const amount = Math.round(parseFloat(mintingAmount) * 100000000).toString();
 
-        if (values.payment_method === 'ckBTC') {
-          selectedRecieverAccountId = receiverckBTCAccountId;
-          selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(btcAmount));
-        } else if (values.payment_method === 'ckETH') {
-          selectedRecieverAccountId = recieverckETHAccountId;
-          selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount));
-        } else if (values.payment_method === 'ICP') {
-          selectedRecieverAccountId = recieverICPAccountId;
-          selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount));
-        } else {
-          throw new Error('Invalid payment method');
-        }
-
-        const price = selectedAmount;
-        const amount = Math.round(price * 100000000).toFixed(0);
-
-        const args = {
-          to: {
-            owner: Principal.fromText(selectedRecieverAccountId),
-            subaccount: [] as []
-          },
-          memo: [] as [],
-          fee: [] as [],
-          from_subaccount: [] as [],
-          created_at_time: [] as [],
-          amount: BigInt(amount)
-        }
-
-        const transfer = await actor.icrc1_transfer(args);
-        if (transfer.Ok && principalId) {
-          const uuid = crypto.randomBytes(16).toString('hex');
-          const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
-          const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
-
-          const result = await newTokenSwap({
-            newTokenSwapId: newTokenSwapId,
-            principalId: principalId,
-            paymentAmount: selectedAmount.toString(),
-            paymentName: values.payment_method,
-            paymentAmountUSD: (parseInt(values.bit10_amount) * selectedBit10TokenPrice).toString(),
-            bit10tokenQuantity: (values.bit10_amount).toString(),
-            bit10tokenName: values.bit10_token,
-            transactionIndex: transfer.Ok.toString()
-          });
-
-          await fetch('/bit10-token-request', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
+          const args = {
+            to: {
+              owner: Principal.fromText(mintingPrincipalId),
+              subaccount: [] as []
             },
-            body: JSON.stringify({
+            memo: [] as [],
+            fee: [] as [],
+            from_subaccount: [] as [],
+            created_at_time: [] as [],
+            amount: BigInt(amount)
+          }
+
+          const transfer = await actor.icrc1_transfer(args);
+
+          if (transfer.Ok && principalId) {
+            const uuid = crypto.randomBytes(16).toString('hex');
+            const generateNewTokenMintId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+            const newTokenMintId = 'mint_' + generateNewTokenMintId;
+
+            const result = await newTokenMint({
+              newTokenMintId: newTokenMintId,
+              principalId: principalId,
+              mintAmount: (values.minting_bit10_amount).toString(),
+              mintName: values.minting_bit10_token,
+              mintAmountUSD: (values.minting_bit10_amount * parseFloat(selectedMintingBit10TokenPrice.toFixed(8)) * 1.01).toString(),
+              recieveAmount: ((selectedMintingBit10TokenPrice * values.minting_bit10_amount) / parseFloat(recieveingTokenPrice)).toString(),
+              recieveName: values.recieving_token,
+              transactionIndex: transfer.Ok.toString()
+            });
+
+            await fetch('/bit10-mint-request', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                newTokenMintId: newTokenMintId,
+                principalId: principalId,
+                mintAmount: (values.minting_bit10_amount).toString(),
+                mintName: values.minting_bit10_token,
+                recieveAmount: ((selectedMintingBit10TokenPrice * values.minting_bit10_amount) / parseFloat(recieveingTokenPrice)).toString(),
+                recieveName: values.recieving_token,
+                tokenMintAt: new Date().toISOString(),
+              }),
+            });
+
+            if (result === 'Token mint added successfully') {
+              toast.success('Token mint was successful!');
+            } else {
+              toast.error('An error occurred while processing your request. Please try again!');
+            }
+          } else if (transfer.Err?.InsufficientFunds) {
+            toast.error('Insufficient funds');
+          } else {
+            toast.error('Mint failed.');
+          }
+        }
+      } else {
+        const hasAllowed = await window.ic.plug.requestConnect({
+          whitelist: [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, bit10DEFICanisterId, bit10BRC20CanisterId]
+        });
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (hasAllowed && btcAmount && ethAmount && icpAmount) {
+          let selectedCanisterId;
+
+          if (values.payment_method === 'ckBTC') {
+            selectedCanisterId = ckBTCLegerCanisterId;
+          } else if (values.payment_method === 'ckETH') {
+            selectedCanisterId = ckETHLegerCanisterId;
+          } else if (values.payment_method === 'ICP') {
+            selectedCanisterId = ICPLegerCanisterId;
+          } else {
+            throw new Error('Invalid payment method');
+          }
+
+          const actor = await window.ic.plug.createActor({
+            canisterId: selectedCanisterId,
+            interfaceFactory: idlFactory,
+          }) as ActorType;
+
+          const receiverckBTCAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+          const recieverckETHAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+          const recieverICPAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+
+          let selectedRecieverAccountId;
+          let selectedAmount;
+
+          if (values.payment_method === 'ckBTC') {
+            selectedRecieverAccountId = receiverckBTCAccountId;
+            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(btcAmount));
+          } else if (values.payment_method === 'ckETH') {
+            selectedRecieverAccountId = recieverckETHAccountId;
+            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount));
+          } else if (values.payment_method === 'ICP') {
+            selectedRecieverAccountId = recieverICPAccountId;
+            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount));
+          } else {
+            throw new Error('Invalid payment method');
+          }
+
+          const price = selectedAmount;
+          const amount = Math.round(price * 100000000).toFixed(0);
+
+          const args = {
+            to: {
+              owner: Principal.fromText(selectedRecieverAccountId),
+              subaccount: [] as []
+            },
+            memo: [] as [],
+            fee: [] as [],
+            from_subaccount: [] as [],
+            created_at_time: [] as [],
+            amount: BigInt(amount)
+          }
+
+          const transfer = await actor.icrc1_transfer(args);
+          if (transfer.Ok && principalId) {
+            const uuid = crypto.randomBytes(16).toString('hex');
+            const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+            const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
+
+            const result = await newTokenSwap({
               newTokenSwapId: newTokenSwapId,
               principalId: principalId,
+              paymentAmount: selectedAmount.toString(),
+              paymentName: values.payment_method,
+              paymentAmountUSD: (parseFloat(values.bit10_amount) * selectedBit10TokenPrice).toString(),
               bit10tokenQuantity: (values.bit10_amount).toString(),
               bit10tokenName: values.bit10_token,
-              bit10tokenBoughtAt: new Date().toISOString(),
-            }),
-          });
+              transactionIndex: transfer.Ok.toString()
+            });
 
-          if (result === 'Token swap added successfully') {
-            toast.success('Token swap was successful!');
+            await fetch('/bit10-token-request', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                newTokenSwapId: newTokenSwapId,
+                principalId: principalId,
+                bit10tokenQuantity: (values.bit10_amount).toString(),
+                bit10tokenName: values.bit10_token,
+                bit10tokenBoughtAt: new Date().toISOString(),
+              }),
+            });
+
+            if (result === 'Token swap added successfully') {
+              toast.success('Token swap was successful!');
+            } else {
+              toast.error('An error occurred while processing your request. Please try again!');
+            }
+          } else if (transfer.Err?.InsufficientFunds) {
+            toast.error('Insufficient funds');
           } else {
-            toast.error('An error occurred while processing your request. Please try again!');
+            toast.error('Transfer failed.');
           }
-        } else if (transfer.Err?.InsufficientFunds) {
-          toast.error('Insufficient funds');
-        } else {
-          toast.error('Transfer failed.');
         }
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      setSwaping(false);
+      setProcessing(false);
       toast.error('An error occurred while processing your request. Please try again!');
     } finally {
-      setSwaping(false);
+      setProcessing(false);
     }
   }
 
@@ -437,118 +617,213 @@ export default function SwapModule() {
           <Card className='w-[300px] md:w-[500px] animate-fade-bottom-up'>
             <CardHeader>
               <CardTitle className='flex flex-row items-center justify-between'>
-                <div>Swap</div>
+                <div>{isMintMode === 'mint' ? 'Revese Swap' : 'Swap'}</div>
               </CardTitle>
               <CardDescription>BIT10 exchange</CardDescription>
             </CardHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
-                <CardContent className='flex flex-col space-y-2'>
-                  <div className='rounded-lg border-2 py-2 px-6'>
-                    <p>Pay with</p>
-                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
-                      <div className='text-4xl text-center md:text-start'>
-                        {selectedBit10TokenPrice ? ((parseInt(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.03).toFixed(6) : '0'}
-                      </div>
-
-                      <div className='grid grid-cols-5 items-center'>
-                        <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                <CardContent className='flex flex-col'>
+                  {isMintMode === 'mint' ? (
+                    <div className='rounded-lg border-2 py-4 px-6 z-[1]'>
+                      <p>Mint with</p>
+                      <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
+                        <div className='w-full'>
                           <FormField
                             control={form.control}
-                            name='payment_method'
+                            name='minting_bit10_amount'
                             render={({ field }) => (
-                              <FormItem className='w-full px-2'>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
-                                      <SelectValue placeholder='Select payment method' />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {paymentMethod.map((name, index) => (
-                                      <SelectItem key={index} value={name}>
-                                        {name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        <div className='col-span-1 -ml-6 z-20'>
-                          <Image src={payingTokenImg} alt={form.watch('payment_method')} width={75} height={75} className='z-20 border-2 rounded-full bg-white' />
-                        </div>
-                      </div>
-                    </div>
-                    <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                      <TooltipProvider>
-                        <Tooltip delayDuration={300}>
-                          <TooltipTrigger asChild>
-                            <div className='flex flex-row space-x-1'>
-                              $ {selectedBit10TokenPrice ? ((parseInt(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))) * 1.03).toFixed(4) : '0'}
-                              <Info className='w-5 h-5 cursor-pointer ml-1' />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                            Price in {form.watch('payment_method')} + 3% Platform fee <br />
-                            $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))} = $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <div>
-                        1 {form.watch('payment_method')} = $ {payingTokenPrice}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className='rounded-lg border-2 py-2 px-6'>
-                    <p>Receive</p>
-                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
-                      <div className='w-full md:w-3/4'>
-                        <FormField
-                          control={form.control}
-                          name='bit10_amount'
-                          render={({ field }) => (
-                            <FormItem>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormItem>
                                 <FormControl>
-                                  <SelectTrigger className='dark:border-white'>
-                                    <SelectValue placeholder='Select number of tokens' />
-                                  </SelectTrigger>
+                                  <Input {...field} placeholder='BIT10 Tokens to Mint' className='dark:border-white' />
                                 </FormControl>
-                                <SelectContent>
-                                  {bit10Amount.map((number, index) => (
-                                    <SelectItem key={index} value={number}>
-                                      {number}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className='grid grid-cols-5 items-center'>
+                          <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                            <FormField
+                              control={form.control}
+                              name='minting_bit10_token'
+                              render={({ field }) => (
+                                <FormItem className='w-full px-2'>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
+                                        <SelectValue placeholder='Select BIT10 token' />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {bit10Token.map((name, index) => (
+                                        <SelectItem key={index} value={name}>
+                                          {name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className='col-span-1 -ml-6 z-20'>
+                            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
+                            <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
+                          </div>
+                        </div>
                       </div>
+                      <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
+                        <TooltipProvider>
+                          <Tooltip delayDuration={300}>
+                            <TooltipTrigger asChild>
+                              <div className='flex flex-row space-x-1'>
+                                $ {(form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(8)) * 1.01).toFixed(8)}
+                                <Info className='w-5 h-5 cursor-pointer ml-1' />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                              Price in USD + 1% Minting fee <br />
+                              $ {(form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(11) ?? 'N/A'))} + $ {0.01 * (form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(11) ?? '0'))} = $ {(form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(11) ?? '0')) + (0.01 * (form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(11) ?? '0')))}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <div>
+                          1 {form.watch('minting_bit10_token')} = $ {selectedMintingBit10TokenPrice.toFixed(8)}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='rounded-lg border-2 py-4 px-6 z-[1]'>
+                      <p>Pay with</p>
+                      <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
+                        <div className='text-4xl text-center md:text-start'>
+                          {selectedBit10TokenPrice ? ((parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.03).toFixed(6) : '0'}
+                        </div>
 
-                      <div className='grid grid-cols-5 items-center'>
-                        <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                        <div className='grid grid-cols-5 items-center'>
+                          <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                            <FormField
+                              control={form.control}
+                              name='payment_method'
+                              render={({ field }) => (
+                                <FormItem className='w-full px-2'>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
+                                        <SelectValue placeholder='Select payment method' />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {paymentMethod.map((name, index) => (
+                                        <SelectItem key={index} value={name}>
+                                          {name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className='col-span-1 -ml-6 z-20'>
+                            <Image src={payingTokenImg} alt={form.watch('payment_method')} width={75} height={75} className='z-20 border-2 rounded-full bg-white' />
+                          </div>
+                        </div>
+                      </div>
+                      <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
+                        <TooltipProvider>
+                          <Tooltip delayDuration={300}>
+                            <TooltipTrigger asChild>
+                              <div className='flex flex-row space-x-1'>
+                                $ {selectedBit10TokenPrice ? ((parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))) * 1.03).toFixed(4) : '0'}
+                                <Info className='w-5 h-5 cursor-pointer ml-1' />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                              Price in {form.watch('payment_method')} + 3% Platform fee <br />
+                              $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))} = $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <div>
+                          1 {form.watch('payment_method')} = $ {payingTokenPrice}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className='grid place-items-center z-[2]'>
+                    <ArrowUpDown className='h-10 w-10 p-2 border rounded-full -mt-4 bg-background cursor-pointer' onClick={() => handleModeClick()} />
+                  </div>
+
+                  {isMintMode === 'mint' ? (
+                    <div className='rounded-lg border-2 py-4 px-6 -mt-4 z-[1]'>
+                      <p>Receive</p>
+                      <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
+                        <div className='text-4xl text-center md:text-start'>
+                          {((selectedMintingBit10TokenPrice * form.watch('minting_bit10_amount')) / parseFloat(recieveingTokenPrice)).toFixed(8)}
+                        </div>
+                        <div className='grid grid-cols-5 items-center'>
+                          <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                            <FormField
+                              control={form.control}
+                              name='recieving_token'
+                              render={({ field }) => (
+                                <FormItem className='w-full px-2'>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
+                                        <SelectValue placeholder='Select payment method' />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {mintReciveToken.map((name, index) => (
+                                        <SelectItem key={index} value={name}>
+                                          {name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className='col-span-1 -ml-6 z-20'>
+                            <Image src={recievingTokenImg} alt={form.watch('recieving_token')} width={75} height={75} className='z-20 border-2 rounded-full bg-white' />
+                          </div>
+                        </div>
+                      </div>
+                      <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
+                        <div>$ {(form.watch('minting_bit10_amount') * parseFloat(recieveingTokenPrice)).toFixed(8)}</div>
+                        <div>
+                          1 {form.watch('recieving_token')} = $ {parseFloat(recieveingTokenPrice).toFixed(8)}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='rounded-lg border-2 py-4 px-6 -mt-4 z-[1]'>
+                      <p>Receive</p>
+                      <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
+                        <div className='w-full md:w-3/4'>
                           <FormField
                             control={form.control}
-                            name='bit10_token'
+                            name='bit10_amount'
                             render={({ field }) => (
-                              <FormItem className='w-full px-2'>
+                              <FormItem>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
-                                    <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
-                                      <SelectValue placeholder='Select BIT10 token' />
+                                    <SelectTrigger className='dark:border-white'>
+                                      <SelectValue placeholder='Select number of tokens' />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    {bit10Token.map((name, index) => (
-                                      <SelectItem key={index} value={name}>
-                                        {name}
+                                    {bit10Amount.map((number, index) => (
+                                      <SelectItem key={index} value={number}>
+                                        {number}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
@@ -558,25 +833,53 @@ export default function SwapModule() {
                             )}
                           />
                         </div>
-                        <div className='col-span-1 -ml-6 z-20'>
-                          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
-                          <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
+
+                        <div className='grid grid-cols-5 items-center'>
+                          <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                            <FormField
+                              control={form.control}
+                              name='bit10_token'
+                              render={({ field }) => (
+                                <FormItem className='w-full px-2'>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
+                                        <SelectValue placeholder='Select BIT10 token' />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {bit10Token.map((name, index) => (
+                                        <SelectItem key={index} value={name}>
+                                          {name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className='col-span-1 -ml-6 z-20'>
+                            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
+                            <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
+                        <div>$ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))).toFixed(4)}</div>
+                        <div>
+                          1 {form.watch('bit10_token')} = $ {selectedBit10TokenPrice.toFixed(4)}
                         </div>
                       </div>
                     </div>
-
-                    <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                      <div>$ {(parseInt(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))).toFixed(4)}</div>
-                      <div>
-                        1 {form.watch('bit10_token')} = $ {selectedBit10TokenPrice.toFixed(4)}
-                      </div>
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
                 <CardFooter className='flex flex-row space-x-2 w-full items-center'>
                   <Button className='w-full' disabled={swapDisabledConditions}>
-                    {swaping && <Loader2 className='animate-spin mr-2' size={15} />}
-                    {swaping ? 'Swaping...' : bit10TokenSwapBtnMessage}
+                    {processing && <Loader2 className='animate-spin mr-2' size={15} />}
+                    {processing ? `${bit10TokenProcessingBtnMessage}...` : bit10TokenSwapBtnMessage}
                   </Button>
                 </CardFooter>
               </form>

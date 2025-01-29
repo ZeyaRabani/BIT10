@@ -64,6 +64,10 @@ const config = {
                 destination: '/api/bit10-token-request',
             },
             {
+                source: '/bit10-mint-request',
+                destination: '/api/bit10-mint-request',
+            },
+            {
                 source: '/bit10-latest-price-:index_fund',
                 destination: '/api/bit10-latest-price/:index_fund',
             },

@@ -25,7 +25,7 @@ const FormSchema = z.object({
         required_error: 'Please enter the number of BIT10.DEFI tokens you wish to transfer.',
     })
         .positive('The amount must be a positive number.')
-        .max(99999999, 'Amount cannot exceed 8 decimal places.')
+        .min(0.03, 'Minimum amount should be 0.03')
         .refine(value => Number(value.toFixed(8)) === value, 'Amount cannot have more than 8 decimal places.')),
 });
 

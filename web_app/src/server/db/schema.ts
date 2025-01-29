@@ -10,6 +10,19 @@ export const keyStatus = pgEnum('key_status', ['default', 'valid', 'invalid', 'e
 export const keyType = pgEnum('key_type', ['aead-ietf', 'aead-det', 'hmacsha512', 'hmacsha256', 'auth', 'shorthash', 'generichash', 'kdf', 'secretbox', 'secretstream', 'stream_xchacha20'])
 export const oneTimeTokenType = pgEnum('one_time_token_type', ['confirmation_token', 'reauthentication_token', 'recovery_token', 'email_change_token_new', 'email_change_token_current', 'phone_change_token'])
 
+export const mbTokenMint = pgTable('mb_token_mint', {
+  tokenMintId: text('token_mint_id').primaryKey().notNull(),
+  userPrincipalId: text('user_principal_id').notNull(),
+  mintingAmount: text('minting_amount').notNull(),
+  mintingTokenName: text('minting_token_name').notNull(),
+  mintingUsdAmount: text('minting_usd_amount').notNull(),
+  recievingTokenAmount: text('recieving_token_amount').notNull(),
+  recievingTokenName: text('recieving_token_name').notNull(),
+  mintingStatus: text('minting_status').notNull(),
+  tokenMintAt: timestamp('token_mint_at', { withTimezone: true, mode: 'string' }).notNull(),
+  transactionIndex: text('transaction_index').notNull(),
+});
+
 export const waitlistAddress = pgTable('waitlist_address', {
   // You can use { mode: 'bigint' } if numbers are exceeding js number limitations
   waitlistAddressId: bigint('waitlist_address_id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity({ name: 'waitlist_address_waitlist_address_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),

@@ -2,7 +2,7 @@
 "use server"
 
 import { db } from '@/server/db'
-import { mbUsers, userSignups, mbPrincipalIdWhitelist, mbTokenSwap, teTokenSwap } from '@/server/db/schema'
+import { mbUsers, userSignups, mbPrincipalIdWhitelist, mbTokenSwap, mbTokenMint, teTokenSwap } from '@/server/db/schema'
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
 
@@ -14,6 +14,17 @@ interface NewTokenSwap {
     paymentAmountUSD: string;
     bit10tokenQuantity: string;
     bit10tokenName: string;
+    transactionIndex: string;
+}
+
+interface NewTokenMint {
+    newTokenMintId: string;
+    principalId: string;
+    mintAmount: string;
+    mintName: string;
+    mintAmountUSD: string;
+    recieveAmount: string;
+    recieveName: string;
     transactionIndex: string;
 }
 
@@ -79,6 +90,31 @@ export const newTokenSwap = async ({ newTokenSwapId, principalId, paymentAmount,
         return 'Token swap added successfully'
     } catch (error) {
         return 'Error swaping tokens';
+    }
+};
+
+export const newTokenMint = async ({ newTokenMintId, principalId, mintAmount, mintName, mintAmountUSD, recieveAmount, recieveName, transactionIndex }: NewTokenMint) => {
+    try {
+        // const uuid = crypto.randomBytes(16).toString('hex');
+        // const generateNewTokenMintId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+        // const newTokenMintId = 'mint_' + generateNewTokenMintId;
+
+        await db.insert(mbTokenMint).values({
+            tokenMintId: newTokenMintId,
+            userPrincipalId: principalId,
+            mintingAmount: mintAmount,
+            mintingTokenName: mintName,
+            mintingUsdAmount: mintAmountUSD,
+            recievingTokenAmount: recieveAmount,
+            recievingTokenName: recieveName,
+            mintingStatus: 'Unconfirmed', // Confirmed || Failed
+            tokenMintAt: new Date().toISOString(),
+            transactionIndex: transactionIndex
+        });
+
+        return 'Token mint added successfully'
+    } catch (error) {
+        return 'Error minting tokens';
     }
 };
 
