@@ -5,6 +5,9 @@ import { requestBIT10BTC } from '@/actions/dbActions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Actor, HttpAgent } from '@dfinity/agent'
+import { Principal } from '@dfinity/principal'
+import { idlFactory } from '@/lib/faucet.did'
 import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel, FormDescription } from '@/components/ui/form'
@@ -25,6 +28,18 @@ const FormSchema = z.object({
     }),
 })
 
+const funnyFaucetMessage = [
+    'Relax, Scrooge McCrypto! Leave some for the rest of us.',
+    `You've got enough tokens to buy the moon. Faucet denied!`,
+    `Nice try, but this isn't an all-you-can-eat buffet!`,
+    `Even the faucet is jealous of your balance!`,
+    `Bro, your wallet is heavier than my future. No more for you!`,
+    `You could fund a small country. Step aside, please.`,
+    `Faucet says: 'Nah fam, you good.'`,
+    `Your wallet just filed for token obesity. No more!`,
+    `You're already swimming in tokens, don't drown!`
+];
+
 export default function Page() {
     const [submitting, setSubmitting] = useState(false);
 
@@ -41,30 +56,64 @@ export default function Page() {
 
             setSubmitting(true);
 
-            const result = await requestBIT10BTC({
-                email: data.email,
-                principalId: data.principalID
+            const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
+            const canisterId = '5wxtf-uqaaa-aaaap-qpvha-cai';
+
+            const agent = new HttpAgent({ host });
+            const actor = Actor.createActor(idlFactory, {
+                agent,
+                canisterId,
             });
 
-            if (result) {
-                await fetch('/bit10-btc-request', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: data.email,
-                        principalId: data.principalID,
-                    }),
-                });
+            if (data.principalID) {
+                const to_account = {
+                    owner: Principal.fromText(data.principalID),
+                    subaccount: [],
+                };
 
-                if (result === 'Request added successfully') {
-                    toast.success('Request added successfully! BIT10.BTC will be sent to your principal ID.');
-                    form.reset();
-                    setSubmitting(false);
-                } else {
-                    toast.error('An error occurred. Please try again!');
-                    setSubmitting(false);
+                if (actor && actor.check_and_transfer) {
+                    try {
+                        const balance = await actor.check_and_transfer({ to_account });
+
+                        if (typeof balance === 'object' && balance !== null && 'Ok' in balance) {
+                            // @ts-ignore
+                            if (BigInt(balance.Ok) === BigInt(0)) {
+                                const randomMessage = funnyFaucetMessage[Math.floor(Math.random() * funnyFaucetMessage.length)];
+                                toast.info(randomMessage);
+                                setSubmitting(false);
+                            } else {
+                                const result = await requestBIT10BTC({
+                                    email: data.email,
+                                    principalId: data.principalID
+                                });
+
+                                if (result) {
+                                    await fetch('/bit10-btc-request', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            email: data.email,
+                                            principalId: data.principalID,
+                                        }),
+                                    });
+
+                                    if (result === 'Request added successfully') {
+                                        toast.success('Request added successfully! BIT10.BTC will be sent to your principal ID.');
+                                        form.reset();
+                                        setSubmitting(false);
+                                    } else {
+                                        toast.error('An error occurred. Please try again!');
+                                        setSubmitting(false);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        toast.error('An error occurred. Please try again!');
+                        setSubmitting(false);
+                    }
                 }
             }
         }
