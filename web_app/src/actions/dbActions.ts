@@ -2,19 +2,34 @@
 "use server"
 
 import { db } from '@/server/db'
-import { mbUsers, userSignups, mbPrincipalIdWhitelist, mbTokenSwap, mbTokenMint, teTokenSwap } from '@/server/db/schema'
+import { mbUsers, userSignups, mbPrincipalIdWhitelist, mbTokenSwap, swap, mbTokenMint, teTokenSwap } from '@/server/db/schema'
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
+
+// interface NewTokenSwap {
+//     newTokenSwapId: string;
+//     principalId: string;
+//     paymentAmount: string;
+//     paymentName: string;
+//     paymentAmountUSD: string;
+//     bit10tokenQuantity: string;
+//     bit10tokenName: string;
+//     transactionIndex: string;
+// }
 
 interface NewTokenSwap {
     newTokenSwapId: string;
     principalId: string;
-    paymentAmount: string;
-    paymentName: string;
-    paymentAmountUSD: string;
-    bit10tokenQuantity: string;
-    bit10tokenName: string;
-    transactionIndex: string;
+    tickInName: string;
+    tickInAmount: string;
+    tickInUSDAmount: string;
+    tickInTxBlock: string;
+    tickOutName: string;
+    tickOutAmount: string;
+    tickOutTxBlock: string;
+    transactionType: 'Swap' | 'Reverse Swap';
+    network: 'ICP';
+    transactionTimestamp: string;
 }
 
 interface NewTokenMint {
@@ -68,26 +83,29 @@ export const whitelistedPrincipalIds = async () => {
     }
 }
 
-export const newTokenSwap = async ({ newTokenSwapId, principalId, paymentAmount, paymentName, paymentAmountUSD, bit10tokenQuantity, bit10tokenName, transactionIndex }: NewTokenSwap) => {
+export const newTokenSwap = async ({ newTokenSwapId, principalId, tickInName, tickInAmount, tickInUSDAmount, tickInTxBlock, tickOutName, tickOutAmount, tickOutTxBlock, transactionType, network, transactionTimestamp }: NewTokenSwap) => {
     try {
         // const uuid = crypto.randomBytes(16).toString('hex');
         // const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
         // const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
 
-        await db.insert(mbTokenSwap).values({
+        await db.insert(swap).values({
             tokenSwapId: newTokenSwapId,
             userPrincipalId: principalId,
-            tokenPurchaseAmount: paymentAmount,
-            tokenPurchaseName: paymentName,
-            tokenPurchaseUsdAmount: paymentAmountUSD,
-            bit10TokenQuantity: bit10tokenQuantity,
-            bit10TokenName: bit10tokenName,
-            tokenTransactionStatus: 'Unconfirmed', // Confirmed || Failed
-            tokenBoughtAt: new Date().toISOString(),
-            transactionIndex: transactionIndex
+            tickInName: tickInName,
+            tickInAmount: tickInAmount,
+            tickInUsdAmount: tickInUSDAmount,
+            tickInTxBlock: tickInTxBlock,
+            tickOutName: tickOutName,
+            tickOutAmount: tickOutAmount,
+            tickOutTxBlock: tickOutTxBlock,
+            transactionType: transactionType,
+            transactionStatus: 'Unconfirmed', // Confirmed || Failed
+            transactionTimestamp: transactionTimestamp,
+            network: network
         });
 
-        return 'Token swap added successfully'
+        return 'Token swap successfully'
     } catch (error) {
         return 'Error swaping tokens';
     }

@@ -55,7 +55,7 @@ async function fetchAndUpdateData() {
         }))
 
         const totalPrice = dataEntries.reduce((sum, entry) => sum + entry.quote.USD.price, 0);
-        const tokenPrice = totalPrice / dataEntries.length;
+        const tokenPrice = (totalPrice / dataEntries.length) / 1000;
 
         const newEntry = {
             timestmpz: new Date().toISOString(),

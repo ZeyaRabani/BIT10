@@ -1,4 +1,4 @@
-import { pgTable, unique, bigint, text, timestamp, serial, varchar, foreignKey, boolean, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, foreignKey, unique, bigint, serial, varchar, boolean, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -22,6 +22,56 @@ export const mbTokenMint = pgTable('mb_token_mint', {
 	tokenMintAt: timestamp('token_mint_at', { withTimezone: true, mode: 'string' }).notNull(),
 	transactionIndex: text('transaction_index').notNull(),
 });
+
+export const swap = pgTable('swap', {
+	tokenSwapId: text('token_swap_id').primaryKey().notNull(),
+	userPrincipalId: text('user_principal_id').notNull(),
+	tickInName: text('tick_in_name').notNull(),
+	tickInAmount: text('tick_in_amount').notNull(),
+	tickInUsdAmount: text('tick_in_usd_amount').notNull(),
+	tickInTxBlock: text('tick_in_tx_block').notNull(),
+	tickOutName: text('tick_out_name').notNull(),
+	tickOutAmount: text('tick_out_amount').notNull(),
+	tickOutTxBlock: text('tick_out_tx_block').notNull(),
+	transactionType: text('transaction_type').notNull(),
+	transactionStatus: text('transaction_status').notNull(),
+	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
+	network: text('network').notNull(),
+},
+	(table) => {
+		return {
+			swapUserPrincipalIdFkey: foreignKey({
+				columns: [table.userPrincipalId],
+				foreignColumns: [mbUsers.userPrincipalId],
+				name: 'swap_user_principal_id_fkey'
+			}),
+		}
+	});
+
+export const teSwap = pgTable('te_swap', {
+	tokenSwapId: text('token_swap_id').primaryKey().notNull(),
+	userPrincipalId: text('user_principal_id').notNull(),
+	tickInName: text('tick_in_name').notNull(),
+	tickInAmount: text('tick_in_amount').notNull(),
+	tickInUsdAmount: text('tick_in_usd_amount').notNull(),
+	tickInTxBlock: text('tick_in_tx_block').notNull(),
+	tickOutName: text('tick_out_name').notNull(),
+	tickOutAmount: text('tick_out_amount').notNull(),
+	tickOutTxBlock: text('tick_out_tx_block').notNull(),
+	transactionType: text('transaction_type').notNull(),
+	transactionStatus: text('transaction_status').notNull(),
+	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
+	network: text('network').notNull(),
+},
+	(table) => {
+		return {
+			teSwapUserPrincipalIdFkey: foreignKey({
+				columns: [table.userPrincipalId],
+				foreignColumns: [teUsers.userPrincipalId],
+				name: 'te_swap_user_principal_id_fkey'
+			}),
+		}
+	});
 
 export const waitlistAddress = pgTable('waitlist_address', {
 	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations

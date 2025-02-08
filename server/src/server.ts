@@ -49,6 +49,6 @@ const requestHandler = (request: http.IncomingMessage, response: http.ServerResp
 
 const server = http.createServer(requestHandler);
 
-server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+server.listen(PORT, '::', () => {
+    console.log(`🚀 Server is running on port ${PORT} (IPv6 and IPv4)`);
 });

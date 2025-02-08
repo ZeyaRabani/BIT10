@@ -1,11 +1,11 @@
 import React from 'react'
 import { Tailwind, Body, Container, Head, Heading, Hr, Html, Preview, Section, Text } from '@react-email/components'
 
-export function BIT10Request({ newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenName, bit10tokenBoughtAt }: { newTokenSwapId: string, principalId: string, bit10tokenQuantity: string, bit10tokenName: string, bit10tokenBoughtAt: string }) {
+export function BIT10Request({ newTokenSwapId, principalId, tickOutName, tickOutAmount, transactionTimestamp }: { newTokenSwapId: string, principalId: string, tickOutName: string, tickOutAmount: string, transactionTimestamp: string }) {
     return (
         <Html>
             <Head />
-            <Preview>{bit10tokenName} token request</Preview>
+            <Preview>{tickOutName} token request</Preview>
             <Tailwind>
                 <Body className='bg-[#f3f3f5] font-sansSerif'>
                     <Container className='w-[680px] max-w-full mx-auto'>
@@ -23,7 +23,7 @@ export function BIT10Request({ newTokenSwapId, principalId, bit10tokenQuantity, 
 
                         <Section className='flex flex-col space-y-4 p-4 bg-white rounded-b-md'>
                             <Heading as='h2' className='m-0 mb-3.5 font-bold text-xl text-[#0c0d0e]'>
-                                Request from {principalId} on BIT10 Swap page for {bit10tokenQuantity} {bit10tokenName} tokens
+                                Request from {principalId} on BIT10 Swap page for {tickOutAmount} {tickOutName} tokens
                             </Heading>
 
                             <Hr className='my-5' />
@@ -37,11 +37,11 @@ export function BIT10Request({ newTokenSwapId, principalId, bit10tokenQuantity, 
                             </Text>
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                BIT10 Token Quantity: {bit10tokenQuantity} {bit10tokenName}
+                                BIT10 Token Quantity: {tickOutAmount} {tickOutName}
                             </Text>
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                BIT10 Token Bought At: {bit10tokenBoughtAt}
+                                BIT10 Token Bought At: {transactionTimestamp}
                             </Text>
 
                             <Hr className='my-5' />
@@ -55,7 +55,7 @@ export function BIT10Request({ newTokenSwapId, principalId, bit10tokenQuantity, 
 
                     <Section className='w-[680px] max-w-full mx-auto mt-4'>
                         <Text className='text-gray-500'>
-                            You&apos;re receiving this email because someone requested {bit10tokenName} tokens on the BIT10 Swap page.
+                            You&apos;re receiving this email because someone requested {tickOutAmount} {tickOutName} tokens on the BIT10 testnet Swap page.
                         </Text>
                     </Section>
                 </Body>

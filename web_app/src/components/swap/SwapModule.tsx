@@ -27,6 +27,7 @@ import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory as OracleidfFactory } from '@/lib/oracle.did'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10.did'
+import { idlFactory as idlFactory2 } from '@/lib/swap.did'
 import crypto from 'crypto'
 import { newTokenMint, newTokenSwap } from '@/actions/dbActions'
 
@@ -46,6 +47,19 @@ type ActorType = {
     from_subaccount: [];
     created_at_time: [];
     amount: bigint;
+  }) => Promise<{ Ok?: number; Err?: { InsufficientFunds?: null } }>;
+};
+
+type ICRC2ActorType = {
+  icrc2_approve: (args: {
+    spender: { owner: Principal; subaccount: [] };
+    fee: [];
+    memo: [];
+    from_subaccount: [];
+    created_at_time: [];
+    amount: bigint;
+    expected_allowance: [];
+    expires_at: [bigint];
   }) => Promise<{ Ok?: number; Err?: { InsufficientFunds?: null } }>;
 };
 
@@ -370,12 +384,12 @@ export default function SwapModule() {
     try {
       setProcessing(true);
 
-      // const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
       const ckBTCLegerCanisterId = 'mxzaz-hqaaa-aaaar-qaada-cai';
       const ckETHLegerCanisterId = 'ss2fx-dyaaa-aaaar-qacoq-cai';
       const ICPLegerCanisterId = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
       const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
       const bit10BRC20CanisterId = '7bi3r-piaaa-aaaap-qpnrq-cai';
+      const swapCanisterId = '6phs7-6yaaa-aaaap-qpvoq-cai';
 
       if (isMintMode === 'mint') {
         const hasAllowed = await window.ic.plug.requestConnect({
@@ -464,12 +478,14 @@ export default function SwapModule() {
         }
       } else {
         const hasAllowed = await window.ic.plug.requestConnect({
-          whitelist: [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, bit10DEFICanisterId, bit10BRC20CanisterId]
+          whitelist: [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, swapCanisterId]
         });
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         if (hasAllowed && btcAmount && ethAmount && icpAmount) {
+          toast.info('Allow the transaction on your wallet to proceed.');
+          
           let selectedCanisterId;
 
           if (values.payment_method === 'ckBTC') {
@@ -485,84 +501,216 @@ export default function SwapModule() {
           const actor = await window.ic.plug.createActor({
             canisterId: selectedCanisterId,
             interfaceFactory: idlFactory,
-          }) as ActorType;
+          }) as ICRC2ActorType;
 
-          const receiverckBTCAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
-          const recieverckETHAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
-          const recieverICPAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
-
-          let selectedRecieverAccountId;
           let selectedAmount;
 
           if (values.payment_method === 'ckBTC') {
-            selectedRecieverAccountId = receiverckBTCAccountId;
-            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(btcAmount));
+            // selectedRecieverAccountId = receiverckBTCAccountId;
+            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(btcAmount) * 2); // More in case of sudden price change
           } else if (values.payment_method === 'ckETH') {
-            selectedRecieverAccountId = recieverckETHAccountId;
-            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount));
+            // selectedRecieverAccountId = recieverckETHAccountId;
+            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount) * 2);
           } else if (values.payment_method === 'ICP') {
-            selectedRecieverAccountId = recieverICPAccountId;
-            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount));
+            // selectedRecieverAccountId = recieverICPAccountId;
+            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount) * 2);
           } else {
             throw new Error('Invalid payment method');
           }
 
           const price = selectedAmount;
           const amount = Math.round(price * 100000000).toFixed(0);
+          const time = BigInt(Date.now()) * BigInt(1_000_000) + BigInt(300_000_000_000);
 
           const args = {
-            to: {
-              owner: Principal.fromText(selectedRecieverAccountId),
+            spender: {
+              owner: Principal.fromText(swapCanisterId),
               subaccount: [] as []
             },
-            memo: [] as [],
             fee: [] as [],
+            memo: [] as [],
             from_subaccount: [] as [],
             created_at_time: [] as [],
-            amount: BigInt(amount)
+            amount: BigInt(amount),
+            expected_allowance: [] as [],
+            expires_at: [time] as [bigint],
           }
 
-          const transfer = await actor.icrc1_transfer(args);
-          if (transfer.Ok && principalId) {
-            const uuid = crypto.randomBytes(16).toString('hex');
-            const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
-            const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
+          const approve = await actor.icrc2_approve(args);
 
-            const result = await newTokenSwap({
-              newTokenSwapId: newTokenSwapId,
-              principalId: principalId,
-              paymentAmount: selectedAmount.toString(),
-              paymentName: values.payment_method,
-              paymentAmountUSD: (parseFloat(values.bit10_amount) * selectedBit10TokenPrice).toString(),
-              bit10tokenQuantity: (values.bit10_amount).toString(),
-              bit10tokenName: values.bit10_token,
-              transactionIndex: transfer.Ok.toString()
+          if (approve.Ok) {
+            toast.success('Approval was successful! Proceeding with transfer...');
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const actor2 = await window.ic.plug.createActor({
+              canisterId: swapCanisterId,
+              interfaceFactory: idlFactory2,
             });
 
-            await fetch('/bit10-token-request', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
+            const args2 = {
+              tick_in_name: values.payment_method,
+              tick_out_name: values.bit10_token,
+              tick_out_amount: Number(values.bit10_amount)
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            const transfer = await actor2.mb_swap(args2);
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (transfer.Ok) {
+              const uuid = crypto.randomBytes(16).toString('hex');
+              const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+              const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
+
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+              const principal = Principal.fromUint8Array(transfer.Ok.user_principal_id._arr);
+              const textualRepresentation = principal.toText();
+
+              const formatTimestamp = (nanoseconds: string): string => {
+                const milliseconds = BigInt(nanoseconds) / BigInt(1_000_000);
+                const date = new Date(Number(milliseconds));
+
+                return date.toISOString().replace("T", " ").replace("Z", "+00");
+              };
+
+              const result = await newTokenSwap({
                 newTokenSwapId: newTokenSwapId,
-                principalId: principalId,
-                bit10tokenQuantity: (values.bit10_amount).toString(),
-                bit10tokenName: values.bit10_token,
-                bit10tokenBoughtAt: new Date().toISOString(),
-              }),
-            });
+                principalId: textualRepresentation,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                tickInName: transfer.Ok.tick_in_name,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInAmount: transfer.Ok.tick_in_amount.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInUSDAmount: transfer.Ok.tick_in_usd_amount.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInTxBlock: transfer.Ok.tick_in_tx_block.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickOutName: transfer.Ok.tick_out_name,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickOutAmount: transfer.Ok.tick_out_amount.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickOutTxBlock: transfer.Ok.tick_out_tx_block.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                transactionType: transfer.Ok.transaction_type as "Swap" | "Reverse Swap",
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                network: transfer.Ok.network,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
+                transactionTimestamp: formatTimestamp(transfer.Ok.transaction_timestamp)
+              });
 
-            if (result === 'Token swap added successfully') {
-              toast.success('Token swap was successful!');
+              await fetch('/bit10-token-request', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  newTokenSwapId: newTokenSwapId,
+                  principalId: principalId,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                  tickOutName: transfer.Ok.tick_out_name,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                  tickOutAmount: transfer.Ok.tick_out_amount.toString(),
+                  transactionTimestamp: new Date().toISOString(),
+                }),
+              });
+
+              if (result === 'Token swap successfully') {
+                toast.success('Token swap was successful!');
+              } else {
+                toast.error('An error occurred while processing your request. Please try again!');
+              }
+
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            } else if (transfer.Err) {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              const errorMessage = String(transfer.Err);
+              if (errorMessage.includes("Insufficient balance")) {
+                toast.error("Insufficient funds");
+              } else {
+                toast.error('An error occurred while processing your request. Please try again!');
+              }
             } else {
               toast.error('An error occurred while processing your request. Please try again!');
             }
-          } else if (transfer.Err?.InsufficientFunds) {
-            toast.error('Insufficient funds');
           } else {
-            toast.error('Transfer failed.');
+            toast.error('Approval failed.');
           }
+          // const receiverckBTCAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+          // const recieverckETHAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+          // const recieverICPAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
+
+          // let selectedRecieverAccountId;
+          // let selectedAmount;
+
+          // if (values.payment_method === 'ckBTC') {
+          //   selectedRecieverAccountId = receiverckBTCAccountId;
+          //   selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(btcAmount));
+          // } else if (values.payment_method === 'ckETH') {
+          //   selectedRecieverAccountId = recieverckETHAccountId;
+          //   selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount));
+          // } else if (values.payment_method === 'ICP') {
+          //   selectedRecieverAccountId = recieverICPAccountId;
+          //   selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount));
+          // } else {
+          //   throw new Error('Invalid payment method');
+          // }
+
+          // const price = selectedAmount;
+          // const amount = Math.round(price * 100000000).toFixed(0);
+
+          // const args = {
+          //   to: {
+          //     owner: Principal.fromText(selectedRecieverAccountId),
+          //     subaccount: [] as []
+          //   },
+          //   memo: [] as [],
+          //   fee: [] as [],
+          //   from_subaccount: [] as [],
+          //   created_at_time: [] as [],
+          //   amount: BigInt(amount)
+          // }
+
+          // const transfer = await actor.icrc1_transfer(args);
+          // if (transfer.Ok && principalId) {
+          //   const uuid = crypto.randomBytes(16).toString('hex');
+          //   const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+          //   const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
+
+          //   const result = await newTokenSwap({
+          //     newTokenSwapId: newTokenSwapId,
+          //     principalId: principalId,
+          //     paymentAmount: selectedAmount.toString(),
+          //     paymentName: values.payment_method,
+          //     paymentAmountUSD: (parseFloat(values.bit10_amount) * selectedBit10TokenPrice).toString(),
+          //     bit10tokenQuantity: (values.bit10_amount).toString(),
+          //     bit10tokenName: values.bit10_token,
+          //     transactionIndex: transfer.Ok.toString()
+          //   });
+
+          //   await fetch('/bit10-token-request', {
+          //     method: 'POST',
+          //     headers: {
+          //       'Content-Type': 'application/json',
+          //     },
+          //     body: JSON.stringify({
+          //       newTokenSwapId: newTokenSwapId,
+          //       principalId: principalId,
+          //       bit10tokenQuantity: (values.bit10_amount).toString(),
+          //       bit10tokenName: values.bit10_token,
+          //       bit10tokenBoughtAt: new Date().toISOString(),
+          //     }),
+          //   });
+
+          //   if (result === 'Token swap added successfully') {
+          //     toast.success('Token swap was successful!');
+          //   } else {
+          //     toast.error('An error occurred while processing your request. Please try again!');
+          //   }
+          // } else if (transfer.Err?.InsufficientFunds) {
+          //   toast.error('Insufficient funds');
+          // } else {
+          //   toast.error('Transfer failed.');
+          // }
         }
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

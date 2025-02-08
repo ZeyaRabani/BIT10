@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const password = env.EMAIL_PASSWORD;
     const email2 = 'harshalraikwar07@gmail.com';
 
-    const { newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenName, bit10tokenBoughtAt } = await request.json() as { newTokenSwapId: string; principalId: string; bit10tokenQuantity: string; bit10tokenName: string; bit10tokenBoughtAt: string; };
+    const { newTokenSwapId, principalId, tickOutName, tickOutAmount, transactionTimestamp } = await request.json() as { newTokenSwapId: string, principalId: string, tickOutName: string, tickOutAmount: string, transactionTimestamp: string };
 
     const transport = nodemailer.createTransport({
         service: 'gmail',
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
         },
     });
 
-    const emailHtml = await render(BIT10Request({ newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenName, bit10tokenBoughtAt }));
+    const emailHtml = await render(BIT10Request({ newTokenSwapId, principalId, tickOutName, tickOutAmount, transactionTimestamp }));
 
     const mailOptions: Mail.Options = {
         from: {
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         to: myEmail,
         cc: email2,
         // replyTo: email,
-        subject: `${bit10tokenName} token request from ${principalId}`,
+        subject: `${tickOutName} token request from ${principalId}`,
         html: emailHtml
     };
 
