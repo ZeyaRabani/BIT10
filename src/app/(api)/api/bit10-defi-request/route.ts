@@ -1,15 +1,15 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
-import Mail from 'nodemailer/lib/mailer'
+import type Mail from 'nodemailer/lib/mailer'
 import { render } from '@react-email/render'
 import { BIT10DEFIRequest } from '@/emails/BIT10Request'
 
 export async function POST(request: NextRequest) {
     const myEmail = process.env.PERSONAL_EMAIL;
     const password = process.env.EMAIL_PASSWORD;
-    const email2 = 'harshalraikwar07@gmail.com'
+    const email2 = 'harshalraikwar07@gmail.com';
 
-    const { newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenName, bit10tokenBoughtAt } = await request.json();
+    const { newTokenSwapId, principalId, tickOutName, tickOutAmount, transactionTimestamp } = await request.json() as { newTokenSwapId: string, principalId: string, tickOutName: string, tickOutAmount: string, transactionTimestamp: string };
 
     const transport = nodemailer.createTransport({
         service: 'gmail',
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         },
     });
 
-    const emailHtml = render(BIT10DEFIRequest({ newTokenSwapId, principalId, bit10tokenQuantity, bit10tokenName, bit10tokenBoughtAt }));
+    const emailHtml = await render(BIT10DEFIRequest({ newTokenSwapId, principalId, tickOutName, tickOutAmount, transactionTimestamp }));
 
     const mailOptions: Mail.Options = {
         from: {
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
         to: myEmail,
         cc: email2,
         // replyTo: email,
-        subject: `Test BIT10.DEFI token request from ${principalId}`,
+        subject: `${tickOutName} token request from ${principalId}`,
         html: emailHtml
     };
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
                 if (!err) {
                     resolve('Email sent successfully!');
                 } else {
-                    reject(err.message);
+                    reject(new Error(err.message));
                 }
             });
         });

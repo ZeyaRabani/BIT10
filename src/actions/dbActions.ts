@@ -1,18 +1,23 @@
 "use server"
 
 import { db } from '@/db/db'
-import { user_signups, te_users, te_token_swap, te_request_btc } from '@/db/schema'
+import { user_signups, te_users, te_token_swap, te_swap, te_request_btc } from '@/db/schema'
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
 
 interface NewTokenSwap {
     newTokenSwapId: string;
     principalId: string;
-    paymentAmount: string;
-    paymentName: string;
-    paymentAmountUSD: string;
-    bit10tokenQuantity: string;
-    bit10tokenName: string;
+    tickInName: string;
+    tickInAmount: string;
+    tickInUSDAmount: string;
+    tickInTxBlock: string;
+    tickOutName: string;
+    tickOutAmount: string;
+    tickOutTxBlock: string;
+    transactionType: 'Swap' | 'Reverse Swap';
+    network: 'ICP';
+    transactionTimestamp: string;
 }
 
 export const addUserSignUps = async ({ email }: { email: string }) => {
@@ -56,25 +61,29 @@ export const addNewUser = async ({ principalId }: { principalId: string }) => {
     }
 };
 
-export const newTokenSwap = async ({ newTokenSwapId, principalId, paymentAmount, paymentName, paymentAmountUSD, bit10tokenQuantity, bit10tokenName }: NewTokenSwap) => {
+export const newTokenSwap = async ({ newTokenSwapId, principalId, tickInName, tickInAmount, tickInUSDAmount, tickInTxBlock, tickOutName, tickOutAmount, tickOutTxBlock, transactionType, network, transactionTimestamp }: NewTokenSwap) => {
     try {
         // const uuid = crypto.randomBytes(16).toString('hex');
         // const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
         // const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
 
-        await db.insert(te_token_swap).values({
+        await db.insert(te_swap).values({
             token_swap_id: newTokenSwapId,
             user_principal_id: principalId,
-            token_purchase_amount: paymentAmount,
-            token_purchase_name: paymentName,
-            token_purchase_usd_amount: paymentAmountUSD,
-            bit10_token_quantity: bit10tokenQuantity,
-            bit10_token_name: bit10tokenName,
-            token_transaction_status: 'Unconfirmed', // Confirmed || Failed
-            token_bought_at: new Date().toISOString()
+            tick_in_name: tickInName,
+            tick_in_amount: tickInAmount,
+            tick_in_usd_amount: tickInUSDAmount,
+            tick_in_tx_block: tickInTxBlock,
+            tick_out_name: tickOutName,
+            tick_out_amount: tickOutAmount,
+            tick_out_tx_block: tickOutTxBlock,
+            transaction_type: transactionType,
+            transaction_status: 'Unconfirmed', // Confirmed || Failed
+            transaction_timestamp: transactionTimestamp,
+            network: network
         });
 
-        return 'Token swap added successfully'
+        return 'Token swap successfully'
     } catch (error) {
         return 'Error swaping tokens';
     }

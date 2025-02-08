@@ -20,6 +20,7 @@ import BIT10Img from '@/assets/swap/bit10.svg'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10.did'
+import { idlFactory as idlFactory2 } from '@/lib/swap.did'
 import crypto from 'crypto'
 import { newTokenSwap } from '@/actions/dbActions'
 
@@ -32,13 +33,15 @@ interface BuyingTokenPriceResponse {
 }
 
 type ActorType = {
-    icrc1_transfer: (args: {
-        to: { owner: Principal; subaccount: [] };
-        memo: [];
+    icrc2_approve: (args: {
+        spender: { owner: Principal; subaccount: [] };
         fee: [];
+        memo: [];
         from_subaccount: [];
         created_at_time: [];
         amount: bigint;
+        expected_allowance: [];
+        expires_at: [bigint];
     }) => Promise<{ Ok?: number; Err?: { InsufficientFunds?: null } }>;
 };
 
@@ -183,7 +186,7 @@ export default function Swap() {
             return bit10BRC20Price ?? 0;
         } else if (bit10Token === 'Test BIT10.TOP') {
             return bit10TOPPrice ?? 0;
-        } 
+        }
         else {
             return 0;
         }
@@ -197,16 +200,16 @@ export default function Swap() {
         try {
             setSwaping(true);
             const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
-            const tbit10DEFICanisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
-            const tbit10BRC20CanisterId = 'uv4pt-4qaaa-aaaap-qpuxa-cai';
-            const tbit10TOPCanisterId = 'wbckh-zqaaa-aaaap-qpuza-cai';
+            const swapCanisterId = '6phs7-6yaaa-aaaap-qpvoq-cai'
 
             const hasAllowed = await window.ic.plug.requestConnect({
-                whitelist: [bit10BTCCanisterId, tbit10DEFICanisterId, tbit10BRC20CanisterId, tbit10TOPCanisterId]
+                whitelist: [bit10BTCCanisterId, swapCanisterId]
             });
 
             // @ts-ignore
             if (hasAllowed && bit10BTCAmount) {
+                toast.info('Allow the transaction on your wallet to proceed.');
+
                 const selectedCanisterId = bit10BTCCanisterId;
 
                 const actor = await window.ic.plug.createActor({
@@ -214,79 +217,99 @@ export default function Swap() {
                     interfaceFactory: idlFactory,
                 }) as ActorType;
 
-                const selectedRecieverAccountId = 'eam3c-zvqkv-blrno-3qztd-qjp2g-222mt-m4ekx-yquch-ds2rm-oraij-sqe';
-                const selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(bit10BTCAmount));
-                // let selectedRecieverAccountId;
-                // let selectedAmount;
-
-                // if (values.payment_method === 'ckBTC') {
-                //     selectedRecieverAccountId = receiverckBTCAccountId;
-                //     selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(bit10BTCAmount));
-                // } else if (values.payment_method === 'ckETH') {
-                //     selectedRecieverAccountId = recieverckETHAccountId;
-                //     selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount));
-                // } else if (values.payment_method === 'ICP') {
-                //     selectedRecieverAccountId = recieverICPAccountId;
-                //     selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount));
-                // } else {
-                //     throw new Error('Invalid payment method');
-                // }
+                const selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(bit10BTCAmount)) * 2; // More in case of sudden price change
 
                 const price = selectedAmount;
                 const amount = Math.round(price * 100000000).toFixed(0);
+                const time = BigInt(Date.now()) * BigInt(1_000_000) + BigInt(300_000_000_000)
 
                 const args = {
-                    to: {
-                        owner: Principal.fromText(selectedRecieverAccountId),
+                    spender: {
+                        owner: Principal.fromText(swapCanisterId),
                         subaccount: [] as []
                     },
-                    memo: [] as [],
                     fee: [] as [],
+                    memo: [] as [],
                     from_subaccount: [] as [],
                     created_at_time: [] as [],
-                    amount: BigInt(amount)
+                    amount: BigInt(amount),
+                    expected_allowance: [] as [],
+                    expires_at: [time] as [bigint],
                 }
 
-                const transfer = await actor.icrc1_transfer(args);
-                if (transfer.Ok && principalId) {
-                    const uuid = crypto.randomBytes(16).toString('hex');
-                    const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
-                    const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
+                const approve = await actor.icrc2_approve(args);
+                if (approve.Ok && principalId) {
+                    toast.success('Approval was successful! Proceeding with transfer.');
 
-                    const result = await newTokenSwap({
-                        newTokenSwapId: newTokenSwapId,
-                        principalId: principalId,
-                        paymentAmount: selectedAmount.toString(),
-                        paymentName: values.payment_method,
-                        paymentAmountUSD: (parseInt(values.bit10_amount) * selectedBit10TokenPrice).toString(),
-                        bit10tokenQuantity: (values.bit10_amount).toString(),
-                        bit10tokenName: values.bit10_token,
+                    const actor2 = await window.ic.plug.createActor({
+                        canisterId: swapCanisterId,
+                        interfaceFactory: idlFactory2,
                     });
 
-                    await fetch('/bit10-token-request', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            newTokenSwapId: newTokenSwapId,
-                            principalId: principalId,
-                            bit10tokenQuantity: (values.bit10_amount).toString(),
-                            bit10tokenName: values.bit10_token,
-                            bit10tokenBoughtAt: new Date().toISOString(),
-                        }),
-                    });
-
-                    if (result === 'Token swap added successfully') {
-                        toast.success('Token swap was successful!');
-                    } else {
-                        toast.error('An error occurred while processing your request. Please try again!');
+                    const args2 = {
+                        tick_in_name: values.payment_method,
+                        tick_out_name: values.bit10_token,
+                        tick_out_amount: Number(values.bit10_amount)
                     }
-                } else if (transfer.Err?.InsufficientFunds) {
-                    toast.error('Insufficient funds');
+
+                    const transfer = await actor2.te_swap(args2);
+                    if (transfer.Ok) {
+                        const uuid = crypto.randomBytes(16).toString('hex');
+                        const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+                        const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
+
+                        const principal = Principal.fromUint8Array(transfer.Ok.user_principal_id._arr);
+                        const textualRepresentation = principal.toText();
+
+                        const formatTimestamp = (nanoseconds: string): string => {
+                            const milliseconds = BigInt(nanoseconds) / BigInt(1_000_000);
+                            const date = new Date(Number(milliseconds));
+
+                            return date.toISOString().replace("T", " ").replace("Z", "+00");
+                        };
+
+                        const result = await newTokenSwap({
+                            newTokenSwapId: newTokenSwapId,
+                            principalId: textualRepresentation,
+                            tickInName: transfer.Ok.tick_in_name,
+                            tickInAmount: transfer.Ok.tick_in_amount.toString(),
+                            tickInUSDAmount: transfer.Ok.tick_in_usd_amount.toString(),
+                            tickInTxBlock: transfer.Ok.tick_in_tx_block.toString(),
+                            tickOutName: transfer.Ok.tick_out_name,
+                            tickOutAmount: transfer.Ok.tick_out_amount.toString(),
+                            tickOutTxBlock: transfer.Ok.tick_out_tx_block.toString(),
+                            transactionType: transfer.Ok.transaction_type as "Swap" | "Reverse Swap",
+                            network: transfer.Ok.network,
+                            transactionTimestamp: formatTimestamp(transfer.Ok.transaction_timestamp)
+                        });
+
+                        await fetch('/bit10-token-request', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                newTokenSwapId: newTokenSwapId,
+                                principalId: principalId,
+                                tickOutName: transfer.Ok.tick_out_name, 
+                                tickOutAmount: transfer.Ok.tick_out_amount.toString(),
+                                transactionTimestamp: new Date().toISOString(),
+                            }),
+                        });
+
+                        if (result === 'Token swap successfully') {
+                            toast.success('Token swap was successful!');
+                        } else {
+                            toast.error('An 1 error occurred while processing your request. Please try again!');
+                        }
+                    } else {
+                        toast.error('An 2 error occurred while processing your request. Please try again!');
+                    }
                 } else {
-                    toast.error('Transfer failed.');
+                    toast.error('Approval failed.');
                 }
+            } else {
+                toast.error('Transfer failed.');
             }
         } catch (error) {
             setSwaping(false);
