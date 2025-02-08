@@ -106,7 +106,7 @@ export default function Swap() {
             returnData = data.tokenPrice ?? 0;
         } else if (tokenPriceAPI === 'test-bit10-top-latest-price') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
-            returnData = (data.tokenPrice ?? 0) / 1000;
+            returnData = data.tokenPrice ?? 0;
         }
         return returnData;
     };
@@ -291,7 +291,7 @@ export default function Swap() {
                             body: JSON.stringify({
                                 newTokenSwapId: newTokenSwapId,
                                 principalId: principalId,
-                                tickOutName: transfer.Ok.tick_out_name, 
+                                tickOutName: transfer.Ok.tick_out_name,
                                 tickOutAmount: transfer.Ok.tick_out_amount.toString(),
                                 transactionTimestamp: new Date().toISOString(),
                             }),
@@ -300,10 +300,17 @@ export default function Swap() {
                         if (result === 'Token swap successfully') {
                             toast.success('Token swap was successful!');
                         } else {
-                            toast.error('An 1 error occurred while processing your request. Please try again!');
+                            toast.error('An error occurred while processing your request. Please try again!');
+                        }
+                    } else if (transfer.Err) {
+                        const errorMessage = String(transfer.Err);
+                        if (errorMessage.includes("Insufficient balance")) {
+                            toast.error("Insufficient funds");
+                        } else {
+                            toast.error('An error occurred while processing your request. Please try again!');
                         }
                     } else {
-                        toast.error('An 2 error occurred while processing your request. Please try again!');
+                        toast.error('An error occurred while processing your request. Please try again!');
                     }
                 } else {
                     toast.error('Approval failed.');
