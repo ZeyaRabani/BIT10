@@ -1,9 +1,9 @@
 "use server"
 
 import { db } from '@/db/db'
-import { user_signups, te_users, te_token_swap, te_swap, te_request_btc } from '@/db/schema'
+import { user_signups, te_users, te_swap, te_request_btc } from '@/db/schema'
 import crypto from 'crypto'
-import { eq, desc } from 'drizzle-orm'
+import { eq, asc } from 'drizzle-orm'
 
 interface NewTokenSwap {
     newTokenSwapId: string;
@@ -92,16 +92,17 @@ export const newTokenSwap = async ({ newTokenSwapId, principalId, tickInName, ti
 export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: string }) => {
     try {
         const data = await db.select({
-            token_swap_id: te_token_swap.token_swap_id,
-            token_purchase_amount: te_token_swap.token_purchase_amount,
-            token_purchase_name: te_token_swap.token_purchase_name,
-            bit10_token_quantity: te_token_swap.bit10_token_quantity,
-            bit10_token_name: te_token_swap.bit10_token_name,
-            token_transaction_status: te_token_swap.token_transaction_status,
-            token_bought_at: te_token_swap.token_bought_at,
+            tokenSwapId: te_swap.token_swap_id,
+            transactionType: te_swap.transaction_type,
+            tickInAmount: te_swap.tick_in_amount,
+            tickInName: te_swap.tick_in_name,
+            tickOutAmount: te_swap.tick_out_amount,
+            tickOutName: te_swap.tick_out_name,
+            tokenBoughtAt: te_swap.transaction_timestamp
         })
-            .from(te_token_swap)
-            .where(eq(te_token_swap.user_principal_id, paymentAddress)).orderBy(desc(te_token_swap.token_bought_at));
+            .from(te_swap)
+            .where(eq(te_swap.user_principal_id, paymentAddress))
+            .orderBy(asc(te_swap.transaction_timestamp));
         return data;
     } catch (error) {
         return 'Error fetching user recent activity';
@@ -120,20 +121,22 @@ export const requestBIT10BTC = async ({ email, principalId }: { email: string, p
     }
 };
 
-export const swapDetails = async ({ swapId }: { swapId: string }) => {
+export const transactionDetails = async ({ transactionId }: { transactionId: string }) => {
     try {
         const data = await db.select({
-            token_swap_id: te_token_swap.token_swap_id,
-            user_principal_id: te_token_swap.user_principal_id,
-            token_purchase_amount: te_token_swap.token_purchase_amount,
-            token_purchase_name: te_token_swap.token_purchase_name,
-            token_transaction_status: te_token_swap.token_transaction_status,
-            token_bought_at: te_token_swap.token_bought_at,
+            transactionId: te_swap.token_swap_id,
+            transactionType: te_swap.transaction_type,
+            transactionTime: te_swap.transaction_timestamp,
+            transactionFromAccount: te_swap.user_principal_id,
+            transactionTickInAmount: te_swap.tick_in_amount,
+            transactionTickInName: te_swap.tick_in_name,
+            transactionTickOutAmount: te_swap.tick_out_amount,
+            transactionTickOutName: te_swap.tick_out_name,
         })
-            .from(te_token_swap)
-            .where(eq(te_token_swap.token_swap_id, swapId));
+            .from(te_swap)
+            .where(eq(te_swap.token_swap_id, transactionId));
         return data;
     } catch (error) {
-        return 'Error fetching swap details';
+        return 'Error fetching transaction details';
     }
 }

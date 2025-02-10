@@ -12,53 +12,37 @@ import { useWallet } from '@/context/WalletContext'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
-
-export type PortfolioTableDataType = {
-    token_swap_id: string;
-    user_principal_id: string;
-    token_purchase_amount: string;
-    token_purchase_name: string;
-    bit10_token_quantity: string;
-    bit10_token_name: string;
-    token_transaction_status: string;
-    token_bought_at: Date | string;
-}
+import type { PortfolioTableDataType } from '@/components/ui/data-table-portfolio'
 
 const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
-        accessorKey: 'token_swap_id',
+        accessorKey: 'tokenSwapId',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Swap ID' />
+            <DataTableColumnHeader column={column} title='Transaction ID' />
         ),
     },
     {
-        accessorKey: 'token_purchase_amount',
+        accessorKey: 'mode',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Purchase Amount' info='Amount paid for buying token' />
-        ),
-    },
-    // {
-    //     accessorKey: 'bit10_token_quantity',
-    //     header: ({ column }) => (
-    //         <DataTableColumnHeader column={column} title='Quantity' info='No. of BIT10 token bought' />
-    //     ),
-    // },
-    {
-        accessorKey: 'bit10_token_name',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='BIT10 Token' />
+            <DataTableColumnHeader column={column} title='Type' />
         ),
     },
     {
-        accessorKey: 'token_bought_at',
+        accessorKey: 'tickIn',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Token Bought at' />
+            <DataTableColumnHeader column={column} title='Spent' info='Amount spent for buying token' />
         ),
     },
     {
-        accessorKey: 'token_transaction_status',
+        accessorKey: 'tickOutName',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Transaction Status' />
+            <DataTableColumnHeader column={column} title='Received' />
+        ),
+    },
+    {
+        accessorKey: 'tokenBoughtAt',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Timestamp' />
         ),
     },
     {
@@ -69,7 +53,7 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 
             return (
                 <a
-                    href={`/explorer/${order.token_swap_id}`}
+                    href={`/explorer/${order.tokenSwapId}`}
                     target='_blank'
                     rel='noopener noreferrer'
                 >
@@ -128,8 +112,8 @@ export default function RecentActivity() {
                         <DataTable
                             columns={portfolioTableColumns}
                             data={recentActivityData ?? []}
-                            userSearchColumn='bit10_token_name'
-                            inputPlaceHolder='Search by BIT10 token name'
+                            userSearchColumn='tickOutName'
+                            inputPlaceHolder='Search by Received token name'
                         />
                     </CardContent>
                 </Card>
