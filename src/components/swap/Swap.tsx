@@ -239,7 +239,7 @@ export default function Swap() {
 
                 const approve = await actor.icrc2_approve(args);
                 if (approve.Ok && principalId) {
-                    toast.success('Approval was successful! Proceeding with transfer.');
+                    toast.success('Approval was successful! Proceeding with transfer...');
 
                     const actor2 = await window.ic.plug.createActor({
                         canisterId: swapCanisterId,

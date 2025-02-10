@@ -3,7 +3,7 @@
 import { db } from '@/db/db'
 import { user_signups, te_users, te_swap, te_request_btc } from '@/db/schema'
 import crypto from 'crypto'
-import { eq, asc } from 'drizzle-orm'
+import { eq, desc } from 'drizzle-orm'
 
 interface NewTokenSwap {
     newTokenSwapId: string;
@@ -102,7 +102,7 @@ export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: s
         })
             .from(te_swap)
             .where(eq(te_swap.user_principal_id, paymentAddress))
-            .orderBy(asc(te_swap.transaction_timestamp));
+            .orderBy(desc(te_swap.transaction_timestamp));
         return data;
     } catch (error) {
         return 'Error fetching user recent activity';
