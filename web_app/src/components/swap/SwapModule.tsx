@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import * as z from 'zod'
 import { useWallet } from '@/context/WalletContext'
 import { useQueries } from '@tanstack/react-query'
@@ -23,8 +23,6 @@ import CkETHImg from '@/assets/swap/ckETH.png'
 import ICPImg from '@/assets/swap/ICP.png'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import BIT10Img from '@/assets/swap/bit10.svg'
-import { Actor, HttpAgent } from '@dfinity/agent'
-import { idlFactory as OracleidfFactory } from '@/lib/oracle.did'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10.did'
 import { idlFactory as idlFactory2 } from '@/lib/swap.did'
@@ -144,60 +142,16 @@ export default function SwapModule() {
   //   }
   // }
 
-  const fetchBit10Price = async (tokenPriceAPI: string) => {
+  const fetchBit10Price = useCallback(async (tokenPriceAPI: string) => {
     const response = await fetch(tokenPriceAPI);
 
     if (!response.ok) {
       toast.error('Error fetching BIT10 price. Please try again!');
     }
 
-    let data;
-    let returnData;
-    if (tokenPriceAPI === 'bit10-latest-price-defi') {
-      data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
-      returnData = data.tokenPrice ?? 0;
-    } else if (tokenPriceAPI === 'bit10-latest-price-brc20') {
-      data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
-      returnData = data.tokenPrice ?? 0;
-    }
-    return returnData;
-  };
-
-  const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
-  const canisterId = 'fg5vt-paaaa-aaaap-qhhra-cai';
-
-  const agent = new HttpAgent({ host });
-  const oracleActor = Actor.createActor(OracleidfFactory, { agent, canisterId })
-
-  const fetchBit10DEFISupply = async () => {
-    const totalSupply = oracleActor.bit10_defi_total_supply_of_token_available ? await oracleActor.bit10_defi_total_supply_of_token_available() : undefined;
-
-    if (!totalSupply) {
-      toast.error('Error fetching BIT10 supply. Please try again!');
-    }
-
-    if (totalSupply && typeof totalSupply === 'bigint') {
-      const scaledTotalSupply = Number(totalSupply) / 100000000;
-      return scaledTotalSupply;
-    } else {
-      return 0;
-    }
-  }
-
-  const fetchBit10DEFITokenBought = async () => {
-    const totalSupply = oracleActor.bit10_defi_total_token_available_for_buying ? await oracleActor.bit10_defi_total_token_available_for_buying() : undefined;
-
-    if (!(totalSupply as { Ok?: bigint }).Ok) {
-      toast.error('Error fetching BIT10 token bought. Please try again!');
-    }
-
-    if ((totalSupply as { Ok?: bigint }).Ok && typeof (totalSupply as { Ok?: bigint }).Ok === 'bigint') {
-      const scaledTotalSupply = Number((totalSupply as { Ok: bigint }).Ok) / 100000000;
-      return scaledTotalSupply;
-    } else {
-      return 0;
-    }
-  }
+    const data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> };
+    return data.tokenPrice ?? 0;
+  }, []);
 
   const bit10PriceQueries = useQueries({
     queries: [
@@ -206,44 +160,33 @@ export default function SwapModule() {
         queryFn: () => fetchBit10Price('bit10-latest-price-defi'),
         refetchInterval: 1800000, // 30 min.
       },
-      {
-        queryKey: ['bit10DEFITokenTotalSupply'],
-        queryFn: () => fetchBit10DEFISupply()
-      },
-      {
-        queryKey: ['bit10DEFIBuyingTokenSupply'],
-        queryFn: () => fetchBit10DEFITokenBought(),
-        refetchInterval: 180000, // 3 miin.
-      },
-      {
-        queryKey: ['bit10BRC20TokenPrice'],
-        queryFn: () => fetchBit10Price('bit10-latest-price-brc20'),
-        refetchInterval: 1800000,
-      },
+      // {
+      //   queryKey: ['bit10BRC20TokenPrice'],
+      //   queryFn: () => fetchBit10Price('bit10-latest-price-brc20'),
+      //   refetchInterval: 1800000,
+      // },
     ],
   });
 
-  const isLoading = bit10PriceQueries.some(query => query.isLoading);
-  const bit10DEFIPrice = bit10PriceQueries[0].data;
-  const bit10DEFITotalSupply = bit10PriceQueries[1].data;
-  const bit10DEFIBuyingSupply = bit10PriceQueries[2].data;
-  const bit10BRC20Price = bit10PriceQueries[3].data;
+  const isLoading = useMemo(() => bit10PriceQueries.some(query => query.isLoading), [bit10PriceQueries]);
+  const bit10DEFIPrice = useMemo(() => bit10PriceQueries[0].data, [bit10PriceQueries]);
+  // const bit10BRC20Price = useMemo(() => bit10PriceQueries[1].data, [bit10PriceQueries]);
 
-  const fetchPayWithPrice = async (currency: string) => {
+  const fetchPayWithPrice = useCallback(async (currency: string) => {
     const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);
     if (!response.ok) {
       toast.error(`Error fetching ${currency} price. Please try again!`);
     }
     const data = await response.json() as BuyingTokenPriceResponse;
     return data.data.amount;
-  };
+  }, []);
 
   const payWithPriceQueries = useQueries({
     queries: [
       {
         queryKey: ['btcPrice'],
         queryFn: () => fetchPayWithPrice('BTC'),
-        refetchInterval: 10000, // 10 src.
+        refetchInterval: 10000, // 10 sec.
       },
       {
         queryKey: ['ethPrice'],
@@ -258,9 +201,9 @@ export default function SwapModule() {
     ],
   });
 
-  const btcAmount = payWithPriceQueries[0].data;
-  const ethAmount = payWithPriceQueries[1].data;
-  const icpAmount = payWithPriceQueries[2].data;
+  const btcAmount = useMemo(() => payWithPriceQueries[0].data, [payWithPriceQueries]);
+  const ethAmount = useMemo(() => payWithPriceQueries[1].data, [payWithPriceQueries]);
+  const icpAmount = useMemo(() => payWithPriceQueries[2].data, [payWithPriceQueries]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -308,9 +251,11 @@ export default function SwapModule() {
     const bit10Token = form.watch('bit10_token');
     if (bit10Token === 'BIT10.DEFI') {
       return bit10DEFIPrice ?? 0;
-    } else if (bit10Token === 'BIT10.BRC20') {
-      return bit10BRC20Price ?? 0;
-    } else {
+    }
+    // else if (bit10Token === 'BIT10.BRC20') {
+    //   return bit10BRC20Price ?? 0;
+    // } 
+    else {
       return 0;
     }
   };
@@ -321,9 +266,11 @@ export default function SwapModule() {
     const bit10Token = form.watch('minting_bit10_token');
     if (bit10Token === 'BIT10.DEFI') {
       return bit10DEFIPrice ?? 0;
-    } else if (bit10Token === 'BIT10.BRC20') {
-      return bit10BRC20Price ?? 0;
-    } else {
+    }
+    // else if (bit10Token === 'BIT10.BRC20') {
+    //   return bit10BRC20Price ?? 0;
+    // } 
+    else {
       return 0;
     }
   };
@@ -357,12 +304,10 @@ export default function SwapModule() {
   const recieveingTokenPrice = MintRecieveTokenPrice();
 
   const bit10TokenSwapBtn = (): string => {
-    if (Number(form.watch('bit10_amount')) + Number(bit10DEFIBuyingSupply?.toFixed(8)) > Number(bit10DEFITotalSupply?.toFixed(8)) && isMintMode === 'swap') {
-      return 'Requested tokens exceed available supply'
-    } else if (isMintMode === 'mint') {
-      return 'Revese Swap'
+    if (isMintMode === 'mint') {
+      return 'Revese Swap';
     } else {
-      return 'Swap'
+      return 'Swap';
     }
   }
 
@@ -370,15 +315,15 @@ export default function SwapModule() {
 
   const bit10TokenProcessingBtn = (): string => {
     if (isMintMode === 'mint') {
-      return 'Revese Swapping'
+      return 'Revese Swapping';
     } else {
-      return 'Swapping'
+      return 'Swapping';
     }
   }
 
   const bit10TokenProcessingBtnMessage = bit10TokenProcessingBtn();
 
-  const swapDisabledConditions = !isConnected || processing || !btcAmount || !ethAmount || !icpAmount || payingTokenPrice === '0' || selectedBit10TokenPrice === 0 || selectedMintingBit10TokenPrice === 0 || recieveingTokenPrice === '0' || Number(form.watch('bit10_amount')) + Number(bit10DEFIBuyingSupply?.toFixed(8)) > Number(bit10DEFITotalSupply?.toFixed(8))
+  const swapDisabledConditions = !isConnected || processing || !btcAmount || !ethAmount || !icpAmount || payingTokenPrice === '0' || selectedBit10TokenPrice === 0 || selectedMintingBit10TokenPrice === 0 || recieveingTokenPrice === '0'
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     try {
@@ -485,7 +430,7 @@ export default function SwapModule() {
         // @ts-ignore
         if (hasAllowed && btcAmount && ethAmount && icpAmount) {
           toast.info('Allow the transaction on your wallet to proceed.');
-          
+
           let selectedCanisterId;
 
           if (values.payment_method === 'ckBTC') {
@@ -506,13 +451,10 @@ export default function SwapModule() {
           let selectedAmount;
 
           if (values.payment_method === 'ckBTC') {
-            // selectedRecieverAccountId = receiverckBTCAccountId;
             selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(btcAmount) * 2); // More in case of sudden price change
           } else if (values.payment_method === 'ckETH') {
-            // selectedRecieverAccountId = recieverckETHAccountId;
             selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount) * 2);
           } else if (values.payment_method === 'ICP') {
-            // selectedRecieverAccountId = recieverICPAccountId;
             selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount) * 2);
           } else {
             throw new Error('Invalid payment method');
@@ -570,7 +512,7 @@ export default function SwapModule() {
                 const milliseconds = BigInt(nanoseconds) / BigInt(1_000_000);
                 const date = new Date(Number(milliseconds));
 
-                return date.toISOString().replace("T", " ").replace("Z", "+00");
+                return date.toISOString().replace('T', ' ').replace('Z', '+00');
               };
 
               const result = await newTokenSwap({
@@ -591,7 +533,7 @@ export default function SwapModule() {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                 tickOutTxBlock: transfer.Ok.tick_out_tx_block.toString(),
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                transactionType: transfer.Ok.transaction_type as "Swap" | "Reverse Swap",
+                transactionType: transfer.Ok.transaction_type as 'Swap' | 'Reverse Swap',
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                 network: transfer.Ok.network,
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
@@ -624,8 +566,8 @@ export default function SwapModule() {
             } else if (transfer.Err) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               const errorMessage = String(transfer.Err);
-              if (errorMessage.includes("Insufficient balance")) {
-                toast.error("Insufficient funds");
+              if (errorMessage.includes('Insufficient balance')) {
+                toast.error('Insufficient funds');
               } else {
                 toast.error('An error occurred while processing your request. Please try again!');
               }
@@ -635,82 +577,6 @@ export default function SwapModule() {
           } else {
             toast.error('Approval failed.');
           }
-          // const receiverckBTCAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
-          // const recieverckETHAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
-          // const recieverICPAccountId = 'vhpiq-6dprt-6vc5j-xtzl5-dw2aj-mqzmy-5c2lo-xxmj7-5sivk-vwax6-5qe';
-
-          // let selectedRecieverAccountId;
-          // let selectedAmount;
-
-          // if (values.payment_method === 'ckBTC') {
-          //   selectedRecieverAccountId = receiverckBTCAccountId;
-          //   selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(btcAmount));
-          // } else if (values.payment_method === 'ckETH') {
-          //   selectedRecieverAccountId = recieverckETHAccountId;
-          //   selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount));
-          // } else if (values.payment_method === 'ICP') {
-          //   selectedRecieverAccountId = recieverICPAccountId;
-          //   selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount));
-          // } else {
-          //   throw new Error('Invalid payment method');
-          // }
-
-          // const price = selectedAmount;
-          // const amount = Math.round(price * 100000000).toFixed(0);
-
-          // const args = {
-          //   to: {
-          //     owner: Principal.fromText(selectedRecieverAccountId),
-          //     subaccount: [] as []
-          //   },
-          //   memo: [] as [],
-          //   fee: [] as [],
-          //   from_subaccount: [] as [],
-          //   created_at_time: [] as [],
-          //   amount: BigInt(amount)
-          // }
-
-          // const transfer = await actor.icrc1_transfer(args);
-          // if (transfer.Ok && principalId) {
-          //   const uuid = crypto.randomBytes(16).toString('hex');
-          //   const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
-          //   const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
-
-          //   const result = await newTokenSwap({
-          //     newTokenSwapId: newTokenSwapId,
-          //     principalId: principalId,
-          //     paymentAmount: selectedAmount.toString(),
-          //     paymentName: values.payment_method,
-          //     paymentAmountUSD: (parseFloat(values.bit10_amount) * selectedBit10TokenPrice).toString(),
-          //     bit10tokenQuantity: (values.bit10_amount).toString(),
-          //     bit10tokenName: values.bit10_token,
-          //     transactionIndex: transfer.Ok.toString()
-          //   });
-
-          //   await fetch('/bit10-token-request', {
-          //     method: 'POST',
-          //     headers: {
-          //       'Content-Type': 'application/json',
-          //     },
-          //     body: JSON.stringify({
-          //       newTokenSwapId: newTokenSwapId,
-          //       principalId: principalId,
-          //       bit10tokenQuantity: (values.bit10_amount).toString(),
-          //       bit10tokenName: values.bit10_token,
-          //       bit10tokenBoughtAt: new Date().toISOString(),
-          //     }),
-          //   });
-
-          //   if (result === 'Token swap added successfully') {
-          //     toast.success('Token swap was successful!');
-          //   } else {
-          //     toast.error('An error occurred while processing your request. Please try again!');
-          //   }
-          // } else if (transfer.Err?.InsufficientFunds) {
-          //   toast.error('Insufficient funds');
-          // } else {
-          //   toast.error('Transfer failed.');
-          // }
         }
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -6,17 +6,17 @@ import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
-import { Search, X, CircleCheck, Timer, CircleX } from 'lucide-react'
+import { Search, X } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 export type PortfolioTableDataType = {
     tokenSwapId: string;
-    tokenPurchaseAmount: string;
-    tokenPurchaseName: string;
-    bit10TokenQuantity: string;
-    bit10TokenName: string;
-    tokenTransactionStatus: string;
+    transactionType: string;
+    tickInAmount: string;
+    tickInName: string;
+    tickOutAmount: string;
+    tickOutName: string;
     tokenBoughtAt: Date | string;
-    transactionIndex: string;
 }
 
 interface DataTableProps<TData> {
@@ -90,46 +90,26 @@ export function DataTable<TData, TValue>({
 
     const renderCellContent = (cell: CellContext<PortfolioTableDataType, unknown>, row: { original: PortfolioTableDataType }) => {
         switch (cell.column.id) {
-            case 'paymentAmount':
+            case 'mode':
+                return (
+                    <Badge className={row.original.transactionType === 'Swap' ? 'bg-primary' : 'bg-[#FF0066]'}>{row.original.transactionType}</Badge>
+                );
+            case 'tickIn':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{row.original.tokenPurchaseAmount}</div>
-                        <div>{row.original.tokenPurchaseName}</div>
+                        <div>{(parseFloat(row.original.tickInAmount)/100000000).toFixed(8)}</div>
+                        <div>{row.original.tickInName}</div>
+                    </div>
+                );
+            case 'tickOutName':
+                return (
+                    <div className='flex flex-row space-x-1 items-center'>
+                        <div>{row.original.tickOutAmount}</div>
+                        <div>{row.original.tickOutName}</div>
                     </div>
                 );
             case 'tokenBoughtAt':
                 return formatDate(row.original.tokenBoughtAt);
-            case 'bit10TokenName':
-                return (
-                    <div className='flex flex-row space-x-1 items-center'>
-                        <div>{row.original.bit10TokenQuantity}</div>
-                        <div>{row.original.bit10TokenName}</div>
-                    </div>
-                );
-            case 'tokenTransactionStatus':
-                if (row.original.tokenTransactionStatus === 'Confirmed') {
-                    return (
-                        <div className='flex flex-row space-x-1 items-center'>
-                            <div><CircleCheck className='w-4 h-4 pb-0.5' /></div>
-                            <div>{row.original.tokenTransactionStatus}</div>
-                        </div>
-                    )
-                } else if (row.original.tokenTransactionStatus === 'Failed') {
-                    return (
-                        <div className='flex flex-row space-x-1 items-center'>
-                            <div><CircleX className='w-4 h-4 pb-0.5' /></div>
-                            <div>{row.original.tokenTransactionStatus}</div>
-                        </div>
-                    )
-                }
-                else {
-                    return (
-                        <div className='flex flex-row space-x-1 items-center'>
-                            <div><Timer className='w-4 h-4 pb-0.5' /></div>
-                            <div>{row.original.tokenTransactionStatus}</div>
-                        </div>
-                    )
-                }
             default:
                 return cell.column.columnDef.cell ? flexRender(cell.column.columnDef.cell, cell) : null;
         }

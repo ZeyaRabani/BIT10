@@ -12,47 +12,37 @@ import { useWallet } from '@/context/WalletContext'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
-
-type PortfolioTableDataType = {
-    tokenSwapId: string;
-    tokenPurchaseAmount: string;
-    tokenPurchaseName: string;
-    bit10TokenQuantity: string;
-    bit10TokenName: string;
-    tokenTransactionStatus: string;
-    tokenBoughtAt: Date | string;
-    transactionIndex: string;
-}
+import type { PortfolioTableDataType } from '@/components/ui/data-table-portfolio'
 
 const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
         accessorKey: 'tokenSwapId',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Swap ID' />
+            <DataTableColumnHeader column={column} title='Transaction ID' />
         ),
     },
     {
-        accessorKey: 'paymentAmount',
+        accessorKey: 'mode',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Purchase Amount' info='Amount paid for buying token' />
+            <DataTableColumnHeader column={column} title='Type' />
         ),
     },
-    // {
-    //     accessorKey: 'bit10_token_quantity',
-    //     header: ({ column }) => (
-    //         <DataTableColumnHeader column={column} title='Quantity' info='No. of BIT10 token bought' />
-    //     ),
-    // },
     {
-        accessorKey: 'bit10TokenName',
+        accessorKey: 'tickIn',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='BIT10 Token' />
+            <DataTableColumnHeader column={column} title='Spent' info='Amount spent for buying token' />
+        ),
+    },
+    {
+        accessorKey: 'tickOutName',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Received' />
         ),
     },
     {
         accessorKey: 'tokenBoughtAt',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Token Bought at' />
+            <DataTableColumnHeader column={column} title='Timestamp' />
         ),
     },
     {
@@ -63,15 +53,7 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 
             return (
                 <a
-                    href={
-                        order.tokenPurchaseName === 'ckBTC'
-                            ? `https://dashboard.internetcomputer.org/bitcoin/transaction/${order.transactionIndex}`
-                            : order.tokenPurchaseName === 'ckETH'
-                                ? `https://dashboard.internetcomputer.org/ethereum/transaction/${order.transactionIndex}`
-                                : order.tokenPurchaseName === 'ICP'
-                                    ? `https://dashboard.internetcomputer.org/transaction/${order.transactionIndex}`
-                                    : '#'
-                    }
+                    href={`/explorer/${order.tokenSwapId}`}
                     target='_blank'
                     rel='noopener noreferrer'
                 >
@@ -130,8 +112,8 @@ export default function RecentActivity() {
                         <DataTable
                             columns={portfolioTableColumns}
                             data={recentActivityData ?? []}
-                            userSearchColumn='bit10TokenName'
-                            inputPlaceHolder='Search by BIT10 token name'
+                            userSearchColumn='tickOutName'
+                            inputPlaceHolder='Search by Received token name'
                         />
                     </CardContent>
                 </Card>

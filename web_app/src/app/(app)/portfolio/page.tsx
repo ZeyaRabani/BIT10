@@ -11,7 +11,7 @@ export default function Page() {
     const { isConnected } = useWallet();
 
     return (
-        <MaxWidthWrapper className='pt-4'>
+        <MaxWidthWrapper className='py-4'>
             {isConnected ? (
                 <Suspense fallback={<Preloader />}>
                     <Portfolio />

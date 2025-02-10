@@ -2,20 +2,9 @@
 "use server"
 
 import { db } from '@/server/db'
-import { mbUsers, userSignups, mbPrincipalIdWhitelist, mbTokenSwap, swap, mbTokenMint, teTokenSwap } from '@/server/db/schema'
+import { mbUsers, userSignups, mbPrincipalIdWhitelist, swap, mbTokenMint, teTokenSwap } from '@/server/db/schema'
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
-
-// interface NewTokenSwap {
-//     newTokenSwapId: string;
-//     principalId: string;
-//     paymentAmount: string;
-//     paymentName: string;
-//     paymentAmountUSD: string;
-//     bit10tokenQuantity: string;
-//     bit10tokenName: string;
-//     transactionIndex: string;
-// }
 
 interface NewTokenSwap {
     newTokenSwapId: string;
@@ -139,21 +128,40 @@ export const newTokenMint = async ({ newTokenMintId, principalId, mintAmount, mi
 export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: string }) => {
     try {
         const data = await db.select({
-            tokenSwapId: mbTokenSwap.tokenSwapId,
-            tokenPurchaseAmount: mbTokenSwap.tokenPurchaseAmount,
-            tokenPurchaseName: mbTokenSwap.tokenPurchaseName,
-            bit10TokenQuantity: mbTokenSwap.bit10TokenQuantity,
-            bit10TokenName: mbTokenSwap.bit10TokenName,
-            tokenTransactionStatus: mbTokenSwap.tokenTransactionStatus,
-            tokenBoughtAt: mbTokenSwap.tokenBoughtAt,
-            transactionIndex: mbTokenSwap.transactionIndex
+            tokenSwapId: swap.tokenSwapId,
+            transactionType: swap.transactionType,
+            tickInAmount: swap.tickInAmount,
+            tickInName: swap.tickInName,
+            tickOutAmount: swap.tickOutAmount,
+            tickOutName: swap.tickOutName,
+            tokenBoughtAt: swap.transactionTimestamp
         })
-            .from(mbTokenSwap)
-            .where(eq(mbTokenSwap.userPrincipalId, paymentAddress))
-            .orderBy(desc(mbTokenSwap.tokenBoughtAt));
+            .from(swap)
+            .where(eq(swap.userPrincipalId, paymentAddress))
+            .orderBy(desc(swap.transactionTimestamp));
         return data;
     } catch (error) {
         return 'Error fetching user recent activity';
+    }
+}
+
+export const transactionDetails = async ({ transactionId }: { transactionId: string }) => {
+    try {
+        const data = await db.select({
+            transactionId: swap.tokenSwapId,
+            transactionType: swap.transactionType,
+            transactionTime: swap.transactionTimestamp,
+            transactionFromAccount: swap.userPrincipalId,
+            transactionTickInAmount: swap.tickInAmount,
+            transactionTickInName: swap.tickInName,
+            transactionTickOutAmount: swap.tickOutAmount,
+            transactionTickOutName: swap.tickOutName,
+        })
+            .from(swap)
+            .where(eq(swap.tokenSwapId, transactionId));
+        return data;
+    } catch (error) {
+        return 'Error fetching transaction details';
     }
 }
 
