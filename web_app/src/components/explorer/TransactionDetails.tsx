@@ -127,7 +127,12 @@ export default function TransactionDetails({ transactionId }: { transactionId: s
 
                                         <div className='flex flex-col md:flex-row md:items-center md:justify-between hover:bg-accent hover:rounded py-1 px-2'>
                                             <div className='font-semibold tracking-wide'>Recieved</div>
-                                            <div className='break-words'>{activity.transactionTickOutAmount} {activity.transactionTickOutName}</div>
+                                            <div className='break-words'>
+                                                {activity.transactionType === "Swap"
+                                                    ? activity.transactionTickOutAmount
+                                                    : (parseFloat(activity.transactionTickOutAmount) / 100000000).toFixed(8)}
+
+                                                {activity.transactionTickOutName}</div>
                                         </div>
                                     </div>
                                 ))}

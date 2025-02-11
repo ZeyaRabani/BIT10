@@ -6,10 +6,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 export const idlFactory = ({ IDL }) => {
-  const SwapArgs = IDL.Record({
+  const ReverseSwapArgs = IDL.Record({
     'tick_out_name': IDL.Text,
     'tick_in_name': IDL.Text,
-    'tick_out_amount': IDL.Nat,
+    'tick_in_amount': IDL.Nat,
   });
   const MbSwapResponseData = IDL.Record({
     'tick_in_tx_block': IDL.Nat,
@@ -28,6 +28,11 @@ export const idlFactory = ({ IDL }) => {
     'Ok': MbSwapResponseData,
     'Err': IDL.Text,
   });
+  const SwapArgs = IDL.Record({
+    'tick_out_name': IDL.Text,
+    'tick_in_name': IDL.Text,
+    'tick_out_amount': IDL.Nat,
+  });
   return IDL.Service({
     'bit10_circulating_supply': IDL.Func(
       [],
@@ -39,6 +44,12 @@ export const idlFactory = ({ IDL }) => {
       [IDL.Variant({ 'Ok': IDL.Nat, 'Err': IDL.Text })],
       [],
     ),
+    'bit10_reverse_swap_supply': IDL.Func(
+      [],
+      [IDL.Vec(IDL.Record({ 'token': IDL.Text, 'supply': IDL.Nat }))],
+      ['query'],
+    ),
+    'mb_reverse_swap': IDL.Func([ReverseSwapArgs], [MbSwapResponse], []),
     'mb_swap': IDL.Func([SwapArgs], [MbSwapResponse], []),
     'te_swap': IDL.Func([SwapArgs], [MbSwapResponse], []),
   });

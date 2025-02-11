@@ -2,7 +2,7 @@
 "use server"
 
 import { db } from '@/server/db'
-import { mbUsers, userSignups, mbPrincipalIdWhitelist, swap, mbTokenMint, teTokenSwap } from '@/server/db/schema'
+import { mbUsers, userSignups, mbPrincipalIdWhitelist, swap, mbTokenMint, teSwap } from '@/server/db/schema'
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
 
@@ -168,11 +168,11 @@ export const transactionDetails = async ({ transactionId }: { transactionId: str
 export const testnetRevenue = async () => {
     try {
         const data = await db.select({
-            tokenPurchaseAmount: teTokenSwap.tokenPurchaseAmount,
-            tokenBoughtAt: teTokenSwap.tokenBoughtAt
+            tokenPurchaseAmount: teSwap.tickInAmount,
+            tokenBoughtAt: teSwap.transactionTimestamp
         })
-            .from(teTokenSwap)
-            .orderBy(teTokenSwap.tokenBoughtAt);
+            .from(teSwap)
+            .orderBy(teSwap.transactionTimestamp);
         return data;
     } catch (error) {
         return 'Error fetching testnet revenue';

@@ -102,7 +102,7 @@ export default function Page() {
 
             return Array.from(groupedMap.entries()).map(([date, total]) => ({
                 date,
-                totalTokenPurchaseAmount: total,
+                totalTokenPurchaseAmount: total / 100000000,
             }));
         }
 

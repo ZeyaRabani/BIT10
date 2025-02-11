@@ -27,7 +27,7 @@ import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10.did'
 import { idlFactory as idlFactory2 } from '@/lib/swap.did'
 import crypto from 'crypto'
-import { newTokenMint, newTokenSwap } from '@/actions/dbActions'
+import { newTokenSwap } from '@/actions/dbActions'
 
 interface BuyingTokenPriceResponse {
   data: {
@@ -37,16 +37,16 @@ interface BuyingTokenPriceResponse {
   };
 }
 
-type ActorType = {
-  icrc1_transfer: (args: {
-    to: { owner: Principal; subaccount: [] };
-    memo: [];
-    fee: [];
-    from_subaccount: [];
-    created_at_time: [];
-    amount: bigint;
-  }) => Promise<{ Ok?: number; Err?: { InsufficientFunds?: null } }>;
-};
+// type ActorType = {
+//   icrc1_transfer: (args: {
+//     to: { owner: Principal; subaccount: [] };
+//     memo: [];
+//     fee: [];
+//     from_subaccount: [];
+//     created_at_time: [];
+//     amount: bigint;
+//   }) => Promise<{ Ok?: number; Err?: { InsufficientFunds?: null } }>;
+// };
 
 type ICRC2ActorType = {
   icrc2_approve: (args: {
@@ -338,87 +338,150 @@ export default function SwapModule() {
 
       if (isMintMode === 'mint') {
         const hasAllowed = await window.ic.plug.requestConnect({
-          whitelist: [bit10DEFICanisterId, bit10BRC20CanisterId]
+          whitelist: [bit10DEFICanisterId, bit10BRC20CanisterId, swapCanisterId]
         });
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        if (hasAllowed) {
+        if (hasAllowed && bit10Amount) {
+          toast.info('Allow the transaction on your wallet to proceed.');
+
           let selectedCanisterId;
 
           if (values.minting_bit10_token === 'BIT10.DEFI') {
             selectedCanisterId = bit10DEFICanisterId;
-          } else if (values.minting_bit10_token === 'BIT10.BRC20') {
-            selectedCanisterId = bit10BRC20CanisterId;
-          } else {
+          }
+          // else if (values.minting_bit10_token === 'BIT10.BRC20') {
+          //   selectedCanisterId = bit10BRC20CanisterId;
+          // } 
+          else {
             throw new Error('Invalid payment method');
           }
 
           const actor = await window.ic.plug.createActor({
             canisterId: selectedCanisterId,
             interfaceFactory: idlFactory,
-          }) as ActorType;
+          }) as ICRC2ActorType;
 
-          const mintingPrincipalId = '4lsko-jea7e-7cxs4-el2uz-2uzfq-emw2x-s2qfe-igrsy-y4zr3-ucgbz-5ae';
-
-          const mintingAmount = (values.minting_bit10_amount * 1.01).toFixed(8);
+          const mintingAmount = (values.minting_bit10_amount * 1.5).toFixed(8);
           const amount = Math.round(parseFloat(mintingAmount) * 100000000).toString();
+          const time = BigInt(Date.now()) * BigInt(1_000_000) + BigInt(300_000_000_000);
+
+          console.log(mintingAmount)
 
           const args = {
-            to: {
-              owner: Principal.fromText(mintingPrincipalId),
+            spender: {
+              owner: Principal.fromText(swapCanisterId),
               subaccount: [] as []
             },
-            memo: [] as [],
             fee: [] as [],
+            memo: [] as [],
             from_subaccount: [] as [],
             created_at_time: [] as [],
-            amount: BigInt(amount)
+            amount: BigInt(amount),
+            expected_allowance: [] as [],
+            expires_at: [time] as [bigint],
           }
 
-          const transfer = await actor.icrc1_transfer(args);
+          const approve = await actor.icrc2_approve(args);
 
-          if (transfer.Ok && principalId) {
-            const uuid = crypto.randomBytes(16).toString('hex');
-            const generateNewTokenMintId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
-            const newTokenMintId = 'mint_' + generateNewTokenMintId;
+          if (approve.Ok) {
+            toast.success('Approval was successful! Proceeding with transfer...');
 
-            const result = await newTokenMint({
-              newTokenMintId: newTokenMintId,
-              principalId: principalId,
-              mintAmount: (values.minting_bit10_amount).toString(),
-              mintName: values.minting_bit10_token,
-              mintAmountUSD: (values.minting_bit10_amount * parseFloat(selectedMintingBit10TokenPrice.toFixed(8)) * 1.01).toString(),
-              recieveAmount: ((selectedMintingBit10TokenPrice * values.minting_bit10_amount) / parseFloat(recieveingTokenPrice)).toString(),
-              recieveName: values.recieving_token,
-              transactionIndex: transfer.Ok.toString()
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const actor2 = await window.ic.plug.createActor({
+              canisterId: swapCanisterId,
+              interfaceFactory: idlFactory2,
             });
 
-            await fetch('/bit10-mint-request', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                newTokenMintId: newTokenMintId,
-                principalId: principalId,
-                mintAmount: (values.minting_bit10_amount).toString(),
-                mintName: values.minting_bit10_token,
-                recieveAmount: ((selectedMintingBit10TokenPrice * values.minting_bit10_amount) / parseFloat(recieveingTokenPrice)).toString(),
-                recieveName: values.recieving_token,
-                tokenMintAt: new Date().toISOString(),
-              }),
-            });
+            const tickInAmount = Math.round(parseFloat(values.minting_bit10_amount.toString()) * 100000000).toString();
 
-            if (result === 'Token mint added successfully') {
-              toast.success('Token mint was successful!');
+            const args2 = {
+              tick_in_name: values.minting_bit10_token,
+              tick_in_amount: Number(tickInAmount),
+              tick_out_name: values.recieving_token
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            const transfer = await actor2.mb_reverse_swap(args2);
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (transfer.Ok) {
+              const uuid = crypto.randomBytes(16).toString('hex');
+              const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+              const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
+
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+              const principal = Principal.fromUint8Array(transfer.Ok.user_principal_id._arr);
+              const textualRepresentation = principal.toText();
+
+              const formatTimestamp = (nanoseconds: string): string => {
+                const milliseconds = BigInt(nanoseconds) / BigInt(1_000_000);
+                const date = new Date(Number(milliseconds));
+
+                return date.toISOString().replace('T', ' ').replace('Z', '+00');
+              };
+
+              const result = await newTokenSwap({
+                newTokenSwapId: newTokenSwapId,
+                principalId: textualRepresentation,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                tickInName: transfer.Ok.tick_in_name,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInAmount: transfer.Ok.tick_in_amount.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInUSDAmount: transfer.Ok.tick_in_usd_amount.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInTxBlock: transfer.Ok.tick_in_tx_block.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickOutName: transfer.Ok.tick_out_name,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickOutAmount: transfer.Ok.tick_out_amount.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickOutTxBlock: transfer.Ok.tick_out_tx_block.toString(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                transactionType: transfer.Ok.transaction_type as 'Swap' | 'Reverse Swap',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                network: transfer.Ok.network,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
+                transactionTimestamp: formatTimestamp(transfer.Ok.transaction_timestamp)
+              });
+
+              await fetch('/bit10-token-request', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  newTokenSwapId: newTokenSwapId,
+                  principalId: principalId,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                  tickOutName: transfer.Ok.tick_out_name,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                  tickOutAmount: transfer.Ok.tick_out_amount.toString(),
+                  transactionTimestamp: new Date().toISOString(),
+                }),
+              });
+
+              if (result === 'Token swap successfully') {
+                toast.success('Token reverse swap was successful!');
+              } else {
+                toast.error('An error occurred while processing your request. Please try again!');
+              }
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            } else if (transfer.Err) {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              const errorMessage = String(transfer.Err);
+              if (errorMessage.includes('Insufficient balance')) {
+                toast.error('Insufficient funds');
+              } else {
+                toast.error('An error occurred while processing your request. Please try again!');
+              }
             } else {
               toast.error('An error occurred while processing your request. Please try again!');
             }
-          } else if (transfer.Err?.InsufficientFunds) {
-            toast.error('Insufficient funds');
           } else {
-            toast.error('Mint failed.');
+            toast.error('Approval failed.');
           }
         }
       } else {
