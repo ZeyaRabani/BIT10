@@ -104,7 +104,7 @@ export default function TransactionDetails({ transactionId }: { transactionId: s
                                         <div className='flex flex-col md:flex-row md:items-center md:justify-between hover:bg-accent hover:rounded py-1 px-2'>
                                             <div className='font-semibold tracking-wide'>Transaction Type</div>
                                             <div>
-                                                <Badge className={activity.transactionType === 'Swap' ? 'bg-primary' : 'bg-[#FF0066]'}>
+                                                <Badge className={activity.transactionType === 'Swap' ? 'bg-primary' : 'bg-[#FF0066] hover:bg-[#f64189]'}>
                                                     {activity.transactionType}
                                                 </Badge>
                                             </div>

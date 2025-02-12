@@ -363,11 +363,9 @@ export default function SwapModule() {
             interfaceFactory: idlFactory,
           }) as ICRC2ActorType;
 
-          const mintingAmount = (values.minting_bit10_amount * 1.5).toFixed(8);
+          const mintingAmount = ((values.minting_bit10_amount * 1.03) + 0.03).toFixed(8);
           const amount = Math.round(parseFloat(mintingAmount) * 100000000).toString();
           const time = BigInt(Date.now()) * BigInt(1_000_000) + BigInt(300_000_000_000);
-
-          console.log(mintingAmount)
 
           const args = {
             spender: {
@@ -703,7 +701,7 @@ export default function SwapModule() {
                 <CardContent className='flex flex-col'>
                   {isMintMode === 'mint' ? (
                     <div className='rounded-lg border-2 py-4 px-6 z-[1]'>
-                      <p>Mint with</p>
+                      <p>Spent</p>
                       <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                         <div className='w-full'>
                           <FormField
@@ -756,13 +754,14 @@ export default function SwapModule() {
                           <Tooltip delayDuration={300}>
                             <TooltipTrigger asChild>
                               <div className='flex flex-row space-x-1'>
-                                $ {(form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(8)) * 1.01).toFixed(8)}
+                                {form.watch('minting_bit10_amount') * 1.01} {form.watch('minting_bit10_token')}
+                                {/* $ {(form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(8)) * 1.01).toFixed(8)} */}
                                 <Info className='w-5 h-5 cursor-pointer ml-1' />
                               </div>
                             </TooltipTrigger>
                             <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                              Price in USD + 1% Minting fee <br />
-                              $ {(form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(11) ?? 'N/A'))} + $ {0.01 * (form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(11) ?? '0'))} = $ {(form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(11) ?? '0')) + (0.01 * (form.watch('minting_bit10_amount') * parseFloat(selectedMintingBit10TokenPrice.toFixed(11) ?? '0')))}
+                              Spent amount + 1% Minting fee <br />
+                              {form.watch('minting_bit10_amount')} + {0.01 * form.watch('minting_bit10_amount')} = {form.watch('minting_bit10_amount') * 1.01}
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -773,7 +772,7 @@ export default function SwapModule() {
                     </div>
                   ) : (
                     <div className='rounded-lg border-2 py-4 px-6 z-[1]'>
-                      <p>Pay with</p>
+                      <p>Spent</p>
                       <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                         <div className='text-4xl text-center md:text-start'>
                           {selectedBit10TokenPrice ? ((parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.03).toFixed(6) : '0'}
@@ -820,7 +819,7 @@ export default function SwapModule() {
                               </div>
                             </TooltipTrigger>
                             <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                              Price in {form.watch('payment_method')} + 3% Platform fee <br />
+                              Spent amount + 3% Platform fee <br />
                               $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))} = $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))}
                             </TooltipContent>
                           </Tooltip>
