@@ -208,7 +208,7 @@ export default function SwapModule() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      payment_method: 'ckBTC',
+      payment_method: 'ICP',
       bit10_amount: '1',
       bit10_token: 'BIT10.DEFI',
       minting_bit10_amount: 0.03,
@@ -363,7 +363,7 @@ export default function SwapModule() {
             interfaceFactory: idlFactory,
           }) as ICRC2ActorType;
 
-          const mintingAmount = ((values.minting_bit10_amount * 1.03) + 0.03).toFixed(8);
+          const mintingAmount = ((values.minting_bit10_amount * 1.03) + 0.03).toFixed(8); // More in case of sudden price change
           const amount = Math.round(parseFloat(mintingAmount) * 100000000).toString();
           const time = BigInt(Date.now()) * BigInt(1_000_000) + BigInt(300_000_000_000);
 
@@ -512,11 +512,11 @@ export default function SwapModule() {
           let selectedAmount;
 
           if (values.payment_method === 'ckBTC') {
-            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(btcAmount) * 2); // More in case of sudden price change
+            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(btcAmount) * 1.5); // More in case of sudden price change
           } else if (values.payment_method === 'ckETH') {
-            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount) * 2);
+            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(ethAmount) * 1.5);
           } else if (values.payment_method === 'ICP') {
-            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount) * 2);
+            selectedAmount = ((parseFloat(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(icpAmount) * 1.5);
           } else {
             throw new Error('Invalid payment method');
           }
