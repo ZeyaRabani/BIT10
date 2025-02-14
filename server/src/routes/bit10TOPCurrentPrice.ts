@@ -8,19 +8,18 @@ type CoinData = {
     id: number;
     name: string;
     symbol: string;
-    tokenAddress: string;
     price: number;
 };
 
-type Bit10BRC20Entry = {
+type Bit10TOPEntry = {
     timestmpz: string;
     tokenPrice: number;
     data: CoinData[];
 };
 
-const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20.json');
+const jsonFilePath = path.join(__dirname, '../../../data/bit10_top.json');
 const cache = new NodeCache();
-let latestData: { bit10_brc20: Bit10BRC20Entry[] } | null = null;
+let latestData: { bit10_top: Bit10TOPEntry[] } | null = null;
 
 async function fetchData() {
     try {
@@ -32,11 +31,11 @@ async function fetchData() {
 
         const fileContent = fs.readFileSync(jsonFilePath, 'utf-8');
         latestData = JSON.parse(fileContent);
-        console.log('BIT10.BRC20 Current Data refreshed at:', new Date().toISOString());
+        console.log('BIT10.TOP Current Data refreshed at:', new Date().toISOString());
 
-        cache.set('bit10_brc20_current_price_data', latestData);
+        cache.set('bit10_top_current_price_data', latestData);
     } catch (error) {
-        console.error('Error reading JSON file for BIT10.BRC20:', error);
+        console.error('Error reading JSON file for BIT10.TOP:', error);
         latestData = null;
     }
 }
@@ -48,7 +47,7 @@ cron.schedule('*/30 * * * *', () => { // 30 min
 
 fetchData().catch(error => console.error('Error in initial data fetch:', error));
 
-export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBit10TOPCurrentPrice = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(405);
@@ -57,12 +56,12 @@ export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, res
     }
 
     try {
-        const cachedData = cache.get<{ bit10_brc20: Bit10BRC20Entry[] }>('bit10_brc20_current_price_data');
+        const cachedData = cache.get<{ bit10_top: Bit10TOPEntry[] }>('bit10_top_current_price_data');
 
-        if (cachedData?.bit10_brc20?.length) {
+        if (cachedData?.bit10_top?.length) {
             response.setHeader('Content-Type', 'application/json');
             response.writeHead(200);
-            response.end(JSON.stringify(cachedData.bit10_brc20[0]));
+            response.end(JSON.stringify(cachedData.bit10_top[0]));
             return;
         }
 

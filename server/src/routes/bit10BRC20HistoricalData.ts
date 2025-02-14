@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
+import cron from 'node-cron'
 
 interface Coin {
     id: number;
@@ -92,10 +93,10 @@ async function fetchAndUpdateData() {
     }
 }
 
-setInterval(() => {
+// cron.schedule('*/30 * * * * *', () => { // 30 sec
+cron.schedule('*/30 * * * *', () => { // 30 min.
     fetchAndUpdateData().catch(error => console.error('Error in fetchAndUpdateData for BIT10.BRC20:', error));
-}, 30 * 60 * 1000); // 30 * 60 * 1000 = 1800000 milliseconds = 30 min
-// }, 3 * 1000); // 3 * 1000 = 3000 milliseconds = 3 seconds
+});
 
 export const handleBit10BRC20HistoricalData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {

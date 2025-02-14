@@ -1,8 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import fs from 'fs'
+import fs from 'fs/promises'
 import path from 'path'
 import axios from 'axios'
 import NodeCache from 'node-cache'
+import cron from 'node-cron'
 
 type CoinData = {
     id: number;
@@ -19,90 +20,87 @@ type Bit10BRC20Entry = {
 };
 
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20.json');
-const cache = new NodeCache();
+const jsonRebalanceFilePath = path.join(__dirname, '../../../data/bit10_brc20_rebalance.json');
+const cache = new NodeCache({ stdTTL: 1800 });
 
-async function fetchAndUpdateData() {
+const fetchAndUpdateData = async () => {
+    const coinmarketCapKey = process.env.COINMARKETCAP_API_KEY;
+
+    if (!coinmarketCapKey) {
+        console.error('COINMARKETCAP_API_KEY is not defined.');
+        return;
+    }
+
     try {
-        const jsonRebalanceFilePath = path.join(__dirname, '../../../data/bit10_brc20_rebalance.json');
-        const rebalanceData = JSON.parse(fs.readFileSync(jsonRebalanceFilePath, 'utf-8'));
-
-        const changes = rebalanceData.bit10_brc20_rebalance[0].changes;
-        const addedIds = changes.added.map((token: { id: number }) => token.id);
-        const retainedIds = changes.retained.map((token: { id: number }) => token.id);
-
+        const rebalanceData = await readJsonFile(jsonRebalanceFilePath);
+        const changes = rebalanceData.bit10_brc20_rebalance?.[0]?.changes || {};
+        const addedIds = changes.added?.map((token: { id: number }) => token.id) || [];
+        const retainedIds = changes.retained?.map((token: { id: number }) => token.id) || [];
         const combinedIds = [...addedIds, ...retainedIds];
 
-        const coinmarket_cap_key = process.env.COINMARKETCAP_API_KEY;
-        const url = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${combinedIds.join(',')}&CMC_PRO_API_KEY=${coinmarket_cap_key}`;
+        if (combinedIds.length === 0) {
+            console.warn('No token IDs found for BIT10.BRC20 rebalance.');
+            return;
+        }
 
-        const result = await axios.get(url);
+        const url = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${combinedIds.join(',')}`;
+        const result = await axios.get(url, {
+            headers: { 'X-CMC_PRO_API_KEY': coinmarketCapKey },
+        });
 
         const dataEntries = Object.values(result.data.data) as {
             id: number;
             name: string;
             symbol: string;
             platform: {
-                token_address: string;
-            }
+                token_address: string
+            };
             quote: {
                 USD: {
-                    price: number;
-                };
+                    price: number
+                }
             };
         }[];
 
-        const coinsData = dataEntries.map(entry => ({
+        const coinsData = dataEntries.map((entry) => ({
             id: entry.id,
             name: entry.name,
             symbol: entry.symbol,
             tokenAddress: entry.platform.token_address,
             price: entry.quote.USD.price
-        }))
+        }));
 
-        const totalPrice = dataEntries.reduce((sum, entry) => sum + entry.quote.USD.price, 0);
-        const tokenPrice = totalPrice / dataEntries.length;
+        const totalPrice = coinsData.reduce((sum, coin) => sum + coin.price, 0);
+        const tokenPrice = totalPrice / coinsData.length;
 
-        const newEntry = {
+        const newEntry: Bit10BRC20Entry = {
             timestmpz: new Date().toISOString(),
             tokenPrice,
-            data: coinsData
+            data: coinsData,
         };
 
-        let existingData;
-        try {
-            existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')) as { bit10_brc20: Bit10BRC20Entry[] };
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (err) {
-            console.error('Error fetching data for BIT10.BRC20:', err);
-            existingData = { bit10_brc20: [] };
-        }
-
+        let existingData = await readJsonFile(jsonFilePath);
         existingData.bit10_brc20.unshift(newEntry);
-
         cache.set('bit10_brc20_data', existingData);
 
-        fs.writeFileSync(jsonFilePath, JSON.stringify(existingData, null, 2));
-        console.log('Adding data for BIT10.BRC20');
+        await writeJsonFile(jsonFilePath, existingData);
+        console.log('BIT10.BRC20 data updated successfully.');
     } catch (error) {
-        console.error('Error fetching data for BIT10.BRC20:', error);
+        console.error('Error fetching BIT10.BRC20 data:', error);
     }
-}
+};
 
-setInterval(() => {
-    fetchAndUpdateData().catch(error => console.error('Error in fetchAndUpdateData for BIT10.BRC20:', error));
-}, 30 * 60 * 1000); // 30 * 60 * 1000 = 1800000 milliseconds = 30 min
-// }, 3 * 1000); // 3 * 1000 = 3000 milliseconds = 3 seconds
+// cron.schedule('*/30 * * * * *', fetchAndUpdateData); // 30 sec
+cron.schedule('*/30 * * * *', fetchAndUpdateData); // 30 min
 
 const filterDataByDays = (data: Bit10BRC20Entry[], days: number): Bit10BRC20Entry[] => {
-    const currentTime = Date.now();
-    const cutoffTime = currentTime - days * 24 * 60 * 60 * 1000;
+    const cutoffTime = Date.now() - days * 24 * 60 * 60 * 1000;
     return data.filter((entry) => new Date(entry.timestmpz).getTime() >= cutoffTime);
 };
 
 export const handleBit10BRC20 = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(405);
+        response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed for BIT10.BRC20' }));
         return;
     }
@@ -111,32 +109,39 @@ export const handleBit10BRC20 = async (request: IncomingMessage, response: Serve
         let existingData = cache.get<{ bit10_brc20: Bit10BRC20Entry[] }>('bit10_brc20_data');
 
         if (!existingData) {
-            if (fs.existsSync(jsonFilePath)) {
-                existingData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
-                cache.set('bit10_brc20_data', existingData);
-            } else {
-                existingData = { bit10_brc20: [] };
-            }
+            existingData = await readJsonFile(jsonFilePath);
+            cache.set('bit10_brc20_data', existingData);
         }
 
-        const url = new URL(request.url || '', `http://${request.headers.host}`);
+        const url = new URL(request.url || '', `http://${request.headers?.host || 'localhost'}`);
         const dayParam = url.searchParams.get('day');
 
         let responseData = existingData?.bit10_brc20 || [];
+        if (dayParam === '1') responseData = filterDataByDays(responseData, 1);
+        else if (dayParam === '7') responseData = filterDataByDays(responseData, 7);
 
-        if (dayParam === '1') {
-            responseData = filterDataByDays(responseData, 1);
-        } else if (dayParam === '7') {
-            responseData = filterDataByDays(responseData, 7);
-        }
-
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(200);
+        response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ bit10_brc20: responseData }));
     } catch (error) {
-        console.error('Error reading data:', error);
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(500);
-        response.end(JSON.stringify({ error: 'Error reading data for BIT10.BRC20' }));
+        console.error('Error handling BIT10.BRC20 request:', error);
+        response.writeHead(500, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify({ error: 'Internal Server Error' }));
     }
 };
+
+async function readJsonFile(filePath: string) {
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data);
+    } catch {
+        return { bit10_brc20: [] };
+    }
+}
+
+async function writeJsonFile(filePath: string, data: object) {
+    try {
+        await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+    } catch (error) {
+        console.error('Error writing file:', error);
+    }
+}
