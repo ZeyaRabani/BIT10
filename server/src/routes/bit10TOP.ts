@@ -32,10 +32,8 @@ const fetchAndUpdateData = async () => {
 
     try {
         const rebalanceData = await readJsonFile(jsonRebalanceFilePath);
-        const changes = rebalanceData.test_bit10_top_rebalance?.[0]?.changes || {};
-        const addedIds = changes.added?.map((token: { id: number }) => token.id) || [];
-        const retainedIds = changes.retained?.map((token: { id: number }) => token.id) || [];
-        const combinedIds = [...addedIds, ...retainedIds];
+        const newTokens = rebalanceData.test_bit10_top_rebalance?.[0]?.newTokens || [];
+        const combinedIds = newTokens.map((token: { id: number }) => token.id);
 
         if (combinedIds.length === 0) {
             console.warn('No token IDs found for BIT10.TOP rebalance.');

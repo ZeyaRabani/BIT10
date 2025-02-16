@@ -13,14 +13,14 @@ type CoinData = {
     price: number;
 };
 
-type Bit10BRC20Entry = {
+type Bit10MEMEEntry = {
     timestmpz: string;
     tokenPrice: number;
     data: CoinData[];
 };
 
-const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20.json');
-const jsonRebalanceFilePath = path.join(__dirname, '../../../data/bit10_brc20_rebalance.json');
+const jsonFilePath = path.join(__dirname, '../../../data/bit10_meme.json');
+const jsonRebalanceFilePath = path.join(__dirname, '../../../data/test_bit10_meme_rebalance.json');
 const cache = new NodeCache({ stdTTL: 1800 });
 
 const fetchAndUpdateData = async () => {
@@ -33,11 +33,11 @@ const fetchAndUpdateData = async () => {
 
     try {
         const rebalanceData = await readJsonFile(jsonRebalanceFilePath);
-        const newTokens = rebalanceData.bit10_brc20_rebalance?.[0]?.newTokens || [];
+        const newTokens = rebalanceData.test_bit10_meme_rebalance?.[0]?.newTokens || [];
         const combinedIds = newTokens.map((token: { id: number }) => token.id);
 
         if (combinedIds.length === 0) {
-            console.warn('No token IDs found for BIT10.BRC20 rebalance.');
+            console.warn('No token IDs found for BIT10.MEME rebalance.');
             return;
         }
 
@@ -51,12 +51,13 @@ const fetchAndUpdateData = async () => {
             name: string;
             symbol: string;
             platform: {
-                token_address: string
-            };
+                slug: string | null;
+                token_address: string | null;
+            }
             quote: {
                 USD: {
-                    price: number
-                }
+                    price: number;
+                };
             };
         }[];
 
@@ -64,64 +65,65 @@ const fetchAndUpdateData = async () => {
             id: entry.id,
             name: entry.name,
             symbol: entry.symbol,
-            tokenAddress: entry.platform.token_address,
+            chain: entry.platform?.slug ?? '',
+            tokenAddress: entry.platform?.token_address ?? '',
             price: entry.quote.USD.price
         }));
 
         const totalPrice = coinsData.reduce((sum, coin) => sum + coin.price, 0);
         const tokenPrice = totalPrice / coinsData.length;
 
-        const newEntry: Bit10BRC20Entry = {
+        const newEntry: Bit10MEMEEntry = {
             timestmpz: new Date().toISOString(),
             tokenPrice,
             data: coinsData,
         };
 
         let existingData = await readJsonFile(jsonFilePath);
-        existingData.bit10_brc20.unshift(newEntry);
-        cache.set('bit10_brc20_data', existingData);
+        existingData.bit10_meme.unshift(newEntry);
+        cache.set('bit10_meme_data', existingData);
 
         await writeJsonFile(jsonFilePath, existingData);
-        console.log('BIT10.BRC20 data updated successfully.');
+        console.log('BIT10.MEME data updated successfully.');
     } catch (error) {
-        console.error('Error fetching BIT10.BRC20 data:', error);
+        console.error('Error fetching BIT10.MEME data:', error);
     }
 };
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateData); // 30 sec
 cron.schedule('*/30 * * * *', fetchAndUpdateData); // 30 min
 
-const filterDataByDays = (data: Bit10BRC20Entry[], days: number): Bit10BRC20Entry[] => {
+const filterDataByDays = (data: Bit10MEMEEntry[], days: number): Bit10MEMEEntry[] => {
     const cutoffTime = Date.now() - days * 24 * 60 * 60 * 1000;
     return data.filter((entry) => new Date(entry.timestmpz).getTime() >= cutoffTime);
 };
 
-export const handleBit10BRC20 = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBit10MEME = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.writeHead(405, { 'Content-Type': 'application/json' });
-        response.end(JSON.stringify({ error: 'Method Not Allowed for BIT10.BRC20' }));
+        response.end(JSON.stringify({ error: 'Method Not Allowed for BIT10.MEME' }));
         return;
     }
 
     try {
-        let existingData = cache.get<{ bit10_brc20: Bit10BRC20Entry[] }>('bit10_brc20_data');
+        let existingData = cache.get<{ bit10_meme: Bit10MEMEEntry[] }>('bit10_meme_data');
 
         if (!existingData) {
             existingData = await readJsonFile(jsonFilePath);
-            cache.set('bit10_brc20_data', existingData);
+            cache.set('bit10_meme_data', existingData);
         }
 
         const url = new URL(request.url || '', `http://${request.headers?.host || 'localhost'}`);
         const dayParam = url.searchParams.get('day');
 
-        let responseData = existingData?.bit10_brc20 || [];
+        let responseData = existingData?.bit10_meme || [];
         if (dayParam === '1') responseData = filterDataByDays(responseData, 1);
         else if (dayParam === '7') responseData = filterDataByDays(responseData, 7);
 
         response.writeHead(200, { 'Content-Type': 'application/json' });
-        response.end(JSON.stringify({ bit10_brc20: responseData }));
+        response.end(JSON.stringify({ bit10_meme: responseData }));
     } catch (error) {
-        console.error('Error handling BIT10.BRC20 request:', error);
+        console.error('Error handling BIT10.MEME request:', error);
         response.writeHead(500, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Internal Server Error' }));
     }
@@ -132,7 +134,7 @@ async function readJsonFile(filePath: string) {
         const data = await fs.readFile(filePath, 'utf-8');
         return JSON.parse(data);
     } catch {
-        return { bit10_brc20: [] };
+        return { bit10_meme: [] };
     }
 }
 

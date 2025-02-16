@@ -8,7 +8,11 @@ import { handleBit10BRC20HistoricalData } from './routes/bit10BRC20HistoricalDat
 import { handleBit10TOP } from './routes/bit10TOP'
 import { handleBit10TOPCurrentPrice } from './routes/bit10TOPCurrentPrice'
 import { handleBit10TOPHistoricalData } from './routes/bit10TOPHistoricalData'
+import { handleBit10MEME } from './routes/bit10MEME'
+import { handleBit10MEMECurrentPrice } from './routes/bit10MEMECurrentPrice'
 import { handleBit10MEMEHistoricalData } from './routes/bit10MEMEHistoricalData'
+import { handleTestBit10MEMERebalance } from './routes/testBit10MEMERebalance'
+import { handleTestBit10TOPRebalance } from './routes/testBit10TOPRebalance'
 
 dotenv.config();
 
@@ -29,9 +33,13 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/test-bit10-top?day=7': handleBit10TOP,
     '/test-bit10-top-current-price': handleBit10TOPCurrentPrice,
     '/bit10-top-historical-data': handleBit10TOPHistoricalData,
-    // Add BIT10.MEME: test-bit10-meme, test-bit10-meme?day=1, test-bit10-meme?day=7, test-bit10-meme-current-price, bit10-meme-historical-data
+    '/test-bit10-top-rebalance': handleTestBit10TOPRebalance,
+    '/test-bit10-meme': handleBit10MEME,
+    '/test-bit10-meme?day=1': handleBit10MEME,
+    '/test-bit10-meme?day=7': handleBit10MEME,
+    '/test-bit10-meme-current-price': handleBit10MEMECurrentPrice,
     '/bit10-meme-historical-data': handleBit10MEMEHistoricalData,
-    // Rebalance for bit10-defi, bit10-brc20, test-bit10-top, test-bit10-meme: Rebalance happens on every Wednsay, 3:30 PM IST
+    '/test-bit10-meme-rebalance': handleTestBit10MEMERebalance,
 };
 
 const requestHandler = (request: http.IncomingMessage, response: http.ServerResponse) => {
