@@ -77,14 +77,14 @@ const fetchAndUpdateData = async () => {
 
         const rebalanceData: TestBit10TOPRebalanceData = {
             timestmpz: latestData.timestmpz,
+            indexValue: latestData.tokenPrice,
             priceOfTokenToBuy,
             newTokens,
             changes: {
                 added: addedTokens,
                 removed: removedTokens,
                 retained: retainedTokens
-            },
-            indexValue: latestData.tokenPrice
+            }
         };
 
         existingData.test_bit10_top_rebalance.unshift(rebalanceData);

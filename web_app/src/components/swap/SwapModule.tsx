@@ -66,9 +66,9 @@ type Mode = 'swap' | 'mint';
 // const tabs = ['Quick Swap', 'Advanced Trading']
 
 const paymentMethod = [
+  'ICP',
   'ckBTC',
-  'ckETH',
-  'ICP'
+  'ckETH'
 ]
 
 const bit10Amount = [
