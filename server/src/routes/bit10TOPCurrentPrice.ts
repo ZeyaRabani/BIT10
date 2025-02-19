@@ -31,11 +31,11 @@ async function fetchData() {
 
         const fileContent = fs.readFileSync(jsonFilePath, 'utf-8');
         latestData = JSON.parse(fileContent);
-        console.log('BIT10.TOP Current Data refreshed at:', new Date().toISOString());
+        console.log('Test BIT10.TOP Current Data refreshed at:', new Date().toISOString());
 
         cache.set('bit10_top_current_price_data', latestData);
     } catch (error) {
-        console.error('Error reading JSON file for BIT10.TOP:', error);
+        console.error('Error reading JSON file for Test BIT10.TOP:', error);
         latestData = null;
     }
 }
@@ -56,12 +56,12 @@ export const handleBit10TOPCurrentPrice = async (request: IncomingMessage, respo
     }
 
     try {
-        const cachedData = cache.get<{ bit10_top: Bit10TOPEntry[] }>('bit10_top_current_price_data');
+        const cachedData = cache.get<{ bit10_top_current_price: Bit10TOPEntry[] }>('bit10_top_current_price_data');
 
-        if (cachedData?.bit10_top?.length) {
+        if (cachedData?.bit10_top_current_price?.length) {
             response.setHeader('Content-Type', 'application/json');
             response.writeHead(200);
-            response.end(JSON.stringify(cachedData.bit10_top[0]));
+            response.end(JSON.stringify(cachedData.bit10_top_current_price[0]));
             return;
         }
 

@@ -25,7 +25,7 @@ export function Welcome() {
                                         We are on Testnet!
                                     </Heading>
                                     <Text className='text-white text-lg'>
-                                        Building the S&P 500 of Bitcoin
+                                        Building the S&P 500 of crypto
                                     </Text>
                                 </Column>
                             </Row>
@@ -36,7 +36,7 @@ export function Welcome() {
                                 Thank you for signing up to BIT10&apos;s testnet, here&apos;s what you can expect and how to get started
                             </Heading>
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                <span className='font-bold'>BIT10</span> is an innovative asset manager designed to give you the opportunity to buy our Index, which tracks the biggest crypto tokens, ordinals, and BRC-20&apos;s in the Bitcoin DeFi ecosystem. With BIT10, you can hold a pre-picked basket of assets simply by purchasing one token.
+                                <span className='font-bold'>BIT10</span> is an innovative asset manager designed to give you the opportunity to buy our Index, which tracks the biggest crypto tokens in the ecosystem. With BIT10, you can hold a pre-picked basket of assets simply by purchasing one token.
                             </Text>
 
                             <Hr className='my-5' />
@@ -46,13 +46,13 @@ export function Welcome() {
                             </Heading>
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                1. <span className='font-bold'>Diversification</span>: Our Index tracks the biggest and most promising crypto tokens, ordinals, and BRC-20&apos;s in the Bitcoin DeFi ecosystem.
+                                1. <span className='font-bold'>Diversification</span>: Our Index tracks the biggest and most promising crypto tokens, BRC-20&apos;s, and more in the crypto ecosystem.
                             </Text>
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
                                 2. <span className='font-bold'>Simplicity</span>: Hold a variety of assets by simply buying one token.
                             </Text>
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                3. <span className='font-bold'>Innovation</span>: BIT10 combines Bitcoin&apos;s stability with advanced financial tools, offering you a modern solution for your investments.
+                                3. <span className='font-bold'>Innovation</span>: BIT10 combines top crypto stability with advanced financial tools, offering you a modern solution for your investments.
                             </Text>
 
                             <Hr className='my-5' />

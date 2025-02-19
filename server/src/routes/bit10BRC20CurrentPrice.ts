@@ -57,12 +57,12 @@ export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, res
     }
 
     try {
-        const cachedData = cache.get<{ bit10_brc20: Bit10BRC20Entry[] }>('bit10_brc20_current_price_data');
+        const cachedData = cache.get<{ bit10_brc20_current_price: Bit10BRC20Entry[] }>('bit10_brc20_current_price_data');
 
-        if (cachedData?.bit10_brc20?.length) {
+        if (cachedData?.bit10_brc20_current_price?.length) {
             response.setHeader('Content-Type', 'application/json');
             response.writeHead(200);
-            response.end(JSON.stringify(cachedData.bit10_brc20[0]));
+            response.end(JSON.stringify(cachedData.bit10_brc20_current_price[0]));
             return;
         }
 

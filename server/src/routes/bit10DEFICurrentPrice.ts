@@ -56,12 +56,12 @@ export const handleBit10DEFICurrentPrice = async (request: IncomingMessage, resp
     }
 
     try {
-        const cachedData = cache.get<{ bit10_defi: Bit10DEFIEntry[] }>('bit10_defi_current_price_data');
+        const cachedData = cache.get<{ bit10_defi_current_price: Bit10DEFIEntry[] }>('bit10_defi_current_price_data');
 
-        if (cachedData?.bit10_defi?.length) {
+        if (cachedData?.bit10_defi_current_price?.length) {
             response.setHeader('Content-Type', 'application/json');
             response.writeHead(200);
-            response.end(JSON.stringify(cachedData.bit10_defi[0]));
+            response.end(JSON.stringify(cachedData.bit10_defi_current_price[0]));
             return;
         }
 

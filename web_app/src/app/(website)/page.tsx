@@ -93,7 +93,7 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
               className='text-4xl md:text-6xl font-bold text-center bg-clip-text dark:text-transparent dark:bg-gradient-to-b dark:from-neutral-50 dark:to-neutral-400 bg-opacity-50'>
-              BIT10 <br /> <span className='italic'>S&P500 of Bitcoin DeFi</span>
+              BIT10 <br /> <span className='italic'>S&P500 of crypto</span>
             </motion.h1>
 
             <motion.p
@@ -101,8 +101,8 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8, ease: 'easeInOut' }}
               className='mt-4 font-normal text-lg dark:text-neutral-300 max-w-4xl text-center mx-auto'>
-              For investors, researching the right investment in Bitcoin DeFi can be time-consuming. <br /> Buying individual tokens involves high risks and fees. <br />
-              We simplify the process by offering investors a single diversified token in Bitcoin DeFi. <br />
+              For investors, researching the right investment in crypto can be time-consuming. <br /> Buying individual tokens involves high risks and fees. <br />
+              We simplify the process by offering investors a single diversified token in crypto. <br />
             </motion.p>
 
             <motion.div
@@ -186,7 +186,7 @@ export default function Page() {
           <motion.p
             {...sectionMotionProps}
             className='md:max-w-3xl'>
-            Discover BIT10, your gateway to a diversified, auto-rebalancing index of top crypto tokens, ordinals, and BRC-20s. Simplify investing, reduce costs, and maximize returns across Bitcoin and beyond.          </motion.p>
+            Discover BIT10, your gateway to a diversified, auto-rebalancing index of top crypto tokens, BRC-20s, and more. Simplify investing, reduce costs, and maximize returns across Bitcoin and beyond.</motion.p>
           <div className='py-2 md:py-4 grid gap-6 overflow-hidden lg:overflow-visible'>
             <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
               <motion.div
@@ -196,7 +196,7 @@ export default function Page() {
                   <div className='max-w-md flex-1'>
                     <div className='text-2xl md:text-3xl font-semibold tracking-wide'>Decentralized Index Token</div>
                     <div className='text-xl mt-2'>
-                      Invest in a token backed by the value of the top cryptocurrencies or specifically curated Bitcoin native assets. Experience the potential benefits of diversification in the fast-evolving world of digital assets.
+                      Invest in a token backed by the value of the top cryptocurrencies or specifically curated assets. Experience the potential benefits of diversification in the fast-evolving world of digital assets.
                     </div>
                   </div>
                   <div className='absolute -right-[10%] -bottom-[80%] lg:-bottom-[40%]'>

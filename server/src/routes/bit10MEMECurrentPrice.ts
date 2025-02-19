@@ -8,6 +8,7 @@ type CoinData = {
     id: number;
     name: string;
     symbol: string;
+    chain: string;
     tokenAddress: string;
     price: number;
 };
@@ -20,7 +21,7 @@ type Bit10MEMEEntry = {
 
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_meme.json');
 const cache = new NodeCache();
-let latestData: { bit10_meme: Bit10MEMEEntry[] } | null = null;
+let latestData: { bit10_top: Bit10MEMEEntry[] } | null = null;
 
 async function fetchData() {
     try {
@@ -32,11 +33,11 @@ async function fetchData() {
 
         const fileContent = fs.readFileSync(jsonFilePath, 'utf-8');
         latestData = JSON.parse(fileContent);
-        console.log('BIT10.MEME Current Data refreshed at:', new Date().toISOString());
+        console.log('Test BIT10.MEME Current Data refreshed at:', new Date().toISOString());
 
         cache.set('bit10_meme_current_price_data', latestData);
     } catch (error) {
-        console.error('Error reading JSON file for BIT10.MEME:', error);
+        console.error('Error reading JSON file for Test BIT10.MEME:', error);
         latestData = null;
     }
 }
@@ -57,12 +58,12 @@ export const handleBit10MEMECurrentPrice = async (request: IncomingMessage, resp
     }
 
     try {
-        const cachedData = cache.get<{ bit10_meme: Bit10MEMEEntry[] }>('bit10_meme_current_price_data');
+        const cachedData = cache.get<{ bit10_meme_current_price: Bit10MEMEEntry[] }>('bit10_meme_current_price_data');
 
-        if (cachedData?.bit10_meme?.length) {
+        if (cachedData?.bit10_meme_current_price?.length) {
             response.setHeader('Content-Type', 'application/json');
             response.writeHead(200);
-            response.end(JSON.stringify(cachedData.bit10_meme[0]));
+            response.end(JSON.stringify(cachedData.bit10_meme_current_price[0]));
             return;
         }
 

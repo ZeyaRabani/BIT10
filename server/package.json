@@ -5,6 +5,11 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:pull": "drizzle-kit introspect",
     "dev": "nodemon src/server.ts"
   },
   "keywords": [],
@@ -12,20 +17,18 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.10.1",
     "@types/node-cron": "^3.0.11",
-    "@types/node-fetch": "^2.6.12",
-    "axios": "^1.7.8",
-    "express": "^4.21.1",
-    "nodemon": "^3.1.7",
+    "axios": "^1.7.9",
+    "drizzle-kit": "^0.30.4",
+    "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.39.3",
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.3",
-    "node-fetch": "^3.3.2"
+    "postgres": "^3.4.5"
   }
 }
