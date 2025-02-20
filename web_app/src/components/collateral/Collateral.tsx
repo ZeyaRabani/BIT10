@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { LoaderCircle, ExternalLink } from 'lucide-react'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/oracle.did'
+// import RebalanceCollateral from './RebalanceCollateral'
 
 interface AllocationDataType {
     symbol: string;
@@ -312,7 +313,7 @@ export default function Collateral() {
                         </div>
 
                         {/* <div>
-                            <div className='text-2xl'>BIT10.BRC20</div>
+                            <RebalanceCollateral />
                         </div> */}
                     </CardContent>
                 </Card>

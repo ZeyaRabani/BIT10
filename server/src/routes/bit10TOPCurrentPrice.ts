@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import fs from 'fs'
+import fs from 'fs/promises'
 import path from 'path'
 import NodeCache from 'node-cache'
 import cron from 'node-cron'
@@ -19,24 +19,19 @@ type Bit10TOPEntry = {
 
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_top.json');
 const cache = new NodeCache();
-let latestData: { bit10_top: Bit10TOPEntry[] } | null = null;
+let latestData: { bit10_top_current_price: Bit10TOPEntry[] } | null = null;
 
 async function fetchData() {
     try {
-        if (!fs.existsSync(jsonFilePath)) {
-            console.warn(`JSON file not found: ${jsonFilePath}`);
-            latestData = null;
-            return;
+        const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
+        const parsedData: { bit10_top_current_price: Bit10TOPEntry[] } = JSON.parse(fileContent);
+        if (parsedData.bit10_top_current_price.length > 0) {
+            latestData = { bit10_top_current_price: [parsedData.bit10_top_current_price[0]] };
+            cache.set('bit10_top_current_price_data', latestData.bit10_top_current_price[0]);
+            console.log('Test BIT10.TOP Current Data refreshed at:', new Date().toISOString());
         }
-
-        const fileContent = fs.readFileSync(jsonFilePath, 'utf-8');
-        latestData = JSON.parse(fileContent);
-        console.log('Test BIT10.TOP Current Data refreshed at:', new Date().toISOString());
-
-        cache.set('bit10_top_current_price_data', latestData);
     } catch (error) {
         console.error('Error reading JSON file for Test BIT10.TOP:', error);
-        latestData = null;
     }
 }
 
@@ -49,29 +44,19 @@ fetchData().catch(error => console.error('Error in initial data fetch:', error))
 
 export const handleBit10TOPCurrentPrice = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(405);
+        response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));
         return;
     }
 
-    try {
-        const cachedData = cache.get<{ bit10_top_current_price: Bit10TOPEntry[] }>('bit10_top_current_price_data');
+    const cachedData = cache.get<Bit10TOPEntry>('bit10_top_current_price_data') || latestData;
 
-        if (cachedData?.bit10_top_current_price?.length) {
-            response.setHeader('Content-Type', 'application/json');
-            response.writeHead(200);
-            response.end(JSON.stringify(cachedData.bit10_top_current_price[0]));
-            return;
-        }
-
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(404);
-        response.end(JSON.stringify({ error: 'No data available' }));
-    } catch (error) {
-        console.error('Error serving data:', error);
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(500);
-        response.end(JSON.stringify({ error: 'Internal Server Error' }));
+    if (cachedData) {
+        response.writeHead(200, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify(cachedData));
+        return;
     }
+
+    response.writeHead(404, { 'Content-Type': 'application/json' });
+    response.end(JSON.stringify({ error: 'No data available' }));
 };

@@ -7,10 +7,10 @@ import NodeCache from 'node-cache'
 const cache = new NodeCache({ stdTTL: 6 * 24 * 60 * 60 });
 
 async function fetchData() {
-    const cacheKey = 'bit10Brc20RebalanceData';
+    const cacheKey = 'bit10_brc20_rebalance_data';
     const cachedData = cache.get(cacheKey);
 
-    if (cachedData) {
+    if (cachedData !== undefined) {
         return cachedData;
     }
 
@@ -24,26 +24,25 @@ async function fetchData() {
         return result;
     } catch (error) {
         console.error('Error reading rebalance data for BIT10.BRC20:', error);
+        cache.set(cacheKey, [], 300);
+        return [];
     }
 }
 
 export const handleBit10BRC20RebalanceData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(405);
+        response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));
         return;
     }
 
     try {
         const rebalanceData = await fetchData();
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(200);
+        response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ rebalanceData }));
     } catch (error) {
         console.error('Error serving data:', error);
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(500);
+        response.writeHead(500, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Internal Server Error' }));
     }
 };
