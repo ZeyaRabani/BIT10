@@ -11,7 +11,10 @@ async function fetchData(days: number) {
         const now = new Date();
         const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000).toISOString();
 
-        const result = await db.select()
+        const result = await db.select({
+            timestmpz: bit10Brc20.timestmpz,
+            tokenPrice: bit10Brc20.tokenPrice
+        })
             .from(bit10Brc20)
             .where(gte(bit10Brc20.timestmpz, startDate))
             .orderBy(desc(bit10Brc20.timestmpz))

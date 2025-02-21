@@ -4,7 +4,7 @@ import { desc } from 'drizzle-orm'
 import type { IncomingMessage, ServerResponse } from 'http'
 import NodeCache from 'node-cache'
 
-const cache = new NodeCache({ stdTTL: 6 * 24 * 60 * 60 });
+const cache = new NodeCache({ stdTTL: 1800 });
 
 async function fetchData() {
     const cacheKey = 'test_bit10_meme_rebalance_data';

@@ -13,17 +13,9 @@ import type { ChartConfig } from '@/components/ui/chart'
 
 const tabs = ['24H', '7D']
 
-type CoinData = {
-    id: number;
-    name: string;
-    symbol: string;
-    price: number;
-};
-
 type Bit10Entry = {
     timestmpz: string;
     tokenPrice: number;
-    data: CoinData[];
 };
 
 export default function Preformance() {

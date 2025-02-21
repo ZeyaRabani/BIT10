@@ -30,7 +30,6 @@ export async function GET(request: NextRequest, context: { params: Promise<{ ind
         const data = (await res.json()) as {
             timestmpz: string;
             tokenPrice: number;
-            data: { id: number; name: string; symbol: string; price: number }[];
         };
 
         return new Response(JSON.stringify(data), {

@@ -130,7 +130,7 @@ export default function Navbar() {
                         </Link>
 
                         {
-                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' || pathname.startsWith('/explorer') || pathname === '/collateral' ? (
+                            pathname === '/swap' || pathname === '/send' || pathname === '/portfolio' || pathname.startsWith('/explorer') || pathname === '/collateral' || pathname.startsWith('/collateral') ? (
                                 <>
                                     <Link href='/swap' passHref>
                                         <span
