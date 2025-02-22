@@ -1,6 +1,6 @@
 # BIT10
 
-BIT10 is pioneering the concept of the "S&P500 of crypto assets." It offers users a simplified way to diversify their exposure to DeFi assets by tracking the biggest crypto tokens, BRC-20s, and ERC-20s in the DeFi ecosystem.
+BIT10 is pioneering the concept of the "S&P500 of Crypto assets." It offers users a simplified way to diversify their exposure to DeFi assets by tracking the biggest crypto tokens, BRC-20s, and ERC-20s in the DeFi ecosystem.
 
 ## 🚀 The Problem
 

@@ -79,6 +79,10 @@ const config = {
                 source: '/bit10-latest-rebalance-:index_fund',
                 destination: '/api/bit10-latest-rebalance/:index_fund',
             },
+            {
+                source: '/bit10-rebalance-history-:index_fund',
+                destination: '/api/bit10-rebalance-history/:index_fund',
+            }
         ]
     },
     compiler: {

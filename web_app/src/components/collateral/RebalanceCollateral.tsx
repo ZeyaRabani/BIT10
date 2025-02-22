@@ -6,9 +6,8 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
-import type { ChartConfig } from '@/components/ui/chart'
 import { Badge } from '@/components/ui/badge'
-import { LoaderCircle, History, ExternalLink } from 'lucide-react'
+import { History, ExternalLink } from 'lucide-react'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/oracle.did'
 
@@ -55,9 +54,23 @@ type Bit10RebalanceEntry = {
     retained: CoinSetData[];
 };
 
+interface RebalanceData {
+    bit10Name: string;
+    bit10RebalanceHistory: string;
+    bit10Token: {
+        newTokens: CoinSetData[];
+        priceOfTokenToBuy: number;
+    };
+    bit10Price: number;
+    bit10Supply: number;
+    bit10Data: CoinData[];
+}
+
 // temp
 const bit10Allocation: WalletDataType[] = [
     { walletAddress: 'bc1pkjd3.....aqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.BRC20'] },
+    // { walletAddress: 'bc1pkjd3.....aqgc55hyll', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'] },
+    // { walletAddress: 'bc1pkjd3.....aqgc55hyll2', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'], tokenId: ['25028'] },
 ];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
@@ -149,7 +162,15 @@ export default function RebalanceCollateral() {
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10BRC20Price = bit10Queries[0].data;
     const bit10BRC20TotalSupply = bit10Queries[1].data;
-    const bit10BRC20Tokens = bit10Queries[2].data;
+    const bit10BRC20Tokens = bit10Queries[2].data as {
+        timestmpz: string,
+        indexValue: number,
+        priceOfTokenToBuy: number,
+        newTokens: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        added: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        removed: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        retained: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
+    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -158,7 +179,7 @@ export default function RebalanceCollateral() {
             } else if (window.innerWidth >= 768) {
                 setInnerRadius(70);
             } else {
-                setInnerRadius(70);
+                setInnerRadius(50);
             }
         };
 
@@ -170,26 +191,74 @@ export default function RebalanceCollateral() {
         };
     }, []);
 
-    const bit10ChartConfig: ChartConfig = {
-        ...Object.fromEntries(
-            bit10BRC20Tokens?.newTokens.map((token, index) => [
-                token.symbol,
-                {
-                    label: token.symbol,
-                    color: color[index % color.length],
-                }
-            ]) ?? []
-        )
+    const calculateTotalCollateral = (tokens: CoinSetData[], priceData: CoinData[]) => {
+        return tokens?.reduce((sum, token) => {
+            const foundCollateralPrice = priceData?.find(collateral => collateral.id === token.id);
+            return foundCollateralPrice ? sum + (token.noOfTokens * foundCollateralPrice.price) : sum;
+        }, 0) ?? 0;
     };
 
-    const bit10PieChartData = bit10BRC20Tokens?.newTokens.map((token, index) => ({
-        name: token.symbol,
-        value: 100 / bit10BRC20Tokens.newTokens.length,
-        fill: color[index % color.length],
-    }));
+    const calculateTargetValue = (priceOfTokenToBuy: number, numTokens: number) => {
+        return (priceOfTokenToBuy ?? 0) * (numTokens ?? 0);
+    };
+
+    const initialBit10RebalanceData: RebalanceData[] = [
+        {
+            bit10Name: 'BIT10.BRC20',
+            bit10RebalanceHistory: 'brc20',
+            bit10Token: {
+                newTokens: bit10BRC20Tokens?.newTokens || [],
+                priceOfTokenToBuy: bit10BRC20Tokens?.priceOfTokenToBuy || 0
+            },
+            bit10Price: bit10BRC20Price?.tokenPrice ?? 0,
+            bit10Supply: bit10BRC20TotalSupply ?? 0,
+            bit10Data: bit10BRC20Price?.data ?? []
+        }
+    ];
+
+    const generateChartConfig = (tokens: CoinSetData[]) => {
+        return {
+            ...Object.fromEntries(
+                tokens?.map((token, index) => [
+                    token.symbol,
+                    {
+                        label: token.symbol,
+                        color: color[index % color.length],
+                    }
+                ]) ?? []
+            )
+        };
+    };
+
+    const generatePieChartData = (tokens: CoinSetData[]) => {
+        return tokens?.map((token, index) => ({
+            name: token.symbol,
+            value: 100 / (tokens?.length || 1),
+            fill: color[index % color.length],
+        })) || [];
+    };
+
+    const bit10RebalanceData = initialBit10RebalanceData.map(data => {
+        const totalCollateral = calculateTotalCollateral(data.bit10Token.newTokens, bit10BRC20Price?.data ?? []);
+        const targetValue = calculateTargetValue(data.bit10Token.priceOfTokenToBuy, data.bit10Token.newTokens.length);
+        const percentChange = targetValue !== 0
+            ? ((totalCollateral - targetValue) / targetValue) * 100
+            : 0;
+        const chartConfig = generateChartConfig(data.bit10Token.newTokens);
+        const pieChartData = generatePieChartData(data.bit10Token.newTokens);
+
+        return {
+            ...data,
+            totalCollateral,
+            targetValue,
+            percentChange,
+            chartConfig,
+            pieChartData
+        };
+    });
 
     return (
-        <div className='flex flex-col space-y-4'>
+        <div>
             {isLoading ? (
                 <div className='w-full animate-fade-left-slow'>
                     <div className='flex flex-col h-full space-y-2 pt-8'>
@@ -199,157 +268,125 @@ export default function RebalanceCollateral() {
                     </div>
                 </div>
             ) : (
-                <div className='flex flex-col space-y-2'>
-                    <div>
-                        <div className='flex flex-col md:flex-row space-y-2 justify-center md:justify-between md:space-y-0'>
-                            <div className='text-2xl'>BIT10.BRC20</div>
-                            <Button asChild>
-                                <Link href='/collateral/brc20'>
-                                    <History />
-                                    Rebalance History
-                                </Link>
-                            </Button>
-                        </div>
-                        <div className='grid md:grid-cols-3 gap-4 items-center'>
-                            <div className='flex-1'>
-                                <ChartContainer
-                                    config={bit10ChartConfig}
-                                    className='aspect-square max-h-[300px]'
-                                >
-                                    <PieChart>
-                                        <ChartTooltip
-                                            cursor={false}
-                                            content={<ChartTooltipContent hideLabel />}
-                                        />
-                                        <Pie
-                                            data={bit10PieChartData}
-                                            dataKey='value'
-                                            nameKey='name'
-                                            innerRadius={innerRadius}
-                                            strokeWidth={5}
-                                        >
-                                            <Label
-                                                content={({ viewBox }) => {
-                                                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
-                                                        return (
-                                                            <text
-                                                                x={viewBox.cx}
-                                                                y={viewBox.cy}
-                                                                textAnchor='middle'
-                                                                dominantBaseline='middle'
-                                                            >
-                                                                <tspan
-                                                                    x={viewBox.cx}
-                                                                    y={viewBox.cy}
-                                                                    className='fill-foreground text-xl font-bold'
-                                                                >
-                                                                    BIT10.BRC20
-                                                                </tspan>
-                                                                <tspan
-                                                                    x={viewBox.cx}
-                                                                    y={(viewBox.cy ?? 0) + 24}
-                                                                    className='fill-muted-foreground'
-                                                                >
-                                                                    Allocations
-                                                                </tspan>
-                                                            </text>
-                                                        )
-                                                    }
-                                                }}
-                                            />
-                                        </Pie>
-                                    </PieChart>
-                                </ChartContainer>
-                            </div>
-                            <div className='flex w-full flex-col space-y-3 col-span-2'>
-                                <h1 className='text-2xl'>BIT10.BRC20</h1>
-                                <div className='text-lg flex flex-1 flex-row items-center justify-start'>
-                                    Total Collateral: {''}
-                                    {bit10BRC20Tokens?.newTokens.reduce((sum, token) => {
-                                        const foundCollateralPrice = bit10BRC20Price?.data.find(collateral =>
-                                            collateral.id === token.id
-                                        );
-                                        return foundCollateralPrice ? sum + (token.noOfTokens * foundCollateralPrice.price) : sum;
-                                    }, 0).toFixed(4)} USD
-                                    {/* When bought */}
-                                    {/* {bit10BRC20Tokens && (bit10BRC20Tokens?.priceOfTokenToBuy * bit10BRC20Tokens?.newTokens.length).toFixed(4)} */}
-                                    {/* Total price */}
-                                    {/* {bit10BRC20Tokens?.newTokens.reduce((sum, token) => {
-                                        const foundCollateralPrice = bit10BRC20Price?.data.find(collateral =>
-                                            collateral.id === token.id
-                                        );
-                                        return foundCollateralPrice ? sum + (token.noOfTokens * foundCollateralPrice.price) : sum;
-                                    }, 0).toFixed(4)} */}
-
-                                    {bit10BRC20Tokens?.priceOfTokenToBuy && bit10BRC20Tokens?.newTokens.reduce((sum, token) => {
-                                        const foundCollateralPrice = bit10BRC20Price?.data.find(collateral =>
-                                            collateral.id === token.id
-                                        );
-                                        return foundCollateralPrice ? sum + (token.noOfTokens * foundCollateralPrice.price) : sum;
-                                    }, 0) !== (bit10BRC20Tokens?.priceOfTokenToBuy * bit10BRC20Tokens?.newTokens.length) &&
-                                        <Badge className='ml-1 text-white' style={{
-                                            backgroundColor: bit10BRC20Tokens?.newTokens.reduce((sum, token) => {
-                                                const foundCollateralPrice = bit10BRC20Price?.data.find(collateral =>
-                                                    collateral.id === token.id
-                                                );
-                                                return foundCollateralPrice ? sum + (token.noOfTokens * foundCollateralPrice.price) : sum;
-                                            }, 0) > bit10BRC20Tokens?.priceOfTokenToBuy * bit10BRC20Tokens?.newTokens.length ? 'green' : 'red'
-                                        }}>
-                                            {`${bit10BRC20Tokens?.newTokens.reduce((sum, token) => {
-                                                const foundCollateralPrice = bit10BRC20Price?.data.find(collateral =>
-                                                    collateral.id === token.id
-                                                );
-                                                return foundCollateralPrice ? sum + (token.noOfTokens * foundCollateralPrice.price) : sum;
-                                            }, 0) > bit10BRC20Tokens?.priceOfTokenToBuy * bit10BRC20Tokens?.newTokens.length ? '+ ' : ''}${((bit10BRC20Tokens?.newTokens.reduce((sum, token) => {
-                                                const foundCollateralPrice = bit10BRC20Price?.data.find(collateral =>
-                                                    collateral.id === token.id
-                                                );
-                                                return foundCollateralPrice ? sum + (token.noOfTokens * foundCollateralPrice.price) : sum;
-                                            }, 0) - bit10BRC20Tokens?.priceOfTokenToBuy * bit10BRC20Tokens?.newTokens.length) / bit10BRC20Tokens?.priceOfTokenToBuy * bit10BRC20Tokens?.newTokens.length * 100).toFixed(4)}%`}
-                                        </Badge>
-                                    }
+                <div className='flex flex-col space-y-4'>
+                    {
+                        bit10RebalanceData.map((data, index) => (
+                            <div key={index} className='animate-fade-left-slow'>
+                                <div className='flex flex-col md:flex-row space-y-2 justify-center md:justify-between md:space-y-0'>
+                                    <div className='text-2xl'>{data.bit10Name}</div>
+                                    <Button asChild>
+                                        <Link href={`/collateral/${data.bit10RebalanceHistory}`}>
+                                            <History />
+                                            Rebalance History
+                                        </Link>
+                                    </Button>
                                 </div>
-                                <h1 className='text-lg flex flex-row items-center'>BIT10.BRC20 Price: {bit10BRC20Price ? bit10BRC20Price.tokenPrice.toFixed(4) : <LoaderCircle className='animate-spin ml-1 h-5 w-5' />} USD</h1>
-                                <h1 className='text-lg'>Token Supply (100% Collateral Coverage): {bit10BRC20TotalSupply} BIT10.BRC20</h1>
-                                <table className='w-full table-auto text-lg'>
-                                    <thead>
-                                        <tr className='p-1 rounded'>
-                                            <th className='text-left'>Collateral Token</th>
-                                            <th className='text-left'>Total Collateral</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {bit10BRC20Tokens?.newTokens.map((token, index) => {
-                                            const bit10Token = 'BIT10.BRC20'
-                                            const foundAllocation = bit10Allocation.find(allocation =>
-                                                allocation.tokenId?.includes(token.id.toString())
-                                            ) ?? bit10Allocation.find(allocation =>
-                                                !allocation.tokenId && allocation.bit10.includes(bit10Token)
-                                            );
-                                            const foundCollateralPrice = bit10BRC20Price?.data.find(collateral =>
-                                                collateral.id === token.id
-                                            );
-                                            return (
-                                                <tr key={token.id} className='hover:bg-accent p-1 rounded'>
-                                                    <td className='flex items-center space-x-1'>
-                                                        <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
-                                                        <span>{token.symbol}</span>
-                                                        <span>({foundAllocation?.walletAddress})</span>
-                                                        <a href={foundAllocation?.explorerAddress} target='_blank' rel='noopener noreferrer'>
-                                                            <ExternalLink size={16} className='text-primary' />
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        {foundCollateralPrice ? `${(token.noOfTokens * foundCollateralPrice?.price).toFixed(4)} USD` : 'Price not available'}
-                                                    </td>
+                                <div className='grid md:grid-cols-3 gap-4 items-center'>
+                                    <div className='flex-1'>
+                                        <ChartContainer
+                                            config={data.chartConfig}
+                                            className='aspect-square max-h-[300px]'
+                                        >
+                                            <PieChart>
+                                                <ChartTooltip
+                                                    cursor={false}
+                                                    content={<ChartTooltipContent hideLabel />}
+                                                />
+                                                <Pie
+                                                    data={data.pieChartData}
+                                                    dataKey='value'
+                                                    nameKey='name'
+                                                    innerRadius={innerRadius}
+                                                    strokeWidth={5}
+                                                >
+                                                    <Label
+                                                        content={({ viewBox }) => {
+                                                            if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                                return (
+                                                                    <text
+                                                                        x={viewBox.cx}
+                                                                        y={viewBox.cy}
+                                                                        textAnchor='middle'
+                                                                        dominantBaseline='middle'
+                                                                    >
+                                                                        <tspan
+                                                                            x={viewBox.cx}
+                                                                            y={viewBox.cy}
+                                                                            className='fill-foreground text-xl font-bold'
+                                                                        >
+                                                                            BIT10.BRC20
+                                                                        </tspan>
+                                                                        <tspan
+                                                                            x={viewBox.cx}
+                                                                            y={(viewBox.cy ?? 0) + 24}
+                                                                            className='fill-muted-foreground'
+                                                                        >
+                                                                            Allocations
+                                                                        </tspan>
+                                                                    </text>
+                                                                )
+                                                            }
+                                                        }}
+                                                    />
+                                                </Pie>
+                                            </PieChart>
+                                        </ChartContainer>
+                                    </div>
+                                    <div className='flex w-full flex-col space-y-3 col-span-2'>
+                                        <h1 className='text-2xl'>{data.bit10Name}</h1>
+                                        <div className='text-lg flex flex-1 flex-row items-center justify-start'>
+                                            Total Collateral: {''}
+                                            {data.totalCollateral.toFixed(4)} USD
+                                            <Badge className='ml-1 text-white' style={{
+                                                backgroundColor: data.percentChange > 0 ? 'green' : 'red'
+                                            }}>
+                                                {data.percentChange.toFixed(4)} %
+                                            </Badge>
+                                        </div>
+                                        <h1 className='text-lg flex flex-row items-center'>{data.bit10Name} Price: {data.bit10Price.toFixed(4)} USD</h1>
+                                        <h1 className='text-lg'>Token Supply (100% Collateral Coverage): {data.bit10Supply} {data.bit10Name}</h1>
+
+                                        <table className='w-full table-auto text-lg'>
+                                            <thead>
+                                                <tr className='p-1 rounded'>
+                                                    <th className='text-left'>Collateral Token</th>
+                                                    <th className='text-left'>Total Collateral</th>
                                                 </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
+                                            </thead>
+                                            <tbody>
+                                                {data.bit10Token.newTokens.map((token, index) => {
+                                                    const bit10Token = `${data.bit10Name}`
+                                                    const foundAllocation = bit10Allocation.find(allocation =>
+                                                        allocation.tokenId?.includes(token.id.toString())
+                                                    ) ?? bit10Allocation.find(allocation =>
+                                                        !allocation.tokenId && allocation.bit10.includes(bit10Token)
+                                                    );
+                                                    const foundCollateralPrice = data.bit10Token.newTokens.find((collateral: { id: number }) =>
+                                                        collateral.id.toString() === token.id.toString()
+                                                    );
+                                                    return (
+                                                        <tr key={token.id} className='hover:bg-accent p-1 rounded'>
+                                                            <td className='flex items-center space-x-1'>
+                                                                <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
+                                                                <span>{token.symbol}</span>
+                                                                <span>({foundAllocation?.walletAddress})</span>
+                                                                <a href={foundAllocation?.explorerAddress} target='_blank' rel='noopener noreferrer'>
+                                                                    <ExternalLink size={16} className='text-primary' />
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                {foundCollateralPrice ? `${(token.noOfTokens * foundCollateralPrice?.price).toFixed(4)} USD` : 'Price not available'}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        ))
+                    }
                 </div>
             )}
         </div>

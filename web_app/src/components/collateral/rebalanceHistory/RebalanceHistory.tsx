@@ -1,10 +1,204 @@
 "use client"
 
 import React from 'react'
+import InformationCard from '@/components/InformationCard'
+import { useQueries } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
+type CoinSetData = {
+    id: number;
+    name: string;
+    symbol: string;
+    tokenAddress?: string;
+    chain?: string;
+    noOfTokens: number;
+    price: number;
+};
+
+type Bit10RebalanceEntry = {
+    timestmpz: string;
+    indexValue: number;
+    priceOfTokenToBuy: number;
+    newTokens: CoinSetData[];
+    added: CoinSetData[];
+    removed: CoinSetData[];
+    retained: CoinSetData[];
+};
 
 export default function RebalanceHistory({ index_fund }: { index_fund: string }) {
+
+    const fetchBit10RebalanceHistory = async (tokenRebalanceAPI: string) => {
+        const response = await fetch(`/bit10-rebalance-history-${tokenRebalanceAPI.split('-').pop()}`);
+
+        if (!response.ok) {
+            toast.error('Error fetching BIT10 Rebalance History. Please try again!');
+            return [];
+        }
+
+        const data = await response.json() as Bit10RebalanceEntry[];
+        return data;
+    };
+
+    const bit10Queries = useQueries({
+        queries: [
+            {
+                queryKey: ['bit10BRC20Rebalance'],
+                queryFn: () => fetchBit10RebalanceHistory(index_fund)
+            },
+        ],
+    });
+
+    const isLoading = bit10Queries.some(query => query.isLoading);
+    const bit10BRC20RebalanceHistory = bit10Queries[0].data;
+
     return (
-        // Check if the rebalance is available in the setlected rebalance
-        <div>RebalanceHistory for {index_fund}</div>
+        <>
+            {bit10BRC20RebalanceHistory?.length === 0 ?
+                <InformationCard message='No rebalance information available for this BIT10 token' /> :
+                <div className='py-4'>
+                    <Card className='dark:border-white w-full'>
+                        {isLoading ? (
+                            <CardContent className='w-full animate-fade-left-slow'>
+                                <div className='flex flex-col h-full space-y-2 pt-8'>
+                                    {['h-12 w-28', 'h-72'].map((classes, index) => (
+                                        <Skeleton key={index} className={classes} />
+                                    ))}
+                                </div>
+                            </CardContent>
+                        ) : (
+                            <CardContent className='flex flex-col space-y-4 py-4'>
+                                <h1 className='text-xl md:text-2xl font-semibold uppercase'>BIT10.{index_fund}</h1>
+                                {bit10BRC20RebalanceHistory?.map((rebalance, index) => (
+                                    <div key={index} className='text-lg border p-2 md:p-4 py-6 rounded-md flex flex-col space-y-3'>
+                                        <p className='font-semibold'>Rebalance Date: {new Date(rebalance.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                        <p>Index Value: {rebalance.indexValue.toFixed(4)} USD</p>
+                                        <p>Total Collateral: {(rebalance.priceOfTokenToBuy * rebalance.newTokens.length).toFixed(4)} USD</p>
+                                        <div>
+                                            <h1>New Tokens</h1>
+                                            <div className='grid place-items-center w-full'>
+                                                <Table className='border-collapse border'>
+                                                    <TableHeader>
+                                                        <TableRow className='text-left'>
+                                                            <TableHead>Token</TableHead>
+                                                            <TableHead>Price (in USD)</TableHead>
+                                                            <TableHead>No. of Tokens</TableHead>
+                                                            <TableHead>Total Price (in USD)</TableHead>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {rebalance.newTokens.map((token, i) => (
+                                                            <TableRow key={i}>
+                                                                <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
+                                                                <TableCell>{token.price}</TableCell>
+                                                                <TableCell>{token.noOfTokens}</TableCell>
+                                                                <TableCell>{(token.price * token.noOfTokens).toFixed(8)}</TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h1>Added Tokens</h1>
+                                            {rebalance.added.length === 0 ? (
+                                                <p className='text-sm text-muted-foreground'>No token added</p>
+                                            ) : (
+                                                <div className='grid place-items-center w-full'>
+                                                    <Table className='border-collapse border'>
+                                                        <TableHeader>
+                                                            <TableRow className='text-left'>
+                                                                <TableHead>Token</TableHead>
+                                                                <TableHead>Price (in USD)</TableHead>
+                                                                <TableHead>No. of Tokens</TableHead>
+                                                                <TableHead>Total Price (in USD)</TableHead>
+                                                            </TableRow>
+                                                        </TableHeader>
+                                                        <TableBody>
+                                                            {rebalance.added.map((token, i) => (
+                                                                <TableRow key={i}>
+                                                                    <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
+                                                                    <TableCell>{token.price}</TableCell>
+                                                                    <TableCell>{token.noOfTokens}</TableCell>
+                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(8)}</TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <h1>Removed Tokens</h1>
+                                            {rebalance.removed.length === 0 ? (
+                                                <p className='text-sm text-muted-foreground'>No token removed</p>
+                                            ) : (
+                                                <div className='grid place-items-center w-full'>
+                                                    <Table className='border-collapse border'>
+                                                        <TableHeader>
+                                                            <TableRow className='text-left'>
+                                                                <TableHead>Token</TableHead>
+                                                                <TableHead>Price (in USD)</TableHead>
+                                                                <TableHead>No. of Tokens</TableHead>
+                                                                <TableHead>Total Price (in USD)</TableHead>
+                                                            </TableRow>
+                                                        </TableHeader>
+                                                        <TableBody>
+                                                            {rebalance.removed.map((token, i) => (
+                                                                <TableRow key={i}>
+                                                                    <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
+                                                                    <TableCell>{token.price}</TableCell>
+                                                                    <TableCell>{token.noOfTokens}</TableCell>
+                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(8)}</TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <h1>Retained Tokens</h1>
+                                            {rebalance.retained.length === 0 ? (
+                                                <p className='text-sm text-muted-foreground'>No token retained</p>
+                                            ) : (
+                                                <div className='grid place-items-center w-full'>
+                                                    <Table className='border-collapse border'>
+                                                        <TableHeader>
+                                                            <TableRow className='text-left'>
+                                                                <TableHead>Token</TableHead>
+                                                                <TableHead>Price (in USD)</TableHead>
+                                                                <TableHead>No. of Tokens</TableHead>
+                                                                <TableHead>Total Price (in USD)</TableHead>
+                                                            </TableRow>
+                                                        </TableHeader>
+                                                        <TableBody>
+                                                            {rebalance.retained.map((token, i) => (
+                                                                <TableRow key={i}>
+                                                                    <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
+                                                                    <TableCell>{token.price}</TableCell>
+                                                                    <TableCell>{token.noOfTokens}</TableCell>
+                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(8)}</TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                    </div>
+                                ))}
+                            </CardContent>
+                        )}
+                    </Card>
+                </div>
+            }
+        </>
     )
 }

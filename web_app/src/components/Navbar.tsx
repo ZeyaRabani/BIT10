@@ -21,7 +21,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from 
 import { Loader2 } from 'lucide-react'
 
 export default function Navbar() {
-    const [visible, setVisible] = useState(true);
+    const [hidden, setHidden] = useState(false)
     const [open, setOpen] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
     const [activeLink, setActiveLink] = useState<string>('');
@@ -69,19 +69,18 @@ export default function Navbar() {
     }, [activeLink]);
 
     useMotionValueEvent(scrollY, 'change', (latest) => {
-        if (latest > 50) {
-            const previousScrollY = scrollY.getPrevious();
-            if (previousScrollY !== undefined) {
-                setVisible(latest < previousScrollY ? true : false);
-            }
+        const previous = scrollY.getPrevious() ?? 0
+        if (latest > previous && latest > 50) {
+            setHidden(true)
+        } else {
+            setHidden(false)
         }
     });
 
     const navbarVariants = {
-        hidden: { y: '-100%', opacity: 0 },
-        visible: { y: '0%', opacity: 1 },
+        visible: { y: 0 },
+        hidden: { y: '-100%' },
     };
-
 
     const handleWalletSelect = async () => {
         setIsConnecting(true);
@@ -100,10 +99,9 @@ export default function Navbar() {
 
     return (
         <motion.div
-            initial='visible'
-            animate={visible ? 'visible' : 'hidden'}
             variants={navbarVariants}
-            transition={{ duration: 0.3 }}
+            animate={hidden ? 'hidden' : 'visible'}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             className='backdrop-blur-3xl fixed top-0 z-50 w-full'
         >
             <nav className='relative flex items-center py-2 flex-wrap px-2.5 md:px-12 tracking-wider justify-between'>

@@ -92,8 +92,8 @@ export default function Page() {
               initial={{ opacity: 0.0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
-              className='text-4xl md:text-6xl font-bold text-center bg-clip-text dark:text-transparent dark:bg-gradient-to-b dark:from-neutral-50 dark:to-neutral-400 bg-opacity-50'>
-              BIT10 <br /> <span className='italic'>S&P500 of crypto</span>
+              className='text-4xl md:text-6xl font-bold text-center bg-clip-text dark:text-transparent dark:bg-gradient-to-b dark:from-neutral-50 dark:to-neutral-400 bg-opacity-50 pb-2'>
+              BIT10 <br /> <span className='italic'>S&P500 of Crypto</span>
             </motion.h1>
 
             <motion.p
