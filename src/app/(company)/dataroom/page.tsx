@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client"
 
 import React, { useTransition } from 'react'
@@ -9,11 +10,13 @@ import { setUserLocale } from '@/services/locale'
 import { toast } from 'sonner'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Languages, Mail } from 'lucide-react'
+import { useQueries } from '@tanstack/react-query'
+import { testnetRevenue } from '@/actions/dbActions'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Area, AreaChart, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
-import { revenue } from '@/data/dataroomData'
 import LinkedinImg from '@/assets/footer/linkedin.svg'
 import XImg from '@/assets/footer/x.svg'
 
@@ -21,6 +24,16 @@ interface Language {
     value: string;
     label: string;
 }
+
+type TestnetRevenueType = {
+    tokenPurchaseAmount: string;
+    tokenBoughtAt: string;
+};
+
+type GroupDataType = {
+    date: string;
+    totalTokenPurchaseAmount: number;
+};
 
 const languages: Language[] = [
     { value: 'en', label: 'English' },
@@ -42,26 +55,80 @@ export default function Page() {
     function handleLanguageChange(value: string) {
         const locale = value as Locale;
         startTransition(() => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             setUserLocale(locale).catch((error) => {
                 toast.error('Failed to set user locale. Please try again!');
             });
         });
     };
 
-    const chartConfig: ChartConfig = {
-        'bit10DeFi': {
-            label: 'BIT10.DEFI',
-        },
-        'total': {
-            label: `${t('total')}`,
-        },
-        'platformFee': {
-            label: `${t('platformFee')}`,
-        },
-        'transferFee': {
-            label: `${t('transferFee')}`,
-        },
-    }
+    const fetchTestnetRevenue = async () => {
+        const response = await testnetRevenue();
+        if (response === 'Error fetching testnet revenue') {
+            toast.error('An error occurred while fetching Testnet Revenue . Please try again!');
+        } else {
+            return response as TestnetRevenueType[];
+        }
+    };
+
+    const testnetRevenueQuery = useQueries({
+        queries: [
+            {
+                queryKey: ['bit10TestnetRevenue'],
+                queryFn: () => fetchTestnetRevenue(),
+            },
+        ]
+    })
+
+    const isLoading = testnetRevenueQuery.some(query => query.isLoading);
+    const testnetRevenueData = testnetRevenueQuery[0].data;
+
+    const totalTokenPurchaseAmount = testnetRevenueData?.reduce((sum, item) => sum + parseFloat(item.tokenPurchaseAmount), 0) ?? 0;
+
+    const groupDataByDate = (data: TestnetRevenueType[]): GroupDataType[] => {
+        const groupedMap = new Map<string, number>();
+
+        if (groupedMap && testnetRevenueData) {
+            data.forEach((item) => {
+                const date = new Date(item.tokenBoughtAt).toISOString().split("T")[0] ?? '';
+                const amount = parseFloat(item.tokenPurchaseAmount);
+
+                if (groupedMap.has(date)) {
+                    groupedMap.set(date, groupedMap.get(date)! + amount);
+                } else {
+                    groupedMap.set(date, amount);
+                }
+            });
+
+            return Array.from(groupedMap.entries()).map(([date, total]) => ({
+                date,
+                totalTokenPurchaseAmount: total / 100000000,
+            }));
+        }
+
+        return [];
+    };
+
+    const result = testnetRevenueData ? groupDataByDate(testnetRevenueData) : [];
+
+    const bit10TestnetRevenueChartConfig: ChartConfig = {
+        'bit10': {
+            label: 'Test BIT10',
+        }
+    };
+
+    const bit10TestnetRevenueChartData = result?.map((entry) => {
+        const formattedDate = new Date(entry.date).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+
+        return {
+            day: formattedDate,
+            bit10: (entry.totalTokenPurchaseAmount.toFixed(6)).toString(),
+        };
+    });
 
     // const handleMouseDown = (e: any) => {
     //     if (e && e.activeLabel) {
@@ -167,6 +234,30 @@ export default function Page() {
                     </AccordionTrigger>
                     <AccordionContent className='flex flex-col space-y-2 w-full h-full'>
                         <p>{t('testnetLaunch')}</p>
+                        <div>
+                            {isLoading ?
+                                <Skeleton className='w-full h-56' />
+                                : (
+                                    <div className='relative flex flex-col w-full h-full'>
+                                        <div className='text-xl font-semibold py-2'>{t('revenue')}: {(totalTokenPurchaseAmount / 100000000).toFixed(8)} BTC</div>
+                                        <ChartContainer config={bit10TestnetRevenueChartConfig} className='max-h-[300px] w-full'>
+                                            <AreaChart accessibilityLayer data={bit10TestnetRevenueChartData}>
+                                                <XAxis dataKey='day' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} />
+                                                <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
+                                                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                                <defs>
+                                                    <linearGradient id='bit10' x1='0' y1='0' x2='0' y2='1'>
+                                                        <stop offset='5%' stopColor='#ff8c1a' stopOpacity={0.8} />
+                                                        <stop offset='95%' stopColor='#ff8c1a' stopOpacity={0.1} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <Area dataKey='bit10' type='natural' fill='#ff8c1a' fillOpacity={0.4} stroke='#ff8c1a' stackId='a' />
+                                                <ChartLegend content={<ChartLegendContent />} />
+                                            </AreaChart>
+                                        </ChartContainer>
+                                    </div>
+                                )}
+                        </div>
                         {/* <div className='relative flex flex-col w-full h-full'>
                             <div className='text-xl font-semibold'>{t('volume')}</div>
                             <RotateCcw className={`absolute top-0 right-0 w-5 h-5 cursor-pointer transition-transform ${rotate ? 'animate-rotate360' : ''}`} onClick={handleZoomOut} />
@@ -196,35 +287,6 @@ export default function Page() {
                                 </AreaChart>
                             </ChartContainer>
                         </div> */}
-
-                        <div className='relative flex flex-col w-full h-full'>
-                            <div className='text-xl font-semibold'>{t('revenue')}</div>
-                            <ChartContainer config={chartConfig} className='max-h-[300px] w-full'>
-                                <AreaChart accessibilityLayer data={revenue}>
-                                    <XAxis dataKey='week' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} />
-                                    <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
-                                    <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                    <defs>
-                                        <linearGradient id='total' x1='0' y1='0' x2='0' y2='1'>
-                                            <stop offset='5%' stopColor='#ff0066' stopOpacity={0.8} />
-                                            <stop offset='95%' stopColor='#ff0066' stopOpacity={0.1} />
-                                        </linearGradient>
-                                        <linearGradient id='platformFee' x1='0' y1='0' x2='0' y2='1'>
-                                            <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
-                                            <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
-                                        </linearGradient>
-                                        <linearGradient id='transferFee' x1='0' y1='0' x2='0' y2='1'>
-                                            <stop offset='5%' stopColor='#ff8c1a' stopOpacity={0.8} />
-                                            <stop offset='95%' stopColor='#ff8c1a' stopOpacity={0.1} />
-                                        </linearGradient>
-                                    </defs>
-                                    <Area dataKey='transferFee' type='natural' fill='#ff8c1a' fillOpacity={0.4} stroke='#ff8c1a' stackId='a' />
-                                    <Area dataKey='platformFee' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
-                                    <Area dataKey='total' type='natural' fill='#ff0066' fillOpacity={0.4} stroke='#ff0066' stackId='a' />
-                                    <ChartLegend content={<ChartLegendContent />} />
-                                </AreaChart>
-                            </ChartContainer>
-                        </div>
                     </AccordionContent>
                 </AccordionItem>
 

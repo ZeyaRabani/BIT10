@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
+import { env } from '@/env'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -24,7 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [incorrectPassword, setIncorrectPassword] = useState(false);
     const [selectedFunnyPassword, setSelectedFunnyPassword] = useState<string | null>(null);
 
-    const correctPassword = process.env.NEXT_PUBLIC_PRIVATE_PASS;
+    const correctPassword = env.NEXT_PUBLIC_PRIVATE_PASS;
 
     const handlePasswordChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
         setPassword(event.target.value);
@@ -37,7 +38,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         } else {
             setIncorrectPassword(true);
             const randomIndex = Math.floor(Math.random() * funnyIncorrectPasswords.length);
-            setSelectedFunnyPassword(funnyIncorrectPasswords[randomIndex]);
+            setSelectedFunnyPassword(funnyIncorrectPasswords[randomIndex] ?? '');
         }
     };
 

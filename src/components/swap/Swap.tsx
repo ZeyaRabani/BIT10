@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import * as z from 'zod'
 import { useWallet } from '@/context/WalletContext'
 import { useQueries } from '@tanstack/react-query'
@@ -32,7 +32,7 @@ interface BuyingTokenPriceResponse {
     };
 }
 
-type ActorType = {
+type ICRC2ActorType = {
     icrc2_approve: (args: {
         spender: { owner: Principal; subaccount: [] };
         fee: [];
@@ -62,7 +62,8 @@ const bit10Amount = [
 const bit10Token = [
     'Test BIT10.DEFI',
     'Test BIT10.BRC20',
-    'Test BIT10.TOP'
+    'Test BIT10.TOP',
+    'Test BIT10.MEME'
 ]
 
 const FormSchema = z.object({
@@ -89,73 +90,68 @@ export default function Swap() {
     //   }
     // }
 
-    const fetchBit10Price = async (tokenPriceAPI: string) => {
+    const fetchBit10Price = useCallback(async (tokenPriceAPI: string) => {
         const response = await fetch(tokenPriceAPI);
 
         if (!response.ok) {
             toast.error('Error fetching BIT10 price. Please try again!');
         }
 
-        let data;
-        let returnData;
-        if (tokenPriceAPI === 'bit10-defi-latest-price') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
-            returnData = data.tokenPrice ?? 0;
-        } else if (tokenPriceAPI === 'bit10-brc20-latest-price') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
-            returnData = data.tokenPrice ?? 0;
-        } else if (tokenPriceAPI === 'test-bit10-top-latest-price') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
-            returnData = data.tokenPrice ?? 0;
-        }
-        return returnData;
-    };
+        const data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> };
+        return data.tokenPrice ?? 0;
+    }, []);
 
     const bit10PriceQueries = useQueries({
         queries: [
             {
-                queryKey: ['tbit10DEFITokenPrice'],
-                queryFn: () => fetchBit10Price('bit10-defi-latest-price'),
+                queryKey: ['bit10DEFITokenPrice'],
+                queryFn: () => fetchBit10Price('bit10-latest-price-defi'),
                 refetchInterval: 1800000, // 30 min.
             },
             {
                 queryKey: ['bit10BRC20TokenPrice'],
-                queryFn: () => fetchBit10Price('bit10-brc20-latest-price'),
+                queryFn: () => fetchBit10Price('bit10-latest-price-brc20'),
                 refetchInterval: 1800000,
             },
             {
                 queryKey: ['bit10TOPTokenPrice'],
-                queryFn: () => fetchBit10Price('test-bit10-top-latest-price'),
+                queryFn: () => fetchBit10Price('test-bit10-latest-price-top'),
+                refetchInterval: 1800000,
+            },
+            {
+                queryKey: ['bit10MEMETokenPrice'],
+                queryFn: () => fetchBit10Price('test-bit10-latest-price-meme'),
                 refetchInterval: 1800000,
             },
         ],
     });
 
-    const isLoading = bit10PriceQueries.some(query => query.isLoading);
-    const bit10DEFIPrice = bit10PriceQueries[0].data;
-    const bit10BRC20Price = bit10PriceQueries[1].data;
-    const bit10TOPPrice = bit10PriceQueries[2].data;
+    const isLoading = useMemo(() => bit10PriceQueries.some(query => query.isLoading), [bit10PriceQueries]);
+    const bit10DEFIPrice = useMemo(() => bit10PriceQueries[0].data, [bit10PriceQueries]);
+    const bit10BRC20Price = useMemo(() => bit10PriceQueries[1].data, [bit10PriceQueries]);
+    const bit10TOPPrice = useMemo(() => bit10PriceQueries[2].data, [bit10PriceQueries]);
+    const bit10MEMEPrice = useMemo(() => bit10PriceQueries[3].data, [bit10PriceQueries]);
 
-    const fetchPayWithPrice = async (currency: string) => {
+    const fetchPayWithPrice = useCallback(async (currency: string) => {
         const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);
         if (!response.ok) {
             toast.error(`Error fetching ${currency} price. Please try again!`);
         }
         const data = await response.json() as BuyingTokenPriceResponse;
         return data.data.amount;
-    };
+    }, []);
 
     const payWithPriceQueries = useQueries({
         queries: [
             {
                 queryKey: ['btcPrice'],
                 queryFn: () => fetchPayWithPrice('BTC'),
-                refetchInterval: 10000, // 10 src.
+                refetchInterval: 10000, // 10 sec.
             },
         ],
     });
 
-    const bit10BTCAmount = payWithPriceQueries[0].data;
+    const bit10BTCAmount = useMemo(() => payWithPriceQueries[0].data, [payWithPriceQueries]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -167,7 +163,7 @@ export default function Swap() {
     });
 
     const payWithTokenImg = (): StaticImageData => {
-        return BIT10Img;
+        return BIT10Img as StaticImageData;
     };
 
     const payingTokenImg = payWithTokenImg();
@@ -186,6 +182,8 @@ export default function Swap() {
             return bit10BRC20Price ?? 0;
         } else if (bit10Token === 'Test BIT10.TOP') {
             return bit10TOPPrice ?? 0;
+        } else if (bit10Token === 'Test BIT10.MEME') {
+            return bit10MEMEPrice ?? 0;
         }
         else {
             return 0;
@@ -194,7 +192,7 @@ export default function Swap() {
 
     const selectedBit10TokenPrice = bit10TokenPrice();
 
-    const swapDisabledConditions = !isConnected || swaping || payingTokenPrice == '0' || selectedBit10TokenPrice == 0
+    const swapDisabledConditions = !isConnected || swaping || payingTokenPrice == '0' || selectedBit10TokenPrice == 0;
 
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
@@ -206,6 +204,7 @@ export default function Swap() {
                 whitelist: [bit10BTCCanisterId, swapCanisterId]
             });
 
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (hasAllowed && bit10BTCAmount) {
                 toast.info('Allow the transaction on your wallet to proceed.');
@@ -215,7 +214,7 @@ export default function Swap() {
                 const actor = await window.ic.plug.createActor({
                     canisterId: selectedCanisterId,
                     interfaceFactory: idlFactory,
-                }) as ActorType;
+                }) as ICRC2ActorType;
 
                 const selectedAmount = ((parseInt(values.bit10_amount) * selectedBit10TokenPrice) / parseFloat(bit10BTCAmount)) * 2; // More in case of sudden price change
 
@@ -241,6 +240,7 @@ export default function Swap() {
                 if (approve.Ok && principalId) {
                     toast.success('Approval was successful! Proceeding with transfer...');
 
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     const actor2 = await window.ic.plug.createActor({
                         canisterId: swapCanisterId,
                         interfaceFactory: idlFactory2,
@@ -252,12 +252,16 @@ export default function Swap() {
                         tick_out_amount: Number(values.bit10_amount)
                     }
 
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                     const transfer = await actor2.te_swap(args2);
+
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     if (transfer.Ok) {
                         const uuid = crypto.randomBytes(16).toString('hex');
                         const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
                         const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
 
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
                         const principal = Principal.fromUint8Array(transfer.Ok.user_principal_id._arr);
                         const textualRepresentation = principal.toText();
 
@@ -271,15 +275,25 @@ export default function Swap() {
                         const result = await newTokenSwap({
                             newTokenSwapId: newTokenSwapId,
                             principalId: textualRepresentation,
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                             tickInName: transfer.Ok.tick_in_name,
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             tickInAmount: transfer.Ok.tick_in_amount.toString(),
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             tickInUSDAmount: transfer.Ok.tick_in_usd_amount.toString(),
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             tickInTxBlock: transfer.Ok.tick_in_tx_block.toString(),
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             tickOutName: transfer.Ok.tick_out_name,
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             tickOutAmount: transfer.Ok.tick_out_amount.toString(),
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             tickOutTxBlock: transfer.Ok.tick_out_tx_block.toString(),
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             transactionType: transfer.Ok.transaction_type as "Swap" | "Reverse Swap",
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             network: transfer.Ok.network,
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
                             transactionTimestamp: formatTimestamp(transfer.Ok.transaction_timestamp)
                         });
 
@@ -291,7 +305,9 @@ export default function Swap() {
                             body: JSON.stringify({
                                 newTokenSwapId: newTokenSwapId,
                                 principalId: principalId,
+                                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                                 tickOutName: transfer.Ok.tick_out_name,
+                                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                                 tickOutAmount: transfer.Ok.tick_out_amount.toString(),
                                 transactionTimestamp: new Date().toISOString(),
                             }),
@@ -302,7 +318,10 @@ export default function Swap() {
                         } else {
                             toast.error('An error occurred while processing your request. Please try again!');
                         }
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     } else if (transfer.Err) {
+                        console.log(transfer);
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                         const errorMessage = String(transfer.Err);
                         if (errorMessage.includes("Insufficient balance")) {
                             toast.error("Insufficient funds");
@@ -318,7 +337,9 @@ export default function Swap() {
             } else {
                 toast.error('Transfer failed.');
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
+            console.log(error);
             setSwaping(false);
             toast.error('An error occurred while processing your request. Please try again!');
         } finally {
@@ -329,32 +350,32 @@ export default function Swap() {
     return (
         <MaxWidthWrapper>
             {/* <div className='grid place-content-center'>
-        <div className='relative flex flex-row space-x-2 items-center justify-center border rounded px-2 py-1'>
-          <AnimatedBackground
-            defaultValue='Quick Swap'
-            className='rounded bg-primary'
-            transition={{
-              ease: 'easeInOut',
-              duration: 0.2,
-            }}
-            onValueChange={(newActiveId) => handleTabChange(newActiveId)}
+    <div className='relative flex flex-row space-x-2 items-center justify-center border rounded px-2 py-1'>
+      <AnimatedBackground
+        defaultValue='Quick Swap'
+        className='rounded bg-primary'
+        transition={{
+          ease: 'easeInOut',
+          duration: 0.2,
+        }}
+        onValueChange={(newActiveId) => handleTabChange(newActiveId)}
+      >
+        {tabs.map((label, index) => (
+          <button
+            key={index}
+            data-id={label}
+            type='button'
+            className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}
           >
-            {tabs.map((label, index) => (
-              <button
-                key={index}
-                data-id={label}
-                type='button'
-                className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}
-              >
-                {label}
-              </button>
-            ))}
-          </AnimatedBackground>
-        </div>
-      </div>
+            {label}
+          </button>
+        ))}
+      </AnimatedBackground>
+    </div>
+  </div>
 
-      {activeTab === 'Quick Swap' && <div> Quick Swap </div>}
-      {activeTab === 'Advanced Trading' && <div> Advanced Trading </div>} */}
+  {activeTab === 'Quick Swap' && <div> Quick Swap </div>}
+  {activeTab === 'Advanced Trading' && <div> Advanced Trading </div>} */}
 
             <div className='flex flex-col py-4 md:py-8 items-center justify-center'>
                 {isLoading ? (
@@ -491,6 +512,7 @@ export default function Swap() {
                                                     />
                                                 </div>
                                                 <div className='col-span-1 -ml-6 z-20'>
+                                                    {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
                                                     <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
                                                 </div>
                                             </div>

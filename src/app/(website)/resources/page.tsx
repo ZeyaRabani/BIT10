@@ -26,8 +26,8 @@ const projects: Project[] = [
     },
     {
         image_url: ResourceImg,
-        title: 'Understanding BIT10: The S&P 500 of Bitcoin DeFi',
-        description: 'Learn about the concept and benefits of BIT10 as an index tracking the top Bitcoin DeFi assets.',
+        title: 'Understanding BIT10: The S&P 500 of crypto',
+        description: 'Learn about the concept and benefits of BIT10 as an index tracking the top crypto assets.',
         link: 'https://x.com/bit10startup/status/1840830560949973177',
     },
     {

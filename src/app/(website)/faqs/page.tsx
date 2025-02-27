@@ -12,7 +12,7 @@ interface FAQs {
 const faqItems = [
     {
         question: 'What is BIT10?',
-        answer: 'BIT10 is a pioneering asset manager that offers users the opportunity to invest in an index representing the top cryptocurrencies and BRC-20 tokens within the Bitcoin DeFi ecosystem. Similar to the S&P500 for traditional assets, BIT10 simplifies investment by providing a pre-selected basket of assets that can be held with just one token purchase.'
+        answer: 'BIT10 is a pioneering asset manager that offers users the opportunity to invest in an index representing the top cryptocurrencies within the crypto ecosystem. Similar to the S&P500 for traditional assets, BIT10 simplifies investment by providing a pre-selected basket of assets that can be held with just one token purchase.'
     },
     {
         question: 'How does BIT10 work?',
@@ -26,7 +26,7 @@ const faqItems = [
                 - <b>Diversification</b>: Gain exposure to multiple cryptocurrencies with a single investment. <br />
                 - <b>Simplicity</b>: Eliminate the need for complex research and management of individual tokens. <br />
                 - <b>Cost-effectiveness</b>: Reduce transaction fees associated with acquiring and managing multiple assets. <br />
-                - <b>Market exposure</b>: Participate in the growth potential of emerging technologies within the Bitcoin DeFi ecosystem. <br />
+                - <b>Market exposure</b>: Participate in the growth potential of emerging technologies within the crypto ecosystem. <br />
             </>
         ),
     },
@@ -52,7 +52,7 @@ const faqItems = [
             <>
                 BIT10 serves various use cases: <br />
                 - <b>Diversified investment portfolio</b>: Access a curated selection of crypto tokens without managing individual assets. <br />
-                - <b>Simplified DeFi access</b>: Easy entry into the Bitcoin DeFi space with a single token purchase. <br />
+                - <b>Simplified DeFi access</b>: Easy entry into the crypto space with a single token purchase. <br />
                 - <b>Hedging and risk management</b>: Mitigate market volatility by diversifying investments across multiple assets. <br />
                 - <b>Governance participation</b>: Indirectly participate in governance features offered by included tokens. <br />
             </>
@@ -60,7 +60,7 @@ const faqItems = [
     },
     {
         question: 'Is BIT10 suitable for long-term investment strategies?',
-        answer: 'Yes, BIT10 provides a convenient and efficient way to build a long-term investment strategy within the Bitcoin DeFi ecosystem. Its auto-rebalancing mechanism ensures that the portfolio remains optimized for performance over time, making it ideal for investors seeking sustainable growth.'
+        answer: 'Yes, BIT10 provides a convenient and efficient way to build a long-term investment strategy within the crypto ecosystem. Its auto-rebalancing mechanism ensures that the portfolio remains optimized for performance over time, making it ideal for investors seeking sustainable growth.'
     },
     {
         question: 'What kind of historical performance data is available on BIT10?',

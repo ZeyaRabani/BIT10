@@ -59,6 +59,7 @@ export default function Page() {
                 toast.success(response.message);
                 form.reset();
             })
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .catch((error) => {
                 toast.error('An error occurred while submitting the form. Please try again!');
             })
@@ -79,6 +80,7 @@ export default function Page() {
                             </div>
                         </div>
                         <div className='mt-2 text-center p-2 md:p-8'>
+                            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
                             <Image className='w-full' src={ContactImg} width='200' height='200' alt='Contact Us' />
                         </div>
                     </div>

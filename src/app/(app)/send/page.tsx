@@ -25,7 +25,7 @@ const FormSchema = z.object({
         required_error: 'Please enter the number of Test BIT10.DEFI tokens you wish to transfer.',
     })
         .positive('The amount must be a positive number.')
-        .max(99999999, 'Amount cannot exceed 8 decimal places.')
+        .min(0.03, 'Minimum amount should be 0.03')
         .refine(value => Number(value.toFixed(8)) === value, 'Amount cannot have more than 8 decimal places.')),
 });
 
@@ -50,8 +50,10 @@ export default function Page() {
                 whitelist: [bit10DEFICanisterId]
             });
 
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (hasAllowed) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const actor = await window.ic.plug.createActor({
                     canisterId: bit10DEFICanisterId,
                     interfaceFactory: idlFactory
@@ -73,7 +75,9 @@ export default function Page() {
                     amount: BigInt(amount)
                 }
 
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 const transfer = await actor.icrc1_transfer(args);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 if (transfer.Ok) {
                     toast.success('Transfer successful');
                     form.reset();
@@ -82,6 +86,7 @@ export default function Page() {
                     toast.error('Transfer failed.');
                 }
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             setSending(false);
             toast.error('An error occurred while processing your request. Please try again!');

@@ -20,14 +20,13 @@ export const WalletProvider: React.FC<React.PropsWithChildren<object>> = ({ chil
 
     const connectWallet = async () => {
         try {
-            // const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
-            const ckBTCLegerCanisterId = 'mxzaz-hqaaa-aaaar-qaada-cai';
-            const ckETHLegerCanisterId = 'ss2fx-dyaaa-aaaar-qacoq-cai';
-            const ICPLegerCanisterId = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
-            const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
-            const bit10BRC20CanisterId = '7bi3r-piaaa-aaaap-qpnrq-cai';
+            const bit10BTCCanisterId = 'eegan-kqaaa-aaaap-qhmgq-cai'
+            const testBit10DEFICanisterId = 'hbs3g-xyaaa-aaaap-qhmna-cai';
+            const testBit10BRC20CanisterId = 'uv4pt-4qaaa-aaaap-qpuxa-cai';
+            const testBit10TOPCanisterId = 'wbckh-zqaaa-aaaap-qpuza-cai';
+            const testBit10MEMECanisterId = 'yeoei-eiaaa-aaaap-qpvzq-cai';
 
-            const whitelist = [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, bit10DEFICanisterId, bit10BRC20CanisterId];
+            const whitelist = [bit10BTCCanisterId, testBit10DEFICanisterId, testBit10BRC20CanisterId, testBit10TOPCanisterId, testBit10MEMECanisterId];
 
             await window.ic.plug.requestConnect({
                 whitelist,
@@ -36,6 +35,7 @@ export const WalletProvider: React.FC<React.PropsWithChildren<object>> = ({ chil
             const getPrincipalId = await window.ic.plug.agent.getPrincipal();
             setPrincipalId(getPrincipalId.toString());
             toast.success('Wallet connected successfully!')
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             toast.error('Wallet connect request cancelled!')
         }

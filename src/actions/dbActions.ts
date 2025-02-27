@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use server"
 
-import { db } from '@/db/db'
-import { user_signups, te_users, te_swap, te_request_btc } from '@/db/schema'
+import { db } from '@/server/db'
+import { userSignups, teUsers, teSwap, teRequestBtc } from '@/server/db/schema'
+
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
 
@@ -22,7 +24,7 @@ interface NewTokenSwap {
 
 export const addUserSignUps = async ({ email }: { email: string }) => {
     try {
-        const newSignUpUser = await db.insert(user_signups).values({ email });
+        const newSignUpUser = await db.insert(userSignups).values({ email });
         return newSignUpUser;
     } catch (error) {
         return 'Error adding user to signups';
@@ -32,7 +34,7 @@ export const addUserSignUps = async ({ email }: { email: string }) => {
 export const userSignUps = async () => {
     try {
         const data = await db.select()
-            .from(user_signups)
+            .from(userSignups)
         return data;
     } catch (error) {
         return 'Error fetching user signups';
@@ -45,15 +47,15 @@ export const addNewUser = async ({ principalId }: { principalId: string }) => {
         const generateNewUserId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
         const newUserId = 'user_' + generateNewUserId;
 
-        const existingUsers = await db.select({ user_address: te_users.user_principal_id }).from(te_users).where(eq(te_users.user_principal_id, principalId));
+        const existingUsers = await db.select({ user_address: teUsers.userPrincipalId }).from(teUsers).where(eq(teUsers.userPrincipalId, principalId));
 
         if (existingUsers && existingUsers.length > 0) {
             return 'User already exists';
         } else {
-            await db.insert(te_users).values({
-                user_id: newUserId,
-                user_principal_id: principalId,
-                created_at: new Date().toISOString()
+            await db.insert(teUsers).values({
+                userId: newUserId,
+                userPrincipalId: principalId,
+                createdAt: new Date().toISOString()
             });
         }
     } catch (error) {
@@ -67,19 +69,19 @@ export const newTokenSwap = async ({ newTokenSwapId, principalId, tickInName, ti
         // const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
         // const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
 
-        await db.insert(te_swap).values({
-            token_swap_id: newTokenSwapId,
-            user_principal_id: principalId,
-            tick_in_name: tickInName,
-            tick_in_amount: tickInAmount,
-            tick_in_usd_amount: tickInUSDAmount,
-            tick_in_tx_block: tickInTxBlock,
-            tick_out_name: tickOutName,
-            tick_out_amount: tickOutAmount,
-            tick_out_tx_block: tickOutTxBlock,
-            transaction_type: transactionType,
-            transaction_status: 'Unconfirmed', // Confirmed || Failed
-            transaction_timestamp: transactionTimestamp,
+        await db.insert(teSwap).values({
+            tokenSwapId: newTokenSwapId,
+            userPrincipalId: principalId,
+            tickInName: tickInName,
+            tickInAmount: tickInAmount,
+            tickInUsdAmount: tickInUSDAmount,
+            tickInTxBlock: tickInTxBlock,
+            tickOutName: tickOutName,
+            tickOutAmount: tickOutAmount,
+            tickOutTxBlock: tickOutTxBlock,
+            transactionType: transactionType,
+            transactionStatus: 'Unconfirmed', // Confirmed || Failed
+            transactionTimestamp: transactionTimestamp,
             network: network
         });
 
@@ -92,17 +94,17 @@ export const newTokenSwap = async ({ newTokenSwapId, principalId, tickInName, ti
 export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: string }) => {
     try {
         const data = await db.select({
-            tokenSwapId: te_swap.token_swap_id,
-            transactionType: te_swap.transaction_type,
-            tickInAmount: te_swap.tick_in_amount,
-            tickInName: te_swap.tick_in_name,
-            tickOutAmount: te_swap.tick_out_amount,
-            tickOutName: te_swap.tick_out_name,
-            tokenBoughtAt: te_swap.transaction_timestamp
+            tokenSwapId: teSwap.tokenSwapId,
+            transactionType: teSwap.transactionType,
+            tickInAmount: teSwap.tickInAmount,
+            tickInName: teSwap.tickInName,
+            tickOutAmount: teSwap.tickOutAmount,
+            tickOutName: teSwap.tickOutName,
+            tokenBoughtAt: teSwap.transactionTimestamp
         })
-            .from(te_swap)
-            .where(eq(te_swap.user_principal_id, paymentAddress))
-            .orderBy(desc(te_swap.transaction_timestamp));
+            .from(teSwap)
+            .where(eq(teSwap.userPrincipalId, paymentAddress))
+            .orderBy(desc(teSwap.transactionTimestamp));
         return data;
     } catch (error) {
         return 'Error fetching user recent activity';
@@ -111,9 +113,9 @@ export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: s
 
 export const requestBIT10BTC = async ({ email, principalId }: { email: string, principalId: string }) => {
     try {
-        await db.insert(te_request_btc).values({
+        await db.insert(teRequestBtc).values({
             email: email,
-            user_principal_id: principalId
+            userPrincipalId: principalId
         });
         return 'Request added successfully';
     } catch (error) {
@@ -124,19 +126,33 @@ export const requestBIT10BTC = async ({ email, principalId }: { email: string, p
 export const transactionDetails = async ({ transactionId }: { transactionId: string }) => {
     try {
         const data = await db.select({
-            transactionId: te_swap.token_swap_id,
-            transactionType: te_swap.transaction_type,
-            transactionTime: te_swap.transaction_timestamp,
-            transactionFromAccount: te_swap.user_principal_id,
-            transactionTickInAmount: te_swap.tick_in_amount,
-            transactionTickInName: te_swap.tick_in_name,
-            transactionTickOutAmount: te_swap.tick_out_amount,
-            transactionTickOutName: te_swap.tick_out_name,
+            transactionId: teSwap.tokenSwapId,
+            transactionType: teSwap.transactionType,
+            transactionTime: teSwap.transactionTimestamp,
+            transactionFromAccount: teSwap.userPrincipalId,
+            transactionTickInAmount: teSwap.tickInAmount,
+            transactionTickInName: teSwap.tickInName,
+            transactionTickOutAmount: teSwap.tickOutAmount,
+            transactionTickOutName: teSwap.tickOutName,
         })
-            .from(te_swap)
-            .where(eq(te_swap.token_swap_id, transactionId));
+            .from(teSwap)
+            .where(eq(teSwap.tokenSwapId, transactionId));
         return data;
     } catch (error) {
         return 'Error fetching transaction details';
+    }
+}
+
+export const testnetRevenue = async () => {
+    try {
+        const data = await db.select({
+            tokenPurchaseAmount: teSwap.tickInAmount,
+            tokenBoughtAt: teSwap.transactionTimestamp
+        })
+            .from(teSwap)
+            .orderBy(teSwap.transactionTimestamp);
+        return data;
+    } catch (error) {
+        return 'Error fetching testnet revenue';
     }
 }

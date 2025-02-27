@@ -76,6 +76,7 @@ export default function Page() {
                         const balance = await actor.check_and_transfer({ to_account });
 
                         if (typeof balance === 'object' && balance !== null && 'Ok' in balance) {
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
                             if (BigInt(balance.Ok) === BigInt(0)) {
                                 const randomMessage = funnyFaucetMessage[Math.floor(Math.random() * funnyFaucetMessage.length)];
@@ -110,6 +111,7 @@ export default function Page() {
                                 }
                             }
                         }
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     } catch (error) {
                         toast.error('An error occurred. Please try again!');
                         setSubmitting(false);

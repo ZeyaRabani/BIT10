@@ -26,6 +26,7 @@ interface DataTableProps<TData> {
     inputPlaceHolder: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function DataTable<TData, TValue>({
     columns,
     data,
@@ -91,7 +92,7 @@ export function DataTable<TData, TValue>({
         switch (cell.column.id) {
             case 'mode':
                 return (
-                    <Badge className={row.original.transactionType === 'Swap' ? 'bg-primary' : 'bg-[#FF0066]'}>{row.original.transactionType}</Badge>
+                    <Badge className={row.original.transactionType === 'Swap' ? 'bg-primary' : 'bg-[#FF0066] hover:bg-[#f64189]'}>{row.original.transactionType}</Badge>
                 );
             case 'tickIn':
                 return (
@@ -103,7 +104,11 @@ export function DataTable<TData, TValue>({
             case 'tickOutName':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{row.original.tickOutAmount}</div>
+                        <div>
+                            {row.original.transactionType === "Swap"
+                                ? row.original.tickOutAmount
+                                : (parseFloat(row.original.tickOutAmount) / 100000000).toFixed(8)}
+                        </div>
                         <div>{row.original.tickOutName}</div>
                     </div>
                 );
