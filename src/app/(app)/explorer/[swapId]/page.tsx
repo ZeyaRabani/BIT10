@@ -1,10 +1,10 @@
 import React from 'react'
-import SwapIdDetails from '@/components/explorer/SwapIdDetails'
+import SwapDetails from '@/components/explorer/SwapDetails'
 
 export default async function Page({ params }: { params: Promise<{ swapId: string }> }) {
-    const swap_id = (await params).swapId
+    const swap_id = (await params).swapId;
 
     return (
-        <SwapIdDetails swapId={swap_id} />
+        <SwapDetails swapId={swap_id} />
     )
 }

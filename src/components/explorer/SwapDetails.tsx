@@ -20,7 +20,7 @@ interface TransactionDetailsType {
     transactionTickOutName: string;
 }
 
-export default function SwapIdDetails({ swapId }: { swapId: string }) {
+export default function SwapDetails({ swapId }: { swapId: string }) {
     const [isTransactionFound, setIsTransactionFound] = useState<boolean>(true);
 
     const fetchTransactionDetails = async (transactionId: string) => {

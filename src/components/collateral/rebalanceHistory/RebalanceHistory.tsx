@@ -130,9 +130,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                         {rebalance.newTokens.map((token, i) => (
                                                             <TableRow key={i}>
                                                                 <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
-                                                                <TableCell>{token.price}</TableCell>
-                                                                <TableCell>{token.noOfTokens}</TableCell>
-                                                                <TableCell>{(token.price * token.noOfTokens).toFixed(8)}</TableCell>
+                                                                <TableCell>{token.price.toFixed(4)}</TableCell>
+                                                                <TableCell>{token.noOfTokens.toFixed(4)}</TableCell>
+                                                                <TableCell>{(token.price * token.noOfTokens).toFixed(4)}</TableCell>
                                                             </TableRow>
                                                         ))}
                                                     </TableBody>
@@ -159,9 +159,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             {rebalance.added.map((token, i) => (
                                                                 <TableRow key={i}>
                                                                     <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
-                                                                    <TableCell>{token.price}</TableCell>
-                                                                    <TableCell>{token.noOfTokens}</TableCell>
-                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(8)}</TableCell>
+                                                                    <TableCell>{token.price.toFixed(4)}</TableCell>
+                                                                    <TableCell>{token.noOfTokens.toFixed(4)}</TableCell>
+                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(4)}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
@@ -189,9 +189,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             {rebalance.removed.map((token, i) => (
                                                                 <TableRow key={i}>
                                                                     <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
-                                                                    <TableCell>{token.price}</TableCell>
-                                                                    <TableCell>{token.noOfTokens}</TableCell>
-                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(8)}</TableCell>
+                                                                    <TableCell>{token.price.toFixed(4)}</TableCell>
+                                                                    <TableCell>{token.noOfTokens.toFixed(4)}</TableCell>
+                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(4)}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
@@ -219,9 +219,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             {rebalance.retained.map((token, i) => (
                                                                 <TableRow key={i}>
                                                                     <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
-                                                                    <TableCell>{token.price}</TableCell>
-                                                                    <TableCell>{token.noOfTokens}</TableCell>
-                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(8)}</TableCell>
+                                                                    <TableCell>{token.price.toFixed(4)}</TableCell>
+                                                                    <TableCell>{token.noOfTokens.toFixed(4)}</TableCell>
+                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(4)}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
