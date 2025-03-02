@@ -85,13 +85,8 @@ export default function RebalanceCollateral() {
             toast.error('Error fetching BIT10 price. Please try again!');
         }
 
-        let data;
-        let returnData;
-        if (tokenPriceAPI === 'bit10-latest-price-brc20') {
-            data = await response.json() as Bit10Entry;
-            returnData = data;
-        }
-        return returnData;
+        const data = await response.json() as Bit10Entry;
+        return data;
     };
 
     const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
@@ -133,13 +128,8 @@ export default function RebalanceCollateral() {
             toast.error('Error fetching BIT10 Tokens. Please try again!');
         }
 
-        let data;
-        let returnData;
-        if (tokenLatestRebalanceAPI === 'bit10-latest-rebalance-brc20') {
-            data = await response.json() as Bit10RebalanceEntry;
-            returnData = data;
-        }
-        return returnData;
+        const data = await response.json() as Bit10RebalanceEntry;
+        return data;
     };
 
     const bit10Queries = useQueries({
@@ -239,7 +229,7 @@ export default function RebalanceCollateral() {
     };
 
     const bit10RebalanceData = initialBit10RebalanceData.map(data => {
-        const totalCollateral = calculateTotalCollateral(data.bit10Token.newTokens, bit10BRC20Price?.data ?? []);
+        const totalCollateral = calculateTotalCollateral(data.bit10Token.newTokens, data.bit10Data ?? []);
         const targetValue = calculateTargetValue(data.bit10Token.priceOfTokenToBuy, data.bit10Token.newTokens.length);
         const percentChange = targetValue !== 0
             ? ((totalCollateral - targetValue) / targetValue) * 100
@@ -268,7 +258,7 @@ export default function RebalanceCollateral() {
                     </div>
                 </div>
             ) : (
-                <div className='flex flex-col space-y-4'>
+                <div className='flex flex-col space-y-4 md:space-y-8'>
                     {
                         bit10RebalanceData.map((data, index) => (
                             <div key={index} className='animate-fade-left-slow'>
@@ -314,7 +304,7 @@ export default function RebalanceCollateral() {
                                                                             y={viewBox.cy}
                                                                             className='fill-foreground text-xl font-bold'
                                                                         >
-                                                                            BIT10.BRC20
+                                                                            {data.bit10Name}
                                                                         </tspan>
                                                                         <tspan
                                                                             x={viewBox.cx}
@@ -361,7 +351,7 @@ export default function RebalanceCollateral() {
                                                     ) ?? bit10Allocation.find(allocation =>
                                                         !allocation.tokenId && allocation.bit10.includes(bit10Token)
                                                     );
-                                                    const foundCollateralPrice = data.bit10Token.newTokens.find((collateral: { id: number }) =>
+                                                    const foundCollateralPrice = data.bit10Data.find((collateral: { id: number }) =>
                                                         collateral.id.toString() === token.id.toString()
                                                     );
                                                     return (

@@ -163,7 +163,7 @@ export default function NonRebalanceCollateral() {
                 </div>
             ) : (
                 <div className='w-full lg:col-span-1 animate-fade-left-slow'>
-                    <div className='flex flex-col space-y-4'>
+                    <div className='flex flex-col space-y-4 md:space-y-8'>
                         <div>
                             <div className='text-2xl'>BIT10.DEFI</div>
                             <div className='grid md:grid-cols-3 gap-4 items-center'>
