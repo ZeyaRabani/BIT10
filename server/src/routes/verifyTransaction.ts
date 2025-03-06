@@ -3,7 +3,12 @@ import { URL } from 'url'
 import axios from 'axios'
 import NodeCache from 'node-cache'
 
-const cache = new NodeCache({ stdTTL: 10 });
+const cache = new NodeCache({
+    stdTTL: 300,  // 5 minutes cache time
+    checkperiod: 120,  // Check for expired keys every 2 minutes
+    useClones: false,
+    deleteOnExpire: true
+});
 const txSecret = process.env.VERIFY_TX_SECRET;
 const unisatTestKey = process.env.UNISAT_TESTNET_KEY;
 
@@ -38,36 +43,53 @@ const fetchFromAPI = async (url: string, headers?: Record<string, string>): Prom
 
 async function getBTCTestnetTransactionData(txid: string): Promise<any> {
     const cachedData = cache.get(txid);
-    if (cachedData) return cachedData;
+    if (cachedData) {
+        const ttl = cache.getTtl(txid);
+        console.log('Cache hit for txid:', txid, 'TTL:', new Date(ttl!).toISOString());
+        return cachedData;
+    }
 
+    console.log('Cache miss for txid:', txid, 'Fetching from API...');
     const headers = {
         Authorization: `Bearer ${unisatTestKey}`,
         'Content-Type': 'application/json'
     };
 
-    const txData = await fetchFromAPI(`https://open-api-testnet.unisat.io/v1/indexer/tx/${txid}`, headers);
-    if (txData.msg !== 'ok' || txData.data.confirmations <= 0) {
-        return {
+    try {
+        const txData = await fetchFromAPI(`https://open-api-testnet.unisat.io/v1/indexer/tx/${txid}`, headers);
+
+        if (txData.msg !== 'ok' || txData.data.confirmations <= 0) {
+            const result = {
+                transaction: txData.data,
+                outputs: null,
+                verified: false,
+                message: txData.data.confirmations <= 0 ? 'Transaction not confirmed yet' : 'Transaction invalid'
+            };
+            cache.set(txid, result, 60);
+            console.log('Cached unconfirmed transaction data for txid:', txid, 'for 60 seconds');
+            return result;
+        }
+
+        const outputs = await fetchFromAPI(`https://open-api-testnet.unisat.io/v1/indexer/tx/${txid}/outs`, headers);
+        const btcAddress = '2MvxteUZggvbprjogjMQVrRZ3NSNVskCpaz';
+        const firstOutput = outputs.data.find((output: { vout: number }) => output.vout === 0);
+
+        const result = {
             transaction: txData.data,
-            outputs: null,
-            verified: false,
-            message: txData.data.confirmations <= 0 ? 'Transaction not confirmed yet' : 'Transaction invalid'
+            outputs: outputs.data,
+            verified: !!firstOutput && firstOutput.address === btcAddress,
+            message: firstOutput && firstOutput.address === btcAddress
+                ? 'Transaction verified successfully'
+                : 'First output address does not match expected address'
         };
+
+        cache.set(txid, result, 300);
+        console.log('Cached confirmed transaction data for txid:', txid, 'for 300 seconds');
+        return result;
+    } catch (error) {
+        console.error('Error fetching transaction data:', error);
+        throw error;
     }
-
-    const outputs = await fetchFromAPI(`https://open-api-testnet.unisat.io/v1/indexer/tx/${txid}/outs`, headers);
-    const btcAddress = '2MvxteUZggvbprjogjMQVrRZ3NSNVskCpaz';
-    const firstOutput = outputs.data.find((output: { vout: number }) => output.vout === 0);
-
-    const result = {
-        transaction: txData.data,
-        outputs: outputs.data,
-        verified: !!firstOutput && firstOutput.address === btcAddress,
-        message: firstOutput && firstOutput.address === btcAddress ? 'Transaction verified successfully' : 'First output address does not match expected address'
-    };
-
-    cache.set(txid, result);
-    return result;
 }
 
 async function getSOLTestnetTransactionData(txid: string): Promise<any> {
