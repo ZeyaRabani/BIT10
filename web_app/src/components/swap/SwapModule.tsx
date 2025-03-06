@@ -10,12 +10,15 @@ import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, Info, ArrowUpDown } from 'lucide-react'
+import { ChevronsUpDown, Check, Loader2, Info, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image, { type StaticImageData } from 'next/image'
 import CkBTCImg from '@/assets/swap/ckBTC.png'
@@ -65,10 +68,15 @@ type Mode = 'swap' | 'mint';
 
 // const tabs = ['Quick Swap', 'Advanced Trading']
 
+// const paymentMethod = [
+//   'ICP',
+//   'ckBTC',
+//   'ckETH'
+// ]
 const paymentMethod = [
-  'ICP',
-  'ckBTC',
-  'ckETH'
+  { label: 'ICP', value: 'ICP', img: ICPImg },
+  { label: 'ckBTC', value: 'ckBTC', img: CkBTCImg },
+  { label: 'ckETH', value: 'ckETH', img: CkETHImg },
 ]
 
 const bit10Amount = [
@@ -79,13 +87,21 @@ const bit10Amount = [
   '5'
 ]
 
+// const bit10Token = [
+//   'BIT10.DEFI',
+//   // 'BIT10.BRC20'
+// ]
+
 const bit10Token = [
-  'BIT10.DEFI',
-  // 'BIT10.BRC20'
+  { label: 'BIT10.DEFI', value: 'BIT10.DEFI' },
+  // { label: 'BIT10.BRC20', value: 'BIT10.BRC20' },
 ]
 
+// const mintReciveToken = [
+//   'ICP'
+// ]
 const mintReciveToken = [
-  'ICP'
+  { label: 'ICP', value: 'ICP', img: ICPImg },
 ]
 
 const FormSchema = z.object({
@@ -724,7 +740,7 @@ export default function SwapModule() {
                               name='minting_bit10_token'
                               render={({ field }) => (
                                 <FormItem className='w-full px-2'>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  {/* <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                       <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
                                         <SelectValue placeholder='Select BIT10 token' />
@@ -737,15 +753,67 @@ export default function SwapModule() {
                                         </SelectItem>
                                       ))}
                                     </SelectContent>
-                                  </Select>
+                                  </Select> */}
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant='outline'
+                                          role='combobox'
+                                          className={cn(
+                                            'border-none justify-between px-1.5 w-full',
+                                            !field.value && 'text-muted-foreground'
+                                          )}
+                                        >
+                                          {field.value
+                                            ? bit10Token.find(
+                                              (bit10Token) => bit10Token.value === field.value
+                                            )?.label
+                                            : 'Select token'}
+                                          <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className='w-[180px] p-0 ml-10'>
+                                      <Command>
+                                        <CommandInput placeholder='Search token...' />
+                                        <CommandList>
+                                          <CommandEmpty>No token found.</CommandEmpty>
+                                          <CommandGroup>
+                                            {bit10Token.map((bit10Token) => (
+                                              <CommandItem
+                                                value={bit10Token.label}
+                                                key={bit10Token.label}
+                                                onSelect={() => {
+                                                  form.setValue('minting_bit10_token', bit10Token.value)
+                                                }}
+                                              >
+                                                <div className='flex flex-row items-center'>
+                                                  <Image src={BIT10Img as StaticImageData} alt={bit10Token.label} width={15} height={15} className='rounded-full bg-white mr-1' />
+                                                  {bit10Token.label}
+                                                </div>
+                                                <Check
+                                                  className={cn(
+                                                    'ml-auto',
+                                                    bit10Token.value === field.value
+                                                      ? 'opacity-100'
+                                                      : 'opacity-0'
+                                                  )}
+                                                />
+                                              </CommandItem>
+                                            ))}
+                                          </CommandGroup>
+                                        </CommandList>
+                                      </Command>
+                                    </PopoverContent>
+                                  </Popover>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
                           </div>
                           <div className='col-span-1 -ml-6 z-20'>
-                            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
-                            <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
+                            <Image src={BIT10Img as StaticImageData} alt='BIT10' width={75} height={75} className='z-20' />
                           </div>
                         </div>
                       </div>
@@ -785,7 +853,7 @@ export default function SwapModule() {
                               name='payment_method'
                               render={({ field }) => (
                                 <FormItem className='w-full px-2'>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  {/* <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                       <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
                                         <SelectValue placeholder='Select payment method' />
@@ -798,7 +866,60 @@ export default function SwapModule() {
                                         </SelectItem>
                                       ))}
                                     </SelectContent>
-                                  </Select>
+                                  </Select> */}
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant='outline'
+                                          role='combobox'
+                                          className={cn(
+                                            'border-none justify-between px-1.5 pr-2 w-full',
+                                            !field.value && 'text-muted-foreground'
+                                          )}
+                                        >
+                                          {field.value
+                                            ? paymentMethod.find(
+                                              (paymentMethod) => paymentMethod.value === field.value
+                                            )?.label
+                                            : 'Select token'}
+                                          <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className='w-[180px] p-0 ml-10'>
+                                      <Command>
+                                        <CommandInput placeholder='Search token...' />
+                                        <CommandList>
+                                          <CommandEmpty>No token found.</CommandEmpty>
+                                          <CommandGroup>
+                                            {paymentMethod.map((paymentMethod) => (
+                                              <CommandItem
+                                                value={paymentMethod.label}
+                                                key={paymentMethod.label}
+                                                onSelect={() => {
+                                                  form.setValue('payment_method', paymentMethod.value)
+                                                }}
+                                              >
+                                                <div className='flex flex-row items-center'>
+                                                  <Image src={paymentMethod.img} alt={paymentMethod.label} width={15} height={15} className='rounded-full bg-white mr-1' />
+                                                  {paymentMethod.label}
+                                                </div>
+                                                <Check
+                                                  className={cn(
+                                                    'ml-auto',
+                                                    paymentMethod.value === field.value
+                                                      ? 'opacity-100'
+                                                      : 'opacity-0'
+                                                  )}
+                                                />
+                                              </CommandItem>
+                                            ))}
+                                          </CommandGroup>
+                                        </CommandList>
+                                      </Command>
+                                    </PopoverContent>
+                                  </Popover>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -849,7 +970,7 @@ export default function SwapModule() {
                               name='recieving_token'
                               render={({ field }) => (
                                 <FormItem className='w-full px-2'>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  {/* <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                       <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
                                         <SelectValue placeholder='Select payment method' />
@@ -862,7 +983,60 @@ export default function SwapModule() {
                                         </SelectItem>
                                       ))}
                                     </SelectContent>
-                                  </Select>
+                                  </Select> */}
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant='outline'
+                                          role='combobox'
+                                          className={cn(
+                                            'border-none justify-between px-1.5 pr-2 w-full',
+                                            !field.value && 'text-muted-foreground'
+                                          )}
+                                        >
+                                          {field.value
+                                            ? mintReciveToken.find(
+                                              (mintReciveToken) => mintReciveToken.value === field.value
+                                            )?.label
+                                            : 'Select token'}
+                                          <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className='w-[180px] p-0 ml-10'>
+                                      <Command>
+                                        <CommandInput placeholder='Search token...' />
+                                        <CommandList>
+                                          <CommandEmpty>No token found.</CommandEmpty>
+                                          <CommandGroup>
+                                            {mintReciveToken.map((mintReciveToken) => (
+                                              <CommandItem
+                                                value={mintReciveToken.label}
+                                                key={mintReciveToken.label}
+                                                onSelect={() => {
+                                                  form.setValue('recieving_token', mintReciveToken.value)
+                                                }}
+                                              >
+                                                <div className='flex flex-row items-center'>
+                                                  <Image src={mintReciveToken.img} alt={mintReciveToken.label} width={15} height={15} className='rounded-full bg-white mr-1' />
+                                                  {mintReciveToken.label}
+                                                </div>
+                                                <Check
+                                                  className={cn(
+                                                    'ml-auto',
+                                                    mintReciveToken.value === field.value
+                                                      ? 'opacity-100'
+                                                      : 'opacity-0'
+                                                  )}
+                                                />
+                                              </CommandItem>
+                                            ))}
+                                          </CommandGroup>
+                                        </CommandList>
+                                      </Command>
+                                    </PopoverContent>
+                                  </Popover>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -917,7 +1091,7 @@ export default function SwapModule() {
                               name='bit10_token'
                               render={({ field }) => (
                                 <FormItem className='w-full px-2'>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  {/* <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                       <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
                                         <SelectValue placeholder='Select BIT10 token' />
@@ -930,15 +1104,67 @@ export default function SwapModule() {
                                         </SelectItem>
                                       ))}
                                     </SelectContent>
-                                  </Select>
+                                  </Select> */}
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant='outline'
+                                          role='combobox'
+                                          className={cn(
+                                            'border-none justify-between px-1.5 pr-2 w-full',
+                                            !field.value && 'text-muted-foreground'
+                                          )}
+                                        >
+                                          {field.value
+                                            ? bit10Token.find(
+                                              (bit10Token) => bit10Token.value === field.value
+                                            )?.label
+                                            : 'Select token'}
+                                          <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className='w-[180px] p-0 ml-10'>
+                                      <Command>
+                                        <CommandInput placeholder='Search token...' />
+                                        <CommandList>
+                                          <CommandEmpty>No token found.</CommandEmpty>
+                                          <CommandGroup>
+                                            {bit10Token.map((bit10Token) => (
+                                              <CommandItem
+                                                value={bit10Token.label}
+                                                key={bit10Token.label}
+                                                onSelect={() => {
+                                                  form.setValue('bit10_token', bit10Token.value)
+                                                }}
+                                              >
+                                                <div className='flex flex-row items-center'>
+                                                  <Image src={BIT10Img as StaticImageData} alt={bit10Token.label} width={15} height={15} className='rounded-full bg-white mr-1' />
+                                                  {bit10Token.label}
+                                                </div>
+                                                <Check
+                                                  className={cn(
+                                                    'ml-auto',
+                                                    bit10Token.value === field.value
+                                                      ? 'opacity-100'
+                                                      : 'opacity-0'
+                                                  )}
+                                                />
+                                              </CommandItem>
+                                            ))}
+                                          </CommandGroup>
+                                        </CommandList>
+                                      </Command>
+                                    </PopoverContent>
+                                  </Popover>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
                           </div>
                           <div className='col-span-1 -ml-6 z-20'>
-                            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
-                            <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
+                            <Image src={BIT10Img as StaticImageData} alt='BIT10' width={75} height={75} className='z-20' />
                           </div>
                         </div>
                       </div>

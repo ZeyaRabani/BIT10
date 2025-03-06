@@ -1,7 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { URL } from 'url'
 import axios from 'axios'
+import NodeCache from 'node-cache'
 
+const cache = new NodeCache({ stdTTL: 10 });
 const txSecret = process.env.VERIFY_TX_SECRET;
 const unisatTestKey = process.env.UNISAT_TESTNET_KEY;
 
@@ -35,6 +37,9 @@ const fetchFromAPI = async (url: string, headers?: Record<string, string>): Prom
 };
 
 async function getBTCTestnetTransactionData(txid: string): Promise<any> {
+    const cachedData = cache.get(txid);
+    if (cachedData) return cachedData;
+
     const headers = {
         Authorization: `Bearer ${unisatTestKey}`,
         'Content-Type': 'application/json'
@@ -54,15 +59,21 @@ async function getBTCTestnetTransactionData(txid: string): Promise<any> {
     const btcAddress = '2MvxteUZggvbprjogjMQVrRZ3NSNVskCpaz';
     const firstOutput = outputs.data.find((output: { vout: number }) => output.vout === 0);
 
-    return {
+    const result = {
         transaction: txData.data,
         outputs: outputs.data,
         verified: !!firstOutput && firstOutput.address === btcAddress,
         message: firstOutput && firstOutput.address === btcAddress ? 'Transaction verified successfully' : 'First output address does not match expected address'
     };
+
+    cache.set(txid, result);
+    return result;
 }
 
 async function getSOLTestnetTransactionData(txid: string): Promise<any> {
+    const cachedData = cache.get(txid);
+    if (cachedData) return cachedData;
+
     const payload = {
         jsonrpc: '2.0',
         id: 1,
@@ -79,7 +90,9 @@ async function getSOLTestnetTransactionData(txid: string): Promise<any> {
             throw { message: 'Transaction not found', status: 404 } as TransactionError;
         }
 
-        return response.data.result;
+        const result = response.data.result;
+        cache.set(txid, result);
+        return result;
     } catch (error) {
         throw error as TransactionError;
     }
