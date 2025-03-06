@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, index, doublePrecision, json, foreignKey, unique, bigint, serial, varchar, boolean, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, doublePrecision, index, json, foreignKey, unique, bigint, serial, varchar, boolean, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -23,6 +23,25 @@ export const mbTokenMint = pgTable('mb_token_mint', {
 	transactionIndex: text('transaction_index').notNull(),
 });
 
+export const teLiquidityTransactions = pgTable('te_liquidity_transactions', {
+	liquidationId: text('liquidation_id').primaryKey().notNull(),
+	tickInAddress: text('tick_in_address').notNull(),
+	tickInName: text('tick_in_name').notNull(),
+	tickInAmount: doublePrecision('tick_in_amount').notNull(),
+	tickInUsdAmount: doublePrecision('tick_in_usd_amount').notNull(),
+	tickInNetwork: text('tick_in_network').notNull(),
+	tickInTxBlock: text('tick_in_tx_block').notNull(),
+	tickOutAddress: text('tick_out_address').notNull(),
+	tickOutName: text('tick_out_name').notNull(),
+	tickOutAmount: doublePrecision('tick_out_amount'),
+	tickOutUsdAmount: doublePrecision('tick_out_usd_amount'),
+	tickOutNetwork: text('tick_out_network').notNull(),
+	tickOutTxBlock: text('tick_out_tx_block').notNull(),
+	liquidationType: text('liquidation_type').notNull(),
+	transactionStatus: text('transaction_status').notNull(),
+	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
+});
+
 export const bit10Top = pgTable('bit10_top', {
 	timestmpz: timestamp({ withTimezone: true, mode: 'string' }).primaryKey().notNull(),
 	tokenPrice: doublePrecision('token_price').notNull(),
@@ -37,6 +56,15 @@ export const bit10TopHistoricalData = pgTable('bit10_top_historical_data', {
 	data: json().notNull(),
 }, (table) => [
 	index('bit10_top_historical_data_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst().op('timestamptz_ops')),
+]);
+
+export const teVerifyTransaction = pgTable('te_verify_transaction', {
+	txid: text().primaryKey().notNull(),
+	chain: text().notNull(),
+	data: json().notNull(),
+	message: text().notNull(),
+}, (table) => [
+	index('idx_txid').using('btree', table.txid.asc().nullsLast().op('text_ops')),
 ]);
 
 export const swap = pgTable('swap', {
