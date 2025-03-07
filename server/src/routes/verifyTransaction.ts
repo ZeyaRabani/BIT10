@@ -6,8 +6,15 @@ import fs from 'fs/promises'
 import path from 'path'
 
 const cache = new NodeCache({
-    stdTTL: 10,  // 10 seconds cache time
-    checkperiod: 5,  // Check for expired keys every 5 seconds
+    stdTTL: 10,  // 10 sec
+    checkperiod: 5,  // 5 sec
+    useClones: false,
+    deleteOnExpire: true
+});
+
+const txCache = new NodeCache({
+    stdTTL: 60,  // 1 min
+    checkperiod: 30,
     useClones: false,
     deleteOnExpire: true
 });
@@ -51,6 +58,11 @@ const fetchFromAPI = async (url: string, headers?: Record<string, string>): Prom
 };
 
 async function getBTCTestnetTransactionData(txid: string): Promise<any> {
+    const cachedTx = txCache.get(txid) as { message?: string };
+    if (cachedTx && cachedTx.message && cachedTx.message !== 'Transaction not confirmed yet' && cachedTx.message !== 'Transaction invalid') {
+        return cachedTx;
+    }
+
     const headers = {
         Authorization: `Bearer ${unisatTestKey}`,
         'Content-Type': 'application/json'
@@ -68,6 +80,7 @@ async function getBTCTestnetTransactionData(txid: string): Promise<any> {
                 txid,
                 timestamp: new Date().toISOString()
             };
+            txCache.set(txid, result);
             return result;
         }
 
@@ -86,8 +99,12 @@ async function getBTCTestnetTransactionData(txid: string): Promise<any> {
             timestamp: new Date().toISOString()
         };
 
+        txCache.set(txid, result);
         return result;
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error && 'status' in error && error.status === 403 && cachedTx) {
+            return cachedTx;
+        }
         console.error('Error fetching transaction data:', error);
         throw error;
     }
