@@ -20,14 +20,6 @@ interface TransactionError {
     status?: number;
 }
 
-interface TransactionResponse {
-    status: string;
-    txid: string;
-    chain: string;
-    timestamp: string;
-    transaction_data: any;
-}
-
 const jsonFilePath = path.join(__dirname, '../../../data/test_verify_transaction.json');
 
 const getCachedJsonData = async (): Promise<any> => {
@@ -133,18 +125,9 @@ export const handleVerifyTransaction = async (req: IncomingMessage, res: ServerR
             return;
         }
 
-        // First check if the transaction exists in the JSON file
         const existingData = await getCachedJsonData();
-        const existingTransaction = existingData.find((item: any) => item.txid === txid);
+        const existingTransactionIndex = existingData.findIndex((item: any) => item.txid === txid);
 
-        if (existingTransaction) {
-            // If found in JSON file, return it
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(existingTransaction));
-            return;
-        }
-
-        // If not found in JSON file, proceed with API call
         let txData;
         switch (chain.toLowerCase()) {
             case 'bitcoin_testnet':
@@ -159,8 +142,19 @@ export const handleVerifyTransaction = async (req: IncomingMessage, res: ServerR
                 return;
         }
 
-        // Add new transaction to JSON file
-        existingData.push(txData);
+        if (existingTransactionIndex !== -1) {
+            const existingTransaction = existingData[existingTransactionIndex];
+            if (existingTransaction.message === 'Transaction not confirmed yet' ||
+                existingTransaction.message === 'Transaction invalid') {
+                if (txData.message === 'Transaction verified successfully' ||
+                    txData.message === 'First output address does not match expected address') {
+                    existingData[existingTransactionIndex] = txData;
+                }
+            }
+        } else {
+            existingData.push(txData);
+        }
+
         await fs.writeFile(jsonFilePath, JSON.stringify(existingData, null, 2));
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
