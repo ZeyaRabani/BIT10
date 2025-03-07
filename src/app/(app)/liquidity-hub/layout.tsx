@@ -1,10 +1,10 @@
 import React from 'react'
-import { UnisatWalletProvider } from '@/context/UnisatWalletContext'
+import { BTCWalletProvider } from '@/context/BTCWalletContext'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
-        <UnisatWalletProvider>
+        <BTCWalletProvider>
             {children}
-        </UnisatWalletProvider>
+        </BTCWalletProvider>
     )
 }

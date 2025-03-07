@@ -9,11 +9,14 @@ import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 // import AnimatedBackground from '@/components/ui/animated-background'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Loader2, Info } from 'lucide-react'
+import { ChevronsUpDown, Check, Loader2, Info } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { cn } from '@/lib/utils'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image, { type StaticImageData } from 'next/image'
 import BIT10Img from '@/assets/swap/bit10.svg'
@@ -47,8 +50,11 @@ type ICRC2ActorType = {
 
 // const tabs = ['Quick Swap', 'Advanced Trading']
 
+// const paymentMethod = [
+//     'BIT10.BTC',
+// ]
 const paymentMethod = [
-    'BIT10.BTC',
+    { label: 'BIT10.BTC', value: 'BIT10.BTC', img: BIT10Img as StaticImageData }
 ]
 
 const bit10Amount = [
@@ -59,11 +65,18 @@ const bit10Amount = [
     '5'
 ]
 
+// const bit10Token = [
+//     'Test BIT10.DEFI',
+//     'Test BIT10.BRC20',
+//     'Test BIT10.TOP',
+//     'Test BIT10.MEME'
+// ]
+
 const bit10Token = [
-    'Test BIT10.DEFI',
-    'Test BIT10.BRC20',
-    'Test BIT10.TOP',
-    'Test BIT10.MEME'
+    { label: 'Test BIT10.DEFI', value: 'Test BIT10.DEFI', img: BIT10Img as StaticImageData },
+    { label: 'Test BIT10.BRC20', value: 'Test BIT10.BRC20', img: BIT10Img as StaticImageData },
+    { label: 'Test BIT10.TOP', value: 'Test BIT10.TOP', img: BIT10Img as StaticImageData },
+    { label: 'Test BIT10.MEME', value: 'Test BIT10.MEME', img: BIT10Img as StaticImageData },
 ]
 
 const FormSchema = z.object({
@@ -320,7 +333,6 @@ export default function Swap() {
                         }
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     } else if (transfer.Err) {
-                        console.log(transfer);
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                         const errorMessage = String(transfer.Err);
                         if (errorMessage.includes("Insufficient balance")) {
@@ -339,7 +351,6 @@ export default function Swap() {
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            console.log(error);
             setSwaping(false);
             toast.error('An error occurred while processing your request. Please try again!');
         } finally {
@@ -377,7 +388,7 @@ export default function Swap() {
   {activeTab === 'Quick Swap' && <div> Quick Swap </div>}
   {activeTab === 'Advanced Trading' && <div> Advanced Trading </div>} */}
 
-            <div className='flex flex-col py-4 md:py-8 items-center justify-center'>
+            <div className='flex flex-col py-4 md:py-8 h-full items-center justify-center'>
                 {isLoading ? (
                     <Card className='w-[300px] md:w-[580px] px-2 pt-6 animate-fade-bottom-up'>
                         <CardContent className='flex flex-col space-y-2'>
@@ -411,20 +422,59 @@ export default function Swap() {
                                                         name='payment_method'
                                                         render={({ field }) => (
                                                             <FormItem className='w-full px-2'>
-                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                    <FormControl>
-                                                                        <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
-                                                                            <SelectValue placeholder='Select payment method' />
-                                                                        </SelectTrigger>
-                                                                    </FormControl>
-                                                                    <SelectContent>
-                                                                        {paymentMethod.map((name) => (
-                                                                            <SelectItem key={name} value={name}>
-                                                                                {name}
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
+                                                                <Popover>
+                                                                    <PopoverTrigger asChild>
+                                                                        <FormControl>
+                                                                            <Button
+                                                                                variant='outline'
+                                                                                role='combobox'
+                                                                                className={cn(
+                                                                                    'border-none justify-between px-1.5 w-full',
+                                                                                    !field.value && 'text-muted-foreground'
+                                                                                )}
+                                                                            >
+                                                                                {field.value
+                                                                                    ? paymentMethod.find(
+                                                                                        (paymentMethod) => paymentMethod.value === field.value
+                                                                                    )?.label
+                                                                                    : 'Select token'}
+                                                                                <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                                            </Button>
+                                                                        </FormControl>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className='w-[180px] p-0 ml-8'>
+                                                                        <Command>
+                                                                            <CommandInput placeholder='Search token...' />
+                                                                            <CommandList>
+                                                                                <CommandEmpty>No token found.</CommandEmpty>
+                                                                                <CommandGroup>
+                                                                                    {paymentMethod.map((paymentMethod) => (
+                                                                                        <CommandItem
+                                                                                            value={paymentMethod.label}
+                                                                                            key={paymentMethod.label}
+                                                                                            onSelect={() => {
+                                                                                                form.setValue('payment_method', paymentMethod.value)
+                                                                                            }}
+                                                                                        >
+                                                                                            <div className='flex flex-row items-center'>
+                                                                                                <Image src={paymentMethod.img} alt={paymentMethod.label} width={15} height={15} className='rounded-full bg-white mr-1' />
+                                                                                                {paymentMethod.label}
+                                                                                            </div>
+                                                                                            <Check
+                                                                                                className={cn(
+                                                                                                    'ml-auto',
+                                                                                                    paymentMethod.value === field.value
+                                                                                                        ? 'opacity-100'
+                                                                                                        : 'opacity-0'
+                                                                                                )}
+                                                                                            />
+                                                                                        </CommandItem>
+                                                                                    ))}
+                                                                                </CommandGroup>
+                                                                            </CommandList>
+                                                                        </Command>
+                                                                    </PopoverContent>
+                                                                </Popover>
                                                                 <FormMessage />
                                                             </FormItem>
                                                         )}
@@ -492,20 +542,59 @@ export default function Swap() {
                                                         name='bit10_token'
                                                         render={({ field }) => (
                                                             <FormItem className='w-full px-2'>
-                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                    <FormControl>
-                                                                        <SelectTrigger className='border-none focus:border-none px-8 md:px-2 outline-none'>
-                                                                            <SelectValue placeholder='Select BIT10 token' />
-                                                                        </SelectTrigger>
-                                                                    </FormControl>
-                                                                    <SelectContent>
-                                                                        {bit10Token.map((name) => (
-                                                                            <SelectItem key={name} value={name}>
-                                                                                {name}
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
+                                                                <Popover>
+                                                                    <PopoverTrigger asChild>
+                                                                        <FormControl>
+                                                                            <Button
+                                                                                variant='outline'
+                                                                                role='combobox'
+                                                                                className={cn(
+                                                                                    'border-none justify-between px-1.5 w-full',
+                                                                                    !field.value && 'text-muted-foreground'
+                                                                                )}
+                                                                            >
+                                                                                {field.value
+                                                                                    ? bit10Token.find(
+                                                                                        (bit10Token) => bit10Token.value === field.value
+                                                                                    )?.label
+                                                                                    : 'Select token'}
+                                                                                <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                                            </Button>
+                                                                        </FormControl>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className='w-[200px] p-0 ml-8'>
+                                                                        <Command>
+                                                                            <CommandInput placeholder='Search token...' />
+                                                                            <CommandList>
+                                                                                <CommandEmpty>No token found.</CommandEmpty>
+                                                                                <CommandGroup>
+                                                                                    {bit10Token.map((bit10Token) => (
+                                                                                        <CommandItem
+                                                                                            value={bit10Token.label}
+                                                                                            key={bit10Token.label}
+                                                                                            onSelect={() => {
+                                                                                                form.setValue('bit10_token', bit10Token.value)
+                                                                                            }}
+                                                                                        >
+                                                                                            <div className='flex flex-row items-center'>
+                                                                                                <Image src={bit10Token.img} alt={bit10Token.label} width={15} height={15} className='rounded-full bg-white mr-1' />
+                                                                                                {bit10Token.label}
+                                                                                            </div>
+                                                                                            <Check
+                                                                                                className={cn(
+                                                                                                    'ml-auto',
+                                                                                                    bit10Token.value === field.value
+                                                                                                        ? 'opacity-100'
+                                                                                                        : 'opacity-0'
+                                                                                                )}
+                                                                                            />
+                                                                                        </CommandItem>
+                                                                                    ))}
+                                                                                </CommandGroup>
+                                                                            </CommandList>
+                                                                        </Command>
+                                                                    </PopoverContent>
+                                                                </Popover>
                                                                 <FormMessage />
                                                             </FormItem>
                                                         )}

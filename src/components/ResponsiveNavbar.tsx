@@ -8,7 +8,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Menu, X, Loader2, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark } from 'lucide-react'
+import { Menu, X, Loader2, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark, HandCoins } from 'lucide-react'
 import PlugImg from '@/assets/wallet/plug.svg'
 import XverseImg from '@/assets/wallet/xverse.svg'
 import UnisatImg from '@/assets/wallet/unisat.svg'
@@ -24,7 +24,7 @@ const links = {
         { title: 'Swap', link: '/swap', icon: ArrowRightLeft },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
-        // { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins }
+        { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins }
     ]
 };
 
@@ -40,7 +40,7 @@ export default function ResponsiveNavbar() {
     const [isClosing, setIsClosing] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
     const [open, setOpen] = useState(false);
-    
+
     const { isConnected, connectWallet, disconnectWallet } = useWallet();
     const pathname = usePathname();
     const appMode = links.app.some(link => pathname.startsWith(link.link));

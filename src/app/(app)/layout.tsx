@@ -6,7 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return (
         <div>
             <Navbar />
-            <div className='mt-20'>
+            <div className='pt-[5rem]'>
                 <Header message='You are on testnet. Tokens have no value.' />
             </div>
             <main className='flex-grow flex-1'>

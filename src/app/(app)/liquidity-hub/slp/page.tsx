@@ -13,7 +13,7 @@ export default function Page() {
         <MaxWidthWrapper className='pt-4'>
             {isConnected ? (
                 <Suspense fallback={<Preloader />}>
-                    <div>Staked Liquidity Provider</div>
+                    <InformationCard message='Staked Liquidity Provider is comming soon...' />
                 </Suspense>
             ) : (
                 <Suspense fallback={<Preloader />}>

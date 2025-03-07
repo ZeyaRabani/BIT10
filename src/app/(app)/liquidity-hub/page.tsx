@@ -17,7 +17,7 @@ export default function Page() {
                                 <Zap size={24} />
                             </div>
                         </div>
-                        <div>Swap assets instantly and earn rewards-no lock-up, no fees, just pure liquidity.</div>
+                        <div>Swap assets instantly and earn rewards: no lock-up, no fees, just pure liquidity.</div>
                     </div>
                 </Link>
 

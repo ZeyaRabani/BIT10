@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, index, doublePrecision, json, foreignKey, unique, bigint, serial, varchar, boolean, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, doublePrecision, index, json, foreignKey, unique, bigint, serial, varchar, boolean, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -21,6 +21,25 @@ export const mbTokenMint = pgTable('mb_token_mint', {
 	mintingStatus: text('minting_status').notNull(),
 	tokenMintAt: timestamp('token_mint_at', { withTimezone: true, mode: 'string' }).notNull(),
 	transactionIndex: text('transaction_index').notNull(),
+});
+
+export const teLiquidityTransactions = pgTable('te_liquidity_transactions', {
+	liquidationId: text('liquidation_id').primaryKey().notNull(),
+	tickInAddress: text('tick_in_address').notNull(),
+	tickInName: text('tick_in_name').notNull(),
+	tickInAmount: doublePrecision('tick_in_amount').notNull(),
+	tickInUsdAmount: doublePrecision('tick_in_usd_amount').notNull(),
+	tickInNetwork: text('tick_in_network').notNull(),
+	tickInTxBlock: text('tick_in_tx_block').notNull(),
+	tickOutAddress: text('tick_out_address').notNull(),
+	tickOutName: text('tick_out_name').notNull(),
+	tickOutAmount: doublePrecision('tick_out_amount'),
+	tickOutUsdAmount: doublePrecision('tick_out_usd_amount'),
+	tickOutNetwork: text('tick_out_network').notNull(),
+	tickOutTxBlock: text('tick_out_tx_block').notNull(),
+	liquidationType: text('liquidation_type').notNull(),
+	transactionStatus: text('transaction_status').notNull(),
+	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
 });
 
 export const bit10Top = pgTable('bit10_top', {

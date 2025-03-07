@@ -2,7 +2,7 @@
 "use server"
 
 import { db } from '@/server/db'
-import { userSignups, teUsers, teSwap, teRequestBtc } from '@/server/db/schema'
+import { userSignups, teUsers, teSwap, teRequestBtc, teLiquidityTransactions } from '@/server/db/schema'
 
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
@@ -19,6 +19,24 @@ interface NewTokenSwap {
     tickOutTxBlock: string;
     transactionType: 'Swap' | 'Reverse Swap';
     network: 'ICP';
+    transactionTimestamp: string;
+}
+
+interface NewLiquidity {
+    newLiquidationId: string;
+    tickInAddress: string;
+    tickInName: string;
+    tickInAmount: number;
+    tickInUsdAmount: number;
+    tickInNetwork: string;
+    tickInTxBlock: string;
+    tickOutAddress: string;
+    tickOutName: string;
+    tickOutAmount: number;
+    tickOutUsdAmount: number;
+    tickOutNetwork: string;
+    tickOutTxBlock: string;
+    liquidationType: 'Instant Liquidity' | 'Staked Liquidity';
     transactionTimestamp: string;
 }
 
@@ -156,3 +174,35 @@ export const testnetRevenue = async () => {
         return 'Error fetching testnet revenue';
     }
 }
+
+export const newLiquidityProvider = async ({ newLiquidationId, tickInAddress, tickInName, tickInAmount, tickInUsdAmount, tickInNetwork, tickInTxBlock, tickOutAddress, tickOutName, tickOutAmount, tickOutUsdAmount, tickOutNetwork, tickOutTxBlock, liquidationType, transactionTimestamp }: NewLiquidity) => {
+    try {
+        // const uuid = crypto.randomBytes(16).toString('hex');
+        // const generateNewLiquidityId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+        // const newLiquidityId = 'liquidity_' + generateNewLiquidityId;
+
+        await db.insert(teLiquidityTransactions).values({
+            liquidationId: newLiquidationId,
+            tickInAddress: tickInAddress,
+            tickInName: tickInName,
+            tickInAmount: tickInAmount,
+            tickInUsdAmount: tickInUsdAmount,
+            tickInNetwork: tickInNetwork,
+            tickInTxBlock: tickInTxBlock,
+            tickOutAddress: tickOutAddress,
+            tickOutName: tickOutName,
+            tickOutAmount: tickOutAmount,
+            tickOutUsdAmount: tickOutUsdAmount,
+            tickOutNetwork: tickOutNetwork,
+            tickOutTxBlock: tickOutTxBlock,
+            liquidationType: liquidationType,
+            transactionStatus: 'Unconfirmed', // Confirmed || Failed
+            transactionTimestamp: transactionTimestamp
+        });
+
+        return 'Token swap successfully'
+    } catch (error) {
+        console.log(error);
+        return 'Error swaping tokens';
+    }
+};
