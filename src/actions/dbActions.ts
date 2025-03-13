@@ -36,7 +36,7 @@ interface NewLiquidity {
     tickOutUsdAmount: number;
     tickOutNetwork: string;
     tickOutTxBlock: string;
-    liquidationType: 'Instant Liquidity' | 'Staked Liquidity';
+    liquidationType: 'Staked Liquidity';
     transactionTimestamp: string;
 }
 

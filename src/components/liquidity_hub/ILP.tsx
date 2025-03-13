@@ -20,11 +20,8 @@ import Image, { type StaticImageData } from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import BitcoinImg from '@/assets/swap/bitcoin.svg'
 import BIT10Img from '@/assets/swap/bit10.svg'
-// import { Principal } from '@dfinity/principal'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/liquidity_hub.did'
-// import crypto from 'crypto'
-// import { newLiquidityProvider } from '@/actions/dbActions'
 
 interface BuyingTokenPriceResponse {
     data: {
@@ -35,7 +32,7 @@ interface BuyingTokenPriceResponse {
 }
 
 const tickIn = [
-    { label: 'Bitcoin', value: 'BTC', img: BitcoinImg as StaticImageData }
+    { label: 'tBTC', value: 'BTC', img: BitcoinImg as StaticImageData }
 ]
 
 const tickOut = [
@@ -209,73 +206,15 @@ export default function ILP() {
                     tick_out_name: values.recieving_token,
                     tick_in_name: values.liquidity_token,
                     tick_in_network: 'bitcoin_testnet'
-                }
+                };
+
+                setTimeout(() => {
+                    setProcessing(false);
+                    toast.info('Transaction was successful. Funds will be sent to your wallet after confirming the transaction.!');
+                }, 2000);
 
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 await actor2.te_ilp(args2);
-                // const transfer = await actor2.te_ilp(args2);
-
-                // console.log(transfer);
-
-                // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                // if (transfer.Ok) {
-                //     const uuid = crypto.randomBytes(16).toString('hex');
-                //     const generateNewLiquidityId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
-                //     const newLiquidityId = 'liquidity_' + generateNewLiquidityId;
-
-                //     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-                //     const principal = Principal.fromUint8Array(transfer.Ok.tick_out_address._arr);
-                //     const textualRepresentation = principal.toText();
-
-                //     const formatTimestamp = (nanoseconds: string): string => {
-                //         const milliseconds = BigInt(nanoseconds) / BigInt(1_000_000);
-                //         const date = new Date(Number(milliseconds));
-                //         return date.toISOString().replace("T", " ").replace("Z", "+00");
-                //     };
-
-                //     // Send BIT10.BTC to canister
-
-                //     const result = await newLiquidityProvider({
-                //         newLiquidationId: newLiquidityId,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickInAddress: transfer.Ok.tick_in_address,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickInName: transfer.Ok.tick_in_name,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickInAmount: transfer.Ok.tick_in_amount,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickInUsdAmount: transfer.Ok.tick_in_usd_amount,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickInNetwork: transfer.Ok.tick_in_network,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickInTxBlock: transfer.Ok.tick_in_tx_block,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickOutAddress: textualRepresentation,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickOutName: transfer.Ok.tick_out_name,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickOutAmount: transfer.Ok.tick_out_amount,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickOutUsdAmount: transfer.Ok.tick_out_usd_amount,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickOutNetwork: transfer.Ok.tick_out_network,
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                //         tickOutTxBlock: transfer.Ok.tick_out_tx_block,
-                //         liquidationType: 'Instant Liquidity',
-                //         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
-                //         transactionTimestamp: formatTimestamp(transfer.Ok.transaction_timestamp)
-                //     })
-                //     console.log(result);
-
-                //     // Implement for DB:
-                //     if (result === 'Token swap successfully') {
-                //     } else {
-                //         toast.error('An error occurred while processing your request. Please try again!');
-                //     }
-                // } else {
-                //     toast.error('An error occurred while processing your request. Please try again!');
-                // }
-                toast.info('Transaction was successful. Funds will be sent to your wallet after confirming the transaction.!');
             } else {
                 toast.error('An error occurred while processing your request. Please try again!');
             }
