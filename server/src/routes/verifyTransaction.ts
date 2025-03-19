@@ -12,9 +12,16 @@ const cache = new NodeCache({
     deleteOnExpire: true
 });
 
-const txCache = new NodeCache({
+const txCacheBTC = new NodeCache({
     stdTTL: 60,  // 1 min
     checkperiod: 30,
+    useClones: false,
+    deleteOnExpire: true
+});
+
+const txCacheSOL = new NodeCache({
+    stdTTL: 8,  // 8 sec
+    checkperiod: 5, // 5 sec
     useClones: false,
     deleteOnExpire: true
 });
@@ -58,7 +65,7 @@ const fetchFromAPI = async (url: string, headers?: Record<string, string>): Prom
 };
 
 async function getBTCTestnetTransactionData(txid: string): Promise<any> {
-    const cachedTx = txCache.get(txid) as { message?: string };
+    const cachedTx = txCacheBTC.get(txid) as { message?: string };
     if (cachedTx && cachedTx.message && cachedTx.message !== 'Transaction not confirmed yet' && cachedTx.message !== 'Transaction invalid') {
         return cachedTx;
     }
@@ -80,7 +87,7 @@ async function getBTCTestnetTransactionData(txid: string): Promise<any> {
                 txid,
                 timestamp: new Date().toISOString()
             };
-            txCache.set(txid, result);
+            txCacheBTC.set(txid, result);
             return result;
         }
 
@@ -99,13 +106,104 @@ async function getBTCTestnetTransactionData(txid: string): Promise<any> {
             timestamp: new Date().toISOString()
         };
 
-        txCache.set(txid, result);
+        txCacheBTC.set(txid, result);
         return result;
     } catch (error: unknown) {
         if (error instanceof Error && 'status' in error && error.status === 403 && cachedTx) {
             return cachedTx;
         }
         console.error('Error fetching transaction data:', error);
+        throw error;
+    }
+}
+
+async function getSOLTestnetTransactionData(txid: string): Promise<any> {
+    const cachedTx = txCacheSOL.get(txid) as { message?: string };
+    if (cachedTx && cachedTx.message && cachedTx.message !== 'Transaction not confirmed yet' && cachedTx.message !== 'Transaction invalid') {
+        return cachedTx;
+    }
+
+    try {
+        const { data: txData } = await axios.post('https://api.devnet.solana.com', {
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getTransaction',
+            params: [
+                txid,
+                'json'
+            ]
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!txData.result) {
+            const result = {
+                transaction: null,
+                verified: false,
+                message: 'Transaction not found',
+                txid,
+                timestamp: new Date().toISOString()
+            };
+            txCacheSOL.set(txid, result);
+            return result;
+        }
+
+        const transaction = txData.result.transaction;
+        const txMessage = transaction.message;
+        const accountKeys = txMessage.accountKeys;
+        const meta = txData.result.meta;
+
+        const transferInstruction = txMessage.instructions.find((inst: any) =>
+            accountKeys[inst.programIdIndex] === '11111111111111111111111111111111' &&
+            inst.accounts.length === 2
+        );
+
+        if (!transferInstruction) {
+            const result = {
+                // transaction: txData.result,
+                verified: false,
+                message: 'No transfer instruction found',
+                txid,
+                timestamp: new Date().toISOString()
+            };
+            txCacheSOL.set(txid, result);
+            return result;
+        }
+
+        const sender = accountKeys[transferInstruction.accounts[0]];
+        const receiver = accountKeys[transferInstruction.accounts[1]];
+        const expectedAddress = 'Cq6JPmEspG6oNcUC47WHuEJWU1K4knsLzHYHSfvpnDHk';
+
+        const receiverPreBalance = meta.preBalances[transferInstruction.accounts[1]];
+        const receiverPostBalance = meta.postBalances[transferInstruction.accounts[1]];
+        // const solAmount = (receiverPostBalance - receiverPreBalance) / 1000000000;
+        const solAmount = receiverPostBalance - receiverPreBalance;
+
+        const verified = receiver === expectedAddress;
+        const resultMessage = verified
+            ? 'Transaction verified successfully'
+            : 'First output address does not match expected address';
+
+        const result = {
+            // transaction: txData.result,
+            receiver,
+            sender,
+            solAmount: solAmount > 0 ? solAmount : 0,
+            verified,
+            message: resultMessage,
+            txid,
+            timestamp: new Date().toISOString()
+        };
+
+        txCacheSOL.set(txid, result);
+        return result;
+    } catch (error: unknown) {
+        if (error instanceof Error && 'status' in error && error.status === 403 && cachedTx) {
+            return cachedTx;
+        }
+        console.error('Error fetching Solana transaction data:', error);
         throw error;
     }
 }
@@ -150,9 +248,9 @@ export const handleVerifyTransaction = async (req: IncomingMessage, res: ServerR
             case 'bitcoin_testnet':
                 txData = await getBTCTestnetTransactionData(txid);
                 break;
-            // case 'solana_devnet':
-            //     txData = await getSOLTestnetTransactionData(txid);
-            //     break;
+            case 'solana_devnet':
+                txData = await getSOLTestnetTransactionData(txid);
+                break;
             default:
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Invalid chain' }));
