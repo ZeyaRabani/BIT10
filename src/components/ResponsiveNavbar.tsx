@@ -10,9 +10,9 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Menu, X, Loader2, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark, HandCoins } from 'lucide-react'
 import PlugImg from '@/assets/wallet/plug.svg'
-import XverseImg from '@/assets/wallet/xverse.svg'
-import UnisatImg from '@/assets/wallet/unisat.svg'
-import PhantomImg from '@/assets/wallet/phantom.svg'
+// import XverseImg from '@/assets/wallet/xverse.svg'
+// import UnisatImg from '@/assets/wallet/unisat.svg'
+// import PhantomImg from '@/assets/wallet/phantom.svg'
 
 const links = {
     web: [
@@ -30,9 +30,9 @@ const links = {
 
 const wallets = [
     { name: 'Plug', img: PlugImg },
-    { name: 'Xverse', img: XverseImg, soon: true },
-    { name: 'UniSat', img: UnisatImg, soon: true },
-    { name: 'Phantom', img: PhantomImg, soon: true }
+    // { name: 'Xverse', img: XverseImg, soon: true },
+    // { name: 'UniSat', img: UnisatImg, soon: true },
+    // { name: 'Phantom', img: PhantomImg, soon: true }
 ];
 
 export default function ResponsiveNavbar() {
@@ -103,30 +103,34 @@ export default function ResponsiveNavbar() {
                                     {appMode ? (
                                         <div>
                                             {isConnected ? (
-                                                <div className='border-b-2 py-2 px-2 cursor-pointer w-full'>
+                                                <div className='border-b-2 pb-2 px-2 cursor-pointer w-full'>
                                                     <Button variant='destructive' className='w-full' onClick={disconnectWallet}>
                                                         Disconnect Wallet
                                                     </Button>
                                                 </div>
                                             ) : (
                                                 <Dialog open={open} onOpenChange={setOpen}>
-                                                    <DialogTrigger className='w-full'>
-                                                        <Button disabled={isConnecting} className='w-full'>
-                                                            {isConnecting ? <Loader2 className='animate-spin mr-2' size={15} /> : 'Connect Wallet'}
-                                                        </Button>
-                                                    </DialogTrigger>
+                                                    <div className='border-b-2 pb-2 px-2 cursor-pointer w-full'>
+                                                        <DialogTrigger className='w-full'>
+                                                            <Button disabled={isConnecting} className='w-full'>
+                                                                {isConnecting ? <Loader2 className='animate-spin mr-2' size={15} /> : 'Connect Wallet'}
+                                                            </Button>
+                                                        </DialogTrigger>
+                                                    </div>
                                                     <DialogContent className='max-w-[90vw] md:max-w-[400px]'>
                                                         <DialogHeader>
                                                             <DialogTitle>Connect your wallet to get started</DialogTitle>
                                                         </DialogHeader>
                                                         <div className='flex flex-col space-y-2'>
-                                                            {wallets.map(({ name, img, soon }) => (
-                                                                <Button key={name} variant='ghost' className='flex justify-between items-center w-full hover:bg-accent' onClick={!soon ? handleWalletSelect : undefined}>
+                                                            {/* {wallets.map(({ name, img, soon }) => ( */}
+                                                            {wallets.map(({ name, img }) => (
+                                                                // <Button key={name} variant='ghost' className='flex justify-between items-center w-full hover:bg-accent' onClick={!soon ? handleWalletSelect : undefined}>
+                                                                <Button key={name} variant='ghost' className='flex justify-between items-center w-full hover:bg-accent' onClick={handleWalletSelect}>
                                                                     <div className='flex items-center space-x-2'>
                                                                         <Image height={30} width={30} src={img} alt={name} className='rounded' />
                                                                         <span className='text-lg md:text-xl'>{name}</span>
                                                                     </div>
-                                                                    {soon && <span className='text-sm text-accent-foreground/80'>Available soon</span>}
+                                                                    {/* {soon && <span className='text-sm text-accent-foreground/80'>Available soon</span>} */}
                                                                 </Button>
                                                             ))}
                                                         </div>

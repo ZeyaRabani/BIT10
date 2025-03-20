@@ -23,23 +23,18 @@ export const mbTokenMint = pgTable('mb_token_mint', {
 	transactionIndex: text('transaction_index').notNull(),
 });
 
-export const teLiquidityTransactions = pgTable('te_liquidity_transactions', {
+export const teLiquidityHub = pgTable('te_liquidity_hub', {
 	liquidationId: text('liquidation_id').primaryKey().notNull(),
 	tickInAddress: text('tick_in_address').notNull(),
 	tickInName: text('tick_in_name').notNull(),
 	tickInAmount: doublePrecision('tick_in_amount').notNull(),
-	tickInUsdAmount: doublePrecision('tick_in_usd_amount').notNull(),
-	tickInNetwork: text('tick_in_network').notNull(),
-	tickInTxBlock: text('tick_in_tx_block').notNull(),
-	tickOutAddress: text('tick_out_address').notNull(),
-	tickOutName: text('tick_out_name').notNull(),
-	tickOutAmount: doublePrecision('tick_out_amount'),
-	tickOutUsdAmount: doublePrecision('tick_out_usd_amount'),
-	tickOutNetwork: text('tick_out_network').notNull(),
-	tickOutTxBlock: text('tick_out_tx_block').notNull(),
+	duration: doublePrecision('duration').notNull(),
 	liquidationType: text('liquidation_type').notNull(),
+	liquidationMode: text('liquidation_mode').notNull(),
 	transactionStatus: text('transaction_status').notNull(),
 	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
+	tickInNetwork: text('tick_in_network').notNull(),
+	tickInTxBlock: text('tick_in_tx_block').notNull(),
 });
 
 export const bit10Top = pgTable('bit10_top', {

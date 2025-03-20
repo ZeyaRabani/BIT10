@@ -193,7 +193,6 @@ export default function ILP() {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (response.txid && hasAllowed) {
-                console.log(response.txid);
 
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const actor2 = await window.ic.plug.createActor({
@@ -220,7 +219,6 @@ export default function ILP() {
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            console.log(error);
             setProcessing(false);
             toast.error('An error occurred while processing your request. Please try again!');
         } finally {
@@ -239,17 +237,17 @@ export default function ILP() {
                     </CardContent>
                 </Card>
             ) : (
-                <Card className='w-[300px] md:w-[500px] animate-fade-bottom-up'>
-                    <CardHeader>
-                        <CardTitle className='flex flex-row items-center justify-between'>
-                            <div>Instant Liquidity Provider</div>
-                        </CardTitle>
+            <Card className='w-[300px] md:w-[500px] animate-fade-bottom-up'>
+                <CardHeader>
+                    <CardTitle className='flex flex-row items-center justify-between'>
+                        <div>Instant Liquidity Provider</div>
+                    </CardTitle>
                         <CardDescription>Swap assets instantly and earn rewards: no lock-up, no fees-just pure liquidity, plus extra incentives from the platform fee.</CardDescription>
-                    </CardHeader>
+                </CardHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
-                            <CardContent className='flex flex-col space-y-3'>
-                                <div className='rounded-lg border-2 py-4 px-6 z-[1]'>
+                <CardContent className='flex flex-col space-y-3'>
+                    <div className='rounded-lg border-2 py-4 px-6 z-[1]'>
                                     <div className='font-semibold tracking-wide'>Spent</div>
                                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 items-start md:items-center md:justify-between text-sm'>
                                         <div>Chain: Bitcoin Testnet</div>
@@ -270,8 +268,8 @@ export default function ILP() {
                                                 </Tooltip>
                                             </TooltipProvider>
                                         </div>
-                                    </div>
-                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
+                        </div>
+                        <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                         <FormField
                                             control={form.control}
                                             name='liquidity_amount'
@@ -284,8 +282,8 @@ export default function ILP() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <div className='grid grid-cols-5 items-center'>
-                                            <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                            <div className='grid grid-cols-5 items-center'>
+                                <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
                                                 <FormField
                                                     control={form.control}
                                                     name='liquidity_token'
@@ -348,20 +346,20 @@ export default function ILP() {
                                                         </FormItem>
                                                     )}
                                                 />
-                                            </div>
-                                            <div className='col-span-1 -ml-6 z-20'>
+                                </div>
+                                <div className='col-span-1 -ml-6 z-20'>
                                                 <Image src={liquidityImg} alt='BIT10' width={75} height={75} className='z-20 bg-white rounded-full' />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
+                                </div>
+                            </div>
+                        </div>
+                        <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
                                         <div>{(form.watch('liquidity_amount') * parseFloat(liquidityPrice)).toFixed(4)} $</div>
                                         <div>
                                             1 {form.watch('liquidity_token')} = $ {parseFloat(liquidityPrice).toFixed(4)}
                                         </div>
-                                    </div>
-                                </div>
-                                <div className='rounded-lg border-2 py-4 px-6 z-[1]'>
+                        </div>
+                    </div>
+                    <div className='rounded-lg border-2 py-4 px-6 z-[1]'>
                                     <div className='flex flex-row items-center'>
                                         <div className='font-semibold tracking-wide'>
                                             Recieve
@@ -380,12 +378,12 @@ export default function ILP() {
                                         </TooltipProvider>
                                     </div>
                                     <div className='text-sm'>Chain: ICP</div>
-                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
+                        <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                         <div className='text-4xl text-center md:text-start'>
                                             {((parseFloat(liquidityPrice) * form.watch('liquidity_amount')) / parseFloat(recivingPrice)).toFixed(4)}
-                                        </div>
-                                        <div className='grid grid-cols-5 items-center'>
-                                            <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
+                            </div>
+                            <div className='grid grid-cols-5 items-center'>
+                                <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
                                                 <FormField
                                                     control={form.control}
                                                     name='recieving_token'
@@ -448,13 +446,13 @@ export default function ILP() {
                                                         </FormItem>
                                                     )}
                                                 />
-                                            </div>
-                                            <div className='col-span-1 -ml-6 z-20'>
+                                </div>
+                                <div className='col-span-1 -ml-6 z-20'>
                                                 <Image src={BIT10Img as StaticImageData} alt='BIT10' width={75} height={75} className='z-20' />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
+                                </div>
+                            </div>
+                        </div>
+                        <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
                                         <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
                                             <TooltipProvider>
                                                 <Tooltip delayDuration={300}>
@@ -472,11 +470,11 @@ export default function ILP() {
                                             </TooltipProvider>
                                         </div>
                                         <div>1 {form.watch('recieving_token')} = $ {parseFloat(recivingPrice).toFixed(4)}</div>
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
 
-                            </CardContent>
-                            <CardFooter>
+                </CardContent>
+                <CardFooter>
                                 {isBTCConnected ? (
                                     <div className='w-full fex flex-col space-y-2'>
                                         <h1>Your spent address: {formatAddress(BTCAddress)}</h1>
@@ -488,14 +486,14 @@ export default function ILP() {
                                         </Button>
                                     </div>
                                 ) : (
-                                    <div className='w-full'>
+                    <div className='w-full'>
                                         <div className='bg-primary rounded text-center py-2 font-medium cursor-pointer hover:bg-primary/90 text-white' onClick={connectBTCWallet}>Connect Bitcoin Wallet</div>
-                                    </div>
+                    </div>
                                 )}
-                            </CardFooter>
+                </CardFooter>
                         </form>
                     </Form>
-                </Card>
+            </Card>
             )}
         </div>
     )

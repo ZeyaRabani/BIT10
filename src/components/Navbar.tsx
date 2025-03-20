@@ -14,9 +14,9 @@ import ResponsiveNavbar from './ResponsiveNavbar'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import PlugImg from '@/assets/wallet/plug.svg'
-import XverseImg from '@/assets/wallet/xverse.svg'
-import UnisatImg from '@/assets/wallet/unisat.svg'
-import PhantomImg from '@/assets/wallet/phantom.svg'
+// import XverseImg from '@/assets/wallet/xverse.svg'
+// import UnisatImg from '@/assets/wallet/unisat.svg'
+// import PhantomImg from '@/assets/wallet/phantom.svg'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Loader2 } from 'lucide-react'
@@ -37,9 +37,9 @@ const links = {
 
 const wallets = [
     { name: 'Plug', img: PlugImg },
-    { name: 'Xverse', img: XverseImg, soon: true },
-    { name: 'UniSat', img: UnisatImg, soon: true },
-    { name: 'Phantom', img: PhantomImg, soon: true }
+    // { name: 'Xverse', img: XverseImg, soon: true },
+    // { name: 'UniSat', img: UnisatImg, soon: true },
+    // { name: 'Phantom', img: PhantomImg, soon: true }
 ];
 
 export default function Navbar() {
@@ -181,13 +181,15 @@ export default function Navbar() {
                                                 <DialogTitle className='tracking-wide pt-2 md:pt-0'>Connect your wallet to get started</DialogTitle>
                                             </DialogHeader>
                                             <div className='flex flex-col space-y-2'>
-                                                {wallets.map(({ name, img, soon }) => (
-                                                    <Button key={name} variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent' onClick={!soon ? handleWalletSelect : undefined}>
+                                                {/* {wallets.map(({ name, img, soon }) => ( */}
+                                                {wallets.map(({ name, img }) => (
+                                                    // <Button key={name} variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent' onClick={!soon ? handleWalletSelect : undefined}>
+                                                    <Button key={name} variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent' onClick={handleWalletSelect}>
                                                         <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
                                                             <Image height={30} width={30} src={img} alt={name} className='rounded' />
                                                             <span className='text-lg md:text-xl'>{name}</span>
                                                         </div>
-                                                        {soon && <span className='text-sm text-accent-foreground/80'>Available soon</span>}
+                                                        {/* {soon && <span className='text-sm text-accent-foreground/80'>Available soon</span>} */}
                                                     </Button>
                                                 ))}
                                             </div>

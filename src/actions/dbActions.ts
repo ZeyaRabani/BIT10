@@ -2,10 +2,10 @@
 "use server"
 
 import { db } from '@/server/db'
-import { userSignups, teUsers, teSwap, teRequestBtc, teLiquidityTransactions } from '@/server/db/schema'
+import { userSignups, teUsers, teSwap, teRequestBtc, teLiquidityHub } from '@/server/db/schema'
 
 import crypto from 'crypto'
-import { eq, desc } from 'drizzle-orm'
+import { eq, desc, and } from 'drizzle-orm'
 
 interface NewTokenSwap {
     newTokenSwapId: string;
@@ -27,16 +27,11 @@ interface NewLiquidity {
     tickInAddress: string;
     tickInName: string;
     tickInAmount: number;
-    tickInUsdAmount: number;
+    duration: number;
     tickInNetwork: string;
     tickInTxBlock: string;
-    tickOutAddress: string;
-    tickOutName: string;
-    tickOutAmount: number;
-    tickOutUsdAmount: number;
-    tickOutNetwork: string;
-    tickOutTxBlock: string;
     liquidationType: 'Staked Liquidity';
+    liquidationMode: string;
     transactionTimestamp: string;
 }
 
@@ -175,34 +170,51 @@ export const testnetRevenue = async () => {
     }
 }
 
-export const newLiquidityProvider = async ({ newLiquidationId, tickInAddress, tickInName, tickInAmount, tickInUsdAmount, tickInNetwork, tickInTxBlock, tickOutAddress, tickOutName, tickOutAmount, tickOutUsdAmount, tickOutNetwork, tickOutTxBlock, liquidationType, transactionTimestamp }: NewLiquidity) => {
+export const newLiquidityProvider = async ({ newLiquidationId, tickInAddress, tickInName, tickInAmount, duration, tickInNetwork, tickInTxBlock, liquidationType, liquidationMode, transactionTimestamp }: NewLiquidity) => {
     try {
         // const uuid = crypto.randomBytes(16).toString('hex');
         // const generateNewLiquidityId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
         // const newLiquidityId = 'liquidity_' + generateNewLiquidityId;
 
-        await db.insert(teLiquidityTransactions).values({
+        await db.insert(teLiquidityHub).values({
             liquidationId: newLiquidationId,
             tickInAddress: tickInAddress,
             tickInName: tickInName,
             tickInAmount: tickInAmount,
-            tickInUsdAmount: tickInUsdAmount,
+            duration: duration,
             tickInNetwork: tickInNetwork,
             tickInTxBlock: tickInTxBlock,
-            tickOutAddress: tickOutAddress,
-            tickOutName: tickOutName,
-            tickOutAmount: tickOutAmount,
-            tickOutUsdAmount: tickOutUsdAmount,
-            tickOutNetwork: tickOutNetwork,
-            tickOutTxBlock: tickOutTxBlock,
-            liquidationType: liquidationType,
+            liquidationType: liquidationType, // Staked Liquidity
+            liquidationMode: liquidationMode, // Stake / Withdraw
             transactionStatus: 'Unconfirmed', // Confirmed || Failed
             transactionTimestamp: transactionTimestamp
         });
 
-        return 'Token swap successfully'
+        return 'Staking successfully'
     } catch (error) {
         console.log(error);
-        return 'Error swaping tokens';
+        return 'Error staking tokens';
     }
 };
+
+export const userStakedLiquidityHistory = async ({ userAddress }: { userAddress: string }) => {
+    try {
+        const data = await db.select({
+            liquidationId: teLiquidityHub.liquidationId,
+            tickInName: teLiquidityHub.tickInName,
+            tickInAmount: teLiquidityHub.tickInAmount,
+            duration: teLiquidityHub.duration,
+            liquidationMode: teLiquidityHub.liquidationMode,
+            transactionTimestamp: teLiquidityHub.transactionTimestamp
+        })
+            .from(teLiquidityHub)
+            .where(and(
+                eq(teLiquidityHub.tickInAddress, userAddress),
+                eq(teLiquidityHub.liquidationType, 'Staked Liquidity')
+            ))
+            .orderBy(desc(teLiquidityHub.transactionTimestamp));
+        return data;
+    } catch (error) {
+        return 'Error fetching user staked liquidity history';
+    }
+}

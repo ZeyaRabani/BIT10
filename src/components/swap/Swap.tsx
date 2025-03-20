@@ -282,7 +282,7 @@ export default function Swap() {
                             const milliseconds = BigInt(nanoseconds) / BigInt(1_000_000);
                             const date = new Date(Number(milliseconds));
 
-                            return date.toISOString().replace("T", " ").replace("Z", "+00");
+                            return date.toISOString().replace('T', ' ').replace('Z', '+00');
                         };
 
                         const result = await newTokenSwap({
@@ -303,7 +303,7 @@ export default function Swap() {
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             tickOutTxBlock: transfer.Ok.tick_out_tx_block.toString(),
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                            transactionType: transfer.Ok.transaction_type as "Swap" | "Reverse Swap",
+                            transactionType: transfer.Ok.transaction_type as 'Swap' | 'Reverse Swap',
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             network: transfer.Ok.network,
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
@@ -335,8 +335,8 @@ export default function Swap() {
                     } else if (transfer.Err) {
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                         const errorMessage = String(transfer.Err);
-                        if (errorMessage.includes("Insufficient balance")) {
-                            toast.error("Insufficient funds");
+                        if (errorMessage.includes('Insufficient balance')) {
+                            toast.error('Insufficient funds');
                         } else {
                             toast.error('An error occurred while processing your request. Please try again!');
                         }

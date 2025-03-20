@@ -32,7 +32,7 @@ export function DataTableColumnHeader<TData, TValue>({ column, title, info, clas
                             <TooltipProvider>
                                 <Tooltip delayDuration={300}>
                                     <TooltipTrigger asChild>
-                                        <span><Info className='h-3 w-3 ml-1' /></span>
+                                        <span><Info className='h-3 w-3' /></span>
                                     </TooltipTrigger>
                                     <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                         {info}

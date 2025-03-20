@@ -21,6 +21,10 @@ const formatColumnName = (columnName: string): string => {
         return 'Token Bought at';
     } else if (columnName === 'view_transaction') {
         return 'Ciew Transaction';
+    } else if (columnName === 'duration') {
+        return 'Staking Duration';
+    } else if (columnName === 'liquidationId') {
+        return 'Liquidation ID';
     }
 
     return columnName
