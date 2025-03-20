@@ -48,7 +48,24 @@ export function DataTable<TData, TValue>({
             columnVisibility,
             rowSelection,
         },
-    })
+    });
+
+    const formatTokenAmount = (value: number): string => {
+        if (value === 0) return '0';
+
+        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
+        const [integerPart, decimalPart = ''] = strValue.split('.');
+
+        if (!decimalPart) return integerPart ?? '0';
+
+        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
+
+        if (firstNonZeroIndex === -1) return integerPart ?? '0';
+
+        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
+
+        return `${integerPart}.${trimmedDecimal}`;
+    };
 
     const formatDate = (dateInput: Date | string): string => {
         const date = new Date(dateInput);
@@ -85,8 +102,11 @@ export function DataTable<TData, TValue>({
             case 'staked_amount':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{(row.original.tickInAmount / 100000000).toFixed(8)}</div>
+                        <div>{formatTokenAmount(row.original.tickInAmount / 100000000)}</div>
                         <div>{row.original.tickInName}</div>
+                        <div>
+                            {row.original.duration > 0 && `for ${row.original.duration} day`}
+                        </div>
                     </div>
                 );
             case 'staked_on':

@@ -92,6 +92,23 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
 
     const selectedBit10Token = bit10Token();
 
+    const formatTokenAmount = (value: number): string => {
+        if (value === 0) return '0';
+
+        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
+        const [integerPart, decimalPart = ''] = strValue.split('.');
+
+        if (!decimalPart) return integerPart ?? '0';
+
+        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
+
+        if (firstNonZeroIndex === -1) return integerPart ?? '0';
+
+        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
+
+        return `${integerPart}.${trimmedDecimal}`;
+    };
+
     return (
         <>
             {selectedBit10Token?.length === 0 ?
@@ -130,9 +147,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                         {rebalance.newTokens.map((token, i) => (
                                                             <TableRow key={i}>
                                                                 <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
-                                                                <TableCell>{token.price.toFixed(4)}</TableCell>
-                                                                <TableCell>{token.noOfTokens.toFixed(4)}</TableCell>
-                                                                <TableCell>{(token.price * token.noOfTokens).toFixed(4)}</TableCell>
+                                                                <TableCell>{formatTokenAmount(token.price)}</TableCell>
+                                                                <TableCell>{formatTokenAmount(token.noOfTokens)}</TableCell>
+                                                                <TableCell>{formatTokenAmount(token.price * token.noOfTokens)}</TableCell>
                                                             </TableRow>
                                                         ))}
                                                     </TableBody>
@@ -159,9 +176,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             {rebalance.added.map((token, i) => (
                                                                 <TableRow key={i}>
                                                                     <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
-                                                                    <TableCell>{token.price.toFixed(4)}</TableCell>
-                                                                    <TableCell>{token.noOfTokens.toFixed(4)}</TableCell>
-                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(4)}</TableCell>
+                                                                    <TableCell>{formatTokenAmount(token.price)}</TableCell>
+                                                                    <TableCell>{formatTokenAmount(token.noOfTokens)}</TableCell>
+                                                                    <TableCell>{formatTokenAmount(token.price * token.noOfTokens)}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
@@ -189,9 +206,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             {rebalance.removed.map((token, i) => (
                                                                 <TableRow key={i}>
                                                                     <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
-                                                                    <TableCell>{token.price.toFixed(4)}</TableCell>
-                                                                    <TableCell>{token.noOfTokens.toFixed(4)}</TableCell>
-                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(4)}</TableCell>
+                                                                    <TableCell>{formatTokenAmount(token.price)}</TableCell>
+                                                                    <TableCell>{formatTokenAmount(token.noOfTokens)}</TableCell>
+                                                                    <TableCell>{formatTokenAmount(token.price * token.noOfTokens)}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
@@ -219,9 +236,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             {rebalance.retained.map((token, i) => (
                                                                 <TableRow key={i}>
                                                                     <TableCell className='font-medium'>{token.name} ({token.symbol})</TableCell>
-                                                                    <TableCell>{token.price.toFixed(4)}</TableCell>
-                                                                    <TableCell>{token.noOfTokens.toFixed(4)}</TableCell>
-                                                                    <TableCell>{(token.price * token.noOfTokens).toFixed(4)}</TableCell>
+                                                                    <TableCell>{formatTokenAmount(token.price)}</TableCell>
+                                                                    <TableCell>{formatTokenAmount(token.noOfTokens)}</TableCell>
+                                                                    <TableCell>{formatTokenAmount(token.price * token.noOfTokens)}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>

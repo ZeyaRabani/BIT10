@@ -29,12 +29,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 const SLPTableColumns: ColumnDef<SLPTableDataType>[] = [
     {
-        accessorKey: 'liquidationId',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Liquidation ID' />
-        ),
-    },
-    {
         accessorKey: 'liquidation_type',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Liquidation Type' />
@@ -46,12 +40,12 @@ const SLPTableColumns: ColumnDef<SLPTableDataType>[] = [
             <DataTableColumnHeader column={column} title='Staked Amount' />
         ),
     },
-    {
-        accessorKey: 'duration',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Stake Duration' info='Duration of Staking (in days)' />
-        ),
-    },
+    // {
+    //     accessorKey: 'duration',
+    //     header: ({ column }) => (
+    //         <DataTableColumnHeader column={column} title='Stake Duration' info='Duration of Staking (in days)' />
+    //     ),
+    // },
     {
         accessorKey: 'staked_on',
         header: ({ column }) => (
@@ -285,7 +279,7 @@ export default function SLP() {
                     } else if (transfer.Err) {
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                         const errorMessage = String(transfer.Err);
-                        if (errorMessage.includes('Insufficient balance')) {
+                        if (errorMessage.includes('Insufficient withdrawable balance')) {
                             toast.error('Insufficient funds');
                         } else {
                             toast.error('An error occurred while processing your request. Please try again!');
@@ -307,10 +301,98 @@ export default function SLP() {
     }
 
     async function withdrawOnSubmit(values: z.infer<typeof FormWithdrawSchema>) {
-        // console.log(values)
-        setWithdrawing(true);
-        toast.error('Cannot withdraw before Staking duration ends!');
-        setWithdrawing(false);
+        try {
+            setWithdrawing(true);
+            const liquidityHubCanisterId = 'jskxc-iiaaa-aaaap-qpwrq-cai'
+
+            const hasAllowed = await window.ic.plug.requestConnect({
+                whitelist: [liquidityHubCanisterId]
+            });
+
+            toast.info('Allow the transaction on your wallet to proceed.');
+
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            if (hasAllowed) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const actor = await window.ic.plug.createActor({
+                    canisterId: liquidityHubCanisterId,
+                    interfaceFactory: idlFactory2,
+                });
+
+                const tickOutAmountNat = Math.round(values.withdraw_liquidity_amount * 100000000);
+
+                const args = {
+                    tick_out_name: values.withdraw_liquidity_token,
+                    tick_out_amount: Number(tickOutAmountNat)
+                };
+
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                const transfer = await actor.te_slp_withdraw(args);
+
+                console.log(transfer)
+
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                if (transfer.Ok) {
+                    const uuid = crypto.randomBytes(16).toString('hex');
+                    const generateNewLiquidityId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
+                    const newLiquidityId = 'liquidity_' + generateNewLiquidityId;
+
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+                    const principal = Principal.fromUint8Array(transfer.Ok.tick_out_address._arr);
+                    const textualRepresentation = principal.toText();
+
+                    const formatTimestamp = (nanoseconds: string): string => {
+                        const milliseconds = BigInt(nanoseconds) / BigInt(1_000_000);
+                        const date = new Date(Number(milliseconds));
+
+                        return date.toISOString().replace('T', ' ').replace('Z', '+00');
+                    };
+
+                    const result = await newLiquidityProvider({
+                        newLiquidationId: newLiquidityId,
+                        tickInAddress: textualRepresentation,
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                        tickInName: transfer.Ok.tick_out_name,
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                        tickInAmount: transfer.Ok.tick_out_amount,
+                        duration: 0,
+                        tickInNetwork: 'ICP',
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                        tickInTxBlock: transfer.Ok.tick_out_block.toString(),
+                        liquidationType: 'Staked Liquidity',
+                        liquidationMode: 'Withdraw',
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
+                        transactionTimestamp: formatTimestamp(transfer.Ok.tick_out_time)
+                    })
+
+                    if (result === 'Staking successfully') {
+                        toast.success('Tokens staked successfully!');
+                    } else {
+                        toast.error('An error occurred while processing your request. Please try again!');
+                    }
+
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                } else if (transfer.Err) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    const errorMessage = String(transfer.Err);
+                    if (errorMessage.includes('Insufficient withdrawable balance. Available:')) {
+                        toast.error('Insufficient withdrawable balance');
+                    } else {
+                        toast.error('An error occurred while processing your request. Please try again!');
+                    }
+                }
+            } else {
+                toast.error('An error occurred while processing your request. Please try again!');
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            console.log(error)
+            setWithdrawing(false);
+            toast.error('An error occurred while processing your request. Please try again!');
+        } finally {
+            setWithdrawing(false);
+        }
     }
 
     return (
@@ -329,7 +411,7 @@ export default function SLP() {
                         </Card>
                     </div>
                     :
-                    <div className={bit10SLPHistory.length > 0 ? 'flex flex-col lg:grid lg:grid-cols-5 gap-4 pb-4' : 'pb-4'}>
+                    <div className={bit10SLPHistory.length > 0 ? 'flex flex-col lg:grid lg:grid-cols-6 gap-4 pb-4' : 'pb-4'}>
                         <div className={bit10SLPHistory.length > 0 ? 'lg:col-span-2' : 'flex flex-col py-4 items-center justify-center'}>
                             <Card className={bit10SLPHistory.length > 0 ? 'animate-fade-bottom-up' : 'w-[300px] md:w-[500px]'}>
                                 <CardHeader>
@@ -462,7 +544,7 @@ export default function SLP() {
                                 </Form>
                             </Card>
                         </div>
-                        <div className={bit10SLPHistory.length > 0 ? 'lg:col-span-3' : 'hidden'}>
+                        <div className={bit10SLPHistory.length > 0 ? 'lg:col-span-4' : 'hidden'}>
                             <Card className='animate-fade-bottom-up'>
                                 <CardHeader className='flex flex-col md:flex-row space-y-2 md:space-y-0 items-center justify-between'>
                                     <div className='text-2xl font-semibold leading-none tracking-tight'>Staked Liquidity History</div>
