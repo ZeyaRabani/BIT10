@@ -127,7 +127,7 @@ export const fetchAndUpdateBit10MEMEData = async () => {
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10MEMEData); // 30 sec
-cron.schedule('*/30 * * * *', fetchAndUpdateBit10MEMEData); // 30 min
+cron.schedule('*/35 * * * *', fetchAndUpdateBit10MEMEData); // 35 min
 
 export const fetchAndUpdateBit10MEMEHistoricalData = async () => {
     // limit is 10
@@ -168,7 +168,7 @@ export const fetchAndUpdateBit10MEMEHistoricalData = async () => {
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10MEMEHistoricalData); // 30 sec
-cron.schedule('*/30 * * * *', fetchAndUpdateBit10MEMEHistoricalData); // 30 min
+cron.schedule('*/35 * * * *', fetchAndUpdateBit10MEMEHistoricalData); // 35 min
 
 export const fetchAndUpdateBit10MEMERebalanceData = async () => {
     try {

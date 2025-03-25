@@ -118,7 +118,7 @@ export const fetchAndUpdateBit10TOPData = async () => {
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10TOPData); // 30 sec
-cron.schedule('*/30 * * * *', fetchAndUpdateBit10TOPData); // 30 min
+cron.schedule('*/35 * * * *', fetchAndUpdateBit10TOPData); // 35 min
 
 export const fetchAndUpdateBit10TOPHistoricalData = async () => {
     // limit is 15
@@ -159,7 +159,7 @@ export const fetchAndUpdateBit10TOPHistoricalData = async () => {
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10TOPHistoricalData); // 30 sec
-cron.schedule('*/30 * * * *', fetchAndUpdateBit10TOPHistoricalData); // 30 min
+cron.schedule('*/35 * * * *', fetchAndUpdateBit10TOPHistoricalData); // 35 min
 
 export const fetchAndUpdateBit10TOPRebalanceData = async () => {
     try {

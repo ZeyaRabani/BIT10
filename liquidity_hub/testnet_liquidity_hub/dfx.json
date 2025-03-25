@@ -1,0 +1,17 @@
+{
+  "canisters": {
+    "testnet_liquidity_hub_backend": {
+      "candid": "src/testnet_liquidity_hub_backend/testnet_liquidity_hub_backend.did",
+      "package": "testnet_liquidity_hub_backend",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

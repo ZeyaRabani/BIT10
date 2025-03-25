@@ -88,9 +88,9 @@ function Type1() {
             </CardHeader>
             <CardContent className='flex flex-col space-y-2'>
                 <div>
-                    <Label>Amount for Index</Label>
-                    <Input className='w-full dark:border-white' placeholder='Enter amount in (ckBTC)' />
-                    <p className='text-accent-foreground py-1 text-sm'>1 ckBTC = $60,335.25</p>
+                    <Label>Name for Index</Label>
+                    <Input className='w-full dark:border-white' placeholder='Name for Index Fund' />
+                    {/* <p className='text-accent-foreground py-1 text-sm'>1 ckBTC = $60,335.25</p> */}
                 </div>
                 {tokens.map((token) => (
                     <SelectToken key={token} />

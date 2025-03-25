@@ -72,4 +72,4 @@ export const fetchAndUpdateBit10DEFIData = async () => {
 };
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10DEFIData); // 30 sec
-cron.schedule('*/30 * * * *', fetchAndUpdateBit10DEFIData); // 30 min
+cron.schedule('*/35 * * * *', fetchAndUpdateBit10DEFIData); // 35 min

@@ -1,0 +1,122 @@
+type BlockIndex = nat;
+type TransferError = variant {
+    BadFee : record { expected_fee : nat };
+    InsufficientFunds : record { balance : nat };
+    TooOld;
+    CreatedInFuture : record { ledger_time : nat64 };
+    Duplicate : record { duplicate_of : BlockIndex };
+    TemporarilyUnavailable;
+    GenericError : record { error_code : nat; message : text };
+};
+
+type TransferArg = record {
+    memo : opt blob;
+    amount : nat;
+    from_subaccount : opt blob;
+    fee : opt nat;
+    to : principal;
+    created_at_time : opt nat64;
+};
+
+type ILPArgs = record {
+    tick_in_name : text;
+    tick_in_network : text;
+    tick_in_tx_block : text;
+    tick_out_name : text;
+};
+
+type ILPResponseData = record {
+    tick_in_address : text;
+    tick_in_name : text;
+    tick_in_amount : nat;
+    tick_in_usd_amount : float64;
+    tick_in_network : text;
+    tick_in_tx_block : text;
+    tick_out_address : principal;
+    tick_out_name : text;
+    tick_out_amount : nat;
+    tick_out_usd_amount : float64;
+    tick_out_network : text;
+    tick_out_tx_block : text;
+    liquidation_type : text;
+    transaction_timestamp : text;
+};
+
+type ILPResponse = variant {
+    Ok : ILPResponseData;
+    Err : text;
+};
+
+type SLPArgs = record {
+    tick_in_name : text;
+    tick_in_amount : nat;
+    duration : nat;
+};
+
+type SLPResponseData = record {
+    tick_in_name : text;
+    tick_in_amount : nat;
+    duration : nat;
+    tick_in_block : nat;
+    tick_in_address : principal;
+    tick_in_timestamp: text;
+};
+
+type SLPResponse = variant {
+    Ok : SLPResponseData;
+    Err : text;
+};
+
+type SLPWithdrawArgs = record {
+    tick_out_name: text;
+    tick_out_amount: nat;
+};
+
+type SLPWithdrawResponseData = record {
+    tick_out_name: text;
+    tick_out_amount: nat;
+    tick_out_block: nat;
+    tick_out_address: principal;
+    tick_out_time: text;
+};
+
+type SLPWithdrawResponse = variant {
+    Ok : SLPWithdrawResponseData;
+    Err : text;
+};
+
+type TransferFromCanisterArgs = record {
+    tick_out_name: text;
+    tick_out_amount: nat;
+    tick_out_duration: nat;
+    tick_out_address: principal;
+};
+
+type TransferFromCanisterResponseData = record {
+    tick_out_name: text;
+    tick_out_amount: nat;
+    tick_out_address: principal;
+    tick_out_caller: principal;
+    tick_out_block: nat;
+    tick_out_time: text;
+};
+
+type TransferFromCanisterResponse = variant {
+    Ok : TransferFromCanisterResponseData;
+    Err : text;
+};
+
+service : {
+    btc_pool_size : () -> (nat) query;
+    btc_required_pool_size : () -> (nat) query;
+    get_responses : () -> (vec ILPResponseData) query;
+    get_response : (text) -> (opt ILPResponseData) query;
+    te_ilp : (ILPArgs) -> (ILPResponse);
+    get_slp_responses : () -> (vec SLPResponseData) query;
+    get_slp_responses_by_principal : (principal) -> (vec SLPResponseData) query;
+    te_slp : (SLPArgs) -> (SLPResponse);
+    get_slp_withdraw_responses : () -> (vec SLPWithdrawResponseData) query;
+    get_slp_withdraw_responses_by_principal : (principal) -> (vec SLPWithdrawResponseData) query;
+    te_slp_withdraw : (SLPWithdrawArgs) -> (SLPWithdrawResponse);
+    te_transfer_from_canister : (TransferFromCanisterArgs) -> (TransferFromCanisterResponse);
+}

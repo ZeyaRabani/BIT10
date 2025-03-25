@@ -125,7 +125,7 @@ export const fetchAndUpdateBit10BRC20Data = async () => {
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10BRC20Data); // 30 sec
-cron.schedule('*/30 * * * *', fetchAndUpdateBit10BRC20Data); // 30 min
+cron.schedule('*/35 * * * *', fetchAndUpdateBit10BRC20Data); // 35 min
 
 export const fetchAndUpdateBit10BRC20HistoricalData = async () => {
     // limit is 10
@@ -169,7 +169,7 @@ export const fetchAndUpdateBit10BRC20HistoricalData = async () => {
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10BRC20HistoricalData); // 30 sec
-cron.schedule('*/30 * * * *', fetchAndUpdateBit10BRC20HistoricalData); // 30 min
+cron.schedule('*/35 * * * *', fetchAndUpdateBit10BRC20HistoricalData); // 35 min
 
 export const fetchAndUpdateBit10BRC20RebalanceData = async () => {
     try {
