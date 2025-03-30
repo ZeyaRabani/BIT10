@@ -25,13 +25,16 @@ const links = {
     web: [
         { title: 'About', link: '/' },
         { title: 'FAQs', link: '/faqs' },
-        { title: 'Resources', link: '/resources' }
+        { title: 'Resources', link: '/resources' },
+        // { title: 'Referral', link: '/referral' }
     ],
     app: [
         { title: 'Swap', link: '/swap' },
+        // { title: 'Custom', link: '/custom' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
-        { title: 'Liquidity Hub', link: '/liquidity-hub' }
+        { title: 'Liquidity Hub', link: '/liquidity-hub' },
+        // { title: 'Referral', link: '/referral' }
     ]
 };
 

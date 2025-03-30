@@ -524,7 +524,13 @@ export default function SLP() {
                                                             render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormControl>
-                                                                        <Input {...field} placeholder='Token staking duration' className='dark:border-white' />
+                                                                        <Input 
+                                                                            {...field}
+                                                                            placeholder='Token staking duration' 
+                                                                            className='dark:border-white' 
+                                                                            type='number'
+                                                                            onChange={(e) => field.onChange(Number(e.target.value))}
+                                                                        />
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>

@@ -8,7 +8,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Menu, X, Loader2, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark, HandCoins } from 'lucide-react'
+import { Menu, X, Loader2, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark, HandCoins, Tickets } from 'lucide-react'
 import PlugImg from '@/assets/wallet/plug.svg'
 // import XverseImg from '@/assets/wallet/xverse.svg'
 // import UnisatImg from '@/assets/wallet/unisat.svg'
@@ -18,13 +18,15 @@ const links = {
     web: [
         { title: 'About', link: '/', icon: Home },
         { title: 'FAQs', link: '/faqs', icon: MessageCircleQuestion },
-        { title: 'Resources', link: '/resources', icon: BookCopy }
+        { title: 'Resources', link: '/resources', icon: BookCopy },
+        // { title: 'Referral', link: '/referral', icon: Tickets }
     ],
     app: [
         { title: 'Swap', link: '/swap', icon: ArrowRightLeft },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
-        { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins }
+        { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins },
+        // { title: 'Referral', link: '/referral', icon: Tickets }
     ]
 };
 
