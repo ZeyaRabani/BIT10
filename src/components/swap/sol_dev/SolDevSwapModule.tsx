@@ -231,6 +231,22 @@ export default function SolDevSwapModule() {
             user
         );
 
+        const userTokenAccountInfo = await program.provider.connection.getAccountInfo(userTokenAccount);
+        if (!userTokenAccountInfo) {
+            const createUserAccountTx = new anchor.web3.Transaction().add(
+                createAssociatedTokenAccountInstruction(
+                    user,
+                    userTokenAccount,
+                    user,
+                    tokenMint
+                )
+            );
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            await program.provider.sendAndConfirm(createUserAccountTx);
+            console.log("Created user token account:", userTokenAccount.toString());
+        }
+
         const recipient = new PublicKey('Cq6JPmEspG6oNcUC47WHuEJWU1K4knsLzHYHSfvpnDHk');
         const recipientTokenAccount = await getAssociatedTokenAddress(
             tokenMint,
@@ -307,7 +323,7 @@ export default function SolDevSwapModule() {
                 const formatTimestamp = (seconds: string): string => {
                     const milliseconds = BigInt(seconds) * BigInt(1_000);
                     const date = new Date(Number(milliseconds));
-                
+
                     return date.toISOString().replace('T', ' ').replace('Z', '+00');
                 };
 
@@ -342,7 +358,7 @@ export default function SolDevSwapModule() {
                         newTokenSwapId: newTokenSwapId,
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
-                        ICPAddress: wallet.publicKey.toString(),
+                        principalId: wallet.publicKey.toString(),
                         tickOutName: transfer.swapResult.tickOutName,
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
