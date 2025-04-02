@@ -1,5 +1,3 @@
-"use client"
-
 import React from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
@@ -8,7 +6,7 @@ import { ExternalLink } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
 import { userRecentActivity } from '@/actions/dbActions'
 import { toast } from 'sonner'
-import { useWallet } from '@/context/WalletContext'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
@@ -53,7 +51,7 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 
             return (
                 <a
-                    href={`/explorer/${order.tokenSwapId}`}
+                    href={`https://solscan.io/tx/${order.tickOutTxBlock}?cluster=devnet`}
                     target='_blank'
                     rel='noopener noreferrer'
                 >
@@ -67,11 +65,11 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     }
 ]
 
-export default function RecentActivity() {
-    const { principalId } = useWallet();
+export default function SolDevrecentActivity() {
+    const SOLWallet = useWallet();
 
-    const fetchRecentActivity = async (principalId: string) => {
-        const response = await userRecentActivity({ paymentAddress: principalId });
+    const fetchRecentActivity = async (SOLAddress: string) => {
+        const response = await userRecentActivity({ paymentAddress: SOLAddress });
         if (response === 'Error fetching user recent activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
         } else {
@@ -83,7 +81,9 @@ export default function RecentActivity() {
         queries: [
             {
                 queryKey: ['bit10RecentActivity'],
-                queryFn: () => principalId ? fetchRecentActivity(principalId) : toast.error('Principal ID is undefined')
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                queryFn: () => SOLWallet.publicKey.toString() ? fetchRecentActivity(SOLWallet.publicKey.toString()) : toast.error('Principal ID is undefined')
             },
         ]
     })

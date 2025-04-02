@@ -111,7 +111,7 @@ export default function Page() {
                                 }
                             }
                         }
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     } catch (error) {
                         toast.error('An error occurred. Please try again!');
                         setSubmitting(false);

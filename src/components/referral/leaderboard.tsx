@@ -1,5 +1,5 @@
 import React from 'react'
-import { useWallet } from '@/context/WalletContext'
+import { useICPWallet } from '@/context/ICPWalletContext'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Trophy } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -47,7 +47,7 @@ const leaderboardTableColumns: ColumnDef<LeaderboardTableDataType>[] = [
         ),
     },
     {
-        accessorKey: 'address',
+        accessorKey: 'ICPAddress',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Principal ID' />
         ),
@@ -67,7 +67,7 @@ const leaderboardTableColumns: ColumnDef<LeaderboardTableDataType>[] = [
 ]
 
 export default function Leaderboard() {
-    const { principalId } = useWallet();
+    const { ICPAddress } = useICPWallet();
 
     return (
         <div className='pt-4 flex flex-col space-y-2'>
@@ -75,8 +75,8 @@ export default function Leaderboard() {
                 <Card className='md:col-span-1'>
                     <CardHeader className='flex flex-row items-center justify-between space-x-2'>
                         <div>
-                            <div className='block md:hidden text-lg'>{principalId ? `${principalId.slice(0, 6)}...${principalId.slice(-6)}` : ''}</div>
-                            <div className='hidden md:block text-lg'>{principalId ? `${principalId.slice(0, 14)}...${principalId.slice(-14)}` : ''}</div>
+                            <div className='block md:hidden text-lg'>{ICPAddress ? `${ICPAddress.slice(0, 6)}...${ICPAddress.slice(-6)}` : ''}</div>
+                            <div className='hidden md:block text-lg'>{ICPAddress ? `${ICPAddress.slice(0, 14)}...${ICPAddress.slice(-14)}` : ''}</div>
                         </div>
                         <div>
                             <Trophy fill='#FFBB29' stroke='#FFBB29' className='h-6 w-6' />
@@ -98,8 +98,8 @@ export default function Leaderboard() {
                 <Card className='md:col-span-1'>
                     <CardHeader className='flex flex-row items-center justify-between space-x-2'>
                         <div>
-                            <div className='block md:hidden'>{principalId ? `${principalId.slice(0, 6)}...${principalId.slice(-6)}` : ''}</div>
-                            <div className='hidden md:block'>{principalId ? `${principalId.slice(0, 14)}...${principalId.slice(-14)}` : ''}</div>
+                            <div className='block md:hidden'>{ICPAddress ? `${ICPAddress.slice(0, 6)}...${ICPAddress.slice(-6)}` : ''}</div>
+                            <div className='hidden md:block'>{ICPAddress ? `${ICPAddress.slice(0, 14)}...${ICPAddress.slice(-14)}` : ''}</div>
                         </div>
                         <div>
                             <Trophy fill='#EDEDED' stroke='#EDEDED' className='h-6 w-6' />
@@ -121,8 +121,8 @@ export default function Leaderboard() {
                 <Card className='md:col-span-1'>
                     <CardHeader className='flex flex-row items-center justify-between space-x-2'>
                         <div>
-                            <div className='block md:hidden'>{principalId ? `${principalId.slice(0, 6)}...${principalId.slice(-6)}` : ''}</div>
-                            <div className='hidden md:block'>{principalId ? `${principalId.slice(0, 14)}...${principalId.slice(-14)}` : ''}</div>
+                            <div className='block md:hidden'>{ICPAddress ? `${ICPAddress.slice(0, 6)}...${ICPAddress.slice(-6)}` : ''}</div>
+                            <div className='hidden md:block'>{ICPAddress ? `${ICPAddress.slice(0, 14)}...${ICPAddress.slice(-14)}` : ''}</div>
                         </div>
                         <div>
                             <Trophy fill='#F7A552' stroke='#F7A552' className='h-6 w-6' />
@@ -146,7 +146,7 @@ export default function Leaderboard() {
                 <DataTable
                     columns={leaderboardTableColumns}
                     data={leaderboardData ?? []}
-                    userSearchColumn='address'
+                    userSearchColumn='ICPAddress'
                     inputPlaceHolder='Search by Principal ID'
                 />
             </div>

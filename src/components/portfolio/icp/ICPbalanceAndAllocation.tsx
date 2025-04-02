@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { useWallet } from '@/context/WalletContext'
+import { useICPWallet } from '@/context/ICPWalletContext'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -20,11 +20,11 @@ const bit10Tokens = ['Test BIT10.DEFI', 'Test BIT10.BRC20', 'Test BIT10.TOP', 'T
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
 
-export default function BalanceAndAllocation() {
+export default function ICPBalanceAndAllocation() {
     const [selectedAllocationToken, setSelectedAllocationToken] = useState('Test BIT10.DEFI');
     const [innerRadius, setInnerRadius] = useState<number>(80);
 
-    const { principalId } = useWallet();
+    const { ICPAddress } = useICPWallet();
 
     const formatPrincipalId = (id: string | undefined) => {
         if (!id) return '';
@@ -41,9 +41,9 @@ export default function BalanceAndAllocation() {
             canisterId,
         });
 
-        if (principalId) {
+        if (ICPAddress) {
             const account = {
-                owner: Principal.fromText(principalId),
+                owner: Principal.fromText(ICPAddress),
                 subaccount: [],
             };
             if (actor && actor.icrc1_balance_of) {
@@ -239,7 +239,7 @@ export default function BalanceAndAllocation() {
     return (
         <div className='flex flex-col space-y-4'>
             <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
-                <h1 className='text-center md:text-start text-3xl font-bold animate-fade-left-slow'>Welcome back {formatPrincipalId(principalId)}</h1>
+                <h1 className='text-center md:text-start text-3xl font-bold animate-fade-left-slow'>Welcome back {formatPrincipalId(ICPAddress)}</h1>
                 <Button className='animate-fade-right-slow' asChild>
                     <Link href='/swap'>Buy BIT10 Token</Link>
                 </Button>

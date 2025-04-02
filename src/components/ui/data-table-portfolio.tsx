@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
@@ -6,6 +6,7 @@ import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
+import { useChain } from '@/context/ChainContext'
 import { Search, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
@@ -16,6 +17,7 @@ export type PortfolioTableDataType = {
     tickInName: string;
     tickOutAmount: string;
     tickOutName: string;
+    tickOutTxBlock: string;
     tokenBoughtAt: Date | string;
 }
 
@@ -37,6 +39,8 @@ export function DataTable<TData, TValue>({
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+
+    const { chain } = useChain();
 
     const table = useReactTable({
         data,
@@ -97,7 +101,9 @@ export function DataTable<TData, TValue>({
             case 'tickIn':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{(parseFloat(row.original.tickInAmount) / 100000000).toFixed(8)}</div>
+                        <div>
+                            {chain === 'icp' ? (parseFloat(row.original.tickInAmount) / 100000000).toFixed(8) : parseFloat(row.original.tickInAmount).toFixed(8)}
+                        </div>
                         <div>{row.original.tickInName}</div>
                     </div>
                 );
@@ -105,7 +111,7 @@ export function DataTable<TData, TValue>({
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {row.original.transactionType === "Swap"
+                            {row.original.transactionType === 'Swap'
                                 ? row.original.tickOutAmount
                                 : (parseFloat(row.original.tickOutAmount) / 100000000).toFixed(8)}
                         </div>

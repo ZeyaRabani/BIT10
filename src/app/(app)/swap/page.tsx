@@ -1,18 +1,18 @@
 "use client"
 
 import React, { Suspense } from 'react'
-import { useWallet } from '@/context/WalletContext'
+import { useChain } from '@/context/ChainContext'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import Preloader from '@/components/Preloader'
 import Swap from '@/components/swap/Swap'
 import InformationCard from '@/components/InformationCard'
 
 export default function Page() {
-    const { isConnected } = useWallet();
+    const { chain } = useChain();
 
     return (
         <MaxWidthWrapper className='pt-4'>
-            {isConnected ? (
+            {chain ? (
                 <Suspense fallback={<Preloader />}>
                     <Swap />
                 </Suspense>

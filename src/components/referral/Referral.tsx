@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { useWallet } from '@/context/WalletContext'
+import { useICPWallet } from '@/context/ICPWalletContext'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { AlarmCheck, Copy } from 'lucide-react'
 import AnimatedBackground from '@/components/ui/animated-background'
@@ -15,7 +15,7 @@ export default function Referral() {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const endDate = new Date('March 25, 2025 15:30:00 GMT+0530');
 
-    const { principalId } = useWallet();
+    const { ICPAddress } = useICPWallet();
 
     useEffect(() => {
         const calculateTimeLeft = () => {
@@ -40,12 +40,12 @@ export default function Referral() {
     }, []);
 
     const handleCopyReferral = () => {
-        if (!principalId) {
+        if (!ICPAddress) {
             toast.error('Please connect your wallet first');
             return;
         }
 
-        navigator.clipboard.writeText(principalId)
+        navigator.clipboard.writeText(ICPAddress)
             .then(() => {
                 toast.success('Referral link copied to clipboard!');
             })

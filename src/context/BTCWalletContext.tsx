@@ -4,6 +4,7 @@ import React, { createContext, useContext } from 'react'
 import { connect, disconnect } from '@stacks/connect'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { toast } from 'sonner'
+import { useChain } from '@/context/ChainContext'
 
 interface BTCWalletContextType {
     BTCAddress?: string;
@@ -17,6 +18,7 @@ const BTCWalletContext = createContext<BTCWalletContextType | undefined>(undefin
 export const BTCWalletProvider: React.FC<React.PropsWithChildren<object>> = ({ children }) => {
     const [BTCAddress, setBTCAddress] = useLocalStorage<string>('BTCAddress');
 
+    const { setChain } = useChain();
     const isBTCConnected = !!BTCAddress;
 
     const connectBTCWallet = async () => {
@@ -27,8 +29,10 @@ export const BTCWalletProvider: React.FC<React.PropsWithChildren<object>> = ({ c
                 // @ts-ignore
                 (address) => address.purpose === 'payment'
             );
+
             setBTCAddress(paymentAddressItem?.address);
-            toast.success('Wallet connected successfully!')
+            setChain('btc');
+            toast.success('Wallet connected successfully!');
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             toast.error('Wallet connection failed!');
@@ -39,6 +43,7 @@ export const BTCWalletProvider: React.FC<React.PropsWithChildren<object>> = ({ c
         try {
             disconnect();
             setBTCAddress(undefined);
+            setChain(undefined);
             toast.success('Wallet disconnected successfully!');
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
@@ -47,12 +52,7 @@ export const BTCWalletProvider: React.FC<React.PropsWithChildren<object>> = ({ c
     };
 
     return (
-        <BTCWalletContext.Provider value={{
-            BTCAddress,
-            isBTCConnected,
-            connectBTCWallet,
-            disconnectBTCWallet
-        }}>
+        <BTCWalletContext.Provider value={{ isBTCConnected, BTCAddress, connectBTCWallet, disconnectBTCWallet }}>
             {children}
         </BTCWalletContext.Provider>
     );

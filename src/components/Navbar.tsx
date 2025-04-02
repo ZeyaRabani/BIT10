@@ -3,9 +3,6 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
-import { useWallet } from '@/context/WalletContext'
-import { addNewUser } from '@/actions/dbActions'
-import { toast } from 'sonner'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import AnimatedBackground from '@/components/ui/animated-background'
@@ -13,13 +10,8 @@ import ModeToggle from './ModeToggle'
 import ResponsiveNavbar from './ResponsiveNavbar'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
-import PlugImg from '@/assets/wallet/plug.svg'
-// import XverseImg from '@/assets/wallet/xverse.svg'
-// import UnisatImg from '@/assets/wallet/unisat.svg'
-// import PhantomImg from '@/assets/wallet/phantom.svg'
+import WalletBtn from './WalletBtn'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Loader2 } from 'lucide-react'
 
 const links = {
     web: [
@@ -30,29 +22,19 @@ const links = {
     ],
     app: [
         { title: 'Swap', link: '/swap' },
-        // { title: 'Custom', link: '/custom' },
+        // { title: 'Custom', link: '/custom'},
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
         { title: 'Liquidity Hub', link: '/liquidity-hub' },
-        // { title: 'Referral', link: '/referral' }
+        // { title: 'Referral', link: '/referral'}
     ]
 };
 
-const wallets = [
-    { name: 'Plug', img: PlugImg },
-    // { name: 'Xverse', img: XverseImg, soon: true },
-    // { name: 'UniSat', img: UnisatImg, soon: true },
-    // { name: 'Phantom', img: PhantomImg, soon: true }
-];
-
 export default function Navbar() {
     const [hidden, setHidden] = useState(false);
-    const [open, setOpen] = useState<boolean>(false);
-    const [isConnecting, setIsConnecting] = useState(false);
     const [activeLink, setActiveLink] = useState<string>('/');
 
     const { scrollY } = useScroll();
-    const { isConnected, connectWallet, disconnectWallet, principalId } = useWallet();
     const pathname = usePathname();
     const router = useRouter();
 
@@ -63,28 +45,6 @@ export default function Navbar() {
         const active = links[appMode ? 'app' : 'web'].find(link => pathname === link.link);
         setActiveLink(active ? active.title : '/');
     }, [pathname, appMode]);
-
-    useEffect(() => {
-        const addUserToDB = async () => {
-            if (isConnected && principalId) {
-                try {
-                    const result = await addNewUser({
-                        principalId: principalId.toString(),
-                    });
-                    if (result === 'Error adding new user') {
-                        toast.error('An error occurred while setting up your account. Please try again!.');
-                    }
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                } catch (error) {
-                    toast.error('An error occurred while setting up your account. Please try again!.');
-                }
-            }
-        };
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        addUserToDB();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [principalId]);
 
     const handleNavigation = (newActiveLink: string) => {
         const active = links[appMode ? 'app' : 'web'].find(link => link.title === newActiveLink);
@@ -106,17 +66,6 @@ export default function Navbar() {
     const navbarVariants = {
         visible: { y: 0 },
         hidden: { y: '-100%' },
-    };
-
-    const handleWalletSelect = async () => {
-        setIsConnecting(true);
-        setOpen(false);
-        await connectWallet();
-        setIsConnecting(false);
-    };
-
-    const handleDisconnect = async () => {
-        disconnectWallet();
     };
 
     return (
@@ -168,40 +117,7 @@ export default function Navbar() {
                 <div className='hidden lg:flex lg:flex-1 lg:justify-end'>
                     {
                         appMode ? (
-                            <>
-                                {isConnected ? (
-                                    <Button variant='destructive' onClick={handleDisconnect}>Disconnect wallet</Button>
-                                ) : (
-                                    <Dialog open={open} onOpenChange={setOpen}>
-                                        <DialogTrigger asChild>
-                                            <Button disabled={isConnecting}>
-                                                {isConnecting && <Loader2 className='animate-spin mr-2' size={15} />}
-                                                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className='max-w-[90vw] md:max-w-[400px]'>
-                                            <DialogHeader>
-                                                <DialogTitle className='tracking-wide pt-2 md:pt-0'>Connect your wallet to get started</DialogTitle>
-                                            </DialogHeader>
-                                            <div className='flex flex-col space-y-2'>
-                                                {/* {wallets.map(({ name, img, soon }) => ( */}
-                                                {wallets.map(({ name, img }) => (
-                                                    // <Button key={name} variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent' onClick={!soon ? handleWalletSelect : undefined}>
-                                                    <Button key={name} variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent' onClick={handleWalletSelect}>
-                                                        <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                                            <Image height={30} width={30} src={img} alt={name} className='rounded' />
-                                                            <span className='text-lg md:text-xl'>{name}</span>
-                                                        </div>
-                                                        {/* {soon && <span className='text-sm text-accent-foreground/80'>Available soon</span>} */}
-                                                    </Button>
-                                                ))}
-                                            </div>
-
-                                            <p className='py-2 text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
-                                        </DialogContent>
-                                    </Dialog>
-                                )}
-                            </>
+                            <WalletBtn />
                         ) : (
                             <Link href='/swap' passHref>
                                 <Button className='rounded-full'>Launch App</Button>

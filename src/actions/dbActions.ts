@@ -18,7 +18,7 @@ interface NewTokenSwap {
     tickOutAmount: string;
     tickOutTxBlock: string;
     transactionType: 'Swap' | 'Reverse Swap';
-    network: 'ICP';
+    network: 'ICP' | 'Solana Devnet';
     transactionTimestamp: string;
 }
 
@@ -113,6 +113,7 @@ export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: s
             tickInName: teSwap.tickInName,
             tickOutAmount: teSwap.tickOutAmount,
             tickOutName: teSwap.tickOutName,
+            tickOutTxBlock: teSwap.tickOutTxBlock,
             tokenBoughtAt: teSwap.transactionTimestamp
         })
             .from(teSwap)
@@ -192,7 +193,6 @@ export const newLiquidityProvider = async ({ newLiquidationId, tickInAddress, ti
 
         return 'Staking successfully'
     } catch (error) {
-        console.log(error);
         return 'Error staking tokens';
     }
 };

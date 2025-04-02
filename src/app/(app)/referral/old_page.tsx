@@ -1,18 +1,18 @@
 "use client"
 
 import React, { Suspense } from 'react'
-import { useWallet } from '@/context/WalletContext'
+import { useICPWallet } from '@/context/ICPWalletContext'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import Preloader from '@/components/Preloader'
 import Referral from '@/components/referral/Referral'
 import InformationCard from '@/components/InformationCard'
 
 export default function Page() {
-    const { isConnected } = useWallet();
+    const { isICPConnected } = useICPWallet();
 
     return (
         <MaxWidthWrapper className='py-4'>
-            {isConnected ? (
+            {isICPConnected ? (
                 <Suspense fallback={<Preloader />}>
                     <Referral />
                 </Suspense>
