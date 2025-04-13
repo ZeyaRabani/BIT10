@@ -17,16 +17,14 @@ const links = {
     web: [
         { title: 'About', link: '/' },
         { title: 'FAQs', link: '/faqs' },
-        { title: 'Resources', link: '/resources' },
-        // { title: 'Referral', link: '/referral' }
+        { title: 'Resources', link: '/resources' }
     ],
     app: [
         { title: 'Swap', link: '/swap' },
         // { title: 'Custom', link: '/custom'},
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
-        { title: 'Liquidity Hub', link: '/liquidity-hub' },
-        // { title: 'Referral', link: '/referral'}
+        { title: 'Liquidity Hub', link: '/liquidity-hub' }
     ]
 };
 
@@ -39,7 +37,6 @@ export default function Navbar() {
     const router = useRouter();
 
     const appMode = links.app.some(link => pathname.startsWith(link.link));
-    // const appMode = pathname === '/swap' || pathname === '/portfolio' || pathname.startsWith('/explorer') || pathname.startsWith('/collateral') || pathname.startsWith('/liquidity-hub')
 
     useEffect(() => {
         const active = links[appMode ? 'app' : 'web'].find(link => pathname === link.link);
@@ -92,7 +89,7 @@ export default function Navbar() {
                                 handleNavigation(newActiveLink)
                             }
                         }}
-                        className='border-b-2 border-white'
+                        className='border-b-2 border-gray-900 dark:border-white'
                         transition={{
                             ease: 'easeInOut',
                             duration: 0.2,

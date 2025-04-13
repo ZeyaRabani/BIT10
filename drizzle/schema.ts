@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, doublePrecision, index, json, foreignKey, unique, bigint, serial, varchar, boolean, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, doublePrecision, index, json, foreignKey, unique, boolean, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -96,6 +96,30 @@ export const testBit10TopRebalance = pgTable('test_bit10_top_rebalance', {
 	(table) => {
 		return {
 			timestmpzIdx: index('test_bit10_top_rebalance_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
+export const referralApr2025 = pgTable('referral_apr_2025', {
+	referralCode: text('referral_code').notNull(),
+	userId: text('user_id').primaryKey().notNull(),
+	usedAt: timestamp('used_at', { withTimezone: true, mode: 'string' }).defaultNow(),
+},
+	(table) => {
+		return {
+			referralApr2025ReferralCodeUserIdKey: unique('referral_apr_2025_referral_code_user_id_key').on(table.referralCode, table.userId),
+			referralApr2025UserIdKey: unique('referral_apr_2025_user_id_key').on(table.userId),
+		}
+	});
+
+export const referralApr2025Tasks = pgTable('referral_apr_2025_tasks', {
+	address: text('address').primaryKey().notNull(),
+	task1: boolean('task_1').default(false).notNull(),
+	task2: boolean('task_2').default(false).notNull(),
+	task3: boolean('task_3').default(false).notNull(),
+},
+	(table) => {
+		return {
+			referralApr2025TasksAddressKey: unique('referral_apr_2025_tasks_address_key').on(table.address),
 		}
 	});
 

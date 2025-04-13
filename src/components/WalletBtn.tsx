@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { addNewUser } from '@/actions/dbActions'
+import { addNewUser, addNewReferral, addNewReferralTasks } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -13,7 +13,27 @@ import ICPLogo from '@/assets/wallet/icp-logo.svg'
 import SOLLogo from '@/assets/wallet/solana-logo.svg'
 import PlugImg from '@/assets/wallet/plug.svg'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ArrowLeft, WalletMinimal, Triangle, Loader2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowLeft, WalletMinimal, Loader2 } from 'lucide-react'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+
+const containerVariants = {
+    visible: {
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const cardVariantsLeft = {
+    hidden: { opacity: 0, x: -40 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: 'easeInOut' } },
+};
+
+const cardVariantsRight = {
+    hidden: { opacity: 0, x: 40 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: 'easeInOut' } },
+};
 
 const icpWallets = [
     { name: 'Plug', img: PlugImg }
@@ -22,8 +42,9 @@ const icpWallets = [
 export default function WalletBtn() {
     const [open, setOpen] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [selectedChain, setSelectedChain] = useState<'ICP' | 'Solana' | null>(null);
-    const [isSOLMoreOption, setIsSOLMoreOption] = useState<boolean>(false);
+    const [selectedChain, setSelectedChain] = useState<'icp' | 'sol_dev' | null>(null);
+
+    const [referralCode] = useLocalStorage('referral');
 
     const { isICPConnected, ICPAddress, connectICPWallet, disconnectICPWallet } = useICPWallet();
     // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -40,11 +61,11 @@ export default function WalletBtn() {
                             principalId: ICPAddress.toString(),
                         });
                         if (result === 'Error adding new user') {
-                            toast.error('An error occurred while setting up your account. Please try again!.');
+                            toast.error('An error occurred while setting up your account. Please try again!');
                         }
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     } catch (error) {
-                        toast.error('An error occurred while setting up your account. Please try again!.');
+                        toast.error('An error occurred while setting up your account. Please try again!');
                     }
                 }
             } else if (chain === 'sol_dev') {
@@ -54,11 +75,11 @@ export default function WalletBtn() {
                             principalId: SOLWallet.publicKey.toString(),
                         });
                         if (result === 'Error adding new user') {
-                            toast.error('An error occurred while setting up your account. Please try again!.');
+                            toast.error('An error occurred while setting up your account. Please try again!');
                         }
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     } catch (error) {
-                        toast.error('An error occurred while setting up your account. Please try again!.');
+                        toast.error('An error occurred while setting up your account. Please try again!');
                     }
                 }
             }
@@ -68,6 +89,78 @@ export default function WalletBtn() {
         addUserToDB();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ICPAddress, publicKey]);
+
+    useEffect(() => {
+        if (isSOLConnected) {
+            setChain('sol_dev');
+        } else if (isICPConnected) {
+            setChain('icp');
+        } else {
+            setChain(undefined);
+        }
+    }, [isICPConnected, isSOLConnected, setChain]);
+
+    useEffect(() => {
+        const addReferralTaskToDB = async () => {
+            if (isICPConnected && ICPAddress) {
+                try {
+                    const result = await addNewReferralTasks({
+                        address: ICPAddress.toString(),
+                    });
+                    if (result === 'Error adding new referral task') {
+                        toast.error('An error occurred while adding referral. Please try again!');
+                    }
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (error) {
+                    toast.error('An error occurred while adding referral. Please try again!');
+                }
+            }
+        }
+        
+        const addReferralToDB = async () => {
+            if (referralCode) {
+                if (chain === 'icp' && ICPAddress) {
+                    try {
+                        // console.log('ICP Address and Referral Code:', { ICPAddress, referralCode });
+                        const result = await addNewReferral({
+                            referralCode: referralCode,
+                            userId: ICPAddress
+                        });
+                        if (result === 'Error adding new referral') {
+                            toast.error('An error occurred while adding referral. Please try again!');
+                        }
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    } catch (error) {
+                        toast.error('An error occurred while adding referral. Please try again!');
+                    }
+                }
+                if (chain === 'sol_dev' && SOLWallet.publicKey) {
+                    try {
+                        // console.log('SOL Public Key and Referral Code:', {
+                        //     publicKey: SOLWallet.publicKey.toString(),
+                        //     referralCode
+                        // });
+                        const result = await addNewReferral({
+                            referralCode: referralCode,
+                            userId: SOLWallet.publicKey.toString()
+                        });
+                        if (result === 'Error adding new referral') {
+                            toast.error('An error occurred while adding referral. Please try again!');
+                        }
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    } catch (error) {
+                        console.log(error);
+                        toast.error('An error occurred while adding referral. Please try again!');
+                    }
+                }
+            }
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        addReferralToDB();
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        addReferralTaskToDB();
+    }, [referralCode, ICPAddress, SOLWallet.publicKey, chain, isICPConnected]);
 
     const handleDisconnect = async () => {
         switch (chain) {
@@ -79,7 +172,7 @@ export default function WalletBtn() {
         }
     };
 
-    const handleChainSelect = (chain: 'ICP' | 'Solana') => {
+    const handleChainSelect = (chain: 'icp' | 'sol_dev') => {
         setSelectedChain(chain);
     };
 
@@ -89,7 +182,7 @@ export default function WalletBtn() {
 
     const renderChainContent = () => {
         switch (selectedChain) {
-            case 'ICP':
+            case 'icp':
                 const handleICPWalletSelect = async () => {
                     setIsConnecting(true);
                     setOpen(false);
@@ -99,19 +192,21 @@ export default function WalletBtn() {
                 };
 
                 return (
-                    <div className='flex flex-col space-y-2'>
-                        {icpWallets.map(({ name, img }) => (
-                            <Button key={name} variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent' onClick={handleICPWalletSelect}>
-                                <div className='flex flex-row space-x-1 md:space-x-2 items-center'>
-                                    <Image height={30} width={30} src={img} alt={name} className='rounded' />
-                                    <span className='text-lg md:text-xl'>{name}</span>
-                                </div>
-                            </Button>
-                        ))}
-                        <p className='py-2 text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                    <div className='flex flex-col justify-between space-y-2 h-[22rem] md:h-72'>
+                        <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='grid md:grid-cols-2 gap-2 items-center overflow-x-hidden'>
+                            {icpWallets.map(({ name, img }) => (
+                                <motion.div variants={cardVariantsRight} key={name}>
+                                    <Button variant='outline' className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white' onClick={handleICPWalletSelect}>
+                                        <Image height={30} width={30} src={img} alt={name} className='rounded' />
+                                        <div className='text-lg md:text-xl overflow-hidden'>{name}</div>
+                                    </Button>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                        <p className='text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
                     </div>
                 );
-            case 'Solana':
+            case 'sol_dev':
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const handleSOLWalletSelect = async (walletName: any) => {
                     if (walletName) {
@@ -119,8 +214,10 @@ export default function WalletBtn() {
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                             SOLSelect(walletName);
                             handleBack();
-                            setChain('sol_dev');
-                            setOpen(false);
+                            if (isSOLConnected) {
+                                setChain('sol_dev');
+                                setOpen(false);
+                            }
                             // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         } catch (error) {
                             toast.error('An error occurred while connecting your wallet. Please try again!');
@@ -128,85 +225,58 @@ export default function WalletBtn() {
                     }
                 };
 
-                const toggleSOLMoreOption = () => {
-                    setIsSOLMoreOption(!isSOLMoreOption);
-                };
-
                 return (
-                    <div className='flex flex-col space-y-2'>
-                        {SOLWallets
-                            // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-                            .filter((wallet) => wallet.readyState === 'Installed')
-                            .map((wallet) => (
-                                <Button key={wallet.adapter.name} variant='ghost' className='flex flex-row w-full justify-between items-center hover:bg-accent' onClick={() => handleSOLWalletSelect(wallet.adapter.name)}>
-                                    <div className='flex flex-row space-x-2 items-center'>
-                                        <Image height='20' width='20' src={wallet.adapter.icon} alt={wallet.adapter.name} />
-                                        <div className='text-lg md:text-xl'>
-                                            {wallet.adapter.name}
-                                        </div>
-                                    </div>
-                                    <div className='text-sm text-accent-foreground/80'>
-                                        Detected
-                                    </div>
-                                </Button>
-                            ))}
-
+                    <div className='flex flex-col justify-between space-y-2 h-[22rem] md:h-72'>
                         {/* eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison */}
-                        {!SOLWallets.some((wallet) => wallet.readyState === 'Installed') && (
-                            <div className='flex flex-col space-y-2 items-center justify-center'>
-                                <h1 className='text-xl md:text-2xl tracking-wide text-center'>You&apos;ll need a wallet on Solana to continue</h1>
-                                <div className='p-4 rounded-full border-2'>
-                                    <WalletMinimal strokeWidth={1} className='h-16 w-16 font-light' />
+                        {!SOLWallets.some((wallet) => wallet.readyState === 'Installed') ? (
+                            <motion.div initial='hidden' whileInView='visible' variants={containerVariants}>
+                                <div className='flex flex-col space-y-2 items-center justify-center'>
+                                    <motion.h1 variants={cardVariantsRight} className='text-xl md:text-2xl tracking-wide text-center'>You&apos;ll need a wallet on Solana to continue</motion.h1>
+                                    <motion.div variants={cardVariantsRight} className='p-4 rounded-full border-2'>
+                                        <WalletMinimal strokeWidth={1} className='h-16 w-16 font-light' />
+                                    </motion.div>
+                                    <motion.div variants={cardVariantsRight} className='flex flex-row justify-center py-2'>
+                                        <a href='https://phantom.app' target='_blank'>
+                                            <Button className='w-full px-20'>Get a Wallet</Button>
+                                        </a>
+                                    </motion.div>
                                 </div>
-                                <div className='flex flex-row justify-center py-2'>
-                                    <a href='https://phantom.app' target='_blank'>
-                                        <Button className='w-full px-20'>Get a Wallet</Button>
-                                    </a>
-                                </div>
-                            </div>
-                        )}
-                        <div className={`flex flex-col space-y-2 transition-all overflow-hidden ${isSOLMoreOption ? 'max-h-screen duration-200' : 'max-h-0 duration-200'}`}>
-                            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison */}
-                            {SOLWallets.filter((wallet) => wallet.readyState !== 'Installed')
-                                .map((wallet) => (
-                                    <Button key={wallet.adapter.name} variant='ghost' className='flex flex-row space-x-2 w-full justify-start items-center hover:bg-accent' onClick={() => handleSOLWalletSelect(wallet.adapter.name)}>
-                                        <Image height='20' width='20' src={wallet.adapter.icon} alt={wallet.adapter.name} />
-                                        <div className='text-lg md:text-xl'>
-                                            {wallet.adapter.name}
-                                        </div>
-                                    </Button>
+                            </motion.div>
+                        ) : (
+                            <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='grid md:grid-cols-2 gap-2 items-center overflow-x-hidden'>
+                                {SOLWallets.map((wallet) => (
+                                    <motion.div variants={cardVariantsRight} key={wallet.adapter.name}>
+                                        <Button variant='outline' className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white' onClick={() => handleSOLWalletSelect(wallet.adapter.name)}>
+                                            <Image height={30} width={30} src={wallet.adapter.icon} alt={wallet.adapter.name} className='rounded' />
+                                            <div className='text-lg md:text-xl overflow-hidden'>{wallet.adapter.name}</div>
+                                        </Button>
+                                    </motion.div>
                                 ))}
-                        </div>
-                        <div className='flex justify-end px-2'>
-                            <div className='flex flex-row space-x-2 items-center cursor-pointer px-2' onClick={toggleSOLMoreOption}>
-                                <h1>{isSOLMoreOption ? 'More' : 'Less'} options</h1>
-                                <Triangle fill={`text-foreground`} className={`dark:hidden h-3 w-3 transform transition-transform duration-200 ${isSOLMoreOption ? '' : 'rotate-180'}`} />
-                                <Triangle fill={`white`} className={`hidden dark:block h-3 w-3 transform transition-transform duration-200 ${isSOLMoreOption ? '' : 'rotate-180'}`} />
-                            </div>
-                        </div>
+                            </motion.div>
+                        )}
 
-                        <p className='py-2 text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                        <p className='text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
                     </div>
                 );
             default:
                 return (
-                    <div className='flex flex-col space-y-2'>
-                        <div
+                    <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='flex flex-col space-y-2'>
+                        <motion.div variants={cardVariantsLeft}
                             className='rounded-md border hover:border-primary hover:text-primary p-4 flex flex-row items-center space-x-2 cursor-pointer'
-                            onClick={() => handleChainSelect('ICP')}
+                            onClick={() => handleChainSelect('icp')}
                         >
                             <Image src={ICPLogo} alt='ICP' className='rounded' height='26' width='26' />
                             <div className='text-lg'>Internet Computer</div>
-                        </div>
+                        </motion.div>
 
-                        <div
+                        <motion.div variants={cardVariantsLeft}
                             className='rounded-md border hover:border-primary hover:text-primary p-4 flex flex-row items-center space-x-2 cursor-pointer'
-                            onClick={() => handleChainSelect('Solana')}
+                            onClick={() => handleChainSelect('sol_dev')}
                         >
                             <Image src={SOLLogo} alt='Solana' className='rounded' height='26' width='26' />
                             <div className='text-lg'>Solana Devnet</div>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 );
         }
     };
@@ -223,7 +293,7 @@ export default function WalletBtn() {
                             {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className='max-w-[90vw] md:max-w-[400px]'>
+                    <DialogContent className='max-w-[90vw] md:max-w-[600px]'>
                         <DialogHeader>
                             <DialogTitle className='tracking-wide pt-2 md:pt-0'>
                                 {selectedChain ? (

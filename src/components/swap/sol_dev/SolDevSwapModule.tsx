@@ -374,7 +374,7 @@ export default function SolDevSwapModule() {
                     toast.error('An error occurred while processing your request. Please try again!');
                 }
             } else {
-                toast.error('Approval failed.');
+                toast.error('Transction approval failed.');
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {

@@ -13,7 +13,7 @@ const tabs = ['Leaderboard', 'Profile'];
 export default function Referral() {
     const [activeTab, setActiveTab] = useState('Leaderboard');
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-    const endDate = new Date('March 25, 2025 15:30:00 GMT+0530');
+    const endDate = new Date('May 25, 2025 15:30:00 GMT+0530');
 
     const { ICPAddress } = useICPWallet();
 
@@ -45,7 +45,11 @@ export default function Referral() {
             return;
         }
 
-        navigator.clipboard.writeText(ICPAddress)
+        const referralLink =
+            // `https://bit10.app?referral=${ICPAddress}`
+            `http://localhost:3000?referral=${ICPAddress}`;
+
+        navigator.clipboard.writeText(referralLink)
             .then(() => {
                 toast.success('Referral link copied to clipboard!');
             })

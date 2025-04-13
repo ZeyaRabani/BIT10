@@ -29,6 +29,7 @@ function SelectToken() {
     };
 
     return (
+        // Have two column: left side will show the pie (make it sticky) and right side it wll show the assets with details and current price, and a search and have a add button
         <div className='flex flex-row space-x-2'>
             <div className='grid grid-cols-5 gap-2 items-center justify-center'>
                 <div className='col-span-1 border rounded p-2 grid place-items-center cursor-pointer' onClick={handleDecrease}>

@@ -1,51 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client"
 
 import React, { useState, useEffect } from 'react'
-// import { useICPWallet } from '@/context/ICPWalletContext'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import WalletBtn from './WalletBtn'
-// import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Menu, X, Loader2, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark, HandCoins, Tickets } from 'lucide-react'
-// import PlugImg from '@/assets/wallet/plug.svg'
-// import XverseImg from '@/assets/wallet/xverse.svg'
-// import UnisatImg from '@/assets/wallet/unisat.svg'
-// import PhantomImg from '@/assets/wallet/phantom.svg'
+import { Menu, X, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark, HandCoins } from 'lucide-react'
 
 const links = {
     web: [
         { title: 'About', link: '/', icon: Home },
         { title: 'FAQs', link: '/faqs', icon: MessageCircleQuestion },
-        { title: 'Resources', link: '/resources', icon: BookCopy },
-        // { title: 'Referral', link: '/referral', icon: Tickets }
+        { title: 'Resources', link: '/resources', icon: BookCopy }
     ],
     app: [
         { title: 'Swap', link: '/swap', icon: ArrowRightLeft },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
-        { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins },
-        // { title: 'Referral', link: '/referral', icon: Tickets }
+        { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins }
     ]
 };
-
-// const wallets = [
-//     { name: 'Plug', img: PlugImg },
-//     // { name: 'Xverse', img: XverseImg, soon: true },
-//     // { name: 'UniSat', img: UnisatImg, soon: true },
-//     // { name: 'Phantom', img: PhantomImg, soon: true }
-// ];
 
 export default function ResponsiveNavbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isClosing, setIsClosing] = useState<boolean>(false);
-    // const [isConnecting, setIsConnecting] = useState(false);
-    // const [open, setOpen] = useState(false);
 
-    // const { isICPConnected, connectICPWallet, disconnectICPWallet } = useICPWallet();
     const pathname = usePathname();
     const appMode = links.app.some(link => pathname.startsWith(link.link));
 
@@ -62,13 +42,6 @@ export default function ResponsiveNavbar() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { if (isOpen) toggleMenu(); }, [pathname]);
-
-    // const handleWalletSelect = async () => {
-    //     setIsConnecting(true);
-    //     setOpen(false);
-    //     await connectICPWallet();
-    //     setIsConnecting(false);
-    // };
 
     return (
         <div className='lg:hidden'>
@@ -106,41 +79,8 @@ export default function ResponsiveNavbar() {
                                     ))}
                                     {appMode ? (
                                         <div className='border-b-2 pb-2 px-2 w-full'>
-                                        <WalletBtn />
-                                         </div>
-                                        //     {/* {isICPConnected ? (
-                                        //         <div className='border-b-2 pb-2 px-2 cursor-pointer w-full'>
-                                        //             <Button variant='destructive' className='w-full' onClick={disconnectICPWallet}>
-                                        //                 Disconnect Wallet
-                                        //             </Button>
-                                        //         </div>
-                                        //     ) : (
-                                        //         <Dialog open={open} onOpenChange={setOpen}>
-                                        //             <div className='border-b-2 pb-2 px-2 cursor-pointer w-full'>
-                                        //                 <DialogTrigger className='w-full'>
-                                        //                     <Button disabled={isConnecting} className='w-full'>
-                                        //                         {isConnecting ? <Loader2 className='animate-spin mr-2' size={15} /> : 'Connect Wallet'}
-                                        //                     </Button>
-                                        //                 </DialogTrigger>
-                                        //             </div>
-                                        //             <DialogContent className='max-w-[90vw] md:max-w-[400px]'>
-                                        //                 <DialogHeader>
-                                        //                     <DialogTitle>Connect your wallet to get started</DialogTitle>
-                                        //                 </DialogHeader>
-                                        //                 <div className='flex flex-col space-y-2'>
-                                        //                     {wallets.map(({ name, img }) => (
-                                        //                         <Button key={name} variant='ghost' className='flex justify-between items-center w-full hover:bg-accent' onClick={handleWalletSelect}>
-                                        //                             <div className='flex items-center space-x-2'>
-                                        //                                 <Image height={30} width={30} src={img} alt={name} className='rounded' />
-                                        //                                 <span className='text-lg md:text-xl'>{name}</span>
-                                        //                             </div>
-                                        //                         </Button>
-                                        //                     ))}
-                                        //                 </div>
-                                        //             </DialogContent>
-                                        //         </Dialog>
-                                        //     )} */}
-                                        // // </div>
+                                            <WalletBtn />
+                                        </div>
                                     ) : (
                                         <div className='border-b-2 py-2 px-2 cursor-pointer w-full'>
                                             <Link href='/swap' passHref>

@@ -47,7 +47,7 @@ const leaderboardTableColumns: ColumnDef<LeaderboardTableDataType>[] = [
         ),
     },
     {
-        accessorKey: 'ICPAddress',
+        accessorKey: 'address',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Principal ID' />
         ),
@@ -58,12 +58,12 @@ const leaderboardTableColumns: ColumnDef<LeaderboardTableDataType>[] = [
             <DataTableColumnHeader column={column} title='Points' />
         ),
     },
-    {
-        accessorKey: 'user_rank',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='User Rank' />
-        ),
-    },
+    // {
+    //     accessorKey: 'user_rank',
+    //     header: ({ column }) => (
+    //         <DataTableColumnHeader column={column} title='User Rank' />
+    //     ),
+    // },
 ]
 
 export default function Leaderboard() {
@@ -82,15 +82,15 @@ export default function Leaderboard() {
                             <Trophy fill='#FFBB29' stroke='#FFBB29' className='h-6 w-6' />
                         </div>
                     </CardHeader>
-                    <CardContent className='flex flex-col space-y-2'>
-                        <div className='flex flex-row items-center space-x-2 font-semibold text-xl'>
+                    <CardContent className='flex flex-col space-y-2 text-2xl'>
+                        {/* <div className='flex flex-row items-center space-x-2 font-semibold text-3xl'>
                             🏆 Grandmaster
-                        </div>
+                        </div> */}
                         <div>
                             Total Points: 42
                         </div>
                         <div>
-                            Incentive: 2 ICP
+                            Incentive: 5 ICP
                         </div>
                     </CardContent>
                 </Card>
@@ -105,15 +105,15 @@ export default function Leaderboard() {
                             <Trophy fill='#EDEDED' stroke='#EDEDED' className='h-6 w-6' />
                         </div>
                     </CardHeader>
-                    <CardContent className='flex flex-col space-y-2'>
-                        <div className='flex flex-row items-center space-x-2 font-semibold text-xl'>
+                    <CardContent className='flex flex-col space-y-2 text-2xl'>
+                        {/* <div className='flex flex-row items-center space-x-2 font-semibold text-3xl'>
                             🏆 Grandmaster
-                        </div>
+                        </div> */}
                         <div>
                             Total Points: 38
                         </div>
                         <div>
-                            Incentive: 2 ICP
+                            Incentive: 3 ICP
                         </div>
                     </CardContent>
                 </Card>
@@ -128,10 +128,10 @@ export default function Leaderboard() {
                             <Trophy fill='#F7A552' stroke='#F7A552' className='h-6 w-6' />
                         </div>
                     </CardHeader>
-                    <CardContent className='flex flex-col space-y-2'>
-                        <div className='flex flex-row items-center space-x-2 font-semibold text-xl'>
+                    <CardContent className='flex flex-col space-y-2 text-2xl'>
+                        {/* <div className='flex flex-row items-center space-x-2 font-semibold text-3xl'>
                             🏆 Grandmaster
-                        </div>
+                        </div> */}
                         <div>
                             Total Points: 29
                         </div>
@@ -146,7 +146,7 @@ export default function Leaderboard() {
                 <DataTable
                     columns={leaderboardTableColumns}
                     data={leaderboardData ?? []}
-                    userSearchColumn='ICPAddress'
+                    userSearchColumn='address'
                     inputPlaceHolder='Search by Principal ID'
                 />
             </div>
