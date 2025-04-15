@@ -2,7 +2,7 @@
 "use server"
 
 import { db } from '@/server/db'
-import { mbUsers, userSignups, mbPrincipalIdWhitelist, swap, teSwap } from '@/server/db/schema'
+import { mbUsers, userSignups, mbPrincipalIdWhitelist, swap, teSwap, referralApr2025, referralApr2025Tasks } from '@/server/db/schema'
 import crypto from 'crypto'
 import { eq, desc } from 'drizzle-orm'
 
@@ -132,7 +132,8 @@ export const transactionDetails = async ({ transactionId }: { transactionId: str
 export const testnetRevenue = async () => {
     try {
         const data = await db.select({
-            tokenPurchaseAmount: teSwap.tickInAmount,
+            // tokenPurchaseAmount: teSwap.tickInAmount,
+            tokenPurchaseAmount: teSwap.tickInUsdAmount,
             tokenBoughtAt: teSwap.transactionTimestamp
         })
             .from(teSwap)
@@ -142,3 +143,38 @@ export const testnetRevenue = async () => {
         return 'Error fetching testnet revenue';
     }
 }
+
+// Referral related code
+export const addNewReferral = async ({ referralCode, userId }: { referralCode: string, userId: string }) => {
+    try {
+        const existingUsers = await db.select({ userId: referralApr2025.userId }).from(referralApr2025).where(eq(referralApr2025.userId, userId));
+
+        if (existingUsers && existingUsers.length > 0) {
+            return 'User already exists';
+        } else {
+            await db.insert(referralApr2025).values({
+                referralCode: referralCode,
+                userId: userId,
+                usedAt: new Date().toISOString()
+            });
+        }
+    } catch (error) {
+        return 'Error adding new referral';
+    }
+};
+
+export const addNewReferralTasks = async ({ address }: { address: string }) => {
+    try {
+        const existingUsers = await db.select({ address: referralApr2025Tasks.address }).from(referralApr2025Tasks).where(eq(referralApr2025Tasks.address, address));
+
+        if (existingUsers && existingUsers.length > 0) {
+            return 'User already exists';
+        } else {
+            await db.insert(referralApr2025Tasks).values({
+                address: address
+            });
+        }
+    } catch (error) {
+        return 'Error adding new referral task';
+    }
+};

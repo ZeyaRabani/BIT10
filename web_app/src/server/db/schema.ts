@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, foreignKey, unique, bigint, serial, varchar, boolean, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, doublePrecision, index, json, foreignKey, unique, boolean, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -23,6 +23,42 @@ export const mbTokenMint = pgTable('mb_token_mint', {
 	transactionIndex: text('transaction_index').notNull(),
 });
 
+export const teLiquidityHub = pgTable('te_liquidity_hub', {
+	liquidationId: text('liquidation_id').primaryKey().notNull(),
+	tickInAddress: text('tick_in_address').notNull(),
+	tickInName: text('tick_in_name').notNull(),
+	tickInAmount: doublePrecision('tick_in_amount').notNull(),
+	duration: doublePrecision('duration').notNull(),
+	liquidationType: text('liquidation_type').notNull(),
+	liquidationMode: text('liquidation_mode').notNull(),
+	transactionStatus: text('transaction_status').notNull(),
+	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
+	tickInNetwork: text('tick_in_network').notNull(),
+	tickInTxBlock: text('tick_in_tx_block').notNull(),
+});
+
+export const bit10Top = pgTable('bit10_top', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	tokenPrice: doublePrecision('token_price').notNull(),
+	data: json('data').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('bit10_top_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
+export const bit10TopHistoricalData = pgTable('bit10_top_historical_data', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	tokenPrice: doublePrecision('token_price').notNull(),
+	data: json('data').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('bit10_top_historical_data_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
 export const swap = pgTable('swap', {
 	tokenSwapId: text('token_swap_id').primaryKey().notNull(),
 	userPrincipalId: text('user_principal_id').notNull(),
@@ -45,6 +81,67 @@ export const swap = pgTable('swap', {
 				foreignColumns: [mbUsers.userPrincipalId],
 				name: 'swap_user_principal_id_fkey'
 			}),
+		}
+	});
+
+export const testBit10TopRebalance = pgTable('test_bit10_top_rebalance', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	indexValue: doublePrecision('index_value').notNull(),
+	priceOfTokenToBuy: doublePrecision('price_of_token_to_buy').notNull(),
+	newTokens: json('new_tokens').notNull(),
+	added: json('added').notNull(),
+	removed: json('removed').notNull(),
+	retained: json('retained').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('test_bit10_top_rebalance_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
+export const referralApr2025 = pgTable('referral_apr_2025', {
+	referralCode: text('referral_code').notNull(),
+	userId: text('user_id').primaryKey().notNull(),
+	usedAt: timestamp('used_at', { withTimezone: true, mode: 'string' }).defaultNow(),
+},
+	(table) => {
+		return {
+			referralApr2025ReferralCodeUserIdKey: unique('referral_apr_2025_referral_code_user_id_key').on(table.referralCode, table.userId),
+			referralApr2025UserIdKey: unique('referral_apr_2025_user_id_key').on(table.userId),
+		}
+	});
+
+export const referralApr2025Tasks = pgTable('referral_apr_2025_tasks', {
+	address: text('address').primaryKey().notNull(),
+	task1: boolean('task_1').default(false).notNull(),
+	task2: boolean('task_2').default(false).notNull(),
+	task3: boolean('task_3').default(false).notNull(),
+},
+	(table) => {
+		return {
+			referralApr2025TasksAddressKey: unique('referral_apr_2025_tasks_address_key').on(table.address),
+		}
+	});
+
+export const bit10Meme = pgTable('bit10_meme', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	tokenPrice: doublePrecision('token_price').notNull(),
+	data: json('data').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('bit10_meme_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
+export const bit10MemeHistoricalData = pgTable('bit10_meme_historical_data', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	tokenPrice: doublePrecision('token_price').notNull(),
+	data: json('data').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('bit10_meme_historical_data_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
 		}
 	});
 
@@ -73,6 +170,21 @@ export const teSwap = pgTable('te_swap', {
 		}
 	});
 
+export const testBit10MemeRebalance = pgTable('test_bit10_meme_rebalance', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	indexValue: doublePrecision('index_value').notNull(),
+	priceOfTokenToBuy: doublePrecision('price_of_token_to_buy').notNull(),
+	newTokens: json('new_tokens').notNull(),
+	added: json('added').notNull(),
+	removed: json('removed').notNull(),
+	retained: json('retained').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('test_bit10_meme_rebalance_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
 export const waitlistAddress = pgTable('waitlist_address', {
 	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
 	waitlistAddressId: bigint('waitlist_address_id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity({ name: 'waitlist_address_waitlist_address_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
@@ -83,6 +195,22 @@ export const waitlistAddress = pgTable('waitlist_address', {
 			waitlistAddressAddressKey: unique('waitlist_address_address_key').on(table.address),
 		}
 	});
+
+export const bit10Defi = pgTable('bit10_defi', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	tokenPrice: doublePrecision('token_price').notNull(),
+	data: json('data').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('bit10_defi_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
+export const bit10CollateralTokenPrices = pgTable('bit10_collateral_token_prices', {
+	bit10TokenName: text('bit10_token_name').primaryKey().notNull(),
+	priceOfTokenToBuy: doublePrecision('price_of_token_to_buy').notNull(),
+});
 
 export const teUsers = pgTable('te_users', {
 	userId: text('user_id').primaryKey().notNull(),
@@ -128,6 +256,32 @@ export const teTokenSwap = pgTable('te_token_swap', {
 		}
 	});
 
+export const bit10Brc20Rebalance = pgTable('bit10_brc20_rebalance', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	indexValue: doublePrecision('index_value').notNull(),
+	priceOfTokenToBuy: doublePrecision('price_of_token_to_buy').notNull(),
+	newTokens: json('new_tokens').notNull(),
+	added: json('added').notNull(),
+	removed: json('removed').notNull(),
+	retained: json('retained').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('bit10_brc20_rebalance_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
+export const bit10Brc20HistoricalData = pgTable('bit10_brc20_historical_data', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	tokenPrice: doublePrecision('token_price').notNull(),
+	data: json('data').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('bit10_brc20_historical_data_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
 export const teRequestBtc = pgTable('te_request_btc', {
 	email: varchar('email', { length: 255 }).notNull(),
 	userPrincipalId: text('user_principal_id').notNull(),
@@ -137,6 +291,17 @@ export const teRequestBtc = pgTable('te_request_btc', {
 	(table) => {
 		return {
 			teRequestBtcRequestIdKey: unique('te_request_btc_request_id_key').on(table.requestId),
+		}
+	});
+
+export const bit10Brc20 = pgTable('bit10_brc20', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	tokenPrice: doublePrecision('token_price').notNull(),
+	data: json('data').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('bit10_brc20_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
 		}
 	});
 

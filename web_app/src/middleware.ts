@@ -3,6 +3,13 @@ import { NextResponse } from 'next/server'
 import { env } from './env'
 
 export default async function middleware(req: NextRequest) {
+    const referralCode = req.nextUrl.searchParams.get('referral')
+    if (referralCode) {
+        const referralResponse = NextResponse.next()
+        referralResponse.cookies.set('referral', referralCode)
+        return referralResponse
+    }
+
     const res = NextResponse.next();
     const nodeEnv = env.NODE_ENV;
     const pathname = req.nextUrl.pathname;

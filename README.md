@@ -1,6 +1,6 @@
 # BIT10
 
-BIT10 is pioneering the concept of the "S&P500 of Crypto assets." It offers users a simplified way to diversify their exposure to DeFi assets by tracking the biggest crypto tokens, BRC-20s, and ERC-20s in the DeFi ecosystem.
+BIT10 is pioneering the concept of the "S&P500 of Crypto assets". It offers users a simplified way to diversify their exposure to DeFi assets by tracking the biggest crypto tokens, BRC-20s, and ERC-20s in the DeFi ecosystem.
 
 ## 🚀 The Problem
 
@@ -41,6 +41,13 @@ BIT10 provides a pre-selected basket of assets, reducing research time and cost.
 <!-- - ERC20 Asset Storage: [2bh6f-siaaa-aaaap-qkmca-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=2bh6f-siaaa-aaaap-qkmca-cai) -->
 <!-- - BRC20 Asset Storage: [2tbj4-6yaaa-aaaap-qkmba-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=2tbj4-6yaaa-aaaap-qkmba-cai) -->
 <!-- - OLD ERROR BRC20 Asset Storage: [2xxwk-lyaaa-aaaap-qkl4q-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=2xxwk-lyaaa-aaaap-qkl4q-cai) -->
+
+## 🔗 Solana Programs & SPL Tokens
+
+### Devnet
+
+- BIT10 Exchange Canister: [DKEKk7aLibx28g6DVMZXk3MinED489KRHfoM3wnnrd2s](https://solana.fm/address/DKEKk7aLibx28g6DVMZXk3MinED489KRHfoM3wnnrd2s?cluster=devnet-solana)
+- Test BIT10.DEFI: [5bzHsBmXwX3U6yqKH8uoFgHrUNyoNJvMuAajsBbsHt5K](https://solana.fm/address/5bzHsBmXwX3U6yqKH8uoFgHrUNyoNJvMuAajsBbsHt5K?cluster=devnet-solana)
 
 ## 🏁 Getting Started
 

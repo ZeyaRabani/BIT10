@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, doublePrecision, index, json, foreignKey, unique, bigint, serial, varchar, boolean, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, doublePrecision, index, json, foreignKey, unique, boolean, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -23,23 +23,18 @@ export const mbTokenMint = pgTable('mb_token_mint', {
 	transactionIndex: text('transaction_index').notNull(),
 });
 
-export const teLiquidityTransactions = pgTable('te_liquidity_transactions', {
+export const teLiquidityHub = pgTable('te_liquidity_hub', {
 	liquidationId: text('liquidation_id').primaryKey().notNull(),
 	tickInAddress: text('tick_in_address').notNull(),
 	tickInName: text('tick_in_name').notNull(),
 	tickInAmount: doublePrecision('tick_in_amount').notNull(),
-	tickInUsdAmount: doublePrecision('tick_in_usd_amount').notNull(),
-	tickInNetwork: text('tick_in_network').notNull(),
-	tickInTxBlock: text('tick_in_tx_block').notNull(),
-	tickOutAddress: text('tick_out_address').notNull(),
-	tickOutName: text('tick_out_name').notNull(),
-	tickOutAmount: doublePrecision('tick_out_amount'),
-	tickOutUsdAmount: doublePrecision('tick_out_usd_amount'),
-	tickOutNetwork: text('tick_out_network').notNull(),
-	tickOutTxBlock: text('tick_out_tx_block').notNull(),
+	duration: doublePrecision().notNull(),
 	liquidationType: text('liquidation_type').notNull(),
+	liquidationMode: text('liquidation_mode').notNull(),
 	transactionStatus: text('transaction_status').notNull(),
 	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
+	tickInNetwork: text('tick_in_network').notNull(),
+	tickInTxBlock: text('tick_in_tx_block').notNull(),
 });
 
 export const bit10Top = pgTable('bit10_top', {
@@ -56,15 +51,6 @@ export const bit10TopHistoricalData = pgTable('bit10_top_historical_data', {
 	data: json().notNull(),
 }, (table) => [
 	index('bit10_top_historical_data_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst().op('timestamptz_ops')),
-]);
-
-export const teVerifyTransaction = pgTable('te_verify_transaction', {
-	txid: text().primaryKey().notNull(),
-	chain: text().notNull(),
-	data: json().notNull(),
-	message: text().notNull(),
-}, (table) => [
-	index('idx_txid').using('btree', table.txid.asc().nullsLast().op('text_ops')),
 ]);
 
 export const swap = pgTable('swap', {
@@ -99,6 +85,24 @@ export const testBit10TopRebalance = pgTable('test_bit10_top_rebalance', {
 	retained: json().notNull(),
 }, (table) => [
 	index('test_bit10_top_rebalance_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst().op('timestamptz_ops')),
+]);
+
+export const referralApr2025 = pgTable('referral_apr_2025', {
+	referralCode: text('referral_code').notNull(),
+	userId: text('user_id').primaryKey().notNull(),
+	usedAt: timestamp('used_at', { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	unique('referral_apr_2025_referral_code_user_id_key').on(table.referralCode, table.userId),
+	unique('referral_apr_2025_user_id_key').on(table.userId),
+]);
+
+export const referralApr2025Tasks = pgTable('referral_apr_2025_tasks', {
+	address: text().primaryKey().notNull(),
+	task1: boolean('task_1').default(false).notNull(),
+	task2: boolean('task_2').default(false).notNull(),
+	task3: boolean('task_3').default(false).notNull(),
+}, (table) => [
+	unique('referral_apr_2025_tasks_address_key').on(table.address),
 ]);
 
 export const bit10Meme = pgTable('bit10_meme', {

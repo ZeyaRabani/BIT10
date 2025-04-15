@@ -82,6 +82,14 @@ const config = {
             {
                 source: '/bit10-rebalance-history-:index_fund',
                 destination: '/api/bit10-rebalance-history/:index_fund',
+            },
+            {
+                source: '/referral-leaderboard',
+                destination: '/api/referral-leaderboard',
+            },
+            {
+                source: '/referral-user-:user_address',
+                destination: '/api/referral-user/:user_address',
             }
         ]
     },

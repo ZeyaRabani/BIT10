@@ -102,7 +102,8 @@ export default function Page() {
 
             return Array.from(groupedMap.entries()).map(([date, total]) => ({
                 date,
-                totalTokenPurchaseAmount: total / 100000000,
+                // totalTokenPurchaseAmount: total / 100000000,
+                totalTokenPurchaseAmount: total,
             }));
         }
 
@@ -239,7 +240,8 @@ export default function Page() {
                                 <Skeleton className='w-full h-56' />
                                 : (
                                     <div className='relative flex flex-col w-full h-full'>
-                                        <div className='text-xl font-semibold py-2'>{t('revenue')}: {(totalTokenPurchaseAmount / 100000000).toFixed(8)} BTC</div>
+                                        {/* <div className='text-xl font-semibold py-2'>{t('revenue')}: {(totalTokenPurchaseAmount / 100000000).toFixed(8)} BTC</div> */}
+                                        <div className='text-xl font-semibold py-2'>{t('revenue')}: {(totalTokenPurchaseAmount).toFixed(8)} USD</div>
                                         <ChartContainer config={bit10TestnetRevenueChartConfig} className='max-h-[300px] w-full'>
                                             <AreaChart accessibilityLayer data={bit10TestnetRevenueChartData}>
                                                 <XAxis dataKey='day' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} />
