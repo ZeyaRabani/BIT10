@@ -5,7 +5,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import NodeCache from 'node-cache'
 import cron from 'node-cron'
-import { and, eq, gt, inArray } from 'drizzle-orm'
+import { and, eq, gt, inArray, count } from 'drizzle-orm'
 
 type Bit10ReferralType = {
     bit10_apr_referral: {
@@ -14,10 +14,8 @@ type Bit10ReferralType = {
         position: number;
         referred_users: string[];
         referral_points: {
-            total_no_of_liquidity_hub_transaction_by_address_on_testnet: number;
             total_no_of_liquidity_hub_transaction_by_referral_on_testnet: number;
             total_no_of_swap_by_referral_on_testnet: number;
-            total_no_of_swap_or_reverse_swap_by_address_on_mainnet: number;
             total_no_of_swap_by_referral_on_mainnet: number;
         }[];
         tasks_completed: {
@@ -56,14 +54,6 @@ async function calculateReferral() {
 
         const newData: Bit10ReferralType = {
             bit10_apr_referral: (await Promise.all(addresses.map(async (addr, index) => {
-                const teliquidityHubCount = await db.select()
-                    .from(teLiquidityHub)
-                    .where(and(
-                        eq(teLiquidityHub.tickInAddress, addr.address),
-                        gt(teLiquidityHub.transactionTimestamp, startDate.toISOString())
-                    ))
-                    .then(res => res.length);
-
                 const hasSwapOnICPTestnet = await db.select()
                     .from(teSwap)
                     .where(and(
@@ -91,13 +81,13 @@ async function calculateReferral() {
                     ))
                     .then(res => res.length) : 0;
 
-                const swapCount = await db.select()
+                const swapCount = await db.select({ count: count() })
                     .from(swap)
                     .where(and(
                         eq(swap.userPrincipalId, addr.address),
                         gt(swap.transactionTimestamp, startDate.toISOString())
                     ))
-                    .then(res => res.length);
+                    .then(res => res[0]?.count || 0);
 
                 const hasSwapOnMainnet = swapCount > 0;
 
@@ -112,14 +102,12 @@ async function calculateReferral() {
 
                 return {
                     address: addr.address,
-                    total_points: (hasSwapOnMainnet === true ? 10 : 0) + (hasSwapOnICPTestnet === true ? 10 : 0) + (teliquidityHubCount * 10) + (referredTeliquidityHubTransactions * 5) + (referredTestnetSwapCount * 5) + (swapCount * 20) + (referredSwapTransactions * 20),
+                    total_points: (hasSwapOnMainnet === true ? 10 : 0) + (hasSwapOnICPTestnet === true ? 10 : 0) + (referredTeliquidityHubTransactions * 5) + (referredTestnetSwapCount * 5) + (referredSwapTransactions * 20),
                     position: index + 1,
                     referred_users: referredUsers,
                     referral_points: [{
-                        total_no_of_liquidity_hub_transaction_by_address_on_testnet: teliquidityHubCount,
                         total_no_of_liquidity_hub_transaction_by_referral_on_testnet: referredTeliquidityHubTransactions,
                         total_no_of_swap_by_referral_on_testnet: referredTestnetSwapCount,
-                        total_no_of_swap_or_reverse_swap_by_address_on_mainnet: swapCount,
                         total_no_of_swap_by_referral_on_mainnet: referredSwapTransactions
                     }],
                     tasks_completed: {
@@ -154,7 +142,7 @@ async function fetchData() {
 }
 
 // cron.schedule('*/30 * * * * *', async () => { // 30 sec
-cron.schedule('*/30 * * * *', async () => { // 30 min
+cron.schedule('*/5 * * * *', async () => { // 5 min
     try {
         await calculateReferral();
         await fetchData();

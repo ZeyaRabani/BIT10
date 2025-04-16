@@ -142,78 +142,99 @@ export default function Profile() {
             <div className='flex flex-col space-y-2'>
                 <div className='text-xl'>Your Referral Status</div>
                 {isLoading ?
-                    <div className='grid md:grid-cols-3 gap-4'>
-                        <Card className='md:col-span-1 p-4'>
-                            <Skeleton className='h-40 w-full rounded-md' />
-                        </Card>
-                        <Card className='md:col-span-1 p-4'>
-                            <Skeleton className='h-40 w-full rounded-md' />
-                        </Card>
-                        <Card className='md:col-span-1 p-4'>
-                            <Skeleton className='h-40 w-full rounded-md' />
-                        </Card>
+                    <div className='flex flex-col space-y-2'>
+                        <div className='grid md:grid-cols-3 gap-4'>
+                            <Card className='md:col-span-1 p-4'>
+                                <Skeleton className='h-40 w-full rounded-md' />
+                            </Card>
+                            <Card className='md:col-span-1 p-4'>
+                                <Skeleton className='h-40 w-full rounded-md' />
+                            </Card>
+                            <Card className='md:col-span-1 p-4'>
+                                <Skeleton className='h-40 w-full rounded-md' />
+                            </Card>
+                        </div>
+                        <div>
+                            <Card className='animate-fade-bottom-up-slow'>
+                                <CardContent>
+                                    <div className='flex flex-col h-full space-y-2 pt-8'>
+                                        {['h-12', 'h-12'].map((classes, index) => (
+                                            <Skeleton key={index} className={classes} />
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
                     :
-                    <div className='grid md:grid-cols-3 gap-4'>
-                        <Card className='md:col-span-1'>
-                            <CardHeader className='flex flex-row items-center justify-between space-x-2'>
-                                <div className='text-xl'>
-                                    Incentive
-                                </div>
-                                <div>
-                                    <Wallet className='h-5 w-5' />
-                                </div>
-                            </CardHeader>
-                            <CardContent className='text-3xl font-semibold tracking-wide'>
-                                <div>
-                                    {/* @ts-expect-error */}
-                                    {bit10Data?.position === 1 ? '5 ICP' :
-                                        // @ts-expect-error
-                                        bit10Data?.position === 2 ? '3 ICP' :
+                    <div className='flex flex-col space-y-2'>
+                        <div className='grid md:grid-cols-3 gap-4'>
+                            <Card className='md:col-span-1'>
+                                <CardHeader className='flex flex-row items-center justify-between space-x-2'>
+                                    <div className='text-xl'>
+                                        Incentive
+                                    </div>
+                                    <div>
+                                        <Wallet className='h-5 w-5' />
+                                    </div>
+                                </CardHeader>
+                                <CardContent className='text-3xl font-semibold tracking-wide'>
+                                    <div>
+                                        {/* @ts-expect-error */}
+                                        {bit10Data?.position === 1 && bit10Data?.total_points !== 0 ? '5 ICP' :
                                             // @ts-expect-error
-                                            bit10Data?.position === 3 ? '2 ICP' :
-                                                '0 ICP'}
-                                </div>
-                            </CardContent>
-                        </Card>
+                                            bit10Data?.position === 2 && bit10Data?.total_points !== 0 ? '3 ICP' :
+                                                // @ts-expect-error
+                                                bit10Data?.position === 3 && bit10Data?.total_points !== 0 ? '2 ICP' :
+                                                    '0 ICP'}
+                                    </div>
+                                </CardContent>
+                            </Card>
 
-                        <Card className='md:col-span-1'>
-                            <CardHeader className='flex flex-row items-center justify-between space-x-2'>
-                                <div className='text-xl'>
-                                    Point
-                                </div>
-                                <div>
-                                    <Tickets className='h-5 w-5' />
-                                </div>
-                            </CardHeader>
-                            <CardContent className='text-3xl font-semibold tracking-wide'>
-                                <div>
-                                    {/* @ts-expect-error */}
-                                    {bit10Data?.total_points || '0'}
-                                </div>
-                            </CardContent>
-                        </Card>
+                            <Card className='md:col-span-1'>
+                                <CardHeader className='flex flex-row items-center justify-between space-x-2'>
+                                    <div className='text-xl'>
+                                        Point
+                                    </div>
+                                    <div>
+                                        <Tickets className='h-5 w-5' />
+                                    </div>
+                                </CardHeader>
+                                <CardContent className='text-3xl font-semibold tracking-wide'>
+                                    <div>
+                                        {/* @ts-expect-error */}
+                                        {bit10Data?.total_points || '0'}
+                                    </div>
+                                </CardContent>
+                            </Card>
 
-                        <Card className='md:col-span-1'>
-                            <CardHeader className='flex flex-row items-center justify-between space-x-2'>
-                                <div className='text-xl'>
-                                    Tasks Completed
-                                </div>
-                                <div>
-                                    <SquareCheck className='h-5 w-5' />
-                                </div>
-                            </CardHeader>
-                            <CardContent className='text-3xl font-semibold tracking-wide'>
-                                <div>
-                                    {/* @ts-expect-error */}
-                                    {bit10Data.tasks_completed ?
-                                        // @ts-expect-error
-                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                                        Object.values(bit10Data.tasks_completed).filter(status => status === true).length
-                                        : 0}
-                                </div>
-                            </CardContent>
-                        </Card>
+                            <Card className='md:col-span-1'>
+                                <CardHeader className='flex flex-row items-center justify-between space-x-2'>
+                                    <div className='text-xl'>
+                                        Tasks Completed
+                                    </div>
+                                    <div>
+                                        <SquareCheck className='h-5 w-5' />
+                                    </div>
+                                </CardHeader>
+                                <CardContent className='text-3xl font-semibold tracking-wide'>
+                                    <div>
+                                        {/* @ts-expect-error */}
+                                        {bit10Data.tasks_completed ?
+                                            // @ts-expect-error
+                                            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                                            Object.values(bit10Data.tasks_completed).filter(status => status === true).length
+                                            : 0}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                        <div>
+                            <DataTable
+                                columns={referralProfileTableColumns}
+                                data={tasksData ?? []}
+                            />
+                        </div>
                     </div>
                 }
             </div>
@@ -224,11 +245,9 @@ export default function Profile() {
                     <AccordionContent>
                         <ul className='list-disc pl-8 text-[1rem] md:text-lg'>
                             <li>10 points per completed task.</li>
-                            <li>10 points per Liquidity Hub transaction (Instant or Staked).</li>
-                            <li className='ml-4'>5 points for each Liquidity Hub transaction by your referral.</li>
+                            <li>5 points per Liquidity Hub transaction (Instant or Staked) by your referral.</li>
                             <li>5 points for each Testnet transaction by your referral.</li>
-                            <li>20 points per Swap or Reverse Swap.</li>
-                            <li className='ml-4'>20 points for each Mainnet swap by your referral.</li>
+                            <li>20 points for each Mainnet Swap by your referral.</li>
                         </ul>
                     </AccordionContent>
                 </AccordionItem>
@@ -247,28 +266,6 @@ export default function Profile() {
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
-
-            <div className='flex flex-col space-y-2'>
-                <div className='text-xl'>Tasks</div>
-                <div>
-                    {isLoading ?
-                        <Card className='animate-fade-bottom-up-slow'>
-                            <CardContent>
-                                <div className='flex flex-col h-full space-y-2 pt-8'>
-                                    {['h-12', 'h-12'].map((classes, index) => (
-                                        <Skeleton key={index} className={classes} />
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                        :
-                        <DataTable
-                            columns={referralProfileTableColumns}
-                            data={tasksData ?? []}
-                        />
-                    }
-                </div>
-            </div>
         </div>
     )
 }

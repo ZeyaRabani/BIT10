@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { DataTablePagination } from '@/components/ui/data-table-pagination'
+// import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { Button } from '@/components/ui/button'
 import { CircleCheck, ExternalLink } from 'lucide-react'
 
@@ -128,9 +128,9 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-            <div>
+            {/* <div>
                 <DataTablePagination table={table} />
-            </div>
+            </div> */}
         </div>
     )
 }

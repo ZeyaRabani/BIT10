@@ -16,9 +16,7 @@ const links = {
     web: [
         { title: 'About', link: '/' },
         { title: 'FAQs', link: '/faqs' },
-        { title: 'Resources', link: '/resources' },
-        // Update this
-        // { title: 'Referral', link: '/referral' }
+        { title: 'Resources', link: '/resources' }
     ],
     app: [
         { title: 'Swap', link: '/swap' },
@@ -116,7 +114,7 @@ export default function Navbar() {
                         appMode ? (
                             <WalletBtn />
                         ) : (
-                            <Link href='/swap' passHref>
+                            <Link href='/launch' passHref>
                                 <Button className='rounded-full'>Launch App</Button>
                             </Link>
                         )}
