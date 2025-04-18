@@ -28,6 +28,7 @@ type Bit10ReferralType = {
         tasks_completed: {
             swap_on_mainnet: boolean;
             swap_on_internet_computer_testnet: boolean;
+            liquidity_hub_tx_on_internet_computer_testnet: boolean;
         };
     }[];
 };
@@ -131,7 +132,8 @@ export default function Leaderboard() {
                                     Total Points: {bit10Top3[0]?.total_points || '--'}
                                 </div>
                                 <div>
-                                    Incentive: 5 ICP
+                                    {/* update this for 5 ICP */}
+                                    Incentive: 0 ICP
                                 </div>
                             </CardContent>
                         </Card>
@@ -158,7 +160,8 @@ export default function Leaderboard() {
                                     Total Points: {bit10Top3[1]?.total_points || '--'}
                                 </div>
                                 <div>
-                                    Incentive: 3 ICP
+                                    {/* update this for 3 ICP */}
+                                    Incentive: 0 ICP
                                 </div>
                             </CardContent>
                         </Card>
@@ -185,7 +188,8 @@ export default function Leaderboard() {
                                     Total Points: {bit10Top3[2]?.total_points || '--'}
                                 </div>
                                 <div>
-                                    Incentive: 2 ICP
+                                    {/* update this for 2 ICP */}
+                                    Incentive: 0 ICP
                                 </div>
                             </CardContent>
                         </Card>

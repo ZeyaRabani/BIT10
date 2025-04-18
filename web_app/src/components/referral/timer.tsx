@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 export default function Timer() {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     // Update this
-    const endDate = new Date('May 25, 2025 15:30:00 GMT+0530');
+    const endDate = new Date('Apr 26, 2025 15:30:00 GMT+0530');
 
     useEffect(() => {
         const calculateTimeLeft = () => {

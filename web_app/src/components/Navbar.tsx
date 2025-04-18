@@ -22,8 +22,7 @@ const links = {
         { title: 'Swap', link: '/swap' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
-        // Update this
-        // { title: 'Referral', link: '/referral' }
+        { title: 'Referral', link: '/referral' }
     ]
 };
 

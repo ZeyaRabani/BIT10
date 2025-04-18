@@ -30,6 +30,7 @@ type Bit10ReferralType = {
         tasks_completed: {
             swap_on_mainnet: boolean;
             swap_on_internet_computer_testnet: boolean;
+            liquidity_hub_tx_on_internet_computer_testnet: boolean;
         };
     }[];
 };
@@ -134,6 +135,14 @@ export default function Profile() {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             status: bit10Data.tasks_completed.swap_on_internet_computer_testnet,
             swap_on_mainnet: 'Swap on Internet Computer Testnet'
+        },
+        {
+            task: 'Swap on Internet Computer Liquidity Hub',
+            points: 10,
+            // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            status: bit10Data.tasks_completed.liquidity_hub_tx_on_internet_computer_testnet,
+            swap_on_mainnet: 'Swap on Internet Computer Testnet'
         }
     ] : [];
 
@@ -180,12 +189,13 @@ export default function Profile() {
                                 </CardHeader>
                                 <CardContent className='text-3xl font-semibold tracking-wide'>
                                     <div>
+                                        {/* Update this for points: 5, 3, 2 */}
                                         {/* @ts-expect-error */}
-                                        {bit10Data?.position === 1 && bit10Data?.total_points !== 0 ? '5 ICP' :
+                                        {bit10Data?.position === 1 && bit10Data?.total_points !== 0 ? '0 ICP' :
                                             // @ts-expect-error
-                                            bit10Data?.position === 2 && bit10Data?.total_points !== 0 ? '3 ICP' :
+                                            bit10Data?.position === 2 && bit10Data?.total_points !== 0 ? '0 ICP' :
                                                 // @ts-expect-error
-                                                bit10Data?.position === 3 && bit10Data?.total_points !== 0 ? '2 ICP' :
+                                                bit10Data?.position === 3 && bit10Data?.total_points !== 0 ? '0 ICP' :
                                                     '0 ICP'}
                                     </div>
                                 </CardContent>

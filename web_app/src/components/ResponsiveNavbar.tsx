@@ -19,8 +19,7 @@ const links = {
         { title: 'Swap', link: '/swap', icon: ArrowRightLeft },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
-        // Update this
-        // { title: 'Referral', link: '/referral', icon: Tickets }
+        { title: 'Referral', link: '/referral', icon: Tickets }
     ]
 };
 

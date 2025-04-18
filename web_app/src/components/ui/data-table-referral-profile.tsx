@@ -54,28 +54,35 @@ export function DataTable<TData, TValue>({
                 return (
                     <div>
                         {row.original.status ? (
-                            <Button variant='outline' className='dark:border-white w-40'>
+                            <Button variant='outline' className='dark:border-white w-full'>
                                 <CircleCheck className='mr-2 h-4 w-4' />
                                 Task Completed
                             </Button>
                         ) : (
-                            // row.original.task === 'Post about BIT10 on Twitter/X' ? <Button className='w-40'>Post</Button> :
-                            //     row.original.task === 'Follow BIT10 on Twitter/X' ? <Button className='w-40'>Follow BIT10</Button> :
-                            //         row.original.task === 'Like BIT10 Post on on Twitter/X' ? <Button className='w-40'>Like Post</Button> :
-                            //             <Button className='w-40'>Swap on Mainnet</Button>
+                            // row.original.task === 'Post about BIT10 on Twitter/X' ? <Button className='w-full'>Post</Button> :
+                            //     row.original.task === 'Follow BIT10 on Twitter/X' ? <Button className='w-full'>Follow BIT10</Button> :
+                            //         row.original.task === 'Like BIT10 Post on on Twitter/X' ? <Button className='w-full'>Like Post</Button> :
+                            //             <Button className='w-full'>Swap on Mainnet</Button>
                             row.original.task === 'Swap on Internet Computer Testnet' ?
                                 <a href='https://testnet.bit10.app/swap' target='_blank'>
-                                    <Button className='w-40'>
+                                    <Button className='w-full'>
                                         Swap on Testnet
                                         <ExternalLink className='ml-2 h-4 w-4' />
                                     </Button>
                                 </a> :
-                                <a href='https://bit10.app/swap' target='_blank'>
-                                    <Button className='w-40'>
-                                        Swap on Mainnet
-                                        <ExternalLink className='ml-2 h-4 w-4' />
-                                    </Button>
-                                </a>
+                                row.original.task === 'Swap on Internet Computer Liquidity Hub' ?
+                                    <a href='https://testnet.bit10.app/liquidity-hub' target='_blank'>
+                                        <Button className='w-full'>
+                                            Swap on Liquidity Hub
+                                            <ExternalLink className='ml-2 h-4 w-4' />
+                                        </Button>
+                                    </a> :
+                                    <a href='https://bit10.app/swap' target='_blank'>
+                                        <Button className='w-full'>
+                                            Swap on Mainnet
+                                            <ExternalLink className='ml-2 h-4 w-4' />
+                                        </Button>
+                                    </a>
                         )}
                     </div>
                 );

@@ -24,7 +24,7 @@ export default function Referral() {
 
         const referralLink =
             `https://bit10.app?referral=${principalId}`
-            // `http://localhost:3000?referral=${principalId}`;
+        // `http://localhost:3000?referral=${principalId}`;
 
         navigator.clipboard.writeText(referralLink)
             .then(() => {
@@ -43,6 +43,10 @@ export default function Referral() {
 
     return (
         <div>
+            {/* Update this */}
+            <header className='bg-primary py-2 px-4 flex justify-between items-center mb-4 rounded'>
+                <p className='text-gray-200 font-medium'>⚠️ Note: This referral program is part of the testing phase. Top 3 users will get a chance to be interviewed and receive incentives for their participation.</p>
+            </header>
             <Card className='dark:border-white animate-fade-bottom-up-slow'>
                 <CardHeader className='flex flex-col md:flex-row items-center justify-center md:justify-between space-y-2 md:space-y-0'>
                     <div className='text-2xl md:text-4xl text-center md:text-start'>Referral</div>

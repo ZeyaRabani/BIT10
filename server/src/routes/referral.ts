@@ -21,6 +21,7 @@ type Bit10ReferralType = {
         tasks_completed: {
             swap_on_mainnet: boolean;
             swap_on_internet_computer_testnet: boolean;
+            liquidity_hub_tx_on_internet_computer_testnet: boolean;
         };
     }[];
 };
@@ -100,9 +101,19 @@ async function calculateReferral() {
                     ))
                     .then(res => res.length) : 0;
 
+                const liquidityHubSwapCount = await db.select({ count: count() })
+                    .from(teLiquidityHub)
+                    .where(and(
+                        eq(teLiquidityHub.tickInAddress, addr.address),
+                        gt(teLiquidityHub.transactionTimestamp, startDate.toISOString())
+                    ))
+                    .then(res => res[0]?.count || 0);
+
+                const hasSwapOnICPLiquidityHub = liquidityHubSwapCount > 0;
+
                 return {
                     address: addr.address,
-                    total_points: (hasSwapOnMainnet === true ? 10 : 0) + (hasSwapOnICPTestnet === true ? 10 : 0) + (referredTeliquidityHubTransactions * 5) + (referredTestnetSwapCount * 5) + (referredSwapTransactions * 20),
+                    total_points: (hasSwapOnMainnet === true ? 10 : 0) + (hasSwapOnICPTestnet === true ? 10 : 0) + (hasSwapOnICPLiquidityHub === true ? 10 : 0) + (referredTeliquidityHubTransactions * 5) + (referredTestnetSwapCount * 5) + (referredSwapTransactions * 20),
                     position: index + 1,
                     referred_users: referredUsers,
                     referral_points: [{
@@ -112,7 +123,8 @@ async function calculateReferral() {
                     }],
                     tasks_completed: {
                         swap_on_mainnet: hasSwapOnMainnet,
-                        swap_on_internet_computer_testnet: hasSwapOnICPTestnet
+                        swap_on_internet_computer_testnet: hasSwapOnICPTestnet,
+                        liquidity_hub_tx_on_internet_computer_testnet: hasSwapOnICPLiquidityHub
                     }
                 };
             }))).sort((a, b) => b.total_points - a.total_points)

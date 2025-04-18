@@ -17,6 +17,7 @@ type Bit10ReferralType = {
         tasks_completed: {
             swap_on_mainnet: boolean;
             swap_on_internet_computer_testnet: boolean;
+            liquidity_hub_tx_on_internet_computer_testnet: boolean;
         };
     }[];
 };
