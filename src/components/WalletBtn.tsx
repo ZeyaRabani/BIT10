@@ -116,12 +116,11 @@ export default function WalletBtn() {
                 }
             }
         }
-        
+
         const addReferralToDB = async () => {
             if (referralCode) {
-                if (chain === 'icp' && ICPAddress) {
+                if (chain === 'icp' && ICPAddress && referralCode !== ICPAddress) {
                     try {
-                        // console.log('ICP Address and Referral Code:', { ICPAddress, referralCode });
                         const result = await addNewReferral({
                             referralCode: referralCode,
                             userId: ICPAddress
@@ -134,7 +133,7 @@ export default function WalletBtn() {
                         toast.error('An error occurred while adding referral. Please try again!');
                     }
                 }
-                if (chain === 'sol_dev' && SOLWallet.publicKey) {
+                if (chain === 'sol_dev' && SOLWallet.publicKey && referralCode !== SOLWallet.publicKey.toString()) {
                     try {
                         // console.log('SOL Public Key and Referral Code:', {
                         //     publicKey: SOLWallet.publicKey.toString(),

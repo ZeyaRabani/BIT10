@@ -480,9 +480,12 @@ export default function ICPILPModule() {
                                         <h1>Your spent address: {formatAddress(BTCAddress)}</h1>
                                         <h1>Your receive address: {formatAddress(ICPAddress)}</h1>
                                         <div className='w-full rounded text-center py-2 font-medium cursor-pointer bg-destructive hover:bg-destructive/90 text-white' onClick={disconnectBTCWallet}>Disconnect Bitcoin Wallet</div>
-                                        <Button className='w-full' disabled={swapDisabledConditions}>
+                                        {/* <Button className='w-full' disabled={swapDisabledConditions}>
                                             {processing && <Loader2 className='animate-spin mr-2' size={15} />}
                                             {processing ? 'Swapping...' : 'Swap'}
+                                        </Button> */}
+                                        <Button className='w-full' disabled>
+                                            Reached pool limit
                                         </Button>
                                     </div>
                                 ) : (

@@ -314,7 +314,7 @@ export default function ICPSwapModule() {
                             },
                             body: JSON.stringify({
                                 newTokenSwapId: newTokenSwapId,
-                                ICPAddress: ICPAddress,
+                                principalId: ICPAddress,
                                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                                 tickOutName: transfer.Ok.tick_out_name,
                                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
