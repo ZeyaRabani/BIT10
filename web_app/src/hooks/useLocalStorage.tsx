@@ -17,10 +17,18 @@ export function useLocalStorage<T extends string = string>(
 ): [T | undefined, (value: T | undefined) => void] | [T, (value: T) => void] {
     const [storedValue, setStoredValue] = useState<T | undefined>(() => {
         if (typeof window !== 'undefined') {
-            const urlParams = new URLSearchParams(window.location.search)
-            const referral = urlParams.get('referral')
+            const urlParams = new URLSearchParams(window.location.search);
+            const referral = urlParams.get('referral');
             if (key === 'referral' && referral) {
-                return referral as T
+                return referral as T;
+            }
+
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith(`${key}=`))
+                ?.split('=')[1];
+            if (key === 'referral' && cookieValue) {
+                return cookieValue as T;
             }
 
             const item = localStorage.getItem(key);

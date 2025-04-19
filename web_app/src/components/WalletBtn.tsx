@@ -188,7 +188,7 @@ export default function WalletBtn() {
     //     addReferralTaskToDB();
     // }, [referralCode, ICPAddress, SOLWallet.publicKey, chain, isICPConnected]);
 
-    useEffect(() => {
+    useEffect(() => {     
         const addReferralTaskToDB = async () => {
             if (isConnected && principalId) {
                 try {
@@ -221,11 +221,11 @@ export default function WalletBtn() {
                 }
             }
         }
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        addReferralToDB();
+        
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         addReferralTaskToDB();
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        addReferralToDB();
     }, [referralCode, principalId, isConnected]);
 
     const handleDisconnect = async () => {
