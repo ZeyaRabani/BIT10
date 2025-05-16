@@ -12,10 +12,18 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import("next").NextConfig} */
 const config = {
+    images: {
+        domains: ['coin-images.coingecko.com', 's2.coinmarketcap.com'],
+    },
     async redirects() {
         return [
             {
                 source: '/gitbook',
+                destination: 'https://gitbook.bit10.app',
+                permanent: true,
+            },
+            {
+                source: '/whitepaper',
                 destination: 'https://gitbook.bit10.app',
                 permanent: true,
             },
@@ -93,6 +101,10 @@ const config = {
             {
                 source: '/test-bit10-rebalance-history-:index_fund',
                 destination: '/api/test-bit10-rebalance-history/:index_fund',
+            },
+            {
+                source: '/token-list',
+                destination: '/api/token-list',
             }
         ]
     },

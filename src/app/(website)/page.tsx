@@ -15,9 +15,9 @@ import EasyaAppImg from '@/assets/home/easya_app.jpg'
 import ICPImg from '@/assets/home/ICP.svg'
 import BSLImg from '@/assets/home/bsl.png'
 import EasyAImg from '@/assets/home/EasyA.png'
-import { WobbleCard } from '@/components/ui/wobble-card'
-import { CircleDot } from 'lucide-react'
-import DashboardImg from '@/assets/home/dashboard.svg'
+// import { WobbleCard } from '@/components/ui/wobble-card'
+// import { CircleDot } from 'lucide-react'
+// import DashboardImg from '@/assets/home/dashboard.svg'
 
 const containerVariants = {
   visible: {
@@ -32,23 +32,23 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeInOut' } },
 };
 
-const cardMotionFadeLeftProps = {
-  initial: { opacity: 0.0, x: 40 },
-  whileInView: { opacity: 1, x: 0 },
-  transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
-};
+// const cardMotionFadeLeftProps = {
+//   initial: { opacity: 0.0, x: 40 },
+//   whileInView: { opacity: 1, x: 0 },
+//   transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
+// };
 
-const cardMotionFadeRightProps = {
-  initial: { opacity: 0.0, x: -40 },
-  whileInView: { opacity: 1, x: 0 },
-  transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
-};
+// const cardMotionFadeRightProps = {
+//   initial: { opacity: 0.0, x: -40 },
+//   whileInView: { opacity: 1, x: 0 },
+//   transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
+// };
 
-const sectionMotionProps = {
-  initial: { opacity: 0.0, x: -40 },
-  whileInView: { opacity: 1, x: 0 },
-  transition: { delay: 0.2, duration: 0.8, ease: 'easeInOut' }
-};
+// const sectionMotionProps = {
+//   initial: { opacity: 0.0, x: -40 },
+//   whileInView: { opacity: 1, x: 0 },
+//   transition: { delay: 0.2, duration: 0.8, ease: 'easeInOut' }
+// };
 
 const testimonials = [
   {
@@ -96,6 +96,24 @@ export default function Page() {
               BIT10 <br /> <span className='italic'>S&P500 of Crypto</span>
             </motion.h1>
 
+            {/* <motion.div
+              initial={{ opacity: 0.0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8, ease: 'easeInOut' }}
+              className='grid place-items-center py-4'>
+              <div className='h-16 w-16'>
+                <svg fill="currentColor" viewBox="-3.2 -3.2 38.40 38.40" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke-width="0.00032"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>bitcoin</title> <path d="M11.28 18.6c0-1.44-0.72-2.72-1.84-3.48 0.68-0.64 1.080-1.52 1.080-2.52 0-1.84-1.44-3.36-3.24-3.44v-1.48c0-0.48-0.4-0.84-0.84-0.84s-0.84 0.4-0.84 0.84v1.48h-0.56v-1.48c0-0.48-0.4-0.84-0.84-0.84s-0.84 0.4-0.84 0.84v1.48h-2.52c-0.44 0-0.84 0.36-0.84 0.84s0.4 0.84 0.84 0.84h0.8v10.32h-0.8c-0.44 0-0.84 0.36-0.84 0.84s0.4 0.84 0.84 0.84h2.44v1.48c0 0.48 0.4 0.84 0.84 0.84s0.84-0.4 0.84-0.84v-1.48h0.56v1.48c0 0.48 0.4 0.84 0.84 0.84s0.84-0.4 0.84-0.84v-1.48c2.32-0.12 4.080-1.96 4.080-4.24zM7.040 10.84c0.96 0 1.76 0.8 1.76 1.76s-0.8 1.76-1.76 1.76h-3.68v-3.52h3.68zM7.040 21.16h-3.68v-5.080h3.72c1.4 0 2.52 1.12 2.52 2.52s-1.16 2.56-2.56 2.56z"></path> </g></svg>
+              </div>
+              <div className='flex flex-row justify-start items-center px-2 py-1 space-x-2 border-2 rounded-full'>
+                <Image src='/assets/temp_home/btc-white.svg' width={18} height={18} alt='BTC' />
+                <Image src='/assets/temp_home/xrp-white.svg' width={28} height={28} alt='XRP' />
+                <Image src='/assets/temp_home/eth-white.svg' width={30} height={30} alt='ETH' />
+                <Image src='/assets/temp_home/bnb-white.svg' width={30} height={30} alt='BNB' />
+                <Image src='/assets/temp_home/tron-white.svg' width={30} height={30} alt='TRON' />
+                <Image src='/assets/temp_home/link-white.svg' width={25} height={25} alt='LINK' />
+              </div>
+            </motion.div> */}
+
             <motion.p
               initial={{ opacity: 0.0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -104,6 +122,47 @@ export default function Page() {
               For investors, researching the right investment in crypto can be time-consuming. <br /> Buying individual tokens involves high risks and fees. <br />
               We simplify the process by offering investors a single diversified token in crypto. <br />
             </motion.p>
+
+            {/* <div className='flex flex-row items-center justify-center space-x-2'>
+              <motion.div
+                initial={{ opacity: 0.0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8, ease: 'easeInOut' }}
+                className='grid place-items-center py-4'>
+                <div className='flex flex-col justify-center space-y-2 items-center px-2 py-2 border-2 rounded-full'>
+                  <Image src='/assets/temp_home/btc-white.svg' width={18} height={18} alt='BTC' />
+                  <Image src='/assets/temp_home/xrp-white.svg' width={28} height={28} alt='XRP' />
+                  <Image src='/assets/temp_home/eth-white.svg' width={30} height={30} alt='ETH' />
+                  <Image src='/assets/temp_home/bnb-white.svg' width={30} height={30} alt='BNB' />
+                  <Image src='/assets/temp_home/tron-white.svg' width={30} height={30} alt='TRON' />
+                  <Image src='/assets/temp_home/link-white.svg' width={25} height={25} alt='LINK' />
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0.0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8, ease: 'easeInOut' }}
+                className='mt-4 font-normal text-lg dark:text-neutral-300 max-w-4xl text-center mx-auto'>
+                For investors, researching the right investment in crypto can be time-consuming. <br /> Buying individual tokens involves high risks and fees. <br />
+                We simplify the process by offering investors a single diversified token in crypto. <br />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0.0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8, ease: 'easeInOut' }}
+                className='grid place-items-center py-4'>
+                <div className='flex flex-col justify-center space-y-2 items-center px-2 py-2 border-2 rounded-full'>
+                  <Image src='/assets/temp_home/btc-white.svg' width={18} height={18} alt='BTC' />
+                  <Image src='/assets/temp_home/xrp-white.svg' width={28} height={28} alt='XRP' />
+                  <Image src='/assets/temp_home/eth-white.svg' width={30} height={30} alt='ETH' />
+                  <Image src='/assets/temp_home/bnb-white.svg' width={30} height={30} alt='BNB' />
+                  <Image src='/assets/temp_home/tron-white.svg' width={30} height={30} alt='TRON' />
+                  <Image src='/assets/temp_home/link-white.svg' width={25} height={25} alt='LINK' />
+                </div>
+              </motion.div>
+            </div> */}
 
             <motion.div
               initial={{ opacity: 0.0, y: 40 }}
@@ -175,7 +234,7 @@ export default function Page() {
           </motion.div>
         </div>
 
-        <div>
+        {/* <div>
           <motion.div
             {...sectionMotionProps}
             id='home-page-features'
@@ -284,7 +343,7 @@ export default function Page() {
               </motion.div>
             </div>
           </div>
-        </div>
+        </div> */}
       </MaxWidthWrapper>
     </div>
   )

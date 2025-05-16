@@ -16,12 +16,12 @@ import { Badge } from '@/components/ui/badge'
 const links = {
     web: [
         { title: 'About', link: '/' },
-        { title: 'FAQs', link: '/faqs' },
-        { title: 'Resources', link: '/resources' }
+        { title: 'Resources', link: '/resources' },
+        { title: 'Whitepaper', link: '/whitepaper' }
     ],
     app: [
         { title: 'Swap', link: '/swap' },
-        // { title: 'Custom', link: '/custom'},
+        // { title: 'Custom', link: '/custom' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
         { title: 'Liquidity Hub', link: '/liquidity-hub' }

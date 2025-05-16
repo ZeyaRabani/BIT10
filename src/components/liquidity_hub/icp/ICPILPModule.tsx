@@ -6,6 +6,7 @@ import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ChevronsUpDown, Check, Loader2, Info } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -158,6 +159,7 @@ export default function ICPILPModule() {
 
     const recivingPrice = recivingTokenPrice();
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const swapDisabledConditions = !isBTCConnected || processing || recivingPrice === '0' || liquidityPrice === '0';
 
     const formatAddress = (id: string | undefined) => {

@@ -6,16 +6,18 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import WalletBtn from './WalletBtn'
-import { Menu, X, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark, HandCoins } from 'lucide-react'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Menu, X, ArrowRightLeft, ChartPie, BriefcaseBusiness, Home, BookText, BookCopy, Landmark, HandCoins } from 'lucide-react'
 
 const links = {
     web: [
         { title: 'About', link: '/', icon: Home },
-        { title: 'FAQs', link: '/faqs', icon: MessageCircleQuestion },
-        { title: 'Resources', link: '/resources', icon: BookCopy }
+        { title: 'Resources', link: '/resources', icon: BookCopy },
+        { title: 'Whitepaper', link: '/whitepaper', icon: BookText }
     ],
     app: [
         { title: 'Swap', link: '/swap', icon: ArrowRightLeft },
+        // { title: 'Custom', link: '/custom', icon: ChartPie },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
         { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins }
