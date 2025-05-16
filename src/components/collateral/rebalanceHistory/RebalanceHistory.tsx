@@ -50,7 +50,6 @@ const RebalanceSwapsTable = ({
     const sellSwaps = [];
     const buySwaps = [];
 
-    // Find tokens that need adjustment
     for (const [symbol, initialToken] of initialMap) {
         const rebalanceToken = rebalanceMap.get(symbol);
 
@@ -72,7 +71,6 @@ const RebalanceSwapsTable = ({
                 }
             }
         } else {
-            // Token removed completely
             sellSwaps.push({
                 symbol,
                 name: initialToken.name,
@@ -84,7 +82,6 @@ const RebalanceSwapsTable = ({
         }
     }
 
-    // Find new tokens to add
     for (const [symbol, rebalanceToken] of rebalanceMap) {
         if (!initialMap.has(symbol)) {
             buySwaps.push({
@@ -98,11 +95,9 @@ const RebalanceSwapsTable = ({
         }
     }
 
-    // Sort swaps by value for better matching
     sellSwaps.sort((a, b) => b.value - a.value);
     buySwaps.sort((a, b) => b.value - a.value);
 
-    // Match sells with buys
     const swapPairs = [];
     let sellIdx = 0;
     let buyIdx = 0;
@@ -159,7 +154,7 @@ const RebalanceSwapsTable = ({
 
     return (
         <div className='my-4 w-full'>
-            <h2 className='text-xl font-semibold mb-4'>Suggested Token Swaps</h2>
+            <h2 className='text-xl font-semibold mb-4'>Rebalance Trades</h2>
             <Table className='border-collapse border'>
                 <TableHeader>
                     <TableRow>
