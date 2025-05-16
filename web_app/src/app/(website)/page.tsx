@@ -15,9 +15,9 @@ import EasyaAppImg from '@/assets/home/easya_app.jpg'
 import ICPImg from '@/assets/home/ICP.svg'
 import BSLImg from '@/assets/home/bsl.png'
 import EasyAImg from '@/assets/home/EasyA.png'
-import { WobbleCard } from '@/components/ui/wobble-card'
-import { CircleDot } from 'lucide-react'
-import DashboardImg from '@/assets/home/dashboard.svg'
+// import { WobbleCard } from '@/components/ui/wobble-card'
+// import { CircleDot } from 'lucide-react'
+// import DashboardImg from '@/assets/home/dashboard.svg'
 
 const containerVariants = {
   visible: {
@@ -32,23 +32,23 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeInOut' } },
 };
 
-const cardMotionFadeLeftProps = {
-  initial: { opacity: 0.0, x: 40 },
-  whileInView: { opacity: 1, x: 0 },
-  transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
-};
+// const cardMotionFadeLeftProps = {
+//   initial: { opacity: 0.0, x: 40 },
+//   whileInView: { opacity: 1, x: 0 },
+//   transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
+// };
 
-const cardMotionFadeRightProps = {
-  initial: { opacity: 0.0, x: -40 },
-  whileInView: { opacity: 1, x: 0 },
-  transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
-};
+// const cardMotionFadeRightProps = {
+//   initial: { opacity: 0.0, x: -40 },
+//   whileInView: { opacity: 1, x: 0 },
+//   transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
+// };
 
-const sectionMotionProps = {
-  initial: { opacity: 0.0, x: -40 },
-  whileInView: { opacity: 1, x: 0 },
-  transition: { delay: 0.2, duration: 0.8, ease: 'easeInOut' }
-};
+// const sectionMotionProps = {
+//   initial: { opacity: 0.0, x: -40 },
+//   whileInView: { opacity: 1, x: 0 },
+//   transition: { delay: 0.2, duration: 0.8, ease: 'easeInOut' }
+// };
 
 const testimonials = [
   {
@@ -175,7 +175,7 @@ export default function Page() {
           </motion.div>
         </div>
 
-        <div>
+        {/* <div>
           <motion.div
             {...sectionMotionProps}
             id='home-page-features'
@@ -284,7 +284,7 @@ export default function Page() {
               </motion.div>
             </div>
           </div>
-        </div>
+        </div> */}
       </MaxWidthWrapper>
     </div>
   )

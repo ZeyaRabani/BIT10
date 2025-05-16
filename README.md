@@ -16,6 +16,39 @@ BIT10 provides a pre-selected basket of assets, reducing research time and cost.
 - **Auto-Rebalancing**: Regularly updates asset allocations to optimize performance.
 - **Decentralized ETF**: Fully decentralized structure powered by the Internet Computer (ICP).
 
+## 📂 Code Structure
+
+### 🪴 Branches
+
+* **`main`**: Contains code for Mainnet, including Smart Contracts/Canisters.
+* **`testnet`**: Contains code for the Testnet version of the website.
+
+### 🌲 Main Branch Folder Structure
+
+* **`asset_storage/`** – Contains canister code for storing different token types:
+
+  * `brc20_asset_storage/` – Stores BRC-20 tokens.
+  * `erc20_asset_storage/` – Stores ERC-20 tokens.
+  * `icp_asset_storage/` – Stores ICP and ICRC tokens.
+  * `solana_asset_storage/` – Stores SOL and SPL tokens.
+
+* **`swap/`**
+
+  * `sol_dev/` – Swap logic (buying BIT10 tokens with SOL) on Solana Devnet.
+
+* **`liquidity_hub/`**
+
+  * `icp/`
+
+    * `testnet_liquidity_hub/` – Canister code for the Liquidity Hub on ICP testnet.
+
+* **`oracle/`** – Canister code for price oracle functionality.
+
+* **`server/`** – Lightweight Node.js server for serving data to the web app.
+
+* **`web_app/`** – Contains frontend code for the BIT10 application.
+
+
 ## 🛠 Tech Stack
 
 - **Frontend**: Next.js, Shadcn/ui, Aceternity UI, motion-primitives

@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ArrowRightLeft, BriefcaseBusiness, Home, MessageCircleQuestion, BookCopy, Landmark, Tickets } from 'lucide-react'
+import { Menu, X, ArrowRightLeft, BriefcaseBusiness, Home, BookText, BookCopy, Landmark, Tickets } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -12,8 +12,8 @@ import WalletBtn from './WalletBtn'
 const links = {
     web: [
         { title: 'About', link: '/', icon: Home },
-        { title: 'FAQs', link: '/faqs', icon: MessageCircleQuestion },
-        { title: 'Resources', link: '/resources', icon: BookCopy }
+        { title: 'Resources', link: '/resources', icon: BookCopy },
+        { title: 'Whitepaper', link: '/whitepaper', icon: BookText }
     ],
     app: [
         { title: 'Swap', link: '/swap', icon: ArrowRightLeft },
