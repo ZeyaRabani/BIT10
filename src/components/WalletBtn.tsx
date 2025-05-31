@@ -5,6 +5,9 @@ import React, { useState, useEffect } from 'react'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { useLogin, usePrivy } from '@privy-io/react-auth'
+import { useRouter } from 'next/navigation'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { addNewUser, addNewReferral, addNewReferralTasks } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -12,10 +15,11 @@ import Image from 'next/image'
 import ICPLogo from '@/assets/wallet/icp-logo.svg'
 import SOLLogo from '@/assets/wallet/solana-logo.svg'
 import PlugImg from '@/assets/wallet/plug.svg'
+import EmailImg from '@/assets/wallet/email.svg'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { motion } from 'framer-motion'
 import { ArrowLeft, WalletMinimal, Loader2 } from 'lucide-react'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
+// import { useLocalStorage } from '@/hooks/useLocalStorage'
 
 const containerVariants = {
     visible: {
@@ -42,15 +46,27 @@ const icpWallets = [
 export default function WalletBtn() {
     const [open, setOpen] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [selectedChain, setSelectedChain] = useState<'icp' | 'sol_dev' | null>(null);
+    const [selectedChain, setSelectedChain] = useState<'icp' | 'sol_dev' | 'privy' | null>(null);
 
-    const [referralCode] = useLocalStorage('referral');
+    // const [referralCode] = useLocalStorage('referral');
 
     const { isICPConnected, ICPAddress, connectICPWallet, disconnectICPWallet } = useICPWallet();
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { select: SOLSelect, wallets: SOLWallets, publicKey, disconnect: disconnectSOLWallet, connected: isSOLConnected } = useWallet();
     const SOLWallet = useWallet();
     const { chain, setChain } = useChain();
+
+    const { authenticated, user: privyUser, logout: privyLogout } = usePrivy();
+
+    const router = useRouter();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const { login } = useLogin({
+        onComplete: ({ isNewUser }) => {
+            if (isNewUser) {
+                router.push('/newbie');
+            }
+        },
+    });
 
     useEffect(() => {
         const addUserToDB = async () => {
@@ -82,84 +98,100 @@ export default function WalletBtn() {
                         toast.error('An error occurred while setting up your account. Please try again!');
                     }
                 }
+            } else if (chain === 'privy') {
+                if (authenticated && privyUser?.wallet?.address) {
+                    try {
+                        const result = await addNewUser({
+                            principalId: privyUser?.wallet?.address,
+                        });
+                        if (result === 'Error adding new user') {
+                            toast.error('An error occurred while setting up your account. Please try again!');
+                        }
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    } catch (error) {
+                        toast.error('An error occurred while setting up your account. Please try again!');
+                    }
+                }
             }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         addUserToDB();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ICPAddress, publicKey]);
+    }, [authenticated, privyUser?.wallet?.address, ICPAddress, SOLWallet.publicKey, publicKey, isICPConnected, isSOLConnected]);
 
     useEffect(() => {
         if (isSOLConnected) {
             setChain('sol_dev');
         } else if (isICPConnected) {
             setChain('icp');
+        } else if (authenticated) {
+            setChain('privy');
         } else {
             setChain(undefined);
         }
-    }, [isICPConnected, isSOLConnected, setChain]);
+    }, [isICPConnected, isSOLConnected, authenticated, setChain]);
 
-    useEffect(() => {
-        const addReferralTaskToDB = async () => {
-            if (isICPConnected && ICPAddress) {
-                try {
-                    const result = await addNewReferralTasks({
-                        address: ICPAddress.toString(),
-                    });
-                    if (result === 'Error adding new referral task') {
-                        toast.error('An error occurred while adding referral. Please try again!');
-                    }
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                } catch (error) {
-                    toast.error('An error occurred while adding referral. Please try again!');
-                }
-            }
-        }
+    // useEffect(() => {
+    //     const addReferralTaskToDB = async () => {
+    //         if (isICPConnected && ICPAddress) {
+    //             try {
+    //                 const result = await addNewReferralTasks({
+    //                     address: ICPAddress.toString(),
+    //                 });
+    //                 if (result === 'Error adding new referral task') {
+    //                     toast.error('An error occurred while adding referral. Please try again!');
+    //                 }
+    //                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //             } catch (error) {
+    //                 toast.error('An error occurred while adding referral. Please try again!');
+    //             }
+    //         }
+    //     }
 
-        const addReferralToDB = async () => {
-            if (referralCode) {
-                if (chain === 'icp' && ICPAddress && referralCode !== ICPAddress) {
-                    try {
-                        const result = await addNewReferral({
-                            referralCode: referralCode,
-                            userId: ICPAddress
-                        });
-                        if (result === 'Error adding new referral') {
-                            toast.error('An error occurred while adding referral. Please try again!');
-                        }
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    } catch (error) {
-                        toast.error('An error occurred while adding referral. Please try again!');
-                    }
-                }
-                if (chain === 'sol_dev' && SOLWallet.publicKey && referralCode !== SOLWallet.publicKey.toString()) {
-                    try {
-                        // console.log('SOL Public Key and Referral Code:', {
-                        //     publicKey: SOLWallet.publicKey.toString(),
-                        //     referralCode
-                        // });
-                        const result = await addNewReferral({
-                            referralCode: referralCode,
-                            userId: SOLWallet.publicKey.toString()
-                        });
-                        if (result === 'Error adding new referral') {
-                            toast.error('An error occurred while adding referral. Please try again!');
-                        }
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    } catch (error) {
-                        console.log(error);
-                        toast.error('An error occurred while adding referral. Please try again!');
-                    }
-                }
-            }
-        }
+    //     const addReferralToDB = async () => {
+    //         if (referralCode) {
+    //             if (chain === 'icp' && ICPAddress && referralCode !== ICPAddress) {
+    //                 try {
+    //                     const result = await addNewReferral({
+    //                         referralCode: referralCode,
+    //                         userId: ICPAddress
+    //                     });
+    //                     if (result === 'Error adding new referral') {
+    //                         toast.error('An error occurred while adding referral. Please try again!');
+    //                     }
+    //                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //                 } catch (error) {
+    //                     toast.error('An error occurred while adding referral. Please try again!');
+    //                 }
+    //             }
+    //             if (chain === 'sol_dev' && SOLWallet.publicKey && referralCode !== SOLWallet.publicKey.toString()) {
+    //                 try {
+    //                     // console.log('SOL Public Key and Referral Code:', {
+    //                     //     publicKey: SOLWallet.publicKey.toString(),
+    //                     //     referralCode
+    //                     // });
+    //                     const result = await addNewReferral({
+    //                         referralCode: referralCode,
+    //                         userId: SOLWallet.publicKey.toString()
+    //                     });
+    //                     if (result === 'Error adding new referral') {
+    //                         toast.error('An error occurred while adding referral. Please try again!');
+    //                     }
+    //                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //                 } catch (error) {
+    //                     console.log(error);
+    //                     toast.error('An error occurred while adding referral. Please try again!');
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        addReferralToDB();
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        addReferralTaskToDB();
-    }, [referralCode, ICPAddress, SOLWallet.publicKey, chain, isICPConnected]);
+    //     // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    //     addReferralToDB();
+    //     // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    //     addReferralTaskToDB();
+    // }, [referralCode, ICPAddress, SOLWallet.publicKey, chain, isICPConnected]);
 
     const handleDisconnect = async () => {
         switch (chain) {
@@ -167,6 +199,9 @@ export default function WalletBtn() {
                 disconnectICPWallet();
             case 'sol_dev':
                 await disconnectSOLWallet();
+                setChain(undefined);
+            case 'privy':
+                await privyLogout();
                 setChain(undefined);
         }
     };
@@ -275,6 +310,14 @@ export default function WalletBtn() {
                             <Image src={SOLLogo} alt='Solana' className='rounded' height='26' width='26' />
                             <div className='text-lg'>Solana Devnet</div>
                         </motion.div>
+
+                        <motion.div variants={cardVariantsLeft}
+                            className='rounded-md border hover:border-primary hover:text-primary p-4 flex flex-row items-center space-x-2 cursor-pointer'
+                            onClick={login}
+                        >
+                            <Image src={EmailImg} alt='Email' className='rounded' height='35' width='35' />
+                            <div className='text-lg'>Connect with Email (Recommended for New Crypto Users)</div>
+                        </motion.div>
                     </motion.div>
                 );
         }
@@ -282,7 +325,7 @@ export default function WalletBtn() {
 
     return (
         <div>
-            {isICPConnected || isSOLConnected ? (
+            {isICPConnected || isSOLConnected || authenticated ? (
                 <Button variant='destructive' onClick={handleDisconnect} className='w-full'>Disconnect wallet</Button>
             ) : (
                 <Dialog open={open} onOpenChange={setOpen}>

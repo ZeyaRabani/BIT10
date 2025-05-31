@@ -2,6 +2,7 @@ import React from 'react'
 import { useChain } from '@/context/ChainContext'
 import ICPILPModule from './icp/ICPILPModule'
 import SolDevILPModule from './sol_dev/SolDevILPModule'
+import PrivyILPModule from './privy/PrivyILPModule'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 
 export default function ILP() {
@@ -11,6 +12,7 @@ export default function ILP() {
         <MaxWidthWrapper>
             {chain === 'icp' && <ICPILPModule />}
             {chain === 'sol_dev' && <SolDevILPModule />}
+            {chain === 'privy' && <PrivyILPModule />}
         </MaxWidthWrapper>
     )
 }

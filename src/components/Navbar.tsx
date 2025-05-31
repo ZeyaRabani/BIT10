@@ -24,7 +24,8 @@ const links = {
         // { title: 'Custom', link: '/custom' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
-        { title: 'Liquidity Hub', link: '/liquidity-hub' }
+        { title: 'Liquidity Hub', link: '/liquidity-hub' },
+        { title: 'Newbie', link: '/newbie' }
     ]
 };
 

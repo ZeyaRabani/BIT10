@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import * as z from 'zod'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { usePrivy } from '@privy-io/react-auth'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { type Program } from '@project-serum/anchor'
 import { PublicKey, Keypair, SystemProgram } from '@solana/web3.js'
 import { type TeSwap } from '@/lib/te_swap.idl'
-import { useProgram } from '@/context/SOLSwapProgramContextProvider'
+import { useProgram } from '@/context/PrivySwapProgramContextProvider'
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from '@solana/spl-token'
 import { BN } from '@coral-xyz/anchor'
 import * as anchor from '@coral-xyz/anchor';
@@ -83,12 +83,11 @@ const FormSchema = z.object({
     }),
 });
 
-export default function SolDevSwapModule() {
+export default function PrivySwapModule() {
     // const [activeTab, setActiveTab] = useState('Quick Swap');
     const [swaping, setSwaping] = useState<boolean>(false);
 
-    const { connected } = useWallet();
-    const wallet = useWallet();
+    const { authenticated, user } = usePrivy();
     const { program, tokenMint } = useProgram();
 
     // const handleTabChange = (label: string | null) => {
@@ -205,7 +204,7 @@ export default function SolDevSwapModule() {
 
     const selectedBit10TokenPrice = bit10TokenPrice();
 
-    const swapDisabledConditions = !connected || swaping || payingTokenPrice == '0' || selectedBit10TokenPrice == 0;
+    const swapDisabledConditions = !authenticated || swaping || payingTokenPrice == '0' || selectedBit10TokenPrice == 0;
 
     async function executeSwap(program: Program<TeSwap>, tokenMint: PublicKey, params: SwapParams) {
         const { tickInName, tickOutName, tickOutAmount } = params;
@@ -304,7 +303,7 @@ export default function SolDevSwapModule() {
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
             setSwaping(true);
-            toast.info('Allow the transaction on your wallet to proceed.');
+            toast.info('Processing your transaction. Please wait for confirmation.');
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
@@ -330,7 +329,7 @@ export default function SolDevSwapModule() {
                     newTokenSwapId: newTokenSwapId,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
-                    principalId: wallet.publicKey.toString(),
+                    principalId: user?.wallet?.address.toString(),
                     tickInName: transfer.swapResult.tickInName,
                     tickInAmount: transfer.swapResult.tickInAmount.toString(),
                     tickInUSDAmount: transfer.swapResult.tickInUsdAmount.toString(),
@@ -357,7 +356,7 @@ export default function SolDevSwapModule() {
                         newTokenSwapId: newTokenSwapId,
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
-                        principalId: wallet.publicKey.toString(),
+                        principalId: user?.wallet?.address.toString(),
                         tickOutName: transfer.swapResult.tickOutName,
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore

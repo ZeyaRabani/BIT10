@@ -6,7 +6,7 @@ import { ExternalLink } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
 import { userRecentActivity } from '@/actions/dbActions'
 import { toast } from 'sonner'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { usePrivy } from '@privy-io/react-auth'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
@@ -65,8 +65,9 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     }
 ]
 
-export default function SolDevrecentActivity() {
-    const SOLWallet = useWallet();
+export default function PrivyRecentActivity() {
+    const { user } = usePrivy();
+    const UserWallet = user?.wallet?.address;
 
     const fetchRecentActivity = async (SOLAddress: string) => {
         const response = await userRecentActivity({ paymentAddress: SOLAddress });
@@ -83,7 +84,7 @@ export default function SolDevrecentActivity() {
                 queryKey: ['bit10RecentActivity'],
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                queryFn: () => SOLWallet.publicKey.toString() ? fetchRecentActivity(SOLWallet.publicKey.toString()) : toast.error('Wallet Address is undefined')
+                queryFn: () => UserWallet.toString() ? fetchRecentActivity(UserWallet.toString()) : toast.error('Wallet Address is undefined')
             },
         ]
     })

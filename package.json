@@ -26,6 +26,8 @@
     "@dfinity/agent": "^2.3.0",
     "@dfinity/principal": "^2.3.0",
     "@hookform/resolvers": "^4.1.1",
+    "@privy-io/react-auth": "^2.13.4",
+    "@privy-io/server-auth": "^1.23.0",
     "@project-serum/anchor": "^0.26.0",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-checkbox": "^1.1.4",

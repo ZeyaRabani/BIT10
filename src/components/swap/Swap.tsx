@@ -4,6 +4,7 @@ import React from 'react'
 import { useChain } from '@/context/ChainContext'
 import ICPSwapModule from './icp/ICPSwapModule'
 import SolDevSwapModule from './sol_dev/SolDevSwapModule'
+import PrivySwapModule from './privy/PrivySwapModule'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 
 export default function Swap() {
@@ -13,6 +14,7 @@ export default function Swap() {
         <MaxWidthWrapper>
             {chain === 'icp' && <ICPSwapModule />}
             {chain === 'sol_dev' && <SolDevSwapModule />}
+            {chain === 'privy' && <PrivySwapModule />}
         </MaxWidthWrapper>
     )
 }

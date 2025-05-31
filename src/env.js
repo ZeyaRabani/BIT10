@@ -27,7 +27,8 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_PRIVATE_PASS: z.string().min(8),
-    NEXT_PUBLIC_POSTHOG_KEY: z.string().min(8)
+    NEXT_PUBLIC_POSTHOG_KEY: z.string().min(8),
+    NEXT_PUBLIC_PRIVY_APP_ID: z.string().min(8)
   },
 
   /**
@@ -42,7 +43,8 @@ export const env = createEnv({
     EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
     NEXT_PUBLIC_PRIVATE_PASS: process.env.NEXT_PUBLIC_PRIVATE_PASS,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
-    NODE_SERVER: process.env.NODE_SERVER
+    NODE_SERVER: process.env.NODE_SERVER,
+    NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
