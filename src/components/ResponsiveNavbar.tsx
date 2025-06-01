@@ -21,7 +21,7 @@ const links = {
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
         { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins },
-        { title: 'Newbie', link: '/newbie', icon: Star }
+        { title: 'Email wallet', link: '/newbie', icon: Star }
     ]
 };
 

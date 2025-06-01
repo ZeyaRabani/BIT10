@@ -315,8 +315,8 @@ export default function WalletBtn() {
                             className='rounded-md border hover:border-primary hover:text-primary p-4 flex flex-row items-center space-x-2 cursor-pointer'
                             onClick={login}
                         >
-                            <Image src={EmailImg} alt='Email' className='rounded' height='35' width='35' />
-                            <div className='text-lg'>Connect with Email (Recommended for New Crypto Users)</div>
+                            <Image src={EmailImg} alt='Email' className='rounded' height='30' width='30' />
+                            <div className='text-lg'>Connect with Email</div>
                         </motion.div>
                     </motion.div>
                 );
@@ -346,7 +346,7 @@ export default function WalletBtn() {
                                         </Button>
                                     </div>
                                 ) : (
-                                    'Select Chain'
+                                    'Select a Network or Use Email (Recommended for Beginners)'
                                 )}
                             </DialogTitle>
                         </DialogHeader>

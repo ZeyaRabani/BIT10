@@ -25,7 +25,7 @@ const links = {
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
         { title: 'Liquidity Hub', link: '/liquidity-hub' },
-        { title: 'Newbie', link: '/newbie' }
+        { title: 'Email wallet', link: '/newbie' }
     ]
 };
 
