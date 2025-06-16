@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/exchange_canister_backend"
+]
+resolver = "2"

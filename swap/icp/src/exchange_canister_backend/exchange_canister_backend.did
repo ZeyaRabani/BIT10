@@ -1,0 +1,17 @@
+type Account = record { owner : principal; subaccount : opt blob };
+type BalanceAndFeeResult = variant { Ok : record { balance: nat; fee: nat; total: nat }; Err : text };
+type TransferArgs = record { to_account : Account; amount : nat; ledger_canister_id: text };
+type Result = variant { Ok : nat; Err : text };
+type SwapArgs = record { tick_in_name: text; tick_out_name: text; tick_out_amount: nat };
+type MbSwapResponseData = record { user_principal_id: principal;  tick_in_name: text;  tick_in_amount: nat;  tick_in_usd_amount: text;  tick_in_tx_block: nat;  tick_out_name: text;  tick_out_amount: nat; tick_out_tx_block: nat; transaction_type: text; transaction_timestamp: text; network: text };
+type MbSwapResponse = variant { Ok : MbSwapResponseData; Err : text };
+type ReverseSwapArgs = record { tick_in_name: text; tick_in_amount: nat; tick_out_name: text };
+
+service : {
+    bit10_circulating_supply : () -> (vec record { token: text; supply: nat }) query;
+    bit10_reverse_swap_supply : () -> (vec record { token: text; supply: nat }) query;
+    bit10_defi_total_supply: () -> (variant { Ok: nat; Err: text });
+    te_swap : (SwapArgs) -> (MbSwapResponse);
+    mb_swap : (SwapArgs) -> (MbSwapResponse);
+    mb_reverse_swap : (ReverseSwapArgs) -> (MbSwapResponse);
+}

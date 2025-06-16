@@ -96,15 +96,6 @@ export default function Page() {
               BIT10 <br /> <span className='italic'>Crypto Index Funds</span>
             </motion.h1>
 
-            <motion.p
-              initial={{ opacity: 0.0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8, ease: 'easeInOut' }}
-              className='mt-4 font-normal text-lg dark:text-neutral-300 max-w-4xl text-center mx-auto'>
-              For investors, researching the right investment in crypto can be time-consuming. <br /> Buying individual tokens involves high risks and fees. <br />
-              We simplify the process by offering investors a single diversified token in crypto. <br />
-            </motion.p>
-
             <motion.div
               initial={{ opacity: 0.0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
