@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { db } from '../db'
-import { referralApr2025Tasks, referralApr2025, swap, teSwap, teLiquidityHub } from '../db/schema'
+import { referralJune2025Tasks, referralJune2025, swap, teSwap, teLiquidityHub } from '../db/schema'
 import fs from 'fs/promises'
 import path from 'path'
 import NodeCache from 'node-cache'
@@ -35,13 +35,13 @@ const start_dare = '16 June, 2025 00:00:00' // Time in GMT+5:30
 
 async function calculateReferral() {
     try {
-        const addresses = await db.select({ address: referralApr2025Tasks.address })
-            .from(referralApr2025Tasks);
+        const addresses = await db.select({ address: referralJune2025Tasks.address })
+            .from(referralJune2025Tasks);
 
         const referrals = await db.select({
-            referralCode: referralApr2025.referralCode,
-            userId: referralApr2025.userId
-        }).from(referralApr2025);
+            referralCode: referralJune2025.referralCode,
+            userId: referralJune2025.userId
+        }).from(referralJune2025);
 
         const referralMap = new Map<string, string[]>();
         for (const referral of referrals) {
