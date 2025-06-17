@@ -1,4 +1,0 @@
-[workspace]
-members = [
-    "src/brc20_asset_storage",
-]

@@ -8,7 +8,7 @@ import cron from 'node-cron'
 import { and, eq, gt, inArray, count } from 'drizzle-orm'
 
 type Bit10ReferralType = {
-    bit10_apr_referral: {
+    bit10_june_2025_referral: {
         address: string;
         total_points: number;
         position: number;
@@ -26,12 +26,12 @@ type Bit10ReferralType = {
     }[];
 };
 
-const jsonFilePath = path.join(__dirname, '../../../data/bit10_apr_referral.json');
+const jsonFilePath = path.join(__dirname, '../../../data/bit10_june_2025_referral.json');
 const cache = new NodeCache();
-let latestData: { bit10_apr_referral: Bit10ReferralType[] } | null = null;
+let latestData: { bit10_june_2025_referral: Bit10ReferralType[] } | null = null;
 
 // Update this
-const start_dare = '14 Apr, 2025 00:00:00' // Time in GMT+5:30
+const start_dare = '16 June, 2025 00:00:00' // Time in GMT+5:30
 
 async function calculateReferral() {
     try {
@@ -54,7 +54,7 @@ async function calculateReferral() {
         const startDate = new Date(start_dare);
 
         const newData: Bit10ReferralType = {
-            bit10_apr_referral: (await Promise.all(addresses.map(async (addr, index) => {
+            bit10_june_2025_referral: (await Promise.all(addresses.map(async (addr, index) => {
                 const hasSwapOnICPTestnet = await db.select()
                     .from(teSwap)
                     .where(and(
@@ -142,10 +142,10 @@ async function calculateReferral() {
 async function fetchData() {
     try {
         const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
-        const parsedData: { bit10_apr_referral: Bit10ReferralType[] } = JSON.parse(fileContent);
-        if (parsedData.bit10_apr_referral.length > 0) {
+        const parsedData: { bit10_june_2025_referral: Bit10ReferralType[] } = JSON.parse(fileContent);
+        if (parsedData.bit10_june_2025_referral.length > 0) {
             latestData = parsedData;
-            cache.set('bit10_apr_referral_data', parsedData.bit10_apr_referral);
+            cache.set('bit10_june_2025_referral_data', parsedData.bit10_june_2025_referral);
             console.log('Referral Current Data refreshed at:', new Date().toISOString());
         }
     } catch (error) {
@@ -181,7 +181,7 @@ export const handleBit10Referral = async (request: IncomingMessage, response: Se
             const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
             const jsonData: Bit10ReferralType = JSON.parse(fileContent);
 
-            const matchingData = jsonData.bit10_apr_referral.find(entry =>
+            const matchingData = jsonData.bit10_june_2025_referral.find(entry =>
                 entry.address.toLowerCase() === address.toLowerCase()
             );
 
@@ -193,7 +193,7 @@ export const handleBit10Referral = async (request: IncomingMessage, response: Se
                 response.end(JSON.stringify({ error: 'Address not found' }));
             }
         } else {
-            const cachedData = cache.get<Bit10ReferralType>('bit10_apr_referral_data') || latestData;
+            const cachedData = cache.get<Bit10ReferralType>('bit10_june_2025_referral_data') || latestData;
 
             if (cachedData) {
                 response.writeHead(200, { 'Content-Type': 'application/json' });

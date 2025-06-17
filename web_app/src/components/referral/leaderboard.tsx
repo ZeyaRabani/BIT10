@@ -13,7 +13,7 @@ import { DataTable } from '@/components/ui/data-table-leaderboard'
 import type { LeaderboardTableDataType } from '@/components/ui/data-table-leaderboard'
 
 type Bit10ReferralType = {
-    bit10_apr_referral: {
+    bit10_june_2025_referral: {
         address: string;
         total_points: number;
         position: number;
@@ -132,8 +132,7 @@ export default function Leaderboard() {
                                     Total Points: {bit10Top3[0]?.total_points || '--'}
                                 </div>
                                 <div>
-                                    {/* update this for 5 ICP */}
-                                    Incentive: 0 ICP
+                                    Incentive: 5 ICP
                                 </div>
                             </CardContent>
                         </Card>
@@ -160,8 +159,7 @@ export default function Leaderboard() {
                                     Total Points: {bit10Top3[1]?.total_points || '--'}
                                 </div>
                                 <div>
-                                    {/* update this for 3 ICP */}
-                                    Incentive: 0 ICP
+                                    Incentive: 3 ICP
                                 </div>
                             </CardContent>
                         </Card>
@@ -188,8 +186,7 @@ export default function Leaderboard() {
                                     Total Points: {bit10Top3[2]?.total_points || '--'}
                                 </div>
                                 <div>
-                                    {/* update this for 2 ICP */}
-                                    Incentive: 0 ICP
+                                    Incentive: 2 ICP
                                 </div>
                             </CardContent>
                         </Card>

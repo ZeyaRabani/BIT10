@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, doublePrecision, index, json, foreignKey, unique, boolean, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, unique, text, timestamp, doublePrecision, index, json, foreignKey, boolean, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -9,6 +9,14 @@ export const factorType = pgEnum('factor_type', ['totp', 'webauthn'])
 export const keyStatus = pgEnum('key_status', ['default', 'valid', 'invalid', 'expired'])
 export const keyType = pgEnum('key_type', ['aead-ietf', 'aead-det', 'hmacsha512', 'hmacsha256', 'auth', 'shorthash', 'generichash', 'kdf', 'secretbox', 'secretstream', 'stream_xchacha20'])
 export const oneTimeTokenType = pgEnum('one_time_token_type', ['confirmation_token', 'reauthentication_token', 'recovery_token', 'email_change_token_new', 'email_change_token_current', 'phone_change_token'])
+
+export const referralJune2025 = pgTable('referral_june_2025', {
+	referralCode: text('referral_code').notNull(),
+	userId: text('user_id').primaryKey().notNull(),
+	usedAt: timestamp('used_at', { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	unique('referral_june_2025_referral_code_user_id_key').on(table.referralCode, table.userId),
+]);
 
 export const mbTokenMint = pgTable('mb_token_mint', {
 	tokenMintId: text('token_mint_id').primaryKey().notNull(),
@@ -21,6 +29,10 @@ export const mbTokenMint = pgTable('mb_token_mint', {
 	mintingStatus: text('minting_status').notNull(),
 	tokenMintAt: timestamp('token_mint_at', { withTimezone: true, mode: 'string' }).notNull(),
 	transactionIndex: text('transaction_index').notNull(),
+});
+
+export const referralJune2025Tasks = pgTable('referral_june_2025_tasks', {
+	address: text().primaryKey().notNull(),
 });
 
 export const teLiquidityHub = pgTable('te_liquidity_hub', {

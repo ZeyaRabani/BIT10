@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useWallet } from '@/context/WalletContext'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { AlarmCheck, Copy } from 'lucide-react'
 import Timer from './timer'
 import AnimatedBackground from '@/components/ui/animated-background'
@@ -16,7 +17,7 @@ export default function Referral() {
 
     const { principalId } = useWallet();
 
-    const handleCopyReferral = () => {
+    const handleCopyMainnetReferral = () => {
         if (!principalId) {
             toast.error('Please connect your wallet first');
             return;
@@ -24,6 +25,25 @@ export default function Referral() {
 
         const referralLink =
             `https://bit10.app?referral=${principalId}`
+        // `http://localhost:3000?referral=${principalId}`;
+
+        navigator.clipboard.writeText(referralLink)
+            .then(() => {
+                toast.success('Referral link copied to clipboard!');
+            })
+            .catch(() => {
+                toast.error('Failed to copy referral link');
+            });
+    };
+
+    const handleCopyTestnetReferral = () => {
+        if (!principalId) {
+            toast.error('Please connect your wallet first');
+            return;
+        }
+
+        const referralLink =
+            `https://testnet.bit10.app?referral=${principalId}`
         // `http://localhost:3000?referral=${principalId}`;
 
         navigator.clipboard.writeText(referralLink)
@@ -43,18 +63,25 @@ export default function Referral() {
 
     return (
         <div>
-            {/* Update this */}
-            <header className='bg-primary py-2 px-4 flex justify-between items-center mb-4 rounded'>
-                <p className='text-gray-200 font-medium'>⚠️ Note: This referral program is part of the testing phase. Top 3 users will get a chance to be interviewed and receive incentives for their participation.</p>
-            </header>
             <Card className='dark:border-white animate-fade-bottom-up-slow'>
                 <CardHeader className='flex flex-col md:flex-row items-center justify-center md:justify-between space-y-2 md:space-y-0'>
                     <div className='text-2xl md:text-4xl text-center md:text-start'>Referral</div>
                     <div>
-                        <Button onClick={handleCopyReferral}>
-                            <Copy />
-                            Copy your referral link
-                        </Button>
+                        <Popover>
+                            <PopoverTrigger className='bg-primary px-4 py-2 rounded text-white'>Copy your referral link</PopoverTrigger>
+                            <PopoverContent className='flex flex-col items-start space-y-2' align='end'>
+                                <Button onClick={handleCopyMainnetReferral}>
+                                    <Copy />
+                                    Copy your Mainnet referral link
+                                </Button>
+
+                                <Button onClick={handleCopyTestnetReferral}>
+                                    <Copy />
+                                    Copy your Testnet referral link
+                                </Button>
+                            </PopoverContent>
+                            {/* <PopoverContent>Place content for the popover here.</PopoverContent> */}
+                        </Popover>
                     </div>
                 </CardHeader>
                 <CardContent>

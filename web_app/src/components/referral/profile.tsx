@@ -15,7 +15,7 @@ import { DataTable } from '@/components/ui/data-table-referral-profile'
 import type { ReferralProfileTableDataType } from '@/components/ui/data-table-referral-profile'
 
 type Bit10ReferralType = {
-    bit10_apr_referral: {
+    bit10_june_2025_referral: {
         address: string;
         total_points: number;
         position: number;
@@ -189,14 +189,17 @@ export default function Profile() {
                                 </CardHeader>
                                 <CardContent className='text-3xl font-semibold tracking-wide'>
                                     <div>
-                                        {/* Update this for points: 5, 3, 2 */}
                                         {/* @ts-expect-error */}
-                                        {bit10Data?.position === 1 && bit10Data?.total_points !== 0 ? '0 ICP' :
+                                        {bit10Data?.position === 1 && bit10Data?.total_points !== 5 ? '5 ICP' :
                                             // @ts-expect-error
-                                            bit10Data?.position === 2 && bit10Data?.total_points !== 0 ? '0 ICP' :
+                                            bit10Data?.position === 2 && bit10Data?.total_points !== 3 ? '3 ICP' :
                                                 // @ts-expect-error
-                                                bit10Data?.position === 3 && bit10Data?.total_points !== 0 ? '0 ICP' :
-                                                    '0 ICP'}
+                                                bit10Data?.position === 3 && bit10Data?.total_points !== 2 ? '2 ICP' :
+                                                    // @ts-expect-error
+                                                    bit10Data?.position === 4 && bit10Data?.total_points !== 1 ? '1 ICP' :
+                                                        // @ts-expect-error
+                                                        bit10Data?.position === 5 && bit10Data?.total_points !== 1 ? '1 ICP' :
+                                                            '0 ICP'}
                                     </div>
                                 </CardContent>
                             </Card>

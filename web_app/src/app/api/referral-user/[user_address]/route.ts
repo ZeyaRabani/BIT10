@@ -2,7 +2,7 @@ import { env } from '@/env'
 import { type NextRequest } from 'next/server'
 
 type Bit10ReferralType = {
-    bit10_apr_referral: {
+    bit10_june_2025_referral: {
         address: string;
         total_points: number;
         position: number;
