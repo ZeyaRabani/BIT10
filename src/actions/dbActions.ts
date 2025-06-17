@@ -2,7 +2,7 @@
 "use server"
 
 import { db } from '@/server/db'
-import { userSignups, teUsers, teSwap, teRequestBtc, teLiquidityHub, referralApr2025, referralApr2025Tasks } from '@/server/db/schema'
+import { userSignups, teUsers, teSwap, teRequestBtc, teLiquidityHub, referralJune2025, referralJune2025Tasks } from '@/server/db/schema'
 
 import crypto from 'crypto'
 import { eq, desc, and } from 'drizzle-orm'
@@ -222,12 +222,12 @@ export const userStakedLiquidityHistory = async ({ userAddress }: { userAddress:
 // Referral related code
 export const addNewReferral = async ({ referralCode, userId }: { referralCode: string, userId: string }) => {
     try {
-        const existingUsers = await db.select({ userId: referralApr2025.userId }).from(referralApr2025).where(eq(referralApr2025.userId, userId));
+        const existingUsers = await db.select({ userId: referralJune2025.userId }).from(referralJune2025).where(eq(referralJune2025.userId, userId));
 
         if (existingUsers && existingUsers.length > 0) {
             return 'User already exists';
         } else {
-            await db.insert(referralApr2025).values({
+            await db.insert(referralJune2025).values({
                 referralCode: referralCode,
                 userId: userId,
                 usedAt: new Date().toISOString()
@@ -240,12 +240,12 @@ export const addNewReferral = async ({ referralCode, userId }: { referralCode: s
 
 export const addNewReferralTasks = async ({ address }: { address: string }) => {
     try {
-        const existingUsers = await db.select({ address: referralApr2025Tasks.address }).from(referralApr2025Tasks).where(eq(referralApr2025Tasks.address, address));
+        const existingUsers = await db.select({ address: referralJune2025Tasks.address }).from(referralJune2025Tasks).where(eq(referralJune2025Tasks.address, address));
 
         if (existingUsers && existingUsers.length > 0) {
             return 'User already exists';
         } else {
-            await db.insert(referralApr2025Tasks).values({
+            await db.insert(referralJune2025Tasks).values({
                 address: address
             });
         }

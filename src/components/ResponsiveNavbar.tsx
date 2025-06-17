@@ -7,7 +7,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import WalletBtn from './WalletBtn'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Menu, X, ArrowRightLeft, ChartPie, BriefcaseBusiness, Home, BookText, BookCopy, Landmark, HandCoins, Star } from 'lucide-react'
+import { Menu, X, ArrowRightLeft, ChartPie, BriefcaseBusiness, Home, BookText, BookCopy, Landmark, HandCoins, Star, Tickets } from 'lucide-react'
 
 const links = {
     web: [
@@ -21,7 +21,8 @@ const links = {
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
         { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins },
-        { title: 'Email wallet', link: '/newbie', icon: Star }
+        { title: 'Email wallet', link: '/newbie', icon: Star },
+        { title: 'Referral', link: '/referral', icon: Tickets }
     ]
 };
 

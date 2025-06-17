@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { useChain } from '@/context/ChainContext'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { AlarmCheck, Copy } from 'lucide-react'
+import Timer from './timer'
 import AnimatedBackground from '@/components/ui/animated-background'
 import Leaderboard from './leaderboard'
 import Profile from './profile'
@@ -12,42 +15,39 @@ const tabs = ['Leaderboard', 'Profile'];
 
 export default function Referral() {
     const [activeTab, setActiveTab] = useState('Leaderboard');
-    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-    const endDate = new Date('May 25, 2025 15:30:00 GMT+0530');
+
+    const { chain } = useChain();
 
     const { ICPAddress } = useICPWallet();
 
-    useEffect(() => {
-        const calculateTimeLeft = () => {
-            const now = new Date();
-            const difference = endDate.getTime() - now.getTime();
+    const handleCopyMainnetReferral = () => {
+        if (!ICPAddress) {
+            toast.error('Please connect to ICP chain first');
+            return;
+        }
 
-            if (difference > 0) {
-                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+        const referralLink =
+            `https://bit10.app?referral=${ICPAddress}`
+        // `http://localhost:3000?referral=${ICPAddress}`;
 
-                setTimeLeft({ days, hours, minutes, seconds });
-            }
-        };
+        navigator.clipboard.writeText(referralLink)
+            .then(() => {
+                toast.success('Referral link copied to clipboard!');
+            })
+            .catch(() => {
+                toast.error('Failed to copy referral link');
+            });
+    };
 
-        const timer = setInterval(calculateTimeLeft, 1000);
-        calculateTimeLeft();
-
-        return () => clearInterval(timer);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const handleCopyReferral = () => {
+    const handleCopyTestnetReferral = () => {
         if (!ICPAddress) {
             toast.error('Please connect your wallet first');
             return;
         }
 
         const referralLink =
-            // `https://bit10.app?referral=${ICPAddress}`
-            `http://localhost:3000?referral=${ICPAddress}`;
+            `https://testnet.bit10.app?referral=${ICPAddress}`
+        // `http://localhost:3000?referral=${ICPAddress}`;
 
         navigator.clipboard.writeText(referralLink)
             .then(() => {
@@ -70,17 +70,31 @@ export default function Referral() {
                 <CardHeader className='flex flex-col md:flex-row items-center justify-center md:justify-between space-y-2 md:space-y-0'>
                     <div className='text-2xl md:text-4xl text-center md:text-start'>Referral</div>
                     <div>
-                        <Button onClick={handleCopyReferral}>
-                            <Copy />
-                            Copy your referral link
-                        </Button>
+                        {chain === 'icp' ? (
+                            <Popover>
+                                <PopoverTrigger className='bg-primary px-4 py-2 rounded text-white'>Copy your referral link</PopoverTrigger>
+                                <PopoverContent className='flex flex-col items-start space-y-2' align='end'>
+                                    <Button onClick={handleCopyMainnetReferral}>
+                                        <Copy />
+                                        Copy your Mainnet referral link
+                                    </Button>
+
+                                    <Button onClick={handleCopyTestnetReferral}>
+                                        <Copy />
+                                        Copy your Testnet referral link
+                                    </Button>
+                                </PopoverContent>
+                            </Popover>
+                        ) : (
+                            <Button disabled>Connect to ICP chain to copy referral link</Button>
+                        )}
                     </div>
                 </CardHeader>
                 <CardContent>
                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 items-center justify-center md:justify-between'>
                         <div className='flex flex-row space-x-1'>
                             <AlarmCheck className='h-6 w-6' />
-                            <div>Ends in {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s</div>
+                            <Timer />
                         </div>
                         <div className='relative flex flex-row space-x-2 items-center justify-center border dark:border-white rounded-md px-2 py-1.5'>
                             <AnimatedBackground
