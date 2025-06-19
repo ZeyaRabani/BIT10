@@ -1,0 +1,8 @@
+{
+  "name": "eth_asset_storage",
+  "version": "0.1.0",
+  "description": "eth_asset_storage",
+  "dependencies": {
+    "secp256k1": "^4.0.3"
+  }
+}

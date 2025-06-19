@@ -1,9 +1,0 @@
-{
-  "canisters": {
-    "erc20_asset_storage": {
-      "candid": "src/erc20_asset_storage/erc20_asset_storage.did",
-      "package": "erc20_asset_storage",
-      "type": "rust"
-    }
-  }
-}

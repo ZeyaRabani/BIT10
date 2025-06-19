@@ -4,13 +4,17 @@ import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 // import { DataTablePagination } from '@/components/ui/data-table-pagination'
+import { useWallet } from '@/context/WalletContext'
+import { toast } from 'sonner'
+import { Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CircleCheck, ExternalLink } from 'lucide-react'
 
 export type ReferralProfileTableDataType = {
     task: string,
     points: number
-    status: boolean,
+    status?: boolean,
+    route?: string
 }
 
 interface DataTableProps<TData> {
@@ -27,6 +31,46 @@ export function DataTable<TData, TValue>({
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+
+    const { principalId } = useWallet();
+
+    const handleCopyMainnetReferral = (route: string) => {
+        if (!principalId) {
+            toast.error('Please connect your wallet first');
+            return;
+        }
+
+        const referralLink =
+            `https://bit10.app/${route}?referral=${principalId}`
+        // `http://localhost:3000/${route}?referral=${principalId}`;
+
+        navigator.clipboard.writeText(referralLink)
+            .then(() => {
+                toast.success('Referral link copied to clipboard!');
+            })
+            .catch(() => {
+                toast.error('Failed to copy referral link');
+            });
+    };
+
+    const handleCopyTestnetReferral = (route: string) => {
+        if (!principalId) {
+            toast.error('Please connect your wallet first');
+            return;
+        }
+
+        const referralLink =
+            `https://testnet.bit10.app/${route}?referral=${principalId}`
+        // `http://localhost:3000/${route}?referral=${principalId}`;
+
+        navigator.clipboard.writeText(referralLink)
+            .then(() => {
+                toast.success('Referral link copied to clipboard!');
+            })
+            .catch(() => {
+                toast.error('Failed to copy referral link');
+            });
+    };
 
     const table = useReactTable({
         data,
@@ -46,7 +90,6 @@ export function DataTable<TData, TValue>({
             rowSelection,
         },
     });
-
 
     const renderCellContent = (cell: CellContext<ReferralProfileTableDataType, unknown>, row: { original: ReferralProfileTableDataType }) => {
         switch (cell.column.id) {
@@ -84,6 +127,26 @@ export function DataTable<TData, TValue>({
                                         </Button>
                                     </a>
                         )}
+                    </div>
+                );
+            case 'others_action':
+                return (
+                    <div>
+                        {row.original.task === 'Transaction on Liquidity Hub' ?
+                            <Button onClick={() => handleCopyTestnetReferral('liquidity-hub')}>
+                                <Copy className="mr-2 h-4 w-4" />
+                                Copy your Liquidity Hub referral link
+                            </Button> :
+                            row.original.task === 'Swap on BIT10 Testnet' ?
+                                <Button onClick={() => handleCopyTestnetReferral('swap')}>
+                                    <Copy className="mr-2 h-4 w-4" />
+                                    Copy your Testnet Swap referral link
+                                </Button> :
+                                <Button onClick={() => handleCopyMainnetReferral('swap')}>
+                                    <Copy className="mr-2 h-4 w-4" />
+                                    Copy your Mainnet Swap referral link
+                                </Button>
+                        }
                     </div>
                 );
             default:

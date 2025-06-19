@@ -7,13 +7,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { AlarmCheck, Copy } from 'lucide-react'
 import Timer from './timer'
 import AnimatedBackground from '@/components/ui/animated-background'
-import Leaderboard from './leaderboard'
 import Profile from './profile'
+import Leaderboard from './leaderboard'
 
-const tabs = ['Leaderboard', 'Profile'];
+const tabs = ['Profile', 'Leaderboard'];
 
 export default function Referral() {
-    const [activeTab, setActiveTab] = useState('Leaderboard');
+    const [activeTab, setActiveTab] = useState('Profile');
 
     const { principalId } = useWallet();
 
@@ -92,7 +92,7 @@ export default function Referral() {
                         </div>
                         <div className='relative flex flex-row space-x-2 items-center justify-center border dark:border-white rounded-md px-2 py-1.5'>
                             <AnimatedBackground
-                                defaultValue='Leaderboard'
+                                defaultValue='Profile'
                                 className='rounded bg-primary'
                                 transition={{
                                     ease: 'easeInOut',
@@ -116,12 +116,12 @@ export default function Referral() {
 
                     <div className='flex flex-col'>
                         {
-                            activeTab === 'Leaderboard' &&
-                            <Leaderboard />
-                        }
-                        {
                             activeTab === 'Profile' &&
                             <Profile />
+                        }
+                        {
+                            activeTab === 'Leaderboard' &&
+                            <Leaderboard />
                         }
                     </div>
                 </CardContent>

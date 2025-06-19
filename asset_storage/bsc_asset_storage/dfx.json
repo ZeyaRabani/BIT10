@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "bsc_asset_storage_backend": {
+      "candid": "src/bsc_asset_storage_backend/bsc_asset_storage_backend.did",
+      "package": "bsc_asset_storage_backend",
+      "type": "custom",
+      "build": [
+        "cargo build --no-default-features --target wasm32-unknown-unknown --release"
+      ],
+      "wasm": "target/wasm32-unknown-unknown/release/bsc_asset_storage_backend.wasm",
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

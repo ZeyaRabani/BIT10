@@ -1,0 +1,32 @@
+type InitArg = record {
+    tron_network : opt TronNetwork;
+    ecdsa_key_name : opt EcdsaKeyName;
+};
+
+type TronNetwork = variant {
+    Mainnet;
+    Nile;
+};
+
+type EcdsaKeyName = variant {
+    TestKeyLocalDevelopment;
+    TestKey1;
+    ProductionKey1;
+};
+
+type BlockTag = variant {
+    Earliest;
+    Safe;
+    Finalized;
+    Latest;
+    Number : nat;
+    Pending;
+};
+
+type Wei = nat;
+
+service : (opt InitArg) -> {
+    tron_address : (owner: opt principal) -> (text);
+    get_tron_balance : (address: opt text) -> (variant { Ok : Wei; Err : text });
+    send_trx : (to: text, amount: Wei) -> (variant { Ok : text; Err : text });
+}

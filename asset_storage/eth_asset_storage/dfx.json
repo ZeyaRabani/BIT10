@@ -1,0 +1,9 @@
+{
+  "canisters": {
+    "eth_asset_storage": {
+      "candid": "src/eth_asset_storage/eth_asset_storage.did",
+      "package": "eth_asset_storage",
+      "type": "rust"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+type InitArg = record {
+    bsc_network : opt BscNetwork;
+    ecdsa_key_name : opt EcdsaKeyName;
+};
+
+type BscNetwork = variant {
+    Mainnet;
+    Testnet;
+};
+
+type EcdsaKeyName = variant {
+    TestKeyLocalDevelopment;
+    TestKey1;
+    ProductionKey1;
+};
+
+type BlockTag = variant {
+    Earliest;
+    Safe;
+    Finalized;
+    Latest;
+    Number : nat;
+    Pending;
+};
+
+type Wei = nat;
+
+type BscTransactionInput = record {
+    to: text;                    // Recipient address
+    value: text;                 // Amount in hex string (e.g., "0x9184e72a000")
+    data: text;                  // Hex encoded data
+    gas_limit: opt text;         // Gas limit in hex string (e.g., "0x7706b")
+    gas_price: opt text;         // Gas price in decimal string (e.g., "130000000")
+    max_fee_per_gas: opt text;   // Max fee per gas in decimal string
+    max_priority_fee_per_gas: opt text; // Max priority fee per gas in decimal string
+};
+
+service : (opt InitArg) -> {
+    bsc_address : (owner: opt principal) -> (text);
+    get_balance : (address: opt text) -> (Wei);
+    transaction_count : (owner: opt principal, block: opt BlockTag) -> (nat);
+    bnb_balance : () -> (Wei);
+    send_bnb : (to: text) -> (text);
+    tx_bnb : (tx_input: BscTransactionInput) -> (text);
+}

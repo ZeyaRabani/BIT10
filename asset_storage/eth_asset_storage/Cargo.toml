@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "src/eth_asset_storage",
+]
+
+[profile.release]
+lto = true
+opt-level = 'z'
+panic = 'abort'
+
+

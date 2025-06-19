@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/bsc_asset_storage"
+]
+resolver = "2"

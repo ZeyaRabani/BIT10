@@ -1,0 +1,34 @@
+type InitArg = record {
+    ethereum_network : opt EthereumNetwork;
+    ecdsa_key_name : opt EcdsaKeyName;
+};
+
+type EthereumNetwork = variant {
+    Mainnet;
+    Sepolia;
+};
+
+type EcdsaKeyName = variant {
+    TestKeyLocalDevelopment;
+    TestKey1;
+    ProductionKey1;
+};
+
+type BlockTag = variant {
+    Earliest;
+    Safe;
+    Finalized;
+    Latest;
+    Number : nat;
+    Pending;
+};
+
+type Wei = nat;
+
+service : (opt InitArg) -> {
+    ethereum_address : (owner: opt principal) -> (text);
+    get_balance : (address: opt text) -> (Wei);
+    transaction_count : (owner: opt principal, block_height: opt BlockTag) -> (nat);
+    send_eth : (to: text, amount: Wei) -> (text);
+    send_erc20 : (to: text, amount: Wei, token_address: text) -> (text);
+};

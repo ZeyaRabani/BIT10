@@ -35,39 +35,6 @@ type Bit10ReferralType = {
     }[];
 };
 
-// const referralProfileData = [
-// {
-//     task: 'Post about BIT10 on Twitter/X',
-//     points: 10,
-//     status: true,
-// },
-// {
-//     task: 'Follow BIT10 on Twitter/X',
-//     points: 10,
-//     status: false,
-// },
-// {
-//     task: 'Turn on all notifications for BIT10 X account',
-//     points: 10,
-//     status: false,
-// },
-// {
-//     task: 'Like BIT10 Post on on Twitter/X',
-//     points: 10,
-//     status: false,
-// },
-//     {
-//         task: 'Swap on Mainnet',
-//         points: 10,
-//         status: false,
-//     },
-//     {
-//         task: 'Swap on Internet Computer Testnet',
-//         points: 10,
-//         status: false,
-//     }
-// ]
-
 const referralProfileTableColumns: ColumnDef<ReferralProfileTableDataType>[] = [
     {
         accessorKey: 'task',
@@ -83,6 +50,27 @@ const referralProfileTableColumns: ColumnDef<ReferralProfileTableDataType>[] = [
     },
     {
         accessorKey: 'action',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Action' />
+        ),
+    },
+]
+
+const referralProfileOthersTableColumns: ColumnDef<ReferralProfileTableDataType>[] = [
+    {
+        accessorKey: 'task',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Task' />
+        ),
+    },
+    {
+        accessorKey: 'points',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Points' />
+        ),
+    },
+    {
+        accessorKey: 'others_action',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Action' />
         ),
@@ -146,6 +134,24 @@ export default function Profile() {
         }
     ] : [];
 
+    const othersTasksData = [
+        {
+            task: 'Transaction on Liquidity Hub',
+            points: 5,
+            route: '/liquidity-hub'
+        },
+        {
+            task: 'Swap on BIT10 Testnet',
+            points: 5,
+            route: '/swap'
+        },
+        {
+            task: 'Swap on BIT10 Mainnet',
+            points: 20,
+            route: '/swap'
+        }
+    ]
+
     return (
         <div className='pt-4 flex flex-col space-y-4'>
             <div className='flex flex-col space-y-2'>
@@ -190,15 +196,15 @@ export default function Profile() {
                                 <CardContent className='text-3xl font-semibold tracking-wide'>
                                     <div>
                                         {/* @ts-expect-error */}
-                                        {bit10Data?.position === 1 && bit10Data?.total_points !== 5 ? '5 ICP' :
+                                        {bit10Data?.position === 1 && bit10Data?.total_points !== 0 ? '5 ICP' :
                                             // @ts-expect-error
-                                            bit10Data?.position === 2 && bit10Data?.total_points !== 3 ? '3 ICP' :
+                                            bit10Data?.position === 2 && bit10Data?.total_points !== 0 ? '3 ICP' :
                                                 // @ts-expect-error
-                                                bit10Data?.position === 3 && bit10Data?.total_points !== 2 ? '2 ICP' :
+                                                bit10Data?.position === 3 && bit10Data?.total_points !== 0 ? '2 ICP' :
                                                     // @ts-expect-error
-                                                    bit10Data?.position === 4 && bit10Data?.total_points !== 1 ? '1 ICP' :
+                                                    bit10Data?.position === 4 && bit10Data?.total_points !== 0 ? '1 ICP' :
                                                         // @ts-expect-error
-                                                        bit10Data?.position === 5 && bit10Data?.total_points !== 1 ? '1 ICP' :
+                                                        bit10Data?.position === 5 && bit10Data?.total_points !== 0 ? '1 ICP' :
                                                             '0 ICP'}
                                     </div>
                                 </CardContent>
@@ -242,10 +248,21 @@ export default function Profile() {
                                 </CardContent>
                             </Card>
                         </div>
-                        <div>
+                        <div className='pt-2'>
+                            <div className='text-xl md:text-2xl'>Your Referral Tasks</div>
+                            <div className='md:text-lg pb-1'>Complete these to earn points and climb the leaderboard.</div>
                             <DataTable
                                 columns={referralProfileTableColumns}
                                 data={tasksData ?? []}
+                            />
+                        </div>
+
+                        <div className='pt-2'>
+                            <div className='text-xl md:text-2xl'>Referred Users&apos; Tasks</div>
+                            <div className='md:text-lg pb-1'>Track the progress of users you&apos;ve referred and earn additional rewards.</div>
+                            <DataTable
+                                columns={referralProfileOthersTableColumns}
+                                data={othersTasksData ?? []}
                             />
                         </div>
                     </div>
