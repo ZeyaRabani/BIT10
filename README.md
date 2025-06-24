@@ -25,28 +25,29 @@ BIT10 provides a pre-selected basket of assets, reducing research time and cost.
 
 ### 🌲 Main Branch Folder Structure
 
-* **`asset_storage/`** – Contains canister code for storing different token types:
+* **`asset_storage/`** - Contains canister code for storing different token types:
 
-  * `brc20_asset_storage/` – Stores BRC-20 tokens.
-  * `erc20_asset_storage/` – Stores ERC-20 tokens.
-  * `icp_asset_storage/` – Stores ICP and ICRC tokens.
-  * `solana_asset_storage/` – Stores SOL and SPL tokens.
+  * `bsc_asset_storage/` - Stores BNB and BEP20 tokens.
+  * `erc20_asset_storage/` - Stores ETH and ERC-20 tokens.
+  * `icp_asset_storage/` - Stores ICP tokens.
+  * `sui_asset_storage/` - Stores SUI tokens.
+  * `trx_asset_storage/` - Stores TRX tokens.
 
 * **`swap/`**
 
-  * `sol_dev/` – Swap logic (buying BIT10 tokens with SOL) on Solana Devnet.
+  * `sol_dev/` - Swap logic (buying BIT10 tokens with SOL) on Solana Devnet.
 
 * **`liquidity_hub/`**
 
   * `icp/`
 
-    * `testnet_liquidity_hub/` – Canister code for the Liquidity Hub on ICP testnet.
+    * `testnet_liquidity_hub/` - Canister code for the Liquidity Hub on ICP testnet.
 
-* **`oracle/`** – Canister code for price oracle functionality.
+* **`oracle/`** - Canister code for price oracle functionality.
 
-* **`server/`** – Lightweight Node.js server for serving data to the web app.
+* **`server/`** - Lightweight Node.js server for serving data to the web app.
 
-* **`web_app/`** – Contains frontend code for the BIT10 application.
+* **`web_app/`** - Contains frontend code for the BIT10 application.
 
 
 ## 🛠 Tech Stack

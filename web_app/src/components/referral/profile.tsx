@@ -136,7 +136,7 @@ export default function Profile() {
 
     const othersTasksData = [
         {
-            task: 'Transaction on Liquidity Hub',
+            task: 'Swap on Internet Computer Liquidity Hub',
             points: 5,
             route: '/liquidity-hub'
         },
@@ -170,6 +170,25 @@ export default function Profile() {
                             </Card>
                         </div>
                         <div>
+                            <div className='flex flex-col space-y-2 pt-2 pb-1'>
+                                <Skeleton className='h-6 w-16' />
+                                <Skeleton className='h-4 w-36' />
+                            </div>
+                            <Card className='animate-fade-bottom-up-slow'>
+                                <CardContent>
+                                    <div className='flex flex-col h-full space-y-2 pt-8'>
+                                        {['h-12', 'h-12'].map((classes, index) => (
+                                            <Skeleton key={index} className={classes} />
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                        <div>
+                            <div className='flex flex-col space-y-2 pt-2 pb-1'>
+                                <Skeleton className='h-6 w-16' />
+                                <Skeleton className='h-4 w-36' />
+                            </div>
                             <Card className='animate-fade-bottom-up-slow'>
                                 <CardContent>
                                     <div className='flex flex-col h-full space-y-2 pt-8'>

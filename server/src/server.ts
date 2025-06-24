@@ -17,6 +17,7 @@ import { handleBit10MEMEFilterData } from './routes/bit10MEMEFilterData'
 import { handleTestBit10MEMERebalanceData } from './routes/testBit10MEMERabalanceHistory'
 import { handleVerifyTransaction } from './routes/verifyTransaction'
 import { handleBit10Referral } from './routes/referral'
+import { handelCreateTransaction } from './routes/createTransaction'
 
 dotenv.config();
 
@@ -35,7 +36,8 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/test-bit10-meme': handleBit10MEMEFilterData,
     '/test-bit10-meme-rebalance': handleTestBit10MEMERebalanceData,
     '/verify-transaction': handleVerifyTransaction,
-    '/referral': handleBit10Referral
+    '/referral': handleBit10Referral,
+    '/create-transaction': handelCreateTransaction
 };
 
 const requestHandler = async (req: http.IncomingMessage, res: http.ServerResponse) => {

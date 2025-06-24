@@ -132,18 +132,18 @@ export function DataTable<TData, TValue>({
             case 'others_action':
                 return (
                     <div>
-                        {row.original.task === 'Transaction on Liquidity Hub' ?
-                            <Button onClick={() => handleCopyTestnetReferral('liquidity-hub')}>
-                                <Copy className="mr-2 h-4 w-4" />
+                        {row.original.task === 'Swap on Internet Computer Liquidity Hub' ?
+                            <Button className='w-full' onClick={() => handleCopyTestnetReferral('liquidity-hub')}>
+                                <Copy className='mr-2 h-4 w-4' />
                                 Copy your Liquidity Hub referral link
                             </Button> :
                             row.original.task === 'Swap on BIT10 Testnet' ?
-                                <Button onClick={() => handleCopyTestnetReferral('swap')}>
-                                    <Copy className="mr-2 h-4 w-4" />
+                                <Button className='w-full' onClick={() => handleCopyTestnetReferral('swap')}>
+                                    <Copy className='mr-2 h-4 w-4' />
                                     Copy your Testnet Swap referral link
                                 </Button> :
-                                <Button onClick={() => handleCopyMainnetReferral('swap')}>
-                                    <Copy className="mr-2 h-4 w-4" />
+                                <Button className='w-full' onClick={() => handleCopyMainnetReferral('swap')}>
+                                    <Copy className='mr-2 h-4 w-4' />
                                     Copy your Mainnet Swap referral link
                                 </Button>
                         }
