@@ -4,7 +4,7 @@ import axios from 'axios'
 import NodeCache from 'node-cache'
 
 const cache = new NodeCache({
-    stdTTL: 300,  // 5 min
+    stdTTL: 30,  // 30 sec
     checkperiod: 5,  // 5 sec
     useClones: false,
     deleteOnExpire: true
@@ -19,7 +19,8 @@ async function createTrx({
     to_token_address,
     amount,
     selectedWallets,
-    destinationAddress
+    destinationAddress,
+    expected_output
 }: {
     from_blockchain: string,
     from_token_symbol: string,
@@ -29,92 +30,122 @@ async function createTrx({
     to_token_address?: string | null,
     amount: string,
     selectedWallets: any,
-    destinationAddress: string
+    destinationAddress?: string | null,
+    expected_output?: string | number
 }) {
     const apiKey = process.env.RANGO_API_KEY;
     if (!apiKey) throw new Error('RANGO_API_KEY is not set in environment variables');
 
-    const from: any = {
-        blockchain: from_blockchain,
-        symbol: from_token_symbol,
-    };
-    if (from_token_address) {
-        from.address = from_token_address;
-    }
+    let currentAmount = parseFloat(amount);
+    let lastResult: any = null;
+    let attempt = 0;
+    const maxAttempts = 100; // Safety cap
 
-    const to: any = {
-        blockchain: to_blockchain,
-        symbol: to_token_symbol,
-    };
-    if (to_token_address) {
-        to.address = to_token_address;
-    }
-
-    const bestRouteResponse = await axios.post(
-        `https://api.rango.exchange/routing/best?apiKey=${apiKey}`,
-        {
-            from,
-            to,
-            checkPrerequisites: false,
-            amount: amount,
-            selectedWallets: selectedWallets,
-        },
-        {
-            headers: {
-                'accept': '*/*',
-                'content-type': 'application/json',
-            }
+    while (true) {
+        attempt++;
+        if (attempt > maxAttempts) {
+            throw new Error(`Could not achieve expected_output=${expected_output} after ${maxAttempts} attempts. Last output: ${lastResult?.transaction?.expectedOutput}`);
         }
-    );
 
-    const bestRouteData = bestRouteResponse.data;
+        const from: any = {
+            blockchain: from_blockchain,
+            symbol: from_token_symbol,
+        };
+        if (from_token_address) {
+            from.address = from_token_address;
+        }
 
-    if (!bestRouteData.requestId || !bestRouteData.result) {
-        throw new Error('No requestId or result returned from Rango best route API');
-    }
+        const to: any = {
+            blockchain: to_blockchain,
+            symbol: to_token_symbol,
+        };
+        if (to_token_address) {
+            to.address = to_token_address;
+        }
 
-    const confirmResponse = await axios.post(
-        `https://api.rango.exchange/routing/confirm?apiKey=${apiKey}`,
-        {
+        const bestRouteResponse = await axios.post(
+            `https://api.rango.exchange/routing/best?apiKey=${apiKey}`,
+            {
+                from,
+                to,
+                checkPrerequisites: false,
+                amount: currentAmount.toString(),
+                selectedWallets: selectedWallets,
+            },
+            {
+                headers: {
+                    'accept': '*/*',
+                    'content-type': 'application/json',
+                }
+            }
+        );
+
+        const bestRouteData = bestRouteResponse.data;
+
+        if (!bestRouteData.requestId || !bestRouteData.result) {
+            throw new Error('No requestId or result returned from Rango best route API');
+        }
+
+        const confirmPayload: any = {
             selectedWallets: selectedWallets,
             checkPrerequisites: false,
             requestId: bestRouteData.requestId,
-            destination: destinationAddress
-        },
-        {
-            headers: {
-                'accept': '*/*',
-                'content-type': 'application/json',
-            }
+        };
+        if (destinationAddress) {
+            confirmPayload.destination = destinationAddress;
         }
-    );
 
-    const createTx = await axios.post(
-        'https://api.rango.exchange/tx/create',
-        {
-            requestId: bestRouteData.requestId,
-            step: 1,
-            userSettings: {
-                slippage: 3,
-                infiniteApprove: false
-            },
-            validations: {
-                balance: true,
-                fee: true,
-                approve: true
+        await axios.post(
+            `https://api.rango.exchange/routing/confirm?apiKey=${apiKey}`,
+            confirmPayload,
+            {
+                headers: {
+                    'accept': '*/*',
+                    'content-type': 'application/json',
+                }
             }
-        },
-        {
-            params: {
-                apiKey: apiKey
+        );
+
+        const createTx = await axios.post(
+            'https://api.rango.exchange/tx/create',
+            {
+                requestId: bestRouteData.requestId,
+                step: 1,
+                userSettings: {
+                    slippage: 3,
+                    infiniteApprove: false
+                },
+                validations: {
+                    balance: true,
+                    fee: true,
+                    approve: true
+                }
             },
-            headers: {
-                'content-type': 'application/json'
+            {
+                params: {
+                    apiKey: apiKey
+                },
+                headers: {
+                    'content-type': 'application/json'
+                }
             }
+        );
+
+        lastResult = createTx.data;
+
+        // If expected_output is not provided, or we have no transaction, just return
+        if (!expected_output || !lastResult?.transaction?.expectedOutput) {
+            return lastResult;
         }
-    );
 
-    return createTx.data;
+        const expectedOutputValue = parseFloat(lastResult.transaction.expectedOutput);
+        if (expectedOutputValue >= parseFloat(expected_output as string)) {
+            return lastResult;
+        }
+
+        // Increase amount for next attempt
+        currentAmount *= 1.05; // Increase by 5%
+    }
 }
 
 export const handelCreateTransaction = async (req: IncomingMessage, res: ServerResponse) => {
@@ -135,6 +166,7 @@ export const handelCreateTransaction = async (req: IncomingMessage, res: ServerR
         const amount = url.searchParams.get('amount');
         const selectedWalletsRaw = url.searchParams.get('selectedWallets');
         const destinationAddress = url.searchParams.get('destinationAddress');
+        const expected_output = url.searchParams.get('expected_output');
 
         if (
             !from_blockchain ||
@@ -142,8 +174,7 @@ export const handelCreateTransaction = async (req: IncomingMessage, res: ServerR
             !to_blockchain ||
             !to_token_symbol ||
             !amount ||
-            !selectedWalletsRaw ||
-            !destinationAddress
+            !selectedWalletsRaw
         ) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
@@ -154,8 +185,7 @@ export const handelCreateTransaction = async (req: IncomingMessage, res: ServerR
                     to_blockchain: !to_blockchain ? 'missing' : 'provided',
                     to_token_symbol: !to_token_symbol ? 'missing' : 'provided',
                     amount: !amount ? 'missing' : 'provided',
-                    selectedWallets: !selectedWalletsRaw ? 'missing' : 'provided',
-                    destinationAddress: !destinationAddress ? 'missing' : 'provided'
+                    selectedWallets: !selectedWalletsRaw ? 'missing' : 'provided'
                 }
             }));
             return;
@@ -182,7 +212,8 @@ export const handelCreateTransaction = async (req: IncomingMessage, res: ServerR
                 to_token_address,
                 amount,
                 selectedWallets,
-                destinationAddress
+                destinationAddress: destinationAddress || undefined,
+                expected_output: expected_output ? Number(expected_output) : undefined
             });
             cache.set(cacheKey, trxResult);
         }

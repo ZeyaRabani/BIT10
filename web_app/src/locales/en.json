@@ -9,7 +9,7 @@
         "volume": "Volume",
         "revenue": "Testnet Revenue",
         "total": "Total (in BTC)",
-        "platformFee": "Platform Fee (in BTC)",
+        "platformFee": "Management Fee (in BTC)",
         "transferFee": "Transfer Fee (in BTC)",
         "links": "Links",
         "twitter": "X/Twitter",
@@ -21,6 +21,6 @@
         "scheduleCall": "Schedule a call with Zeya",
         "fundsRaised": "Funds Raised",
         "icp": "ICP Developer Grant",
-        "icpAmount": "$75k"
+        "icpAmount": "$55k"
     }
 }

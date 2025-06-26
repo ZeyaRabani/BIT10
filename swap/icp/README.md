@@ -86,13 +86,13 @@ sequenceDiagram
 - **Token Swapping**: Swap between various tokens and BIT10 tokens
 - **Price Feeds**: Real-time price updates from multiple sources
 - **Supply Management**: Automated supply tracking and updates
-- **Fee Management**: Transparent fee structure with platform and minting fees
+- **Fee Management**: Transparent fee structure with management and minting fees
 
 ## 🔧 Configuration
 
 The system uses several configuration parameters:
 
-- Platform Fee: 3% on swaps
+- Management Fee: 3% on swaps
 - Minting Fee: 1% on reverse swaps
 - Maximum Retries: 5 for HTTP requests
 - HTTP Request Cycles: 25,000,000,000

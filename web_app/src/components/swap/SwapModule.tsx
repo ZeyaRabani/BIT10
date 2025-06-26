@@ -940,7 +940,7 @@ export default function SwapModule() {
                               </div>
                             </TooltipTrigger>
                             <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                              Spent amount + 3% Platform fee <br />
+                              Spent amount + 3% Management fee <br />
                               $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))} = $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))}
                             </TooltipContent>
                           </Tooltip>
