@@ -25,9 +25,10 @@ export const WalletProvider: React.FC<React.PropsWithChildren<object>> = ({ chil
             const ckETHLegerCanisterId = 'ss2fx-dyaaa-aaaar-qacoq-cai';
             const ICPLegerCanisterId = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
             const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
-            const bit10BRC20CanisterId = '7bi3r-piaaa-aaaap-qpnrq-cai';
+            // const bit10BRC20CanisterId = '7bi3r-piaaa-aaaap-qpnrq-cai';
+            const bit10TopCanisterId = 'g37b3-lqaaa-aaaap-qp4hq-cai';
 
-            const whitelist = [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, bit10DEFICanisterId, bit10BRC20CanisterId];
+            const whitelist = [ckBTCLegerCanisterId, ckETHLegerCanisterId, ICPLegerCanisterId, bit10DEFICanisterId, bit10TopCanisterId];
 
             await window.ic.plug.requestConnect({
                 whitelist,

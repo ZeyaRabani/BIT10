@@ -41,9 +41,9 @@ export default function Preformance() {
         if (tokenPreformance === 'bit10-historic-data-defi-60') {
             data = await response.json() as { bit10_defi: Bit10Entry[] }
             returnData = { bit10_defi: data.bit10_defi.reverse() };
-        } else if (tokenPreformance === 'bit10-historic-data-brc20-60') {
-            data = await response.json() as { bit10_brc20: Bit10Entry[] }
-            returnData = { bit10_brc20: data.bit10_brc20.reverse() };
+        } else if (tokenPreformance === 'bit10-historic-data-top-60') {
+            data = await response.json() as { bit10_top: Bit10Entry[] }
+            returnData = { bit10_top: data.bit10_top.reverse() };
         }
         return returnData;
     };
@@ -55,15 +55,15 @@ export default function Preformance() {
                 queryFn: () => fetchBit10Preformance('bit10-historic-data-defi-60')
             },
             {
-                queryKey: ['bit10BRC20TokenPreformance60d'],
-                queryFn: () => fetchBit10Preformance('bit10-historic-data-brc20-60')
+                queryKey: ['bit10TOPTokenPreformance60d'],
+                queryFn: () => fetchBit10Preformance('bit10-historic-data-top-60')
             }
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10DEFIPreformance60D = bit10Queries[0].data ?? { bit10_defi: [] };
-    const bit10BRC20Preformance60D = bit10Queries[1].data ?? { bit10_brc20: [] };
+    const bit10TOPPreformance60D = bit10Queries[1].data ?? { bit10_top: [] };
 
     const getBit10Preformance = (data: Bit10Entry[], daysBack: number) => {
         if (!data || data.length === 0) {
@@ -89,8 +89,8 @@ export default function Preformance() {
     const selectedBit10Token24H = () => {
         if (selectedPreformanceToken === 'BIT10.DEFI') {
             return getBit10Preformance(bit10DEFIPreformance60D.bit10_defi ?? [], 1);
-        } else if (selectedPreformanceToken === 'BIT10.BRC20') {
-            return getBit10Preformance(bit10BRC20Preformance60D.bit10_brc20 ?? [], 1);
+        } else if (selectedPreformanceToken === 'BIT10.TOP') {
+            return getBit10Preformance(bit10TOPPreformance60D.bit10_top ?? [], 1);
         } else {
             return null;
         }
@@ -101,8 +101,8 @@ export default function Preformance() {
     const selectedBit10Token7D = () => {
         if (selectedPreformanceToken === 'BIT10.DEFI') {
             return getBit10Preformance(bit10DEFIPreformance60D.bit10_defi ?? [], 7);
-        } else if (selectedPreformanceToken === 'BIT10.BRC20') {
-            return getBit10Preformance(bit10BRC20Preformance60D.bit10_brc20 ?? [], 7);
+        } else if (selectedPreformanceToken === 'BIT10.TOP') {
+            return getBit10Preformance(bit10TOPPreformance60D.bit10_top ?? [], 7);
         } else {
             return null;
         }
@@ -113,8 +113,8 @@ export default function Preformance() {
     const selectedBit10Token30D = () => {
         if (selectedPreformanceToken === 'BIT10.DEFI') {
             return getBit10Preformance(bit10DEFIPreformance60D.bit10_defi ?? [], 30);
-        } else if (selectedPreformanceToken === 'BIT10.BRC20') {
-            return getBit10Preformance(bit10BRC20Preformance60D.bit10_brc20 ?? [], 30);
+        } else if (selectedPreformanceToken === 'BIT10.TOP') {
+            return getBit10Preformance(bit10TOPPreformance60D.bit10_top ?? [], 30);
         } else {
             return null;
         }
@@ -125,8 +125,8 @@ export default function Preformance() {
     const selectedBit10Token60D = () => {
         if (selectedPreformanceToken === 'BIT10.DEFI') {
             return getBit10Preformance(bit10DEFIPreformance60D.bit10_defi ?? [], 60);
-        } else if (selectedPreformanceToken === 'BIT10.BRC20') {
-            return getBit10Preformance(bit10BRC20Preformance60D.bit10_brc20 ?? [], 60);
+        } else if (selectedPreformanceToken === 'BIT10.TOP') {
+            return getBit10Preformance(bit10TOPPreformance60D.bit10_top ?? [], 60);
         } else {
             return null;
         }
@@ -137,8 +137,8 @@ export default function Preformance() {
     const selectedBit10TokenChange = () => {
         if (selectedPreformanceToken === 'BIT10.DEFI') {
             return bit10DEFIPreformance60D.bit10_defi;
-        } else if (selectedPreformanceToken === 'BIT10.BRC20') {
-            return bit10BRC20Preformance60D.bit10_brc20;
+        } else if (selectedPreformanceToken === 'BIT10.TOP') {
+            return bit10TOPPreformance60D.bit10_top;
         } else {
             return null;
         }
@@ -185,8 +185,8 @@ export default function Preformance() {
     const bit10PreformanceTokenDataName = () => {
         if (selectedPreformanceToken === 'BIT10.DEFI') {
             return 'bit10DEFI';
-        } else if (selectedPreformanceToken === 'BIT10.BRC20') {
-            return 'bit10BRC20';
+        } else if (selectedPreformanceToken === 'BIT10.TOP') {
+            return 'bit10TOP';
         } else {
             return 'bit10';
         }
@@ -194,7 +194,7 @@ export default function Preformance() {
 
     const tokenDataName = bit10PreformanceTokenDataName();
 
-    const bit10Tokens = ['BIT10.DEFI', 'BIT10.BRC20'];
+    const bit10Tokens = ['BIT10.DEFI', 'BIT10.TOP'];
 
     const bit10PreformanceTokenName = () => {
         if (selectedPreformanceToken === 'BIT10.DEFI') {
@@ -202,10 +202,10 @@ export default function Preformance() {
                 name: 'bit10DEFI',
                 indexFundName: 'BIT10.DEFI'
             };
-        } else if (selectedPreformanceToken === 'BIT10.BRC20') {
+        } else if (selectedPreformanceToken === 'BIT10.TOP') {
             return {
-                name: 'bit10BRC20',
-                indexFundName: 'BIT10.BRC20'
+                name: 'bit10TOP',
+                indexFundName: 'BIT10.TOP'
             };
         } else {
             return {

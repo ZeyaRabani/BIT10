@@ -10,6 +10,7 @@ export const keyStatus = pgEnum('key_status', ['default', 'valid', 'invalid', 'e
 export const keyType = pgEnum('key_type', ['aead-ietf', 'aead-det', 'hmacsha512', 'hmacsha256', 'auth', 'shorthash', 'generichash', 'kdf', 'secretbox', 'secretstream', 'stream_xchacha20'])
 export const oneTimeTokenType = pgEnum('one_time_token_type', ['confirmation_token', 'reauthentication_token', 'recovery_token', 'email_change_token_new', 'email_change_token_current', 'phone_change_token'])
 
+
 export const referralJune2025 = pgTable('referral_june_2025', {
 	referralCode: text('referral_code').notNull(),
 	userId: text('user_id').primaryKey().notNull(),
@@ -321,6 +322,18 @@ export const mbTokenSwap = pgTable('mb_token_swap', {
 		name: 'mb_token_swap_user_principal_id_mb_users_user_principal_id_fk'
 	}),
 	unique('mb_token_swap_transaction_index_key').on(table.transactionIndex),
+]);
+
+export const bit10TopRebalance = pgTable('bit10_top_rebalance', {
+	timestmpz: timestamp({ withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	indexValue: doublePrecision('index_value').notNull(),
+	priceOfTokenToBuy: doublePrecision('price_of_token_to_buy').notNull(),
+	newTokens: json('new_tokens').notNull(),
+	added: json().notNull(),
+	removed: json().notNull(),
+	retained: json().notNull(),
+}, (table) => [
+	index('bit10_top_rebalance_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst().op('timestamptz_ops')),
 ]);
 
 export const users = pgTable('users', {

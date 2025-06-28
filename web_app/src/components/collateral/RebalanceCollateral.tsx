@@ -66,11 +66,16 @@ interface RebalanceData {
     bit10Data: CoinData[];
 }
 
-// temp
+// Update this
 const bit10Allocation: WalletDataType[] = [
-    { walletAddress: 'bc1pkjd3.....aqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.BRC20'] },
-    // { walletAddress: 'bc1pkjd3.....aqgc55hyll', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'] },
-    // { walletAddress: 'bc1pkjd3.....aqgc55hyll2', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'], tokenId: ['25028'] },
+    { walletAddress: 'bc1pkjd3.....aqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'] },
+
+    { walletAddress: '0x8b78d7.....66F925f1', explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', bit10: ['BIT10.TOP'], tokenId: ['1027'] },
+    { walletAddress: 'bc1qfqh8.....79edlnqh', explorerAddress: 'https://mempool.space/address/bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', bit10: ['BIT10.TOP'], tokenId: ['1'] },
+    { walletAddress: '0x7F7307.....fC8Ce6E2', explorerAddress: 'https://bscscan.com/address/0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', bit10: ['BIT10.TOP'], tokenId: ['52', '1839', '74', '2010', '1831'] },
+    { walletAddress: 'KHTRyohh.....J7CN1STn', explorerAddress: 'https://explorer.solana.com/address/KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', bit10: ['BIT10.TOP'], tokenId: ['5426'] },
+    { walletAddress: 'TXHicWyM.....Vx75dtzb', explorerAddress: 'https://tronscan.org/#/address/TXHicWyMh8pBryemgawayVztrxVx75dtzb', bit10: ['BIT10.TOP'], tokenId: ['1958'] },
+    { walletAddress: '0x545a40.....8d1b4c01', explorerAddress: 'https://app.hyperliquid.xyz/explorer/address/0x545a402305d54bf34b588c169b51c24f8d1b4c01', bit10: ['BIT10.TOP'], tokenId: ['32196'] },
 ];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
@@ -90,35 +95,30 @@ export default function RebalanceCollateral() {
     };
 
     const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
-    const canisterId = 'fg5vt-paaaa-aaaap-qhhra-cai';
+    const canisterId = 'egcpt-yyaaa-aaaap-qp4ia-cai';
 
     const agent = new HttpAgent({ host });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const actor = Actor.createActor(idlFactory, { agent, canisterId });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const fetchBit10Supply = async (bit10Token: string) => {
-        // let totalSupply;
-        // if (bit10Token === 'bit10-brc20') {
-        //     const totalSupply = actor.bit10_brc20_total_supply_of_token_available ? await actor.bit10_brc20_total_supply_of_token_available() : undefined;
-        //     return totalSupply
-        // } else if (bit10Token === 'bit10-top') {
-        //     const totalSupply = actor.bit10_top_total_supply_of_token_available ? await actor.bit10_top_total_supply_of_token_available() : undefined;
-        //     return totalSupply
-        // }
+        let totalSupply;
 
-        // if (!totalSupply) {
-        //     toast.error('Error fetching BIT10 supply. Please try again!');
-        // }
+        if (bit10Token === 'bit10-top') {
+            totalSupply = actor.bit10_top_total_supply_of_token_available
+                ? await actor.bit10_top_total_supply_of_token_available()
+                : undefined;
+        }
 
-        // if (totalSupply && typeof totalSupply === 'bigint') {
-        //     const scaledTotalSupply = Number(totalSupply) / 100000000;
-        //     return scaledTotalSupply;
-        // } else {
-        //     return 0;
-        // }
+        console.log('Raw totalSupply:', totalSupply);
 
-        return 0;
+        if (!totalSupply) {
+            toast.error('Error fetching BIT10 supply. Please try again!');
+            return 0;
+        }
+
+        const scaledTotalSupply = Number(totalSupply) / 100000000;
+        return scaledTotalSupply;
     }
 
     const fetchBit10Tokens = async (tokenLatestRebalanceAPI: string) => {
@@ -135,24 +135,24 @@ export default function RebalanceCollateral() {
     const bit10Queries = useQueries({
         queries: [
             {
-                queryKey: ['bit10BRC20TokenPrice'],
-                queryFn: () => fetchBit10Price('bit10-latest-price-brc20')
+                queryKey: ['bit10TOPTokenPrice'],
+                queryFn: () => fetchBit10Price('bit10-latest-price-top')
             },
             {
-                queryKey: ['bit10BRC20TokenTotalSupply'],
-                queryFn: () => fetchBit10Supply('bit10-brc20')
+                queryKey: ['bit10TOPTokenTotalSupply'],
+                queryFn: () => fetchBit10Supply('bit10-top')
             },
             {
-                queryKey: ['bit10BRC20TokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-latest-rebalance-brc20')
+                queryKey: ['bit10TOPTokenList'],
+                queryFn: () => fetchBit10Tokens('bit10-latest-rebalance-top')
             }
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10BRC20Price = bit10Queries[0].data;
-    const bit10BRC20TotalSupply = bit10Queries[1].data;
-    const bit10BRC20Tokens = bit10Queries[2].data as {
+    const bit10TOPPrice = bit10Queries[0].data;
+    const bit10TOPTotalSupply = bit10Queries[1].data;
+    const bit10TOPTokens = bit10Queries[2].data as {
         timestmpz: string,
         indexValue: number,
         priceOfTokenToBuy: number,
@@ -194,15 +194,17 @@ export default function RebalanceCollateral() {
 
     const initialBit10RebalanceData: RebalanceData[] = [
         {
-            bit10Name: 'BIT10.BRC20',
-            bit10RebalanceHistory: 'brc20',
+            bit10Name: 'BIT10.TOP',
+            bit10RebalanceHistory: 'top',
             bit10Token: {
-                newTokens: bit10BRC20Tokens?.newTokens || [],
-                priceOfTokenToBuy: bit10BRC20Tokens?.priceOfTokenToBuy || 0
+                newTokens: bit10TOPTokens?.newTokens || [],
+                priceOfTokenToBuy: bit10TOPTokens?.priceOfTokenToBuy || 0
             },
-            bit10Price: bit10BRC20Price?.tokenPrice ?? 0,
-            bit10Supply: bit10BRC20TotalSupply ?? 0,
-            bit10Data: bit10BRC20Price?.data ?? []
+            bit10Price: bit10TOPPrice?.tokenPrice ?? 0,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            bit10Supply: bit10TOPTotalSupply ?? 0,
+            bit10Data: bit10TOPPrice?.data ?? []
         }
     ];
 

@@ -22,7 +22,11 @@ export const idlFactory = ({ IDL }) => {
             [IDL.Variant({ 'Ok': IDL.Nat, 'Err': IDL.Text })],
             [],
         ),
-        'bit10_oracle': IDL.Func([], [IDL.Text], []),
+        'bit10_top_total_supply_of_token_available': IDL.Func(
+            [],
+            [IDL.Nat64],
+            ['query'],
+        ),
     });
 };
 // @ts-ignore

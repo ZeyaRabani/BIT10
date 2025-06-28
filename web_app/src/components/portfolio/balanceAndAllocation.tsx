@@ -16,7 +16,7 @@ import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 
-const bit10Tokens = ['BIT10.DEFI', 'BIT10.BRC20'];
+const bit10Tokens = ['BIT10.DEFI', 'BIT10.TOP'];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
 
@@ -73,7 +73,7 @@ export default function BalanceAndAllocation() {
         if (tokenPriceAPI === 'bit10-latest-price-defi') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
-        } else if (tokenPriceAPI === 'bit10-latest-price-brc20') {
+        } else if (tokenPriceAPI === 'bit10-latest-price-top') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, tokenAddress: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         }
@@ -87,33 +87,33 @@ export default function BalanceAndAllocation() {
                 queryFn: () => fetchBit10Tokens('bit10-latest-price-defi')
             },
             {
-                queryKey: ['bit10BRC20TokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-latest-price-brc20')
+                queryKey: ['bit10TOPTokenList'],
+                queryFn: () => fetchBit10Tokens('bit10-latest-price-top')
             },
             {
                 queryKey: ['bit10DEFIBalance'],
                 queryFn: () => fetchBit10Balance('bin4j-cyaaa-aaaap-qh7tq-cai')
             },
             {
-                queryKey: ['bit10BRC20Balance'],
-                queryFn: () => fetchBit10Balance('7bi3r-piaaa-aaaap-qpnrq-cai')
+                queryKey: ['bit10TOPBalance'],
+                queryFn: () => fetchBit10Balance('g37b3-lqaaa-aaaap-qp4hq-cai')
             }
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10DEFITokens = bit10Queries[0].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const bit10BRC20Tokens = bit10Queries[1].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
+    const bit10TOPTokens = bit10Queries[1].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
     const bit10DEFITokenBalance = bit10Queries[2].data as bigint | undefined;
-    const bit10BRC20TokenBalance = bit10Queries[3].data as bigint | undefined;
+    const bit10TOPTokenBalance = bit10Queries[3].data as bigint | undefined;
 
-    const totalBit10Tokens = (bit10DEFITokenBalance ?? 0n) + (bit10BRC20TokenBalance ?? 0n);
+    const totalBit10Tokens = (bit10DEFITokenBalance ?? 0n) + (bit10TOPTokenBalance ?? 0n);
 
     const selectedBit10Token = () => {
         if (selectedAllocationToken === 'BIT10.DEFI') {
             return bit10DEFITokens;
-        } else if (selectedAllocationToken === 'BIT10.BRC20') {
-            return bit10BRC20Tokens;
+        } else if (selectedAllocationToken === 'BIT10.TOP') {
+            return bit10TOPTokens;
         } else {
             return null;
         }
@@ -152,8 +152,8 @@ export default function BalanceAndAllocation() {
             balance: `${formatBit10DEFI(Number(bit10DEFITokenBalance))}`
         },
         {
-            token: 'BIT10.BRC20',
-            balance: `${formatBit10DEFI(Number(bit10BRC20TokenBalance))}`
+            token: 'BIT10.TOP',
+            balance: `${formatBit10DEFI(Number(bit10TOPTokenBalance))}`
         }
     ]
 

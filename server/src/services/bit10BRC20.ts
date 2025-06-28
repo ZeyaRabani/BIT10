@@ -104,20 +104,6 @@ export const fetchAndUpdateBit10BRC20Data = async () => {
             });
         });
 
-        const newEntry: Bit10BRC20Entry = { timestmpz, tokenPrice, data: coinsData };
-        let cachedData: Record<string, Bit10BRC20Entry[]> = {};
-
-        try {
-            const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
-            cachedData = JSON.parse(fileContent);
-        } catch (error) {
-            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
-        }
-
-        cachedData['bit10_brc20_current_price'] = [newEntry];
-
-        await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
-
         console.log("✅ BIT10.BRC20 data updated successfully.");
     } catch (error) {
         console.error("❌ Error updating BIT10.BRC20 data:", error);
@@ -161,6 +147,20 @@ export const fetchAndUpdateBit10BRC20HistoricalData = async () => {
                 data: coinsData,
             });
         });
+
+        const newEntry: Bit10BRC20Entry = { timestmpz, tokenPrice, data: coinsData };
+        let cachedData: Record<string, Bit10BRC20Entry[]> = {};
+
+        try {
+            const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
+            cachedData = JSON.parse(fileContent);
+        } catch (error) {
+            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
+        }
+
+        cachedData['bit10_brc20_current_price'] = [newEntry];
+
+        await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
 
         console.log("✅ BIT10.BRC20 historical data updated successfully.");
     } catch (error) {

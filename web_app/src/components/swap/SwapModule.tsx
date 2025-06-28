@@ -89,12 +89,12 @@ const bit10Amount = [
 
 // const bit10Token = [
 //   'BIT10.DEFI',
-//   // 'BIT10.BRC20'
+//   // 'BIT10.TOP'
 // ]
 
 const bit10Token = [
-  { label: 'BIT10.DEFI', value: 'BIT10.DEFI' },
-  // { label: 'BIT10.BRC20', value: 'BIT10.BRC20' },
+  // { label: 'BIT10.DEFI', value: 'BIT10.DEFI' },
+  { label: 'BIT10.TOP', value: 'BIT10.TOP' },
 ]
 
 // const mintReciveToken = [
@@ -176,17 +176,17 @@ export default function SwapModule() {
         queryFn: () => fetchBit10Price('bit10-latest-price-defi'),
         refetchInterval: 1800000, // 30 min.
       },
-      // {
-      //   queryKey: ['bit10BRC20TokenPrice'],
-      //   queryFn: () => fetchBit10Price('bit10-latest-price-brc20'),
-      //   refetchInterval: 1800000,
-      // },
+      {
+        queryKey: ['bit10TOPTokenPrice'],
+        queryFn: () => fetchBit10Price('bit10-latest-price-top'),
+        refetchInterval: 1800000,
+      },
     ],
   });
 
   const isLoading = useMemo(() => bit10PriceQueries.some(query => query.isLoading), [bit10PriceQueries]);
   const bit10DEFIPrice = useMemo(() => bit10PriceQueries[0].data, [bit10PriceQueries]);
-  // const bit10BRC20Price = useMemo(() => bit10PriceQueries[1].data, [bit10PriceQueries]);
+  const bit10TOPPrice = useMemo(() => bit10PriceQueries[1].data, [bit10PriceQueries]);
 
   const fetchPayWithPrice = useCallback(async (currency: string) => {
     const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);
@@ -226,9 +226,9 @@ export default function SwapModule() {
     defaultValues: {
       payment_method: 'ICP',
       bit10_amount: '1',
-      bit10_token: 'BIT10.DEFI',
+      bit10_token: 'BIT10.TOP',
       minting_bit10_amount: 0.03,
-      minting_bit10_token: 'BIT10.DEFI',
+      minting_bit10_token: 'BIT10.TOP',
       recieving_token: 'ICP'
     },
   });
@@ -268,9 +268,9 @@ export default function SwapModule() {
     if (bit10Token === 'BIT10.DEFI') {
       return bit10DEFIPrice ?? 0;
     }
-    // else if (bit10Token === 'BIT10.BRC20') {
-    //   return bit10BRC20Price ?? 0;
-    // } 
+    else if (bit10Token === 'BIT10.TOP') {
+      return bit10TOPPrice ?? 0;
+    } 
     else {
       return 0;
     }
@@ -283,9 +283,9 @@ export default function SwapModule() {
     if (bit10Token === 'BIT10.DEFI') {
       return bit10DEFIPrice ?? 0;
     }
-    // else if (bit10Token === 'BIT10.BRC20') {
-    //   return bit10BRC20Price ?? 0;
-    // } 
+    else if (bit10Token === 'BIT10.TOP') {
+      return bit10TOPPrice ?? 0;
+    } 
     else {
       return 0;
     }
@@ -349,12 +349,13 @@ export default function SwapModule() {
       const ckETHLegerCanisterId = 'ss2fx-dyaaa-aaaar-qacoq-cai';
       const ICPLegerCanisterId = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
       const bit10DEFICanisterId = 'bin4j-cyaaa-aaaap-qh7tq-cai';
-      const bit10BRC20CanisterId = '7bi3r-piaaa-aaaap-qpnrq-cai';
+      // const bit10BRC20CanisterId = '7bi3r-piaaa-aaaap-qpnrq-cai';
+      const bit10TOPCanisterId = 'g37b3-lqaaa-aaaap-qp4hq-cai';
       const swapCanisterId = '6phs7-6yaaa-aaaap-qpvoq-cai';
 
       if (isMintMode === 'mint') {
         const hasAllowed = await window.ic.plug.requestConnect({
-          whitelist: [bit10DEFICanisterId, bit10BRC20CanisterId, swapCanisterId]
+          whitelist: [bit10DEFICanisterId, bit10TOPCanisterId, swapCanisterId]
         });
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -367,9 +368,9 @@ export default function SwapModule() {
           if (values.minting_bit10_token === 'BIT10.DEFI') {
             selectedCanisterId = bit10DEFICanisterId;
           }
-          // else if (values.minting_bit10_token === 'BIT10.BRC20') {
-          //   selectedCanisterId = bit10BRC20CanisterId;
-          // } 
+          else if (values.minting_bit10_token === 'BIT10.TOP') {
+            selectedCanisterId = bit10TOPCanisterId;
+          } 
           else {
             throw new Error('Invalid payment method');
           }

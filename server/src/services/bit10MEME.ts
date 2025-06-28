@@ -106,20 +106,6 @@ export const fetchAndUpdateBit10MEMEData = async () => {
             });
         });
 
-        const newEntry: Bit10MEMEEntry = { timestmpz, tokenPrice, data: coinsData };
-        let cachedData: Record<string, Bit10MEMEEntry[]> = {};
-
-        try {
-            const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
-            cachedData = JSON.parse(fileContent);
-        } catch (error) {
-            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
-        }
-
-        cachedData['bit10_meme_current_price'] = [newEntry];
-
-        await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
-
         console.log("✅ Test BIT10.MEME data updated successfully.");
     } catch (error) {
         console.error("❌ Error updating Test BIT10.MEME data:", error);
@@ -160,6 +146,20 @@ export const fetchAndUpdateBit10MEMEHistoricalData = async () => {
                 data: coinsData,
             });
         });
+
+        const newEntry: Bit10MEMEEntry = { timestmpz, tokenPrice, data: coinsData };
+        let cachedData: Record<string, Bit10MEMEEntry[]> = {};
+
+        try {
+            const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
+            cachedData = JSON.parse(fileContent);
+        } catch (error) {
+            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
+        }
+
+        cachedData['bit10_meme_current_price'] = [newEntry];
+
+        await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
 
         console.log("✅ BIT10.MEME historical data updated successfully.");
     } catch (error) {

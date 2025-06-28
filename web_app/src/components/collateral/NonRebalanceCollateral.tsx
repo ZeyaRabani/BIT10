@@ -54,7 +54,7 @@ export default function NonRebalanceCollateral() {
     };
 
     const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
-    const canisterId = 'fg5vt-paaaa-aaaap-qhhra-cai';
+    const canisterId = 'egcpt-yyaaa-aaaap-qp4ia-cai';
 
     const agent = new HttpAgent({ host });
     const actor = Actor.createActor(idlFactory, { agent, canisterId });

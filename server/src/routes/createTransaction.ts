@@ -39,7 +39,7 @@ async function createTrx({
     let currentAmount = parseFloat(amount);
     let lastResult: any = null;
     let attempt = 0;
-    const maxAttempts = 100; // Safety cap
+    const maxAttempts = 100;
 
     while (true) {
         attempt++;
@@ -133,7 +133,6 @@ async function createTrx({
 
         lastResult = createTx.data;
 
-        // If expected_output is not provided, or we have no transaction, just return
         if (!expected_output || !lastResult?.transaction?.expectedOutput) {
             return lastResult;
         }
@@ -143,7 +142,6 @@ async function createTrx({
             return lastResult;
         }
 
-        // Increase amount for next attempt
         currentAmount *= 1.05; // Increase by 5%
     }
 }

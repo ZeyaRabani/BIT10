@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { testBit10TopRebalance, bit10Top, bit10TopHistoricalData, bit10CollateralTokenPrices } from '../db/schema'
+import { bit10TopRebalance, bit10Top, bit10TopHistoricalData, bit10CollateralTokenPrices } from '../db/schema'
 import { desc, eq } from 'drizzle-orm'
 import axios from 'axios'
 import fs from 'fs/promises'
@@ -58,10 +58,10 @@ if (!COINMARKETCAP_API_KEY) {
 export const fetchAndUpdateBit10TOPData = async () => {
     try {
         const newTokens = await db.select({
-            newTokens: testBit10TopRebalance.newTokens
+            newTokens: bit10TopRebalance.newTokens
         })
-            .from(testBit10TopRebalance)
-            .orderBy(desc(testBit10TopRebalance.timestmpz))
+            .from(bit10TopRebalance)
+            .orderBy(desc(bit10TopRebalance.timestmpz))
             .limit(1)
             .execute() as RebalanceResult[];
 
@@ -96,20 +96,6 @@ export const fetchAndUpdateBit10TOPData = async () => {
                 data: coinsData,
             });
         });
-
-        const newEntry: Bit10TOPEntry = { timestmpz, tokenPrice, data: coinsData };
-        let cachedData: Record<string, Bit10TOPEntry[]> = {};
-
-        try {
-            const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
-            cachedData = JSON.parse(fileContent);
-        } catch (error) {
-            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
-        }
-
-        cachedData['bit10_top_current_price'] = [newEntry];
-
-        await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
 
         console.log("✅ Test BIT10.TOP data updated successfully.");
     } catch (error) {
@@ -152,6 +138,20 @@ export const fetchAndUpdateBit10TOPHistoricalData = async () => {
             });
         });
 
+        const newEntry: Bit10TOPEntry = { timestmpz, tokenPrice, data: coinsData };
+        let cachedData: Record<string, Bit10TOPEntry[]> = {};
+
+        try {
+            const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
+            cachedData = JSON.parse(fileContent);
+        } catch (error) {
+            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
+        }
+
+        cachedData['bit10_top_current_price'] = [newEntry];
+
+        await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
+
         console.log("✅ BIT10.TOP historical data updated successfully.");
     } catch (error) {
         console.error("❌ Error updating BIT10.TOP data:", error);
@@ -183,8 +183,8 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
             .execute();
 
         const existingData = await db.select()
-            .from(testBit10TopRebalance)
-            .orderBy(desc(testBit10TopRebalance.timestmpz))
+            .from(bit10TopRebalance)
+            .orderBy(desc(bit10TopRebalance.timestmpz))
             .limit(1)
             .execute();
 
@@ -229,7 +229,7 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
             }));
 
         await db.transaction(async (tx) => {
-            await tx.insert(testBit10TopRebalance).values({
+            await tx.insert(bit10TopRebalance).values({
                 timestmpz: latestData[0].timestmpz,
                 indexValue: latestData[0].tokenPrice,
                 priceOfTokenToBuy: priceOfTokenToBuy,

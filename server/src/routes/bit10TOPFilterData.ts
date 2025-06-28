@@ -22,7 +22,7 @@ async function fetchData(days: number) {
 
         return result;
     } catch (error) {
-        console.error('Error reading historical data for Test BIT10.TOP:', error);
+        console.error('Error reading historical data for BIT10.TOP:', error);
         return null;
     }
 }

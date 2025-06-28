@@ -11,7 +11,7 @@ import { handleBit10BRC20FilterData } from './routes/bit10BRC20FilterData'
 import { handleBit10BRC20RebalanceData } from './routes/bit10BRC20RabalanceHistory'
 import { handleBit10TOPCurrentPrice } from './routes/bit10TOPCurrentPrice'
 import { handleBit10TOPFilterData } from './routes/bit10TOPFilterData'
-import { handleTestBit10TOPRebalanceData } from './routes/testBit10TOPRabalanceHistory'
+import { handleBit10TopRebalanceData } from './routes/bit10TOPRabalanceHistory'
 import { handleBit10MEMECurrentPrice } from './routes/bit10MEMECurrentPrice'
 import { handleBit10MEMEFilterData } from './routes/bit10MEMEFilterData'
 import { handleTestBit10MEMERebalanceData } from './routes/testBit10MEMERabalanceHistory'
@@ -29,9 +29,9 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/bit10-brc20-current-price': handleBit10BRC20CurrentPrice,
     '/bit10-brc20': handleBit10BRC20FilterData,
     '/bit10-brc20-rebalance': handleBit10BRC20RebalanceData,
-    '/test-bit10-top-current-price': handleBit10TOPCurrentPrice,
-    '/test-bit10-top': handleBit10TOPFilterData,
-    '/test-bit10-top-rebalance': handleTestBit10TOPRebalanceData,
+    '/bit10-top-current-price': handleBit10TOPCurrentPrice,
+    '/bit10-top': handleBit10TOPFilterData,
+    '/bit10-top-rebalance': handleBit10TopRebalanceData,
     '/test-bit10-meme-current-price': handleBit10MEMECurrentPrice,
     '/test-bit10-meme': handleBit10MEMEFilterData,
     '/test-bit10-meme-rebalance': handleTestBit10MEMERebalanceData,

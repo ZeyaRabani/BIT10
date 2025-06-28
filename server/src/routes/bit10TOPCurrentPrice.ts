@@ -28,10 +28,10 @@ async function fetchData() {
         if (parsedData.bit10_top_current_price.length > 0) {
             latestData = { bit10_top_current_price: [parsedData.bit10_top_current_price[0]] };
             cache.set('bit10_top_current_price_data', latestData.bit10_top_current_price[0]);
-            console.log('Test BIT10.TOP Current Data refreshed at:', new Date().toISOString());
+            console.log('BIT10.TOP Current Data refreshed at:', new Date().toISOString());
         }
     } catch (error) {
-        console.error('Error reading JSON file for Test BIT10.TOP:', error);
+        console.error('Error reading JSON file for BIT10.TOP:', error);
     }
 }
 
