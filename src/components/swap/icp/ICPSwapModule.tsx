@@ -125,7 +125,7 @@ export default function ICPSwapModule() {
             },
             {
                 queryKey: ['bit10TOPTokenPrice'],
-                queryFn: () => fetchBit10Price('test-bit10-latest-price-top'),
+                queryFn: () => fetchBit10Price('bit10-latest-price-top'),
                 refetchInterval: 1800000,
             },
             {
@@ -300,7 +300,7 @@ export default function ICPSwapModule() {
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             tickOutTxBlock: transfer.Ok.tick_out_tx_block.toString(),
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                            transactionType: transfer.Ok.transaction_type as 'Swap' | 'Reverse Swap',
+                            transactionType: transfer.Ok.transaction_type as 'Swap',
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             network: transfer.Ok.network,
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
@@ -492,7 +492,7 @@ export default function ICPSwapModule() {
                                                         </div>
                                                     </TooltipTrigger>
                                                     <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                        Price in {form.watch('payment_method')} + 3% Platform fee <br />
+                                                        Price in {form.watch('payment_method')} + 3% Management fee <br />
                                                         $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))} = $ {(parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.03 * (parseFloat(form.watch('bit10_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))}
                                                     </TooltipContent>
                                                 </Tooltip>

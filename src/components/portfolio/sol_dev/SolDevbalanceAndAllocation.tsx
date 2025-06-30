@@ -63,7 +63,7 @@ export default function SolDevbalanceAndAllocation() {
         } else if (tokenPriceAPI === 'bit10-latest-price-brc20') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, tokenAddress: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
-        } else if (tokenPriceAPI === 'test-bit10-latest-price-top') {
+        } else if (tokenPriceAPI === 'bit10-latest-price-top') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         } else if (tokenPriceAPI === 'test-bit10-latest-price-meme') {
@@ -85,7 +85,7 @@ export default function SolDevbalanceAndAllocation() {
             },
             {
                 queryKey: ['bit10TOPTokenList'],
-                queryFn: () => fetchBit10Tokens('test-bit10-latest-price-top')
+                queryFn: () => fetchBit10Tokens('bit10-latest-price-top')
             },
             {
                 queryKey: ['bit10MEMETokenList'],

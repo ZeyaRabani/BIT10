@@ -44,7 +44,7 @@ export default function Preformance() {
         } else if (tokenPreformance === 'bit10-historic-data-brc20-60') {
             data = await response.json() as { bit10_brc20: Bit10Entry[] }
             returnData = { bit10_brc20: data.bit10_brc20.reverse() };
-        } else if (tokenPreformance === 'test-bit10-historic-data-top-60') {
+        } else if (tokenPreformance === 'bit10-historic-data-top-60') {
             data = await response.json() as { bit10_top: Bit10Entry[] }
             returnData = { bit10_top: data.bit10_top.reverse() };
         } else if (tokenPreformance === 'test-bit10-historic-data-meme-60') {
@@ -66,7 +66,7 @@ export default function Preformance() {
             },
             {
                 queryKey: ['bit10TOPTokenPreformance60d'],
-                queryFn: () => fetchBit10Preformance('test-bit10-historic-data-top-60')
+                queryFn: () => fetchBit10Preformance('bit10-historic-data-top-60')
             },
             {
                 queryKey: ['bit10MEMETokenPreformance60d'],

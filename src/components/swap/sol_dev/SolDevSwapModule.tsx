@@ -122,7 +122,7 @@ export default function SolDevSwapModule() {
             // },
             // {
             //     queryKey: ['bit10TOPTokenPrice'],
-            //     queryFn: () => fetchBit10Price('test-bit10-latest-price-top'),
+            //     queryFn: () => fetchBit10Price('bit10-latest-price-top'),
             //     refetchInterval: 1800000,
             // },
             // {

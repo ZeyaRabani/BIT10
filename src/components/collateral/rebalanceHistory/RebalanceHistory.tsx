@@ -231,7 +231,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             },
             {
                 queryKey: ['bit10TOPRebalance'],
-                queryFn: () => fetchTestBit10RebalanceHistory('top')
+                queryFn: () => fetchBit10RebalanceHistory('top')
             },
             {
                 queryKey: ['bit10MEMERebalance'],

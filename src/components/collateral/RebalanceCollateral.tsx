@@ -121,11 +121,11 @@ export default function RebalanceCollateral() {
             },
             {
                 queryKey: ['bit10TOPTokenPrice'],
-                queryFn: () => fetchBit10Price('test-bit10-latest-price-top')
+                queryFn: () => fetchBit10Price('bit10-latest-price-top')
             },
             {
                 queryKey: ['bit10TOPTokenList'],
-                queryFn: () => fetchBit10Tokens('test-bit10-latest-rebalance-top')
+                queryFn: () => fetchBit10Tokens('bit10-latest-rebalance-top')
             },
             {
                 queryKey: ['bit10MEMETokenPrice'],

@@ -192,10 +192,6 @@ export default function WalletBtn() {
                 }
                 if (chain === 'sol_dev' && SOLWallet.publicKey && referralCode !== SOLWallet.publicKey.toString()) {
                     try {
-                        // console.log('SOL Public Key and Referral Code:', {
-                        //     publicKey: SOLWallet.publicKey.toString(),
-                        //     referralCode
-                        // });
                         const result = await addNewReferral({
                             referralCode: referralCode,
                             userId: SOLWallet.publicKey.toString()
@@ -205,16 +201,11 @@ export default function WalletBtn() {
                         }
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     } catch (error) {
-                        console.log(error);
                         toast.error('An error occurred while adding referral. Please try again!');
                     }
                 }
                 if (chain === 'privy' && privyUser?.wallet?.address && referralCode !== privyUser?.wallet?.address.toString()) {
                     try {
-                        // console.log('Privy Address and Referral Code:', {
-                        //     publicKey: privyUser?.wallet?.address.toString(),
-                        //     referralCode
-                        // });
                         const result = await addNewReferral({
                             referralCode: referralCode,
                             userId: privyUser?.wallet?.address.toString()
@@ -224,7 +215,6 @@ export default function WalletBtn() {
                         }
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     } catch (error) {
-                        console.log(error);
                         toast.error('An error occurred while adding referral. Please try again!');
                     }
                 }

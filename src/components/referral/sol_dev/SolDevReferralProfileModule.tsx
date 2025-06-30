@@ -35,39 +35,6 @@ type Bit10ReferralType = {
     }[];
 };
 
-// const referralProfileData = [
-// {
-//     task: 'Post about BIT10 on Twitter/X',
-//     points: 10,
-//     status: true,
-// },
-// {
-//     task: 'Follow BIT10 on Twitter/X',
-//     points: 10,
-//     status: false,
-// },
-// {
-//     task: 'Turn on all notifications for BIT10 X account',
-//     points: 10,
-//     status: false,
-// },
-// {
-//     task: 'Like BIT10 Post on on Twitter/X',
-//     points: 10,
-//     status: false,
-// },
-//     {
-//         task: 'Swap on Mainnet',
-//         points: 10,
-//         status: false,
-//     },
-//     {
-//         task: 'Swap on Internet Computer Testnet',
-//         points: 10,
-//         status: false,
-//     }
-// ]
-
 const referralProfileTableColumns: ColumnDef<ReferralProfileTableDataType>[] = [
     {
         accessorKey: 'task',
@@ -87,6 +54,21 @@ const referralProfileTableColumns: ColumnDef<ReferralProfileTableDataType>[] = [
             <DataTableColumnHeader column={column} title='Action' />
         ),
     },
+]
+
+const referralProfileOthersTableColumns: ColumnDef<ReferralProfileTableDataType>[] = [
+    {
+        accessorKey: 'task',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Task' />
+        ),
+    },
+    {
+        accessorKey: 'points',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Points' />
+        ),
+    }
 ]
 
 export default function SolDevReferralProfileModule() {
@@ -116,16 +98,13 @@ export default function SolDevReferralProfileModule() {
     const bit10Data = bit10UserReferralQueries[0]?.data ?? [];
     // const bit10ReferralTask = bit10UserReferralQueries[0]?.data ?? [];
 
-    // console.log(bit10ReferralTask);
-
-    // @ts-expect-error
-    const tasksData = bit10Data.tasks_completed ? [
+    const tasksData = [
         {
             task: 'Swap on Mainnet',
             points: 10,
             // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: bit10Data.tasks_completed.swap_on_mainnet,
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.swap_on_mainnet : 0,
             swap_on_mainnet: 'Swap on Mainnet'
         },
         {
@@ -133,7 +112,7 @@ export default function SolDevReferralProfileModule() {
             points: 10,
             // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: bit10Data.tasks_completed.swap_on_internet_computer_testnet,
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.swap_on_internet_computer_testnet : 0,
             swap_on_mainnet: 'Swap on Internet Computer Testnet'
         },
         {
@@ -141,10 +120,28 @@ export default function SolDevReferralProfileModule() {
             points: 10,
             // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: bit10Data.tasks_completed.liquidity_hub_tx_on_internet_computer_testnet,
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.liquidity_hub_tx_on_internet_computer_testnet : 0,
             swap_on_mainnet: 'Swap on Internet Computer Testnet'
         }
-    ] : [];
+    ];
+
+    const othersTasksData = [
+        {
+            task: 'Swap on Internet Computer Liquidity Hub',
+            points: 5,
+            route: '/liquidity-hub'
+        },
+        {
+            task: 'Swap on BIT10 Testnet',
+            points: 5,
+            route: '/swap'
+        },
+        {
+            task: 'Swap on BIT10 Mainnet',
+            points: 20,
+            route: '/swap'
+        }
+    ]
 
     return (
         <div className='pt-4 flex flex-col space-y-4'>
@@ -164,6 +161,25 @@ export default function SolDevReferralProfileModule() {
                             </Card>
                         </div>
                         <div>
+                            <div className='flex flex-col space-y-2 pt-2 pb-1'>
+                                <Skeleton className='h-6 w-16' />
+                                <Skeleton className='h-4 w-36' />
+                            </div>
+                            <Card className='animate-fade-bottom-up-slow'>
+                                <CardContent>
+                                    <div className='flex flex-col h-full space-y-2 pt-8'>
+                                        {['h-12', 'h-12'].map((classes, index) => (
+                                            <Skeleton key={index} className={classes} />
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                        <div>
+                            <div className='flex flex-col space-y-2 pt-2 pb-1'>
+                                <Skeleton className='h-6 w-16' />
+                                <Skeleton className='h-4 w-36' />
+                            </div>
                             <Card className='animate-fade-bottom-up-slow'>
                                 <CardContent>
                                     <div className='flex flex-col h-full space-y-2 pt-8'>
@@ -242,10 +258,21 @@ export default function SolDevReferralProfileModule() {
                                 </CardContent>
                             </Card>
                         </div>
-                        <div>
+                        <div className='pt-2'>
+                            <div className='text-xl md:text-2xl'>Your Referral Tasks</div>
+                            <div className='md:text-lg pb-1'>Complete these to earn points and climb the leaderboard.</div>
                             <DataTable
                                 columns={referralProfileTableColumns}
                                 data={tasksData ?? []}
+                            />
+                        </div>
+
+                        <div className='pt-2'>
+                            <div className='text-xl md:text-2xl'>Referred Users&apos; Tasks</div>
+                            <div className='md:text-lg pb-1'>Track the progress of users you&apos;ve referred and earn additional rewards.</div>
+                            <DataTable
+                                columns={referralProfileOthersTableColumns}
+                                data={othersTasksData ?? []}
                             />
                         </div>
                     </div>

@@ -39,7 +39,6 @@ export const PrivySwapProgramContextProvider: FC<PrivySwapProgramContextProvider
         const solanaWallet = wallets[0];
 
         if (!solanaWallet) {
-            console.warn('No Solana wallet found');
             return null;
         }
 
@@ -52,7 +51,6 @@ export const PrivySwapProgramContextProvider: FC<PrivySwapProgramContextProvider
                         const signedTx = await solanaWallet.signTransaction(tx);
                         return signedTx;
                     } catch (error) {
-                        console.error('Error signing transaction:', error);
                         throw error;
                     }
                 },
@@ -61,7 +59,6 @@ export const PrivySwapProgramContextProvider: FC<PrivySwapProgramContextProvider
                         const signedTxs = await solanaWallet.signAllTransactions(txs);
                         return signedTxs;
                     } catch (error) {
-                        console.error('Error signing transactions:', error);
                         throw error;
                     }
                 }

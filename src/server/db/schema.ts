@@ -392,6 +392,21 @@ export const mbTokenSwap = pgTable('mb_token_swap', {
 		}
 	});
 
+export const bit10TopRebalance = pgTable('bit10_top_rebalance', {
+	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	indexValue: doublePrecision('index_value').notNull(),
+	priceOfTokenToBuy: doublePrecision('price_of_token_to_buy').notNull(),
+	newTokens: json('new_tokens').notNull(),
+	added: json('added').notNull(),
+	removed: json('removed').notNull(),
+	retained: json('retained').notNull(),
+},
+	(table) => {
+		return {
+			timestmpzIdx: index('bit10_top_rebalance_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
 export const users = pgTable('users', {
 	userId: text('user_id').notNull(),
 	userPaymentAddress: text('user_payment_address').notNull(),
