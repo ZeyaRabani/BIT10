@@ -104,16 +104,13 @@ export default function Profile() {
     const bit10Data = bit10UserReferralQueries[0]?.data ?? [];
     // const bit10ReferralTask = bit10UserReferralQueries[0]?.data ?? [];
 
-    // console.log(bit10ReferralTask);
-
-    // @ts-expect-error
-    const tasksData = bit10Data.tasks_completed ? [
+    const tasksData = [
         {
             task: 'Swap on Mainnet',
             points: 10,
             // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: bit10Data.tasks_completed.swap_on_mainnet,
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.swap_on_mainnet : 0,
             swap_on_mainnet: 'Swap on Mainnet'
         },
         {
@@ -121,7 +118,7 @@ export default function Profile() {
             points: 10,
             // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: bit10Data.tasks_completed.swap_on_internet_computer_testnet,
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.swap_on_internet_computer_testnet : 0,
             swap_on_mainnet: 'Swap on Internet Computer Testnet'
         },
         {
@@ -129,10 +126,10 @@ export default function Profile() {
             points: 10,
             // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: bit10Data.tasks_completed.liquidity_hub_tx_on_internet_computer_testnet,
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.liquidity_hub_tx_on_internet_computer_testnet : 0,
             swap_on_mainnet: 'Swap on Internet Computer Testnet'
         }
-    ] : [];
+    ];
 
     const othersTasksData = [
         {

@@ -66,16 +66,16 @@ interface RebalanceData {
     bit10Data: CoinData[];
 }
 
-// Update this
+// Update this (temp. placeholder)
 const bit10Allocation: WalletDataType[] = [
-    { walletAddress: 'bc1pkjd3.....aqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'] },
+    { walletAddress: 'bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'] },
 
-    { walletAddress: '0x8b78d7.....66F925f1', explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', bit10: ['BIT10.TOP'], tokenId: ['1027'] },
-    { walletAddress: 'bc1qfqh8.....79edlnqh', explorerAddress: 'https://mempool.space/address/bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', bit10: ['BIT10.TOP'], tokenId: ['1'] },
-    { walletAddress: '0x7F7307.....fC8Ce6E2', explorerAddress: 'https://bscscan.com/address/0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', bit10: ['BIT10.TOP'], tokenId: ['52', '1839', '74', '2010', '1831'] },
-    { walletAddress: 'KHTRyohh.....J7CN1STn', explorerAddress: 'https://explorer.solana.com/address/KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', bit10: ['BIT10.TOP'], tokenId: ['5426'] },
-    { walletAddress: 'TXHicWyM.....Vx75dtzb', explorerAddress: 'https://tronscan.org/#/address/TXHicWyMh8pBryemgawayVztrxVx75dtzb', bit10: ['BIT10.TOP'], tokenId: ['1958'] },
-    { walletAddress: '0x545a40.....8d1b4c01', explorerAddress: 'https://app.hyperliquid.xyz/explorer/address/0x545a402305d54bf34b588c169b51c24f8d1b4c01', bit10: ['BIT10.TOP'], tokenId: ['32196'] },
+    { walletAddress: '0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', bit10: ['BIT10.TOP'], tokenId: ['1027'] },
+    { walletAddress: 'bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', explorerAddress: 'https://mempool.space/address/bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', bit10: ['BIT10.TOP'], tokenId: ['1'] },
+    { walletAddress: '0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', explorerAddress: 'https://bscscan.com/address/0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', bit10: ['BIT10.TOP'], tokenId: ['52', '1839', '74', '2010', '1831'] },
+    { walletAddress: 'KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', explorerAddress: 'https://explorer.solana.com/address/KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', bit10: ['BIT10.TOP'], tokenId: ['5426'] },
+    { walletAddress: 'TXHicWyMh8pBryemgawayVztrxVx75dtzb', explorerAddress: 'https://tronscan.org/#/address/TXHicWyMh8pBryemgawayVztrxVx75dtzb', bit10: ['BIT10.TOP'], tokenId: ['1958'] },
+    { walletAddress: '0x545a402305d54bf34b588c169b51c24f8d1b4c01', explorerAddress: 'https://app.hyperliquid.xyz/explorer/address/0x545a402305d54bf34b588c169b51c24f8d1b4c01', bit10: ['BIT10.TOP'], tokenId: ['32196'] },
 ];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
@@ -109,8 +109,6 @@ export default function RebalanceCollateral() {
                 ? await actor.bit10_top_total_supply_of_token_available()
                 : undefined;
         }
-
-        console.log('Raw totalSupply:', totalSupply);
 
         if (!totalSupply) {
             toast.error('Error fetching BIT10 supply. Please try again!');
@@ -249,6 +247,12 @@ export default function RebalanceCollateral() {
         };
     });
 
+    const formatWallet = (id: string | undefined) => {
+        if (!id) return '';
+        if (id.length <= 7) return id;
+        return `${id.slice(0, 7)}.........${id.slice(-8)}`;
+    };
+
     return (
         <div>
             {isLoading ? (
@@ -361,7 +365,7 @@ export default function RebalanceCollateral() {
                                                             <td className='flex items-center space-x-1'>
                                                                 <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
                                                                 <span>{token.symbol}</span>
-                                                                <span>({foundAllocation?.walletAddress})</span>
+                                                                <span>({formatWallet(foundAllocation?.walletAddress)})</span>
                                                                 <a href={foundAllocation?.explorerAddress} target='_blank' rel='noopener noreferrer'>
                                                                     <ExternalLink size={16} className='text-primary' />
                                                                 </a>

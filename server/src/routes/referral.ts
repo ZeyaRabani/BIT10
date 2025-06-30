@@ -30,7 +30,7 @@ const jsonFilePath = path.join(__dirname, '../../../data/bit10_june_2025_referra
 const cache = new NodeCache();
 let latestData: { bit10_june_2025_referral: Bit10ReferralType[] } | null = null;
 
-const start_dare = '5 July, 2025 00:00:00' // Time in GMT+5:30
+const start_dare = '30 June, 2025 00:00:00' // Time in GMT+5:30
 
 async function calculateReferral() {
     try {
