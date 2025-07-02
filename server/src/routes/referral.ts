@@ -85,11 +85,25 @@ async function calculateReferral() {
                     .from(swap)
                     .where(and(
                         eq(swap.userPrincipalId, addr.address),
+                        eq(swap.transactionType, 'Swap'),
+                        eq(swap.tickOutName, 'BIT10.TOP'),
                         gt(swap.transactionTimestamp, startDate.toISOString())
                     ))
                     .then(res => res[0]?.count || 0);
 
                 const hasSwapOnMainnet = swapCount > 0;
+
+                const reverseSwapCount = await db.select({ count: count() })
+                    .from(swap)
+                    .where(and(
+                        eq(swap.userPrincipalId, addr.address),
+                        eq(swap.transactionType, 'Reverse Swap'),
+                        eq(swap.tickInName, 'BIT10.TOP'),
+                        gt(swap.transactionTimestamp, startDate.toISOString())
+                    ))
+                    .then(res => res[0]?.count || 0);
+
+                const hasReverseSwapOnMainnet = reverseSwapCount > 0;
 
                 const referredSwapTransactions = referredUsers.length > 0 ? await db.select()
                     .from(swap)
@@ -110,9 +124,16 @@ async function calculateReferral() {
 
                 const hasSwapOnICPLiquidityHub = liquidityHubSwapCount > 0;
 
+                const questionnaireAnswered = await db.select({
+                    questionnaire: referralJune2025Tasks.questionnaire
+                })
+                    .from(referralJune2025Tasks)
+                    .where(eq(referralJune2025Tasks.address, addr.address))
+                    .then(res => res[0]?.questionnaire === true);
+
                 return {
                     address: addr.address,
-                    total_points: (hasSwapOnMainnet === true ? 10 : 0) + (hasSwapOnICPTestnet === true ? 10 : 0) + (hasSwapOnICPLiquidityHub === true ? 10 : 0) + (referredTeliquidityHubTransactions * 5) + (referredTestnetSwapCount * 5) + (referredSwapTransactions * 20),
+                    total_points: (hasSwapOnMainnet === true ? 10 : 0) + (hasReverseSwapOnMainnet === true ? 10 : 0) + (hasSwapOnICPTestnet === true ? 10 : 0) + (hasSwapOnICPLiquidityHub === true ? 10 : 0) + (referredTeliquidityHubTransactions * 5) + (referredTestnetSwapCount * 5) + (referredSwapTransactions * 20) + (questionnaireAnswered === true ? 10 : 0),
                     position: index + 1,
                     referred_users: referredUsers,
                     referral_points: [{
@@ -122,8 +143,10 @@ async function calculateReferral() {
                     }],
                     tasks_completed: {
                         swap_on_mainnet: hasSwapOnMainnet,
+                        reverse_swap_on_mainnet: hasReverseSwapOnMainnet,
                         swap_on_internet_computer_testnet: hasSwapOnICPTestnet,
-                        liquidity_hub_tx_on_internet_computer_testnet: hasSwapOnICPLiquidityHub
+                        liquidity_hub_tx_on_internet_computer_testnet: hasSwapOnICPLiquidityHub,
+                        questionnaire_answered: questionnaireAnswered
                     }
                 };
             }))).sort((a, b) => b.total_points - a.total_points)

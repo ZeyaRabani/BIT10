@@ -178,3 +178,15 @@ export const addNewReferralTasks = async ({ address }: { address: string }) => {
         return 'Error adding new referral task';
     }
 };
+
+export const addReferralQuestionsCompletedTasks = async ({ address }: { address: string }) => {
+    try {
+        await db
+            .update(referralJune2025Tasks)
+            .set({ questionnaire: true })
+            .where(eq(referralJune2025Tasks.address, address));
+        return 'Questionnaire marked as completed';
+    } catch (error) {
+        return 'Error adding new referral task';
+    }
+};
