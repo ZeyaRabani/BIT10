@@ -29,8 +29,10 @@ type Bit10ReferralType = {
         }[];
         tasks_completed: {
             swap_on_mainnet: boolean;
+            reverse_swap_on_mainnet: boolean;
             swap_on_internet_computer_testnet: boolean;
             liquidity_hub_tx_on_internet_computer_testnet: boolean;
+            questionnaire_answered: boolean;
         };
     }[];
 };
@@ -101,29 +103,45 @@ export default function PrivyReferralProfileModule() {
 
     const tasksData = [
         {
-            task: 'Swap on Mainnet',
+            task: 'Swap BIT10.TOP on Mainnet',
             points: 10,
             // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.swap_on_mainnet : 0,
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.swap_on_mainnet : false,
             swap_on_mainnet: 'Swap on Mainnet'
+        },
+        {
+            task: 'Reverse Swap BIT10.TOP on Mainnet',
+            points: 10,
+            // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.reverse_swap_on_mainnet : false,
+            swap_on_mainnet: 'Reverse Swap on Mainnet'
         },
         {
             task: 'Swap on Internet Computer Testnet',
             points: 10,
             // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.swap_on_internet_computer_testnet : 0,
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.swap_on_internet_computer_testnet : false,
             swap_on_mainnet: 'Swap on Internet Computer Testnet'
         },
         {
-            task: 'Swap on Internet Computer Liquidity Hub',
+            task: 'Provide liquidity on Internet Computer Liquidity Hub Testnet',
             points: 10,
             // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.liquidity_hub_tx_on_internet_computer_testnet : 0,
-            swap_on_mainnet: 'Swap on Internet Computer Testnet'
-        }
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.liquidity_hub_tx_on_internet_computer_testnet : false,
+            swap_on_mainnet: 'Provide liquidity on Liquidity Hub Testnet'
+        },
+        {
+            task: 'Read the GitBook and answer the following questions',
+            points: 10,
+            // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            status: bit10Data.tasks_completed ? bit10Data.tasks_completed.questionnaire_answered : false,
+            swap_on_mainnet: 'Answer questions'
+        },
     ];
 
     const othersTasksData = [
@@ -224,7 +242,7 @@ export default function PrivyReferralProfileModule() {
                             <Card className='md:col-span-1'>
                                 <CardHeader className='flex flex-row items-center justify-between space-x-2'>
                                     <div className='text-xl'>
-                                        Point
+                                        Points
                                     </div>
                                     <div>
                                         <Tickets className='h-5 w-5' />

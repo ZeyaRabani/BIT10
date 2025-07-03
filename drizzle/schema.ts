@@ -1,4 +1,4 @@
-import { pgTable, unique, text, timestamp, doublePrecision, index, json, foreignKey, boolean, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, unique, text, timestamp, boolean, doublePrecision, index, json, foreignKey, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -36,6 +36,7 @@ export const mbTokenMint = pgTable('mb_token_mint', {
 
 export const referralJune2025Tasks = pgTable('referral_june_2025_tasks', {
 	address: text('address').primaryKey().notNull(),
+	questionnaire: boolean('questionnaire').default(false).notNull(),
 });
 
 export const teLiquidityHub = pgTable('te_liquidity_hub', {
