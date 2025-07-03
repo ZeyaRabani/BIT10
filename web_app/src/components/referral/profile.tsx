@@ -247,7 +247,7 @@ export default function Profile() {
                             <Card className='md:col-span-1'>
                                 <CardHeader className='flex flex-row items-center justify-between space-x-2'>
                                     <div className='text-xl'>
-                                        Point
+                                        Points
                                     </div>
                                     <div>
                                         <Tickets className='h-5 w-5' />

@@ -215,7 +215,7 @@ export function DataTable<TData, TValue>({
     async function handleQuizSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setShowResults(true);
-        // console.log('Correct answers:', correctCount);
+        
         if (correctCount === 10 && principalId) {
             const result = await addReferralQuestionsCompletedTasks({
                 address: principalId
