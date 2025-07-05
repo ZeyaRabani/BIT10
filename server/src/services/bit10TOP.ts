@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { bit10TopRebalance, bit10Top, bit10TopHistoricalData, bit10CollateralTokenPrices } from '../db/schema'
+import { bit10TopRebalance, bit10TopHistoricalData, bit10CollateralTokenPrices } from '../db/schema'
 import { desc, eq } from 'drizzle-orm'
 import axios from 'axios'
 import fs from 'fs/promises'
@@ -20,18 +20,6 @@ type Coin = {
 
 type ApiResponse = {
     data: Coin[];
-}
-
-type NewToken = {
-    id: number;
-    name: string;
-    price: number;
-    symbol: string;
-    noOfTokens: number;
-}
-
-type RebalanceResult = {
-    newTokens: NewToken[];
 }
 
 type CoinData = {
@@ -56,57 +44,6 @@ if (!COINMARKETCAP_API_KEY) {
 }
 
 export const fetchAndUpdateBit10TOPData = async () => {
-    try {
-        const newTokens = await db.select({
-            newTokens: bit10TopRebalance.newTokens
-        })
-            .from(bit10TopRebalance)
-            .orderBy(desc(bit10TopRebalance.timestmpz))
-            .limit(1)
-            .execute() as RebalanceResult[];
-
-        const combinedIds = newTokens[0].newTokens.map((token: { id: number }) => token.id).join(',');
-
-        if (combinedIds.length === 0) {
-            console.warn('No token IDs found for Test BIT10.TOP rebalance.');
-            return;
-        }
-
-        const API_URL = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${combinedIds}`;
-
-        const response = await axios.get(API_URL, {
-            headers: { 'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEY },
-        });
-
-        const coinsData = Object.values(response.data.data).map((entry: any) => ({
-            id: entry.id,
-            name: entry.name,
-            symbol: entry.symbol,
-            price: entry.quote.USD.price
-        }));
-
-        const totalPrice = coinsData.reduce((sum, coin) => sum + coin.price, 0);
-        const tokenPrice = (totalPrice / coinsData.length) / 1000;
-        const timestmpz = new Date().toISOString();
-
-        await db.transaction(async (tx) => {
-            await tx.insert(bit10Top).values({
-                timestmpz: timestmpz,
-                tokenPrice: tokenPrice,
-                data: coinsData,
-            });
-        });
-
-        console.log("✅ Test BIT10.TOP data updated successfully.");
-    } catch (error) {
-        console.error("❌ Error updating Test BIT10.TOP data:", error);
-    }
-}
-
-// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10TOPData); // 30 sec
-cron.schedule('*/35 * * * *', fetchAndUpdateBit10TOPData); // 35 min
-
-export const fetchAndUpdateBit10TOPHistoricalData = async () => {
     // limit is 15
     const API_URL = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=15`;
 
@@ -158,8 +95,8 @@ export const fetchAndUpdateBit10TOPHistoricalData = async () => {
     }
 }
 
-// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10TOPHistoricalData); // 30 sec
-cron.schedule('*/35 * * * *', fetchAndUpdateBit10TOPHistoricalData); // 35 min
+// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10TOPData); // 30 sec
+cron.schedule('*/30 * * * *', fetchAndUpdateBit10TOPData); // 30 min
 
 export const fetchAndUpdateBit10TOPRebalanceData = async () => {
     try {
@@ -167,7 +104,7 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
             priceoftokentobuy: bit10CollateralTokenPrices.priceOfTokenToBuy
         })
             .from(bit10CollateralTokenPrices)
-            .where(eq(bit10CollateralTokenPrices.bit10TokenName, 'Test BIT10.TOP'))
+            .where(eq(bit10CollateralTokenPrices.bit10TokenName, 'BIT10.TOP'))
             .execute();
 
         const latestData = await db.select()
@@ -177,8 +114,8 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
             .execute();
 
         const currentData = await db.select()
-            .from(bit10Top)
-            .orderBy(desc(bit10Top.timestmpz))
+            .from(bit10TopRebalance)
+            .orderBy(desc(bit10TopRebalance.timestmpz))
             .limit(1)
             .execute();
 
@@ -189,10 +126,10 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
             .execute();
 
         if (priceOfTokenToBuyResult.length === 0 || latestData.length === 0 || existingData.length === 0) {
-            throw new Error('No token data found for Test BIT10.TOP');
+            throw new Error('No token data found for BIT10.TOP');
         }
 
-        const tokenValues = (currentData[0].data as Array<{ id: number; price: number }>).map((currentToken) => {
+        const tokenValues = (currentData[0].newTokens as Array<{ id: number; price: number }>).map((currentToken) => {
             const existingToken = (existingData[0].newTokens as Array<{ id: number; noOfTokens: number }>).find((t) => t.id === currentToken.id);
             if (!existingToken) return 0;
             return currentToken.price * existingToken.noOfTokens;
@@ -240,9 +177,9 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
             });
         });
 
-        console.log("✅ Test BIT10.TOP Rebalance data updated successfully.");
+        console.log("✅ BIT10.TOP Rebalance data updated successfully.");
     } catch (error) {
-        console.error("❌ Error updating Test BIT10.TOP Rebalance data:", error);
+        console.error("❌ Error updating BIT10.TOP Rebalance data:", error);
     }
 }
 

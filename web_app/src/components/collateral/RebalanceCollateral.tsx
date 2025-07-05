@@ -76,6 +76,7 @@ const bit10Allocation: WalletDataType[] = [
     { walletAddress: 'KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', explorerAddress: 'https://explorer.solana.com/address/KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', bit10: ['BIT10.TOP'], tokenId: ['5426'] },
     { walletAddress: 'TXHicWyMh8pBryemgawayVztrxVx75dtzb', explorerAddress: 'https://tronscan.org/#/address/TXHicWyMh8pBryemgawayVztrxVx75dtzb', bit10: ['BIT10.TOP'], tokenId: ['1958'] },
     { walletAddress: '0x545a402305d54bf34b588c169b51c24f8d1b4c01', explorerAddress: 'https://app.hyperliquid.xyz/explorer/address/0x545a402305d54bf34b588c169b51c24f8d1b4c01', bit10: ['BIT10.TOP'], tokenId: ['32196'] },
+    { walletAddress: '0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', explorerAddress: 'https://suiscan.xyz/mainnet/account/0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', bit10: ['BIT10.TOP'], tokenId: ['20947'] },
 ];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];

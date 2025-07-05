@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { bit10Brc20Rebalance, bit10Brc20, bit10Brc20HistoricalData, bit10CollateralTokenPrices } from '../db/schema'
+import { bit10Brc20Rebalance, bit10Brc20HistoricalData, bit10CollateralTokenPrices } from '../db/schema'
 import { desc, eq } from 'drizzle-orm'
 import axios from 'axios'
 import fs from 'fs/promises'
@@ -27,19 +27,6 @@ type ApiResponse = {
     };
 }
 
-type NewToken = {
-    id: number;
-    name: string;
-    price: number;
-    symbol: string;
-    noOfTokens: number;
-    tokenAddress: string;
-}
-
-type RebalanceResult = {
-    newTokens: NewToken[];
-}
-
 type CoinData = {
     id: number;
     name: string;
@@ -63,57 +50,6 @@ if (!COINMARKETCAP_API_KEY) {
 }
 
 export const fetchAndUpdateBit10BRC20Data = async () => {
-    try {
-        const newTokens = await db.select({
-            newTokens: bit10Brc20Rebalance.newTokens
-        })
-            .from(bit10Brc20Rebalance)
-            .orderBy(desc(bit10Brc20Rebalance.timestmpz))
-            .limit(1)
-            .execute() as RebalanceResult[];
-
-        const combinedIds = newTokens[0].newTokens.map((token: { id: number }) => token.id).join(',');
-
-        if (combinedIds.length === 0) {
-            console.warn('No token IDs found for BIT10.BRC20 rebalance.');
-            return;
-        }
-
-        const API_URL = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${combinedIds}`;
-
-        const response = await axios.get(API_URL, {
-            headers: { 'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEY },
-        });
-
-        const coinsData = Object.values(response.data.data).map((entry: any) => ({
-            id: entry.id,
-            name: entry.name,
-            symbol: entry.symbol,
-            tokenAddress: entry.platform.token_address,
-            price: entry.quote.USD.price
-        }));
-
-        const tokenPrice = coinsData.reduce((sum, coin) => sum + coin.price, 0) / coinsData.length;
-        const timestmpz = new Date().toISOString();
-
-        await db.transaction(async (tx) => {
-            await tx.insert(bit10Brc20).values({
-                timestmpz: timestmpz,
-                tokenPrice: tokenPrice,
-                data: coinsData,
-            });
-        });
-
-        console.log("✅ BIT10.BRC20 data updated successfully.");
-    } catch (error) {
-        console.error("❌ Error updating BIT10.BRC20 data:", error);
-    }
-}
-
-// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10BRC20Data); // 30 sec
-cron.schedule('*/35 * * * *', fetchAndUpdateBit10BRC20Data); // 35 min
-
-export const fetchAndUpdateBit10BRC20HistoricalData = async () => {
     // limit is 10
     const API_URL = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/category?id=654a0c87ba37f269c8016129&limit=10`;
 
@@ -168,8 +104,8 @@ export const fetchAndUpdateBit10BRC20HistoricalData = async () => {
     }
 }
 
-// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10BRC20HistoricalData); // 30 sec
-cron.schedule('*/35 * * * *', fetchAndUpdateBit10BRC20HistoricalData); // 35 min
+// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10BRC20Data); // 30 sec
+cron.schedule('*/30 * * * *', fetchAndUpdateBit10BRC20Data); // 30 min
 
 export const fetchAndUpdateBit10BRC20RebalanceData = async () => {
     try {
@@ -187,8 +123,8 @@ export const fetchAndUpdateBit10BRC20RebalanceData = async () => {
             .execute();
 
         const currentData = await db.select()
-            .from(bit10Brc20)
-            .orderBy(desc(bit10Brc20.timestmpz))
+            .from(bit10Brc20Rebalance)
+            .orderBy(desc(bit10Brc20Rebalance.timestmpz))
             .limit(1)
             .execute();
 
@@ -202,7 +138,7 @@ export const fetchAndUpdateBit10BRC20RebalanceData = async () => {
             throw new Error('No token data found for BIT10.BRC20');
         }
 
-        const tokenValues = (currentData[0].data as Array<{ id: number; price: number }>).map((currentToken) => {
+        const tokenValues = (currentData[0].newTokens as Array<{ id: number; price: number }>).map((currentToken) => {
             const existingToken = (existingData[0].newTokens as Array<{ id: number; noOfTokens: number }>).find((t) => t.id === currentToken.id);
             if (!existingToken) return 0;
             return currentToken.price * existingToken.noOfTokens;

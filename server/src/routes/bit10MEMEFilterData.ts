@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { bit10Meme } from '../db/schema'
+import { bit10MemeHistoricalData } from '../db/schema'
 import { desc, gte } from 'drizzle-orm'
 import type { IncomingMessage, ServerResponse } from 'http'
 import NodeCache from 'node-cache'
@@ -12,12 +12,12 @@ async function fetchData(days: number) {
         const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000).toISOString();
 
         const result = await db.select({
-            timestmpz: bit10Meme.timestmpz,
-            tokenPrice: bit10Meme.tokenPrice
+            timestmpz: bit10MemeHistoricalData.timestmpz,
+            tokenPrice: bit10MemeHistoricalData.tokenPrice
         })
-            .from(bit10Meme)
-            .where(gte(bit10Meme.timestmpz, startDate))
-            .orderBy(desc(bit10Meme.timestmpz))
+            .from(bit10MemeHistoricalData)
+            .where(gte(bit10MemeHistoricalData.timestmpz, startDate))
+            .orderBy(desc(bit10MemeHistoricalData.timestmpz))
             .execute();
 
         return result;
