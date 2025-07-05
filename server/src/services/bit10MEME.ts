@@ -101,7 +101,7 @@ export const fetchAndUpdateBit10MEMEData = async () => {
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10MEMEData); // 30 sec
-cron.schedule('*/30 * * * *', fetchAndUpdateBit10MEMEData); // 30 min
+cron.schedule('*/20 * * * *', fetchAndUpdateBit10MEMEData); // 20 min
 
 export const fetchAndUpdateBit10MEMERebalanceData = async () => {
     try {

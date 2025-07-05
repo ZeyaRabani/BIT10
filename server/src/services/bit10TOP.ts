@@ -96,7 +96,7 @@ export const fetchAndUpdateBit10TOPData = async () => {
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10TOPData); // 30 sec
-cron.schedule('*/30 * * * *', fetchAndUpdateBit10TOPData); // 30 min
+cron.schedule('*/20 * * * *', fetchAndUpdateBit10TOPData); // 20 min
 
 export const fetchAndUpdateBit10TOPRebalanceData = async () => {
     try {

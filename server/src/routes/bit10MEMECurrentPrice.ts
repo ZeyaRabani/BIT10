@@ -38,7 +38,7 @@ async function fetchData() {
 }
 
 // cron.schedule('*/30 * * * * *', () => { // 30 sec
-cron.schedule('*/30 * * * *', () => { // 30 min
+cron.schedule('*/20 * * * *', () => { // 20 min
     fetchData().catch(error => console.error('Error in fetchData:', error));
 });
 
