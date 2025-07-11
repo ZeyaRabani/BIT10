@@ -122,7 +122,7 @@ export default function Page() {
     }
 
     return (
-        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10'>
+        <div className='absolute pt-36 md:pt-0 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10'>
             <Card className='w-[90vw] md:w-[550px]'>
                 <CardHeader>
                     <CardTitle className='text-4xl text-center'>BIT10.BTC Faucet</CardTitle>

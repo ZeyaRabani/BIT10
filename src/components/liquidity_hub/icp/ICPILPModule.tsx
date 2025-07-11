@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import * as z from 'zod'
-import { useICPWallet } from '@/context/ICPWalletContext'
-import { useBTCWallet } from '@/context/BTCWalletContext'
+// import { useICPWallet } from '@/context/ICPWalletContext'
+// import { useBTCWallet } from '@/context/BTCWalletContext'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ChevronsUpDown, Check, Loader2, Info } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { request } from '@stacks/connect'
+// import { request } from '@stacks/connect'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -58,10 +58,11 @@ const FormSchema = z.object({
 })
 
 export default function ICPILPModule() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [processing, setProcessing] = useState<boolean>(false);
 
-    const { ICPAddress } = useICPWallet();
-    const { BTCAddress, isBTCConnected, connectBTCWallet, disconnectBTCWallet } = useBTCWallet();
+    // const { ICPAddress } = useICPWallet();
+    // const { BTCAddress, isBTCConnected, connectBTCWallet, disconnectBTCWallet } = useBTCWallet();
 
     const fetchPayWithPrice = useCallback(async (currency: string) => {
         const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);
@@ -160,65 +161,66 @@ export default function ICPILPModule() {
     const recivingPrice = recivingTokenPrice();
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const swapDisabledConditions = !isBTCConnected || processing || recivingPrice === '0' || liquidityPrice === '0';
+    // const swapDisabledConditions = !isBTCConnected || processing || recivingPrice === '0' || liquidityPrice === '0';
 
-    const formatAddress = (id: string | undefined) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 8)}........${id.slice(-9)}`;
-    };
+    // const formatAddress = (id: string | undefined) => {
+    //     if (!id) return '';
+    //     if (id.length <= 7) return id;
+    //     return `${id.slice(0, 8)}........${id.slice(-9)}`;
+    // };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
-            setProcessing(true);
+            // setProcessing(true);
 
-            const liquidityHubCanisterId = 'jskxc-iiaaa-aaaap-qpwrq-cai'
+            // const liquidityHubCanisterId = 'jskxc-iiaaa-aaaap-qpwrq-cai'
 
-            const hasAllowed = await window.ic.plug.requestConnect({
-                whitelist: [liquidityHubCanisterId]
-            });
+            // const hasAllowed = await window.ic.plug.requestConnect({
+            //     whitelist: [liquidityHubCanisterId]
+            // });
 
-            toast.info('Allow the transaction on your wallet to proceed.');
+            // toast.info('Allow the transaction on your wallet to proceed.');
 
-            const destinatioAddress = '2MvxteUZggvbprjogjMQVrRZ3NSNVskCpaz';
-            const amountInMicroUnits = 100000000 * values.liquidity_amount;
-            const response = await request('sendTransfer', {
-                recipients: [
-                    {
-                        address: destinatioAddress,
-                        amount: amountInMicroUnits
-                    }
-                ],
-                network: 'testnet'
-            });
+            // const destinatioAddress = '2MvxteUZggvbprjogjMQVrRZ3NSNVskCpaz';
+            // const amountInMicroUnits = 100000000 * values.liquidity_amount;
+            // const response = await request('sendTransfer', {
+            //     recipients: [
+            //         {
+            //             address: destinatioAddress,
+            //             amount: amountInMicroUnits
+            //         }
+            //     ],
+            //     network: 'testnet'
+            // });
 
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            if (response.txid && hasAllowed) {
+            // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // // @ts-ignore
+            // if (response.txid && hasAllowed) {
 
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                const actor2 = await window.ic.plug.createActor({
-                    canisterId: liquidityHubCanisterId,
-                    interfaceFactory: idlFactory,
-                });
+            //     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            //     const actor2 = await window.ic.plug.createActor({
+            //         canisterId: liquidityHubCanisterId,
+            //         interfaceFactory: idlFactory,
+            //     });
 
-                const args2 = {
-                    tick_in_tx_block: response.txid,
-                    tick_out_name: values.recieving_token,
-                    tick_in_name: values.liquidity_token,
-                    tick_in_network: 'bitcoin_testnet'
-                };
+            //     const args2 = {
+            //         tick_in_tx_block: response.txid,
+            //         tick_out_name: values.recieving_token,
+            //         tick_in_name: values.liquidity_token,
+            //         tick_in_network: 'bitcoin_testnet'
+            //     };
 
-                setTimeout(() => {
-                    setProcessing(false);
-                    toast.info('Transaction was successful. Funds will be sent to your wallet after confirming the transaction.!');
-                }, 2000);
+            //     setTimeout(() => {
+            //         setProcessing(false);
+            //         toast.info('Transaction was successful. Funds will be sent to your wallet after confirming the transaction.!');
+            //     }, 2000);
 
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                await actor2.te_ilp(args2);
-            } else {
-                toast.error('An error occurred while processing your request. Please try again!');
-            }
+            //     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            //     await actor2.te_ilp(args2);
+            // } else {
+            //     toast.error('An error occurred while processing your request. Please try again!');
+            // }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             setProcessing(false);
@@ -477,24 +479,24 @@ export default function ICPILPModule() {
 
                             </CardContent>
                             <CardFooter>
-                                {isBTCConnected ? (
+                                <Button className='w-full' disabled>
+                                    Reached pool limit
+                                </Button>
+                                {/* {isBTCConnected ? (
                                     <div className='w-full fex flex-col space-y-2'>
                                         <h1>Your spent address: {formatAddress(BTCAddress)}</h1>
                                         <h1>Your receive address: {formatAddress(ICPAddress)}</h1>
                                         <div className='w-full rounded text-center py-2 font-medium cursor-pointer bg-destructive hover:bg-destructive/90 text-white' onClick={disconnectBTCWallet}>Disconnect Bitcoin Wallet</div>
-                                        {/* <Button className='w-full' disabled={swapDisabledConditions}>
+                                        <Button className='w-full' disabled={swapDisabledConditions}>
                                             {processing && <Loader2 className='animate-spin mr-2' size={15} />}
                                             {processing ? 'Swapping...' : 'Swap'}
-                                        </Button> */}
-                                        <Button className='w-full' disabled>
-                                            Reached pool limit
                                         </Button>
                                     </div>
                                 ) : (
                                     <div className='w-full'>
                                         <div className='bg-primary rounded text-center py-2 font-medium cursor-pointer hover:bg-primary/90 text-white' onClick={connectBTCWallet}>Connect Bitcoin Wallet</div>
                                     </div>
-                                )}
+                                )} */}
                             </CardFooter>
                         </form>
                     </Form>

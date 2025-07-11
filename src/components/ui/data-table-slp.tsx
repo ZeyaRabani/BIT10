@@ -50,21 +50,22 @@ export function DataTable<TData, TValue>({
         },
     });
 
-    const formatTokenAmount = (value: number): string => {
+    const formatTokenAmount = (value: number | null | undefined): string => {
+        if (value === null || value === undefined || isNaN(value)) return '0';
         if (value === 0) return '0';
-
         const strValue = value.toFixed(10).replace(/\.?0+$/, '');
         const [integerPart, decimalPart = ''] = strValue.split('.');
+        const formattedInteger = Number(integerPart).toLocaleString();
 
-        if (!decimalPart) return integerPart ?? '0';
+        if (!decimalPart) return formattedInteger ?? '0';
 
         const firstNonZeroIndex = decimalPart.search(/[1-9]/);
 
-        if (firstNonZeroIndex === -1) return integerPart ?? '0';
+        if (firstNonZeroIndex === -1) return formattedInteger ?? '0';
 
         const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
 
-        return `${integerPart}.${trimmedDecimal}`;
+        return `${formattedInteger}.${trimmedDecimal}`;
     };
 
     const formatDate = (dateInput: Date | string): string => {

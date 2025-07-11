@@ -12,13 +12,13 @@ interface DataTableViewOptionsProps<TData> {
 
 const formatColumnName = (columnName: string): string => {
     if (columnName === 'tokenSwapId') {
-        return 'Swap ID';
-    } else if (columnName === 'paymentAmount') {
-        return 'Purchase Amount';
-    } else if (columnName === 'bit10TokenName') {
-        return 'BIT10 Token';
-    } else if (columnName === 'tokenBoughtAt') {
-        return 'Token Bought at';
+        return 'Transaction ID';
+    } else if (columnName === 'mode') {
+        return 'Type';
+    } else if (columnName === 'tickIn') {
+        return 'Spent';
+    } else if (columnName === 'tickOutName') {
+        return 'Received';
     } else if (columnName === 'view_transaction') {
         return 'Ciew Transaction';
     } else if (columnName === 'duration') {

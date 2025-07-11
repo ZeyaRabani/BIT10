@@ -55,7 +55,7 @@ const RebalanceSwapsTable = ({
 
         if (rebalanceToken) {
             const diff = rebalanceToken.noOfTokens - initialToken.noOfTokens;
-            if (Math.abs(diff) > 0.000001) {
+            if (Math.abs(diff) > 0.00000000000000001) {
                 const swap = {
                     symbol,
                     name: initialToken.name,
@@ -259,21 +259,22 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
 
     const selectedBit10Token = bit10Token();
 
-    const formatTokenAmount = (value: number): string => {
+    const formatTokenAmount = (value: number | null | undefined): string => {
+        if (value === null || value === undefined || isNaN(value)) return '0';
         if (value === 0) return '0';
-
         const strValue = value.toFixed(10).replace(/\.?0+$/, '');
         const [integerPart, decimalPart = ''] = strValue.split('.');
+        const formattedInteger = Number(integerPart).toLocaleString();
 
-        if (!decimalPart) return integerPart ?? '0';
+        if (!decimalPart) return formattedInteger ?? '0';
 
         const firstNonZeroIndex = decimalPart.search(/[1-9]/);
 
-        if (firstNonZeroIndex === -1) return integerPart ?? '0';
+        if (firstNonZeroIndex === -1) return formattedInteger ?? '0';
 
         const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
 
-        return `${integerPart}.${trimmedDecimal}`;
+        return `${formattedInteger}.${trimmedDecimal}`;
     };
 
     return (
@@ -300,8 +301,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                     return (
                                         <div key={entry.timestmpz} className='border p-4 rounded-lg'>
                                             <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                                            <p className='text-lg'>Index Value: {entry.indexValue.toFixed(4)} USD</p>
-                                            <p className='text-lg'>Total Collateral: {(entry.priceOfTokenToBuy * entry.newTokens.length).toFixed(4)} USD</p>
+                                            <p className='text-lg'>Index Value: {formatTokenAmount(entry.indexValue)} USD</p>
+                                            <p className='text-lg'>Total Collateral: {formatTokenAmount(entry.priceOfTokenToBuy * entry.newTokens.length)} USD</p>
                                             <h3 className='font-medium my-2'>
                                                 Allocation (Effective {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
                                             </h3>
