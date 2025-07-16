@@ -628,71 +628,70 @@ export default function SolDevSwapModule() {
                                                 </div>
 
                                                 <div className='grid grid-cols-5 items-center'>
-                                                    <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
-                                                        <FormField
-                                                            control={form.control}
-                                                            name='payment_token'
-                                                            render={({ field }) => (
-                                                                <FormItem className='w-full px-2'>
-                                                                    <FormControl>
-                                                                        <div>
-                                                                            <Button
-                                                                                type='button'
-                                                                                variant='outline'
-                                                                                className={cn('border-none justify-between px-1.5 w-full', !field.value && 'text-muted-foreground')}
-                                                                                onClick={() => setPaymentTokenDialogOpen(true)}
-                                                                            >
-                                                                                {field.value
-                                                                                    ? paymentToken.find((t) => t.value === field.value)?.label
-                                                                                    : 'Select token'}
-                                                                                <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
-                                                                            </Button>
-                                                                            <Dialog open={paymentTokenDialogOpen} onOpenChange={setPaymentTokenDialogOpen}>
-                                                                                <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
-                                                                                    <DialogHeader>
-                                                                                        <DialogTitle>Select Payment Token</DialogTitle>
-                                                                                    </DialogHeader>
-                                                                                    <Input
-                                                                                        placeholder='Search tokens'
-                                                                                        value={paymentTokenSearch}
-                                                                                        onChange={(e) => setPaymentTokenSearch(e.target.value)}
-                                                                                        className='dark:border-white'
-                                                                                    />
-                                                                                    <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
-                                                                                        {filteredPaymentTokens.length === 0 ? (
-                                                                                            <div className='text-center text-gray-500 py-4'>No token found.</div>
-                                                                                        ) : (
-                                                                                            filteredPaymentTokens.map((token) => (
-                                                                                                <Button
-                                                                                                    key={token.value}
-                                                                                                    variant='ghost'
-                                                                                                    className='flex flex-row items-center justify-start py-6'
-                                                                                                    onClick={() => {
-                                                                                                        field.onChange(token.value);
-                                                                                                        setPaymentTokenDialogOpen(false);
-                                                                                                        setPaymentTokenSearch('');
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <div>
-                                                                                                        <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
-                                                                                                    </div>
-                                                                                                    <div className='flex flex-col items-start tracking-wide'>
-                                                                                                        <div>{token.label}</div>
-                                                                                                        <div>{formatAddress(token.address)}</div>
-                                                                                                    </div>
-                                                                                                </Button>
-                                                                                            ))
-                                                                                        )}
-                                                                                    </div>
-                                                                                </DialogContent>
-                                                                            </Dialog>
-                                                                        </div>
-                                                                    </FormControl>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                    </div>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name='payment_token'
+                                                        render={({ field }) => (
+                                                            <FormItem className='w-full px-2 col-span-4'>
+                                                                <FormControl>
+                                                                    <div>
+                                                                        <Button
+                                                                            type='button'
+                                                                            variant='outline'
+                                                                            className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
+                                                                            onClick={() => setPaymentTokenDialogOpen(true)}
+                                                                        >
+                                                                            {field.value
+                                                                                ? paymentToken.find((t) => t.value === field.value)?.label
+                                                                                : 'Select token'}
+                                                                            <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                                        </Button>
+                                                                        <Dialog open={paymentTokenDialogOpen} onOpenChange={setPaymentTokenDialogOpen}>
+                                                                            <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
+                                                                                <DialogHeader>
+                                                                                    <DialogTitle>Select Payment Token</DialogTitle>
+                                                                                </DialogHeader>
+                                                                                <Input
+                                                                                    placeholder='Search tokens'
+                                                                                    value={paymentTokenSearch}
+                                                                                    onChange={(e) => setPaymentTokenSearch(e.target.value)}
+                                                                                    className='dark:border-white'
+                                                                                />
+                                                                                <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
+                                                                                    {filteredPaymentTokens.length === 0 ? (
+                                                                                        <div className='text-center text-gray-500 py-4'>No token found.</div>
+                                                                                    ) : (
+                                                                                        filteredPaymentTokens.map((token) => (
+                                                                                            <Button
+                                                                                                key={token.value}
+                                                                                                variant='ghost'
+                                                                                                className='flex flex-row items-center justify-start py-6'
+                                                                                                onClick={() => {
+                                                                                                    field.onChange(token.value);
+                                                                                                    setPaymentTokenDialogOpen(false);
+                                                                                                    setPaymentTokenSearch('');
+                                                                                                }}
+                                                                                            >
+                                                                                                <div>
+                                                                                                    <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
+                                                                                                </div>
+                                                                                                <div className='flex flex-col items-start tracking-wide'>
+                                                                                                    <div>{token.label}</div>
+                                                                                                    <div>{formatAddress(token.address)}</div>
+                                                                                                </div>
+                                                                                            </Button>
+                                                                                        ))
+                                                                                    )}
+                                                                                </div>
+                                                                            </DialogContent>
+                                                                        </Dialog>
+                                                                    </div>
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
                                                     <div className='col-span-1 -ml-6 z-20'>
                                                         <Image src={payingTokenImg} alt={form.watch('payment_token')} width={75} height={75} className='z-20' />
                                                     </div>
@@ -708,8 +707,8 @@ export default function SolDevSwapModule() {
                                                             </div>
                                                         </TooltipTrigger>
                                                         <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                            Price in {form.watch('payment_token')} + 3% Management fee <br />
-                                                            $ {formatTokenAmount(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatTokenAmount(0.03 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatTokenAmount((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.03 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))))}
+                                                            Price in {form.watch('payment_token')} + 1% Management fee <br />
+                                                            $ {formatTokenAmount(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatTokenAmount(0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatTokenAmount((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))))}
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
@@ -749,71 +748,70 @@ export default function SolDevSwapModule() {
                                                 </div>
 
                                                 <div className='grid grid-cols-5 items-center'>
-                                                    <div className='col-span-4 px-2 mr-8 border-2 rounded-l-full z-10 w-full'>
-                                                        <FormField
-                                                            control={form.control}
-                                                            name='receive_token'
-                                                            render={({ field }) => (
-                                                                <FormItem className='w-full px-2'>
-                                                                    <FormControl>
-                                                                        <div>
-                                                                            <Button
-                                                                                type='button'
-                                                                                variant='outline'
-                                                                                className={cn('border-none justify-between px-1.5 w-full', !field.value && 'text-muted-foreground')}
-                                                                                onClick={() => setReceiveTokenDialogOpen(true)}
-                                                                            >
-                                                                                {field.value
-                                                                                    ? bit10Token.find((t) => t.value === field.value)?.label
-                                                                                    : 'Select token'}
-                                                                                <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
-                                                                            </Button>
-                                                                            <Dialog open={receiveTokenDialogOpen} onOpenChange={setReceiveTokenDialogOpen}>
-                                                                                <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
-                                                                                    <DialogHeader>
-                                                                                        <DialogTitle>Select Receive Token</DialogTitle>
-                                                                                    </DialogHeader>
-                                                                                    <Input
-                                                                                        placeholder='Search tokens'
-                                                                                        value={receiveTokenSearch}
-                                                                                        onChange={(e) => setReceiveTokenSearch(e.target.value)}
-                                                                                        className='dark:border-white'
-                                                                                    />
-                                                                                    <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
-                                                                                        {filteredReceiveTokens.length === 0 ? (
-                                                                                            <div className='text-center text-gray-500 py-4'>No token found.</div>
-                                                                                        ) : (
-                                                                                            filteredReceiveTokens.map((token) => (
-                                                                                                <Button
-                                                                                                    key={token.value}
-                                                                                                    variant='ghost'
-                                                                                                    className='flex flex-row items-center justify-start py-6'
-                                                                                                    onClick={() => {
-                                                                                                        field.onChange(token.value);
-                                                                                                        setReceiveTokenDialogOpen(false);
-                                                                                                        setReceiveTokenSearch('');
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <div>
-                                                                                                        <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
-                                                                                                    </div>
-                                                                                                    <div className='flex flex-col items-start tracking-wide'>
-                                                                                                        <div>{token.label}</div>
-                                                                                                        <div>{formatAddress(token.address)}</div>
-                                                                                                    </div>
-                                                                                                </Button>
-                                                                                            ))
-                                                                                        )}
-                                                                                    </div>
-                                                                                </DialogContent>
-                                                                            </Dialog>
-                                                                        </div>
-                                                                    </FormControl>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                    </div>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name='receive_token'
+                                                        render={({ field }) => (
+                                                            <FormItem className='w-full px-2 col-span-4'>
+                                                                <FormControl>
+                                                                    <div>
+                                                                        <Button
+                                                                            type='button'
+                                                                            variant='outline'
+                                                                            className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
+                                                                            onClick={() => setReceiveTokenDialogOpen(true)}
+                                                                        >
+                                                                            {field.value
+                                                                                ? bit10Token.find((t) => t.value === field.value)?.label
+                                                                                : 'Select token'}
+                                                                            <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                                        </Button>
+                                                                        <Dialog open={receiveTokenDialogOpen} onOpenChange={setReceiveTokenDialogOpen}>
+                                                                            <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
+                                                                                <DialogHeader>
+                                                                                    <DialogTitle>Select Receive Token</DialogTitle>
+                                                                                </DialogHeader>
+                                                                                <Input
+                                                                                    placeholder='Search tokens'
+                                                                                    value={receiveTokenSearch}
+                                                                                    onChange={(e) => setReceiveTokenSearch(e.target.value)}
+                                                                                    className='dark:border-white'
+                                                                                />
+                                                                                <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
+                                                                                    {filteredReceiveTokens.length === 0 ? (
+                                                                                        <div className='text-center text-gray-500 py-4'>No token found.</div>
+                                                                                    ) : (
+                                                                                        filteredReceiveTokens.map((token) => (
+                                                                                            <Button
+                                                                                                key={token.value}
+                                                                                                variant='ghost'
+                                                                                                className='flex flex-row items-center justify-start py-6'
+                                                                                                onClick={() => {
+                                                                                                    field.onChange(token.value);
+                                                                                                    setReceiveTokenDialogOpen(false);
+                                                                                                    setReceiveTokenSearch('');
+                                                                                                }}
+                                                                                            >
+                                                                                                <div>
+                                                                                                    <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
+                                                                                                </div>
+                                                                                                <div className='flex flex-col items-start tracking-wide'>
+                                                                                                    <div>{token.label}</div>
+                                                                                                    <div>{formatAddress(token.address)}</div>
+                                                                                                </div>
+                                                                                            </Button>
+                                                                                        ))
+                                                                                    )}
+                                                                                </div>
+                                                                            </DialogContent>
+                                                                        </Dialog>
+                                                                    </div>
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
                                                     <div className='col-span-1 -ml-6 z-20'>
                                                         {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
                                                         <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
@@ -852,7 +850,7 @@ export default function SolDevSwapModule() {
                                                         <Tooltip delayDuration={300}>
                                                             <TooltipTrigger asChild>
                                                                 <div className='flex flex-row space-x-1 items-center'>
-                                                                    <div>3%</div>
+                                                                    <div>1%</div>
                                                                     <div>
                                                                         <Info className='size-3 align-middle relative bottom-[1px]' />
                                                                     </div>
