@@ -105,14 +105,6 @@ const config = {
             {
                 source: '/token-list',
                 destination: '/api/token-list',
-            },
-            {
-                source: '/referral-leaderboard',
-                destination: '/api/referral-leaderboard',
-            },
-            {
-                source: '/referral-user-:user_address',
-                destination: '/api/referral-user/:user_address',
             }
         ]
     },

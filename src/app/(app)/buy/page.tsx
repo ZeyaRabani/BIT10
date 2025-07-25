@@ -4,7 +4,7 @@ import React, { Suspense } from 'react'
 import { useChain } from '@/context/ChainContext'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import Preloader from '@/components/Preloader'
-import Referral from '@/components/referral/Referral'
+import Buy from '@/components/buy/Buy'
 import InformationCard from '@/components/InformationCard'
 
 export default function Page() {
@@ -34,11 +34,11 @@ export default function Page() {
             <MaxWidthWrapper className='py-4 z-10 relative'>
                 {chain ? (
                     <Suspense fallback={<Preloader />}>
-                        <Referral />
+                        <Buy />
                     </Suspense>
                 ) : (
                     <Suspense fallback={<Preloader />}>
-                        <InformationCard message='Connect your wallet to view Referral' />
+                        <InformationCard message='Connect your wallet to Buy BIT10 tokens' />
                     </Suspense>
                 )}
             </MaxWidthWrapper>

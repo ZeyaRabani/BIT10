@@ -4,7 +4,7 @@ import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 import { Button } from '@/components/ui/button'
 import { ExternalLink } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
-import { userRecentActivity } from '@/actions/dbActions'
+import { userRecentBIT10BuyActivity } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -69,7 +69,7 @@ export default function ICPRecentActivity() {
     const { ICPAddress } = useICPWallet();
 
     const fetchRecentActivity = async (ICPAddress: string) => {
-        const response = await userRecentActivity({ paymentAddress: ICPAddress });
+        const response = await userRecentBIT10BuyActivity({ paymentAddress: ICPAddress });
         if (response === 'Error fetching user recent activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
         } else {

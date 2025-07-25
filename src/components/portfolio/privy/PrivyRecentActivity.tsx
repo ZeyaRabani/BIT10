@@ -4,7 +4,7 @@ import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 import { Button } from '@/components/ui/button'
 import { ExternalLink } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
-import { userRecentActivity } from '@/actions/dbActions'
+import { userRecentBIT10BuyActivity } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { usePrivy } from '@privy-io/react-auth'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -70,7 +70,7 @@ export default function PrivyRecentActivity() {
     const UserWallet = user?.wallet?.address;
 
     const fetchRecentActivity = async (SOLAddress: string) => {
-        const response = await userRecentActivity({ paymentAddress: SOLAddress });
+        const response = await userRecentBIT10BuyActivity({ paymentAddress: SOLAddress });
         if (response === 'Error fetching user recent activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
         } else {

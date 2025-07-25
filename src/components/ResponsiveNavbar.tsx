@@ -17,12 +17,12 @@ const links = {
     ],
     app: [
         { title: 'Swap', link: '/swap', icon: ArrowRightLeft },
+        { title: 'Buy BIT10', link: '/buy', icon: ArrowRightLeft },
         // { title: 'Custom', link: '/custom', icon: ChartPie },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
         { title: 'Liquidity Hub', link: '/liquidity-hub', icon: HandCoins },
-        { title: 'Email wallet', link: '/newbie', icon: Star },
-        { title: 'Referral', link: '/referral', icon: Tickets }
+        { title: 'Email wallet', link: '/newbie', icon: Star }
     ]
 };
 

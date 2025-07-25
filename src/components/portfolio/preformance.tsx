@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import AnimatedBackground from '@/components/ui/animated-background'
 import { Triangle } from 'lucide-react'
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { CartesianGrid, XAxis, YAxis, LineChart, Line } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 
@@ -464,73 +464,101 @@ export default function Preformance() {
                             {
                                 activeTab === '24H' &&
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
-                                    <AreaChart accessibilityLayer data={bit10Preformance24hChartData}>
+                                    <LineChart accessibilityLayer data={bit10Preformance24hChartData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis dataKey='day' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} />
-                                        <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
+                                        <XAxis
+                                            dataKey='day'
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
+                                            stroke="#D5520E"
+                                        />
+                                        <YAxis
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickCount={3}
+                                            stroke="#D5520E"
+                                        />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                        <defs>
-                                            <linearGradient id={tokenDataName} x1='0' y1='0' x2='0' y2='1'>
-                                                <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
-                                                <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
-                                            </linearGradient>
-                                        </defs>
-                                        <Area dataKey={tokenDataName} type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
-                                    </AreaChart>
+                                        <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                    </LineChart>
                                 </ChartContainer>
                             }
                             {
                                 activeTab === '7D' &&
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
-                                    <AreaChart accessibilityLayer data={bit10Preformance7dChartData}>
+                                    <LineChart accessibilityLayer data={bit10Preformance7dChartData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis dataKey='day' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} />
-                                        <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
+                                        <XAxis
+                                            dataKey='day'
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
+                                            stroke="#D5520E"
+                                        />
+                                        <YAxis
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickCount={3}
+                                            stroke="#D5520E"
+                                        />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                        <defs>
-                                            <linearGradient id={tokenDataName} x1='0' y1='0' x2='0' y2='1'>
-                                                <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
-                                                <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
-                                            </linearGradient>
-                                        </defs>
-                                        <Area dataKey={tokenDataName} type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
-                                    </AreaChart>
+                                        <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                    </LineChart>
                                 </ChartContainer>
                             }
                             {
                                 activeTab === '30D' &&
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
-                                    <AreaChart accessibilityLayer data={bit10Preformance30dChartData}>
+                                    <LineChart accessibilityLayer data={bit10Preformance30dChartData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis dataKey='day' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} />
-                                        <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
+                                        <XAxis
+                                            dataKey='day'
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
+                                            stroke="#D5520E"
+                                        />
+                                        <YAxis
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickCount={3}
+                                            stroke="#D5520E"
+                                        />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                        <defs>
-                                            <linearGradient id={tokenDataName} x1='0' y1='0' x2='0' y2='1'>
-                                                <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
-                                                <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
-                                            </linearGradient>
-                                        </defs>
-                                        <Area dataKey={tokenDataName} type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
-                                    </AreaChart>
+                                        <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                    </LineChart>
                                 </ChartContainer>
                             }
                             {
                                 activeTab === '60D' &&
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
-                                    <AreaChart accessibilityLayer data={bit10Preformance60dChartData}>
+                                    <LineChart accessibilityLayer data={bit10Preformance60dChartData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis dataKey='day' tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} />
-                                        <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
+                                        <XAxis
+                                            dataKey='day'
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
+                                            stroke="#D5520E"
+                                        />
+                                        <YAxis
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickCount={3}
+                                            stroke="#D5520E"
+                                        />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                        <defs>
-                                            <linearGradient id={tokenDataName} x1='0' y1='0' x2='0' y2='1'>
-                                                <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
-                                                <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
-                                            </linearGradient>
-                                        </defs>
-                                        <Area dataKey={tokenDataName} type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
-                                    </AreaChart>
+                                        <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                    </LineChart>
                                 </ChartContainer>
                             }
                         </div>

@@ -408,6 +408,34 @@ export const bit10TopRebalance = pgTable('bit10_top_rebalance', {
 		}
 	});
 
+export const teDexSwap = pgTable('te_dex_swap', {
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity({ name: 'dex_swap_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
+	amountIn: text('amount_in').notNull(),
+	amountOut: text('amount_out').notNull(),
+	destinationChain: text('destination_chain').notNull(),
+	poolId: text('pool_id').notNull(),
+	slippage: text('slippage').notNull(),
+	sourceChain: text('source_chain').notNull(),
+	status: text('status').notNull(),
+	swapType: text('swap_type').notNull(),
+	tickInWalletAddress: text('tick_in_wallet_address').notNull(),
+	tickOutWalletAddress: text('tick_out_wallet_address').notNull(),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	timestamp: bigint('timestamp', { mode: 'number' }).notNull(),
+	tokenInAddress: text('token_in_address').notNull(),
+	tokenOutAddress: text('token_out_address').notNull(),
+	txHashIn: text('tx_hash_in').notNull(),
+	txHashOut: text('tx_hash_out').notNull(),
+},
+	(table) => {
+		return {
+			idxDexSwapDestinationChain: index('idx_dex_swap_destination_chain').using('btree', table.destinationChain.asc().nullsLast()),
+			idxDexSwapSourceChain: index('idx_dex_swap_source_chain').using('btree', table.sourceChain.asc().nullsLast()),
+			idxDexSwapTimestamp: index('idx_dex_swap_timestamp').using('btree', table.timestamp.asc().nullsLast()),
+		}
+	});
+
 export const users = pgTable('users', {
 	userId: text('user_id').notNull(),
 	userPaymentAddress: text('user_payment_address').notNull(),

@@ -102,7 +102,7 @@ export default function Page() {
               transition={{ delay: 0.4, duration: 0.8, ease: 'easeInOut' }}
               className='flex flex-row space-x-2 py-2 items-center justify-center'>
               <Button className='px-6 md:px-10' asChild>
-                <Link href='/swap'>
+                <Link href='/buy'>
                   Launch App
                 </Link>
               </Button>

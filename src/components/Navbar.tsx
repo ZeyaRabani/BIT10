@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import AnimatedBackground from '@/components/ui/animated-background'
+import { usePathname } from 'next/navigation'
 import ModeToggle from './ModeToggle'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { ChevronDown } from 'lucide-react'
 import ResponsiveNavbar from './ResponsiveNavbar'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -20,38 +21,31 @@ const links = {
         { title: 'Whitepaper', link: '/whitepaper' }
     ],
     app: [
-        { title: 'Swap', link: '/swap' },
-        // { title: 'Custom', link: '/custom' },
+        {
+            title: 'Exchange',
+            drop: true,
+            links: [
+                { title: 'Swap', link: '/swap' },
+                { title: 'Buy BIT10', link: '/buy' },
+            ]
+        },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
         { title: 'Liquidity Hub', link: '/liquidity-hub' },
-        { title: 'Email wallet', link: '/newbie' },
-        { title: 'Referral', link: '/referral' }
+        { title: 'Email wallet', link: '/newbie' }
     ]
 };
 
 export default function Navbar() {
     const [hidden, setHidden] = useState(false);
-    const [activeLink, setActiveLink] = useState<string>('/');
 
     const { scrollY } = useScroll();
     const pathname = usePathname();
-    const router = useRouter();
 
-    const appMode = links.app.some(link => pathname.startsWith(link.link));
-
-    useEffect(() => {
-        const active = links[appMode ? 'app' : 'web'].find(link => pathname === link.link);
-        setActiveLink(active ? active.title : '/');
-    }, [pathname, appMode]);
-
-    const handleNavigation = (newActiveLink: string) => {
-        const active = links[appMode ? 'app' : 'web'].find(link => link.title === newActiveLink);
-        if (active) {
-            setActiveLink(active.link);
-            router.push(active.link);
-        }
-    };
+    const appMode = links.app.some(link =>
+        (link.link && pathname.startsWith(link.link)) ??
+        link.links?.some(sublink => pathname.startsWith(sublink.link))
+    );
 
     useMotionValueEvent(scrollY, 'change', (latest) => {
         const previous = scrollY.getPrevious() ?? 0
@@ -83,34 +77,47 @@ export default function Navbar() {
                     </Link>
                 </div>
 
-                <div className='hidden lg:pl-16 lg:flex'>
-                    <AnimatedBackground
-                        defaultValue={activeLink || '/'}
-                        onValueChange={(newActiveLink) => {
-                            if (newActiveLink) {
-                                handleNavigation(newActiveLink)
-                            }
-                        }}
-                        className='border-b-2 border-gray-900 dark:border-white'
-                        transition={{
-                            ease: 'easeInOut',
-                            duration: 0.2,
-                        }}
-                    >
-                        {links[appMode ? 'app' : 'web'].map((label, index) => {
-                            return (
-                                <button
-                                    data-id={label.title}
-                                    key={index}
-                                    type='button'
-                                    aria-label={`${label.title} view`}
-                                    className='md:w-auto w-full mx-2 px-3 py-2 hover:rounded hover:text-white hover:bg-primary cursor-pointer'
-                                >
-                                    {label.title}
-                                </button>
-                            );
-                        })}
-                    </AnimatedBackground>
+                <div className='hidden lg:pl-16 lg:flex space-x-2'>
+                    {appMode ? (
+                        links.app.map((item, index) => (
+                            <div key={index} className='relative'>
+                                <TooltipProvider>
+                                    {item.drop ? (
+                                        <Tooltip delayDuration={100}>
+                                            <TooltipTrigger asChild>
+                                                <div className='mx-2 px-3 py-2 flex flex-row space-x-2 items-center cursor-pointer'>
+                                                    {item.title}
+                                                    {item.drop && <ChevronDown className='ml-1 h-4 w-4' />}
+                                                </div>
+                                            </TooltipTrigger>
+                                            {item.drop && item.links && (
+                                                <TooltipContent side='bottom' align='end' className='mr-3 -mt-1 w-fit text-right'>
+                                                    <div className='flex flex-col space-y-2 items-start'>
+                                                        {item.links.map((sublink, subIndex) => (
+                                                            <Link key={subIndex} href={sublink.link} className='hover:text-primary block text-sm'>
+                                                                {sublink.title}
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                </TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    ) : (
+                                        <Link key={item.link} href={item.link ?? '/'} className='mx-2 px-3 py-2 flex flex-row space-x-2 items-center cursor-pointer hover:rounded hover:text-white hover:bg-primary'>
+                                            {item.title}
+                                        </Link>
+                                    )
+                                    }
+                                </TooltipProvider>
+                            </div>
+                        ))
+                    ) : (
+                        links.web.map((label, index) => (
+                            <Link key={index} href={label.link} className='mx-2 px-3 py-2 hover:rounded hover:text-white hover:bg-primary cursor-pointer'>
+                                {label.title}
+                            </Link>
+                        ))
+                    )}
                 </div>
 
                 <div className='hidden lg:flex lg:flex-1 lg:justify-end'>

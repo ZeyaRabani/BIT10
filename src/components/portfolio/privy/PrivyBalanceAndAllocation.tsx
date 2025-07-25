@@ -205,7 +205,7 @@ export default function PrivyBalanceAndAllocation() {
                     Welcome back {UserWallet ? formatAddress(UserWallet.toString()) : 'Guest'}
                 </h1>
                 <Button className='animate-fade-right-slow' asChild>
-                    <Link href='/swap'>Buy BIT10 Token</Link>
+                    <Link href='/buy'>Buy BIT10 Token</Link>
                 </Button>
             </div>
 

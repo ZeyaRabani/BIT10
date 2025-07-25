@@ -4,37 +4,25 @@ import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 import { Button } from '@/components/ui/button'
 import { ExternalLink } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
-import { userRecentBIT10BuyActivity } from '@/actions/dbActions'
+import { userRecentDEXSwapActivity } from '@/actions/dbActions'
 import { toast } from 'sonner'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useAccount } from 'wagmi'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DataTable } from '@/components/ui/data-table-portfolio'
-import type { PortfolioTableDataType } from '@/components/ui/data-table-portfolio'
+import { DataTable } from '@/components/ui/data-table-dex-portfolio'
+import type { PortfolioTableDataType } from '@/components/ui/data-table-dex-portfolio'
 
 const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
-        accessorKey: 'tokenSwapId',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Transaction ID' />
-        ),
-    },
-    {
-        accessorKey: 'mode',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Type' />
-        ),
-    },
-    {
         accessorKey: 'tickIn',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Spent' info='Amount spent for buying token' />
+            <DataTableColumnHeader column={column} title='From' info='Amount spent for swapping token' />
         ),
     },
     {
         accessorKey: 'tickOutName',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Received' />
+            <DataTableColumnHeader column={column} title='To' />
         ),
     },
     {
@@ -44,14 +32,14 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
         ),
     },
     {
-        id: 'view_transaction',
-        header: 'View Transaction',
+        id: 'view_tick_in_transaction',
+        header: 'Inbound Transaction',
         cell: ({ row }) => {
             const order = row.original;
 
             return (
                 <a
-                    href={`https://solscan.io/tx/${order.tickOutTxBlock}?cluster=devnet`}
+                    href={`https://sepolia.etherscan.io/tx/${order.txHashIn}`}
                     target='_blank'
                     rel='noopener noreferrer'
                 >
@@ -62,15 +50,38 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
                 </a>
             )
         },
+
+    },
+    {
+        id: 'view_tick_out_transaction',
+        header: 'Outbound Transaction',
+        cell: ({ row }) => {
+            const order = row.original;
+
+            return (
+                <a
+                    href={`https://sepolia.etherscan.io/tx/${order.txHashOut}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                >
+                    <Button>
+                        View Transaction
+                        <ExternalLink className='ml-1 w-4 h-4' />
+                    </Button>
+                </a>
+            )
+        },
+
     }
 ]
 
-export default function SolDevrecentActivity() {
-    const SOLWallet = useWallet();
+export default function ETHSepoliaRecentActivity() {
+    const { address } = useAccount();
 
-    const fetchRecentActivity = async (SOLAddress: string) => {
-        const response = await userRecentBIT10BuyActivity({ paymentAddress: SOLAddress });
-        if (response === 'Error fetching user recent activity') {
+    const fetchRecentActivity = async (address: string) => {
+        const response = await userRecentDEXSwapActivity({ paymentAddress: address });
+        console.log(response, address)
+        if (response === 'Error fetching user recent DEX activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
         } else {
             return response as PortfolioTableDataType[];
@@ -81,9 +92,7 @@ export default function SolDevrecentActivity() {
         queries: [
             {
                 queryKey: ['bit10RecentActivity'],
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                queryFn: () => SOLWallet.publicKey.toString() ? fetchRecentActivity(SOLWallet.publicKey.toString()) : toast.error('Wallet Address is undefined')
+                queryFn: () => address ? fetchRecentActivity(address) : toast.error('User address is undefined')
             },
         ]
     })

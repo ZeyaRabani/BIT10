@@ -1,7 +1,7 @@
 import React from 'react'
 import { Tailwind, Body, Container, Head, Heading, Hr, Html, Preview, Section, Text } from '@react-email/components'
 
-export function BIT10DEFIRequest({ newTokenSwapId, principalId, tickOutName, tickOutAmount, transactionTimestamp }: { newTokenSwapId: string, principalId: string, tickOutName: string, tickOutAmount: string, transactionTimestamp: string }) {
+export function BIT10DEFIRequest({ newTokenBuyId, principalId, tickOutName, tickOutAmount, transactionTimestamp }: { newTokenBuyId: string, principalId: string, tickOutName: string, tickOutAmount: string, transactionTimestamp: string }) {
     return (
         <Html>
             <Head />
@@ -29,7 +29,7 @@ export function BIT10DEFIRequest({ newTokenSwapId, principalId, tickOutName, tic
                             <Hr className='my-5' />
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
-                                Token Swap ID: {newTokenSwapId}
+                                Token Swap ID: {newTokenBuyId}
                             </Text>
 
                             <Text className='text-[17px] leading-[17px] text-[#3c3f44]'>
