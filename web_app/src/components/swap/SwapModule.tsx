@@ -270,7 +270,7 @@ export default function SwapModule() {
     }
     else if (bit10Token === 'BIT10.TOP') {
       return bit10TOPPrice ?? 0;
-    } 
+    }
     else {
       return 0;
     }
@@ -285,7 +285,7 @@ export default function SwapModule() {
     }
     else if (bit10Token === 'BIT10.TOP') {
       return bit10TOPPrice ?? 0;
-    } 
+    }
     else {
       return 0;
     }
@@ -370,7 +370,7 @@ export default function SwapModule() {
           }
           else if (values.minting_bit10_token === 'BIT10.TOP') {
             selectedCanisterId = bit10TOPCanisterId;
-          } 
+          }
           else {
             throw new Error('Invalid payment method');
           }
@@ -954,7 +954,7 @@ export default function SwapModule() {
                   )}
 
                   <div className='grid place-items-center z-[2]'>
-                    <ArrowUpDown className='h-10 w-10 p-2 border rounded-full -mt-4 bg-background cursor-pointer' onClick={() => handleModeClick()} />
+                    <ArrowUpDown className='h-10 w-10 p-2 border rounded-full -mt-4 bg-background cursor-pointer hover:animate-spinOnce' onClick={() => handleModeClick()} />
                   </div>
 
                   {isMintMode === 'mint' ? (

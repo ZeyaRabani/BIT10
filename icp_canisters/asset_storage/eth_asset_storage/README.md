@@ -49,7 +49,7 @@ To start using BIT10 ETH Asset Storage canister, follow these steps:
 
 2. **Go to eth_asset_storage folder**:
     ```bash
-    cd asset_storage/eth_asset_storage
+    cd icp_canister/asset_storage/eth_asset_storage
     ```
 
 3. **Start the dfx locally and run the canister**:

@@ -48,7 +48,7 @@ To start using BIT10 TRX Asset Storage canister, follow these steps:
 
 2. **Go to trx_asset_storage folder**:
     ```bash
-    cd asset_storage/trx_asset_storage
+    cd icp_canister/asset_storage/trx_asset_storage
     ```
 
 3. **Start the dfx locally and run the canister**:

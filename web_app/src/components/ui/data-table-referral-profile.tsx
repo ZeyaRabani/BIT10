@@ -7,12 +7,8 @@ import { useWallet } from '@/context/WalletContext'
 import { toast } from 'sonner'
 import { Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { addReferralQuestionsCompletedTasks } from '@/actions/dbActions'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Form } from '@/components/ui/form'
 import { CircleCheck, ExternalLink } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
@@ -28,12 +24,6 @@ interface DataTableProps<TData> {
     columns: ColumnDef<ReferralProfileTableDataType>[];
     data: TData[];
 }
-
-const FormSchema = z.object({
-    type: z.enum(['all', 'mentions', 'none'], {
-        required_error: 'You need to select a notification type.',
-    }),
-})
 
 const questionsData = [
     {
@@ -162,10 +152,6 @@ export function DataTable<TData, TValue>({
             });
     };
 
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-    })
-
     const table = useReactTable({
         data,
         columns,
@@ -215,7 +201,7 @@ export function DataTable<TData, TValue>({
     async function handleQuizSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setShowResults(true);
-        
+
         if (correctCount === 10 && principalId) {
             const result = await addReferralQuestionsCompletedTasks({
                 address: principalId
@@ -272,60 +258,58 @@ export function DataTable<TData, TValue>({
                                                         <DialogDescription>
                                                             After reading the GitBook, please answer the following questions. Points will be awarded only after all questions are answered correctly.                                                        </DialogDescription>
                                                     </DialogHeader>
-                                                    <Form {...form}>
-                                                        <form
-                                                            className='w-full max-h-[50vh] md:max-h-[60vh] flex flex-col space-y-4 overflow-x-scroll overflow-y-scroll'
-                                                            onSubmit={handleQuizSubmit}
+                                                    <form
+                                                        className='w-full max-h-[50vh] md:max-h-[60vh] flex flex-col space-y-4 overflow-x-scroll overflow-y-scroll'
+                                                        onSubmit={handleQuizSubmit}
+                                                    >
+                                                        {questions.map((q, qIdx) => (
+                                                            <div key={qIdx} className='mb-4'>
+                                                                <div className='font-semibold mb-2'>{qIdx + 1}. {q.question}</div>
+                                                                <div className='flex flex-col gap-2'>
+                                                                    {q.shuffledOptions.map((opt, oIdx) => {
+                                                                        const isSelected = userAnswers[qIdx] === opt
+                                                                        const isCorrect = showResults && isSelected && opt === q.answer
+                                                                        const isWrong = showResults && isSelected && opt !== q.answer
+                                                                        return (
+                                                                            <label
+                                                                                key={oIdx}
+                                                                                className={cn(
+                                                                                    'flex items-center gap-2 p-2 rounded cursor-pointer border',
+                                                                                    {
+                                                                                        'bg-green-100 border-green-500 text-black': isCorrect,
+                                                                                        'bg-red-100 border-red-500 text-black': isWrong,
+                                                                                        'border-gray-300': !isCorrect && !isWrong,
+                                                                                    }
+                                                                                )}
+                                                                            >
+                                                                                <input
+                                                                                    type='radio'
+                                                                                    name={`question-${qIdx}`}
+                                                                                    value={opt}
+                                                                                    checked={isSelected}
+                                                                                    disabled={showResults}
+                                                                                    onChange={() => handleOptionChange(qIdx, opt)}
+                                                                                />
+                                                                                {opt}
+                                                                            </label>
+                                                                        )
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                        {showResults && (
+                                                            <div className='mt-4 text-lg font-bold text-center'>
+                                                                You got {correctCount} out of {questions.length} correct!
+                                                            </div>
+                                                        )}
+                                                        <Button
+                                                            type='submit'
+                                                            disabled={!allAnswered || showResults}
+                                                            className='w-full'
                                                         >
-                                                            {questions.map((q, qIdx) => (
-                                                                <div key={qIdx} className='mb-4'>
-                                                                    <div className='font-semibold mb-2'>{qIdx + 1}. {q.question}</div>
-                                                                    <div className='flex flex-col gap-2'>
-                                                                        {q.shuffledOptions.map((opt, oIdx) => {
-                                                                            const isSelected = userAnswers[qIdx] === opt
-                                                                            const isCorrect = showResults && isSelected && opt === q.answer
-                                                                            const isWrong = showResults && isSelected && opt !== q.answer
-                                                                            return (
-                                                                                <label
-                                                                                    key={oIdx}
-                                                                                    className={cn(
-                                                                                        'flex items-center gap-2 p-2 rounded cursor-pointer border',
-                                                                                        {
-                                                                                            'bg-green-100 border-green-500 text-black': isCorrect,
-                                                                                            'bg-red-100 border-red-500 text-black': isWrong,
-                                                                                            'border-gray-300': !isCorrect && !isWrong,
-                                                                                        }
-                                                                                    )}
-                                                                                >
-                                                                                    <input
-                                                                                        type='radio'
-                                                                                        name={`question-${qIdx}`}
-                                                                                        value={opt}
-                                                                                        checked={isSelected}
-                                                                                        disabled={showResults}
-                                                                                        onChange={() => handleOptionChange(qIdx, opt)}
-                                                                                    />
-                                                                                    {opt}
-                                                                                </label>
-                                                                            )
-                                                                        })}
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                            {showResults && (
-                                                                <div className='mt-4 text-lg font-bold text-center'>
-                                                                    You got {correctCount} out of {questions.length} correct!
-                                                                </div>
-                                                            )}
-                                                            <Button
-                                                                type='submit'
-                                                                disabled={!allAnswered || showResults}
-                                                                className='w-full'
-                                                            >
-                                                                Submit Answers
-                                                            </Button>
-                                                        </form>
-                                                    </Form>
+                                                            Submit Answers
+                                                        </Button>
+                                                    </form>
                                                     <DialogFooter>
                                                         <DialogClose asChild>
                                                             <Button variant='outline' className='dark:border-white'>Close</Button>

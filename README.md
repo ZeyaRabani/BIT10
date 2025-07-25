@@ -1,19 +1,14 @@
-
-
-
 # BIT10
 
-
-
-BIT10 is pioneering the concept of the "S&P500 of Crypto assets". It offers users a simplified way to diversify their exposure to DeFi assets by tracking the biggest crypto tokens, BRC-20s, and ERC-20s in the DeFi ecosystem.
+BIT10 pioneers the concept of an "S&P 500 for crypto assets." It provides users with a streamlined way to diversify their exposure to DeFi assets by tracking major crypto tokens, including BRC-20s and ERC-20s, across the ecosystem.
 
 ## 🚀 The Problem
 
-Investing in DeFi requires extensive research, and buying individual tokens often incurs high fees. Many users end up with an unbalanced portfolio, increasing risk and exposing them to poor-performing assets.
+Investing in DeFi is often complex, requiring extensive research. Buying individual tokens can be costly and inefficient, and most users end up with unbalanced portfolios that increase risk and expose them to underperforming assets.
 
 ## 💡 The Solution
 
-BIT10 provides a pre-selected basket of assets, reducing research time and cost. By buying one token, users invest in a diversified set of assets. With an auto-rebalancing mechanism, BIT10 optimizes portfolio performance by replacing poorly performing tokens with better ones.
+BIT10 offers a pre-selected, diversified basket of assets, significantly reducing research time and transaction costs. Users can gain diversified exposure by purchasing a single token. With auto-rebalancing, BIT10 continuously optimizes portfolio performance by replacing underperforming assets with stronger performers.
 
 ## 🌐 Features
 
@@ -30,7 +25,32 @@ BIT10 provides a pre-selected basket of assets, reducing research time and cost.
 
 ### 🌲 Main Branch Folder Structure
 
-* **`asset_storage/`** - Contains canister code for storing different token types:
+⚠️ Steps to run the canister and the related architecture diagrams are present in their respective folders.
+
+- **`icp_canister/`** - Contains all the canisters on ICP
+
+  - **`asset_storage/`** - Contains canister code for storing different token types:
+    - `bsc_asset_storage/` - Stores BNB and BEP20 tokens.
+    - `erc20_asset_storage/` - Stores ETH and ERC-20 tokens.
+    - `icp_asset_storage/` - Stores ICP tokens.
+    - `sui_asset_storage/` - Stores SUI tokens.
+    - `trx_asset_storage/` - Stores TRX tokens.
+
+  - **`buy_bit10/`** - Swap logic (buying BIT10 tokens) on ICP.
+  
+  - **`dex/`** - DEX Swap logic (buying tokens on same and cross-chain) on ICP.
+
+  - **`liquidity_hub/`**
+    - `testnet_liquidity_hub/` - Canister code for the Liquidity Hub on ICP testnet.
+
+- **`sol_smart_contracts/`**
+  - `buy_bit10/` - Swap logic (buying BIT10 tokens with SOL) on Solana Devnet.
+
+- **`server/`** - Lightweight Node.js server for serving data to the web app.
+
+- **`web_app/`** - Contains frontend code for the BIT10 application.
+
+<!-- * **`asset_storage/`** - Contains canister code for storing different token types:
 
   * `bsc_asset_storage/` - Stores BNB and BEP20 tokens.
   * `erc20_asset_storage/` - Stores ETH and ERC-20 tokens.
@@ -52,7 +72,7 @@ BIT10 provides a pre-selected basket of assets, reducing research time and cost.
 
 * **`server/`** - Lightweight Node.js server for serving data to the web app.
 
-* **`web_app/`** - Contains frontend code for the BIT10 application.
+* **`web_app/`** - Contains frontend code for the BIT10 application. -->
 
 
 ## 🛠 Tech Stack
@@ -68,6 +88,7 @@ BIT10 provides a pre-selected basket of assets, reducing research time and cost.
 - BIT10.BTC Faucet: [5wxtf-uqaaa-aaaap-qpvha-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=5wxtf-uqaaa-aaaap-qpvha-cai)
 - BIT10 Exchange Canister: [6phs7-6yaaa-aaaap-qpvoq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=6phs7-6yaaa-aaaap-qpvoq-cai)
 - BIT10 Testnet Liquidity Hub: [jskxc-iiaaa-aaaap-qpwrq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=jskxc-iiaaa-aaaap-qpwrq-cai)
+- BIT10 Testnet DEX: [vlda4-oaaaa-aaaap-qp7cq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=vlda4-oaaaa-aaaap-qp7cq-cai)
 - BIT10.BTC: [eegan-kqaaa-aaaap-qhmgq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=eegan-kqaaa-aaaap-qhmgq-cai)
 - Test BIT10.DEFI: [hbs3g-xyaaa-aaaap-qhmna-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=hbs3g-xyaaa-aaaap-qhmna-cai)
 - Test BIT10.BRC20: [uv4pt-4qaaa-aaaap-qpuxa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=uv4pt-4qaaa-aaaap-qpuxa-cai)
@@ -98,12 +119,17 @@ BIT10 provides a pre-selected basket of assets, reducing research time and cost.
 
 To start using BIT10, follow these steps:
 
-1. **Install Dependencies**:
+1. **Navigate to web_app**:
+    ```bash
+    cd web_app
+    ```
+
+2. **Install Dependencies**:
     ```bash
     npm install
     ```
 
-2. **Run the App**:
+3. **Run the App**:
     ```bash
     npm run dev
     ```
@@ -116,6 +142,7 @@ BIT10 is structured using:
 
 - **Next.js** for the frontend framework.
 - **Node.js** for the backend framework.
+- **Rust** for the ICP Canisters
 - **Dfinity** for decentralized canister management.
 - **Drizzle ORM** for efficient database interaction.
 - **tRPC** for type-safe API routing.

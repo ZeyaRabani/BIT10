@@ -86,9 +86,9 @@ sequenceDiagram
 
 ## 📂 Code Structure
 
-* **`liquidity_hub/`**
+* **`icp_canister/`**
 
-  * `icp/`
+  * `liquidity_hub/`
 
     * `testnet_liquidity_hub/` – Canister code for the Liquidity Hub on ICP testnet.
 
@@ -107,7 +107,7 @@ To start using BIT10 Liquidity Hub canister, follow these steps:
 
 2. **Go to liquidity_hub folder**:
     ```bash
-    cd liquidity_hub
+    cd icp_canister/liquidity_hub/testnet_liquidity_hub
     ```
 
 3. **Start the dfx locally and run the canister**:

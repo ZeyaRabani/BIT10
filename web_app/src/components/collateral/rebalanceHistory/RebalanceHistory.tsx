@@ -8,7 +8,6 @@ import React from 'react'
 import { usePathname } from 'next/navigation'
 import InformationCard from '@/components/InformationCard'
 import { useQueries } from '@tanstack/react-query'
-// import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -203,7 +202,6 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         const response = await fetch(`/bit10-rebalance-history-${tokenRebalanceAPI}`);
 
         if (!response.ok) {
-            // toast.error('Error fetching BIT10 Rebalance History. Please try again!');
             return [];
         }
 

@@ -108,7 +108,7 @@ To start using BIT10 Liquidity Hub canister, follow these steps:
 
 2. **Go to ICP swap folder**:
     ```bash
-    cd swap/icp
+    cd icp_canister/buy_bit10
     ```
 
 3. **Start the dfx locally and run the canister**:

@@ -1,0 +1,93 @@
+type InitArg = record {
+    ethereum_network : opt EthereumNetwork;
+    ecdsa_key_name : opt EcdsaKeyName;
+};
+
+type EthereumNetwork = variant {
+    Mainnet;
+    Sepolia;
+};
+
+type EcdsaKeyName = variant {
+    TestKeyLocalDevelopment;
+    TestKey1;
+    ProductionKey1;
+};
+
+type BlockTag = variant {
+    Earliest;
+    Safe;
+    Finalized;
+    Latest;
+    Number : nat;
+    Pending;
+};
+
+type CreateTransactionArgs = record {
+    pool_id: text;
+    tick_in_wallet_address: text;
+    tick_out_wallet_address: text;
+    swap_type: text;
+    source_chain: text;
+    destination_chain: text;
+    token_in_address: text;
+    token_out_address: text;
+    amount_in: text;
+    expected_amount_out: text;
+    slippage: text;
+};
+
+type TransactionData = record {
+    tx_type: text;
+    blockchain: text;
+    from: text;
+    to: text;
+    value: text;
+    data: text;
+    gas_limit: text;
+    max_priority_fee_per_gas: text;
+    max_fee_per_gas: text;
+    nonce: text;
+    chain_id: nat64;
+};
+
+type TransactionResponse = record {
+    transaction_data: TransactionData;
+};
+
+type SwapResponse = record {
+    pool_id: text;
+    tick_in_wallet_address: text;
+    tick_out_wallet_address: text;
+    swap_type: text;
+    source_chain: text;
+    destination_chain: text;
+    token_in_address: text;
+    token_out_address: text;
+    amount_in: text;
+    amount_out: text;
+    slippage: text;
+    tx_hash_in: text;
+    tx_hash_out: text;
+    status: text; // "swap" or "reverted"
+    timestamp: nat64;
+};
+
+type SwapResult = variant {
+    Success : SwapResponse;
+    Error : text;
+};
+
+service : (opt InitArg) -> {
+    ethereum_address : () -> (text);
+
+    get_balance : (opt text) -> (nat);
+
+    transaction_count : (opt BlockTag) -> (nat);
+
+    get_transaction_count_for_address : (text) -> (nat);
+
+    create_transaction : (CreateTransactionArgs) -> (TransactionResponse);
+
+    verify_and_swap : (text) -> (SwapResult);
+};

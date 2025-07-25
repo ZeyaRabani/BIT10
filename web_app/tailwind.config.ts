@@ -133,6 +133,10 @@ export default {
 						transform: 'translate(calc(-50% - 0.5rem))',
 					},
 				},
+				'spinOnce': {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' },
+				},
 				'round': {
 					'0%': { transform: 'rotate(0deg)' },
 					'100%': { transform: 'rotate(360deg)' }
@@ -215,6 +219,7 @@ export default {
 				'fade-in-down-slow': 'fade-in-down 0.6s ease-out',
 				'rotate360': 'rotate360 0.5s linear',
 				'aurora': 'aurora 60s linear infinite',
+				'spinOnce': 'spinOnce 0.5s ease-in-out',
 				'scroll': 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
 				'preloader': 'round 1.7s infinite ease, load 1.7s infinite ease'
 			}
