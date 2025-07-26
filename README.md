@@ -2,6 +2,15 @@
 
 BIT10 pioneers the concept of an "S&P 500 for crypto assets." It provides users with a streamlined way to diversify their exposure to DeFi assets by tracking major crypto tokens, including BRC-20s and ERC-20s, across the ecosystem.
 
+## 🖥️ Presentation
+
+For the World Computer Hacker League (WCHL) 2025, we have created the following demo videos to help you better understand BIT10. Please start by watching the Loom video presentation — it provides a smooth walkthrough of the platform.
+
+- Loom Overview: [loom.com/share/db31b0fcfceb4738828cebd976c7e8fb](https://www.loom.com/share/db31b0fcfceb4738828cebd976c7e8fb)
+- Auto-Rebalancing Demo: [youtube.com/watch?v=ICuc97bdzbw](https://www.youtube.com/watch?v=ICuc97bdzbw)
+- BIT10 Technical Demo: [youtube.com/watch?v=NdYtbdXXe1Y](https://www.youtube.com/watch?v=NdYtbdXXe1Y)
+- BIT10 Testnet DEX Demo: [youtube.com/watch?v=zTjBIXnzJ1s ](https://www.youtube.com/watch?v=zTjBIXnzJ1s )
+
 ## 🚀 The Problem
 
 Investing in DeFi is often complex, requiring extensive research. Buying individual tokens can be costly and inefficient, and most users end up with unbalanced portfolios that increase risk and expose them to underperforming assets.
