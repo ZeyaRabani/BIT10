@@ -199,7 +199,7 @@ export default function ICPSwapModule() {
             {
                 queryKey: ['btcPrice'],
                 queryFn: () => fetchPayWithPrice('BTC'),
-                refetchInterval: 10000, // 10 sec.
+                refetchInterval: 30000, // 30 sec.
             },
         ],
     });
@@ -588,7 +588,7 @@ export default function ICPSwapModule() {
                                                 <div>Pay with</div>
                                                 <div className='flex flex-row space-x-1 items-center'>
                                                     <Wallet size={16} />
-                                                    <p>{payingTokenBalance}</p>
+                                                    <p>{formatTokenAmount(Number(payingTokenBalance))}</p>
                                                 </div>
                                             </div>
                                             <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>

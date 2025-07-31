@@ -1,13 +1,15 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import * as z from 'zod'
-import { useAccount } from 'wagmi'
+import { useAccount, useWalletClient, usePublicClient } from 'wagmi'
+import { formatUnits } from 'viem'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { ChevronsUpDown, Loader2, Info, Settings, MoveLeft } from 'lucide-react'
+import { ChevronsUpDown, Loader2, Info, Settings, MoveLeft, Wallet, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/lib/utils'
+import { ERC20_ABI } from '@/lib/erc20Abi'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -19,9 +21,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/dex.did'
-import { JsonRpcProvider, BrowserProvider, ethers } from 'ethers'
 import { newDEXSwap } from '@/actions/dbActions'
-import { env } from '@/env'
+import { motion } from 'framer-motion'
+import { Badge } from '@/components/ui/badge'
 
 interface TokenPriceResponse {
     data: {
@@ -38,6 +40,8 @@ const supportedToken = [
         img: ETHImg as StaticImageData,
         address: '0x0000000000000000000000000000000000000000',
         token_id: '1027',
+        chain: 'Ethereum',
+        token_type: 'ERC20',
         slug: ['ethereum']
     },
     {
@@ -46,6 +50,8 @@ const supportedToken = [
         img: USDCImg as StaticImageData,
         address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
         token_id: '3408_1027',
+        chain: 'Ethereum',
+        token_type: 'ERC20',
         slug: ['usdc']
     }
 ]
@@ -89,13 +95,6 @@ const FormSchema = z.object({
         }),
 });
 
-const CUSTOM_RPC_URL = env.NEXT_PUBLIC_SEPOLIA_RPC_URL;
-const CUSTOM_RPC_HEADERS = {
-    'accept': 'application/json',
-    'content-type': 'application/json',
-    'x-api-key': env.NEXT_PUBLIC_TATUM_API_KEY
-};
-
 export default function EthSepoliaSwapModule() {
     const [swaping, setSwaping] = useState<boolean>(false);
     const [slippageDialogOpen, setSlippageDialogOpen] = useState(false);
@@ -110,6 +109,50 @@ export default function EthSepoliaSwapModule() {
     const lastToAmount = useRef<number | undefined>(undefined);
 
     const { address, isConnected } = useAccount();
+    const { data: walletClient } = useWalletClient();
+    const publicClient = usePublicClient();
+
+    const fetchSepoliaTokenBalance = useCallback(async (tokenAddress: string) => {
+        try {
+            if (!address || !isConnected || !publicClient) {
+                toast.error('Wallet not connected or public client not available');
+                return '0';
+            }
+
+            if (tokenAddress === '0x0000000000000000000000000000000000000000') {
+                const balance = await publicClient.getBalance({
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+                    address: address as `0x${string}`,
+                });
+
+                const formattedBalance = formatUnits(balance, 18);
+                return formattedBalance;
+            }
+
+            else if (tokenAddress === '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238') {
+                const decimals = await publicClient.readContract({
+                    address: tokenAddress as `0x${string}`,
+                    abi: ERC20_ABI,
+                    functionName: 'decimals',
+                });
+
+                const balance = await publicClient.readContract({
+                    address: tokenAddress as `0x${string}`,
+                    abi: ERC20_ABI,
+                    functionName: 'balanceOf',
+                    args: [address],
+                });
+
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+                const formattedBalance = formatUnits(balance as bigint, decimals as number);
+                return formattedBalance;
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            toast.error('An error occurred while fetching user wallet balance. Please try again!');
+            return '0';
+        }
+    }, [address, isConnected, publicClient]);
 
     const fetchTokenPrice = useCallback(async (currency: string) => {
         const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);
@@ -125,18 +168,36 @@ export default function EthSepoliaSwapModule() {
             {
                 queryKey: ['ethPrice'],
                 queryFn: () => fetchTokenPrice('ETH'),
-                refetchInterval: 15000, // 15 sec.
+                refetchInterval: 30000, // 30 sec.
             },
             {
                 queryKey: ['usdcPrice'],
                 queryFn: () => fetchTokenPrice('USDC'),
-                refetchInterval: 15000, // 15 sec.
+                refetchInterval: 30000, // 30 sec.
             },
         ],
     });
 
     const ethAmount = useMemo(() => payWithPriceQueries[0].data, [payWithPriceQueries]);
     const usdcAmount = useMemo(() => payWithPriceQueries[1].data, [payWithPriceQueries]);
+
+    const fromBalanceQueries = useQueries({
+        queries: [
+            {
+                queryKey: ['ethBalance'],
+                queryFn: () => fetchSepoliaTokenBalance('0x0000000000000000000000000000000000000000'),
+                refetchInterval: 30000, // 30 sec.
+            },
+            {
+                queryKey: ['usdcBalance'],
+                queryFn: () => fetchSepoliaTokenBalance('0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'),
+                refetchInterval: 30000, // 30 sec.
+            },
+        ],
+    });
+
+    const userETHBalance = useMemo(() => fromBalanceQueries[0].data, [fromBalanceQueries]);
+    const userUSDCBalance = useMemo(() => fromBalanceQueries[1].data, [fromBalanceQueries]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -148,6 +209,19 @@ export default function EthSepoliaSwapModule() {
             to_amount: 1
         },
     });
+
+    const fromTokenUserBalance = (): string => {
+        const bit10Token = form.watch('from_token');
+        if (bit10Token === 'Ethereum') {
+            return userETHBalance ?? '0';
+        } else if (bit10Token === 'USD Coin') {
+            return userUSDCBalance ?? '0';
+        } else {
+            return '0';
+        }
+    };
+
+    const fromTokenBalance = fromTokenUserBalance();
 
     const getTokenPrice = useCallback((tokenValue: string) => {
         const token = supportedToken.find(t => t.value === tokenValue);
@@ -309,6 +383,18 @@ export default function EthSepoliaSwapModule() {
     const selectedFromTokenImg = getTokenImg(selectedFromToken?.label);
     const selectedToTokenImg = getTokenImg(selectedToToken?.label);
 
+    const getTokenChainImg = (tokenChain?: string): StaticImageData => {
+        switch (tokenChain) {
+            case 'Ethereum':
+                return ETHImg as StaticImageData;
+            default:
+                return ETHImg as StaticImageData;
+        }
+    };
+
+    const selectedFromTokenChainImg = getTokenChainImg(selectedFromToken?.chain);
+    const selectedToTokenChainImg = getTokenChainImg(selectedToToken?.chain);
+
     const matchingPool = useMemo(() => {
         if (!selectedFromToken || !selectedToToken) return null;
 
@@ -320,16 +406,41 @@ export default function EthSepoliaSwapModule() {
         ) ?? null;
     }, [selectedFromToken, selectedToToken]);
 
-    const swapDisabledConditions = !isConnected || swaping || selectedFromToken?.token_id === selectedToToken?.token_id || !matchingPool;
+    const swapDisabledConditions = !isConnected || swaping || selectedFromToken?.token_id === selectedToToken?.token_id || !matchingPool || form.watch('from_amount') > Number(fromTokenBalance) || form.watch('from_amount') >= (Number(fromTokenBalance) * 1.01);
 
-    const createCustomProvider = useCallback(() => {
-        const fetchRequest = new ethers.FetchRequest(CUSTOM_RPC_URL);
-        fetchRequest.setHeader('accept', CUSTOM_RPC_HEADERS.accept);
-        fetchRequest.setHeader('content-type', CUSTOM_RPC_HEADERS['content-type']);
-        fetchRequest.setHeader('x-api-key', CUSTOM_RPC_HEADERS['x-api-key']);
+    const getSwapMessage = (): string => {
+        const fromAmount = Number(form.watch('from_amount') || 0);
+        const balance = Number(fromTokenBalance || 0);
 
-        return new JsonRpcProvider(fetchRequest, 11155111); // Sepolia chain ID
-    }, []);
+        if (fromAmount >= balance || fromAmount >= balance * 1.01) {
+            return 'Your balance is too low for this transaction';
+        }
+        if (selectedFromToken?.token_id === selectedToToken?.token_id) {
+            return 'Same pair cannot be swapped';
+        }
+        if (!matchingPool) {
+            return 'Pool not found for selected pair';
+        }
+        if (swaping) {
+            return 'Swapping...';
+        }
+        return 'Swap';
+    };
+
+    const handleReverseTokens = () => {
+        const currentFromToken = form.getValues('from_token');
+        const currentToToken = form.getValues('to_token');
+        const currentFromAmount = form.getValues('from_amount');
+        const currentToAmount = form.getValues('to_amount');
+
+        form.setValue('from_token', currentToToken);
+        form.setValue('to_token', currentFromToken);
+
+        form.setValue('from_amount', currentToAmount);
+        form.setValue('to_amount', currentFromAmount);
+
+        setLastUpdatedField('from_amount');
+    };
 
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
@@ -351,16 +462,16 @@ export default function EthSepoliaSwapModule() {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
                 const create_transaction = await actor.create_transaction({
-                    source_chain: fromToken?.value,
-                    destination_chain: toToken?.value,
+                    pool_id: matchingPool.pool_id,
+                    tick_in_wallet_address: address,
+                    tick_out_wallet_address: address,
+                    swap_type: matchingPool.pair_type,
+                    source_chain: fromToken?.chain,
+                    destination_chain: toToken?.chain,
                     token_in_address: fromToken?.address,
                     token_out_address: toToken?.address,
-                    tick_out_wallet_address: address,
                     amount_in: (values.from_amount).toString(),
-                    tick_in_wallet_address: address,
-                    pool_id: matchingPool.pool_id,
                     expected_amount_out: (values.to_amount).toString(),
-                    swap_type: matchingPool.pair_type,
                     slippage: (values.slippage).toString(),
                 });
 
@@ -369,66 +480,35 @@ export default function EthSepoliaSwapModule() {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const txData = create_transaction.transaction_data;
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-                if (typeof window === 'undefined' || !(window as any).ethereum) {
-                    throw new Error('Ethereum provider not found. Please install MetaMask!');
-                }
-                const customProvider = createCustomProvider();
-
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-                const browserProvider = new BrowserProvider((window as any).ethereum);
-                const signer = await browserProvider.getSigner();
-
-                let transactionParams;
-                try {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-                    const dataString = ethers.toUtf8String(txData.data);
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    transactionParams = JSON.parse(dataString);
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                } catch (decodeError) {
-                    throw new Error('Invalid transaction data format received from backend');
-                }
-
-                const encodedData = ethers.toUtf8Bytes(JSON.stringify(transactionParams));
-
                 const transaction = {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                     from: txData.from,
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                     to: txData.to,
-                    data: ethers.hexlify(encodedData),
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                    data: txData.data,
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                     value: txData.value,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                    gasLimit: txData.gas_limit,
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                     maxPriorityFeePerGas: txData.max_priority_fee_per_gas,
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                     maxFeePerGas: txData.max_fee_per_gas,
                 };
 
-                const tx = await signer.sendTransaction(transaction);
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                const txHash = await walletClient.sendTransaction(transaction);
 
-                let receipt;
-                try {
-                    // First try with MetaMask provider
-                    receipt = await tx.wait();
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                } catch (error) {
-                    // If MetaMask fails, try with custom RPC
-                    receipt = await customProvider.waitForTransaction(tx.hash, 1, 60000); // 60 second timeout
-                }
+                toast.info('Transaction sent! Waiting for confirmation...');
 
-                if (!receipt) {
-                    throw new Error('Transaction receipt not found');
-                }
+                // Wait for 10 sec.
+                await new Promise(resolve => setTimeout(resolve, 10000));
 
-                const verifyAndSwap = await retryWithBackoff(
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
-                    () => actor.verify_and_swap(receipt.hash),
-                    3,
-                    1000
-                );
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                const verifyAndSwap = await actor.verify_and_swap(txHash);
 
                 const result = await newDEXSwap({
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -526,36 +606,6 @@ export default function EthSepoliaSwapModule() {
         } finally {
             setSwaping(false);
         }
-    }
-
-    async function retryWithBackoff<T>(fn: () => Promise<T>, maxRetries: number, initialDelay: number): Promise<T> {
-        let lastError: Error;
-
-        for (let attempt = 0; attempt <= maxRetries; attempt++) {
-            try {
-                return await fn();
-            } catch (error) {
-                lastError = error as Error;
-
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                if (!error.message.includes('No consensus could be reached') && !error.message.includes('SysTransient')) {
-                    throw error;
-                }
-
-                if (attempt === maxRetries) {
-                    break;
-                }
-
-                const delay = initialDelay * Math.pow(2, attempt);
-                await new Promise(resolve => setTimeout(resolve, delay));
-            }
-        }
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        throw lastError;
     }
 
     return (
@@ -658,10 +708,10 @@ export default function EthSepoliaSwapModule() {
                                 <div className='py-2 px-6 bg-muted rounded-lg'>
                                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
                                         <div>From</div>
-                                        {/* <div className='flex flex-row space-x-1 items-center'>
-                                        <Wallet size={16} />
-                                        <p>{payingTokenBalance}</p>
-                                    </div> */}
+                                        <div className='flex flex-row space-x-1 items-center'>
+                                            <Wallet size={16} />
+                                            <p>{formatTokenAmount(Number(fromTokenBalance))}</p>
+                                        </div>
                                     </div>
                                     <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                         <FormField
@@ -724,20 +774,26 @@ export default function EthSepoliaSwapModule() {
                                                                                     <Button
                                                                                         key={token.value}
                                                                                         variant='ghost'
-                                                                                        className='flex flex-row items-center justify-start py-6'
+                                                                                        className='flex flex-row items-center justify-between py-6'
                                                                                         onClick={() => {
                                                                                             field.onChange(token.value);
                                                                                             setFromTokenDialogOpen(false);
                                                                                             setFromTokenSearch('');
                                                                                         }}
                                                                                     >
-                                                                                        <div>
-                                                                                            <Image src={token.img} alt={token.label} height={35} />
+                                                                                        <div className='flex flex-row items-center justify-start space-x-0.5'>
+                                                                                            <div>
+                                                                                                <Image src={token.img} alt={token.label} height={35} />
+                                                                                            </div>
+                                                                                            <div className='flex flex-col items-start tracking-wide'>
+                                                                                                <div>{token.label} (on {token.chain})</div>
+                                                                                                <div>{formatAddress(token.address)}</div>
+                                                                                            </div>
                                                                                         </div>
-                                                                                        <div className='flex flex-col items-start tracking-wide'>
-                                                                                            <div>{token.label}</div>
-                                                                                            <div>{formatAddress(token.address)}</div>
-                                                                                        </div>
+
+                                                                                        <Badge variant='outline' className='hidden md:block'>
+                                                                                            {token.token_type}
+                                                                                        </Badge>
                                                                                     </Button>
                                                                                 ))
                                                                             )}
@@ -751,8 +807,9 @@ export default function EthSepoliaSwapModule() {
                                                 )}
                                             />
 
-                                            <div className='col-span-1 -ml-6 z-20 grid place-items-center border-2 border[#B4B3B3] rounded-full bg-white'>
-                                                <Image src={selectedFromTokenImg} alt='From' height={75} className='p-1' />
+                                            <div className='col-span-1 -ml-6 z-20 grid place-items-center relative border-2 border-[#B4B3B3] rounded-full bg-white'>
+                                                <Image src={selectedFromTokenImg} alt='From' height={75} />
+                                                <Image src={selectedFromTokenChainImg} alt='From Chain' height={25} className='absolute -bottom-2 right-0 border-2 border-[#B4B3B3] rounded-full bg-white' />
                                             </div>
                                         </div>
                                     </div>
@@ -778,7 +835,13 @@ export default function EthSepoliaSwapModule() {
                                     </div>
                                 </div>
 
-                                <div className='py-2 px-6'>
+                                <div className='grid place-items-center z-[2]'>
+                                    <Button type='button' variant='ghost' size='sm' className='rounded-full -mt-4 p-2 h-8 w-8 border-2 border-gray-300 hover:border-gray-400 group bg-background' onClick={handleReverseTokens} disabled={swaping}>
+                                        <ArrowUpDown className='h-4 w-4 transition-transform duration-700 group-hover:rotate-[180deg]' />
+                                    </Button>
+                                </div>
+
+                                <div className='py-2 px-6 -mt-4'>
                                     <p>To</p>
                                     <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                         <FormField
@@ -841,20 +904,26 @@ export default function EthSepoliaSwapModule() {
                                                                                     <Button
                                                                                         key={token.value}
                                                                                         variant='ghost'
-                                                                                        className='flex flex-row items-center justify-start py-6'
+                                                                                        className='flex flex-row items-center justify-between py-6'
                                                                                         onClick={() => {
                                                                                             field.onChange(token.value);
                                                                                             setToTokenDialogOpen(false);
                                                                                             setToTokenSearch('');
                                                                                         }}
                                                                                     >
-                                                                                        <div>
-                                                                                            <Image src={token.img} alt={token.label} height={35} />
+                                                                                        <div className='flex flex-row items-center justify-start space-x-0.5'>
+                                                                                            <div>
+                                                                                                <Image src={token.img} alt={token.label} height={35} />
+                                                                                            </div>
+                                                                                            <div className='flex flex-col items-start tracking-wide'>
+                                                                                                <div>{token.label} (on {token.chain})</div>
+                                                                                                <div>{formatAddress(token.address)}</div>
+                                                                                            </div>
                                                                                         </div>
-                                                                                        <div className='flex flex-col items-start tracking-wide'>
-                                                                                            <div>{token.label}</div>
-                                                                                            <div>{formatAddress(token.address)}</div>
-                                                                                        </div>
+
+                                                                                        <Badge variant='outline' className='hidden md:block'>
+                                                                                            {token.token_type}
+                                                                                        </Badge>
                                                                                     </Button>
                                                                                 ))
                                                                             )}
@@ -868,8 +937,9 @@ export default function EthSepoliaSwapModule() {
                                                 )}
                                             />
 
-                                            <div className='col-span-1 -ml-6 z-20 grid place-items-center border-2 border[#B4B3B3] rounded-full bg-white'>
-                                                <Image src={selectedToTokenImg} alt='To' height={75} className='p-1' />
+                                            <div className='col-span-1 -ml-6 z-20 grid place-items-center relative border-2 border-[#B4B3B3] rounded-full bg-white'>
+                                                <Image src={selectedToTokenImg} alt='To' height={75} />
+                                                <Image src={selectedToTokenChainImg} alt='To Chain' height={25} className='absolute -bottom-2 right-0 border-2 border-[#B4B3B3] rounded-full bg-white' />
                                             </div>
                                         </div>
                                     </div>
@@ -933,17 +1003,23 @@ export default function EthSepoliaSwapModule() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
+
                         </CardContent>
-                        <CardFooter className='flex flex-row space-x-2 w-full items-center'>
+                        <CardFooter className='flex flex-col space-y-2 w-full items-center'>
+                            {swaping && (
+                                <motion.div
+                                    className='text-center'
+                                    initial={{ y: 5, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                                >
+                                    Please keep this tab open until the swap is complete.
+                                </motion.div>
+                            )}
+
                             <Button className='w-full rounded-lg' disabled={swapDisabledConditions}>
                                 {swaping && <Loader2 className='animate-spin mr-2' size={15} />}
-                                {selectedFromToken?.token_id === selectedToToken?.token_id
-                                    ? 'Same pair cannot be swap'
-                                    : !matchingPool
-                                        ? 'Pool not found for selected pair'
-                                        : swaping
-                                            ? 'Swaping...'
-                                            : 'Swap'}
+                                {getSwapMessage()}
                             </Button>
                         </CardFooter>
                     </form>

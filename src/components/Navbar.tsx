@@ -106,8 +106,7 @@ export default function Navbar() {
                                         <Link key={item.link} href={item.link ?? '/'} className='mx-2 px-3 py-2 flex flex-row space-x-2 items-center cursor-pointer hover:rounded hover:text-white hover:bg-primary'>
                                             {item.title}
                                         </Link>
-                                    )
-                                    }
+                                    )}
                                 </TooltipProvider>
                             </div>
                         ))

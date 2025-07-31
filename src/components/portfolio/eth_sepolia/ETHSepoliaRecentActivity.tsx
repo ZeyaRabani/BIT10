@@ -80,7 +80,6 @@ export default function ETHSepoliaRecentActivity() {
 
     const fetchRecentActivity = async (address: string) => {
         const response = await userRecentDEXSwapActivity({ paymentAddress: address });
-        console.log(response, address)
         if (response === 'Error fetching user recent DEX activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
         } else {

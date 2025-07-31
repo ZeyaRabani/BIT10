@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function constructMetadata({
   title = 'BIT10',
-  description = 'Empowering Your Portfolio with the Future of Finance',
+  description = 'Diversified crypto index funds. On-chain. Auto-rebalanced. Built for the next wave of investing.',
   // image = '/assets/thumbnails/thumbnail.png',
   icons = '/favicon.ico',
   noIndex = false
