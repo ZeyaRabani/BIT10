@@ -65,7 +65,7 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     }
 ]
 
-export default function PrivyRecentActivity() {
+export default function RecentActivity() {
     const { user } = usePrivy();
     const UserWallet = user?.wallet?.address;
 

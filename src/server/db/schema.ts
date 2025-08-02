@@ -1,4 +1,4 @@
-import { pgTable, unique, text, timestamp, boolean, doublePrecision, index, json, foreignKey, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, unique, text, timestamp, boolean, doublePrecision, index, json, foreignKey, date, numeric, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -136,6 +136,19 @@ export const referralApr2025Tasks = pgTable('referral_apr_2025_tasks', {
 	(table) => {
 		return {
 			referralApr2025TasksAddressKey: unique('referral_apr_2025_tasks_address_key').on(table.address),
+		}
+	});
+
+export const bit10Comparison = pgTable('bit10_comparison', {
+	date: date('date').primaryKey().notNull(),
+	bit10Top: numeric('bit10_top').notNull(),
+	btc: numeric('btc').notNull(),
+	sp500: numeric('sp500').notNull(),
+	gold: numeric('gold').notNull(),
+},
+	(table) => {
+		return {
+			idxBit10ComparisonDate: index('idx_bit10_comparison_date').using('btree', table.date.asc().nullsLast()),
 		}
 	});
 

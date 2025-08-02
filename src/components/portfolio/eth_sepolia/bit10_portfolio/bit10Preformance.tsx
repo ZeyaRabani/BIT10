@@ -19,7 +19,7 @@ type Bit10Entry = {
     tokenPrice: number;
 };
 
-export default function Preformance() {
+export default function Bit10Preformance() {
     const [selectedPreformanceToken, setSelectedPreformanceToken] = useState('Test BIT10.DEFI');
     const [activeTab, setActiveTab] = useState('24H');
 

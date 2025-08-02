@@ -4,9 +4,6 @@ import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 import { Button } from '@/components/ui/button'
 import { ExternalLink } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
-import { userRecentBIT10BuyActivity } from '@/actions/dbActions'
-import { toast } from 'sonner'
-import { useWallet } from '@solana/wallet-adapter-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
@@ -51,7 +48,7 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 
             return (
                 <a
-                    href={`https://solscan.io/tx/${order.tickOutTxBlock}?cluster=devnet`}
+                    href={`https://sepolia.etherscan.io/tx/${order.tickOutTxBlock}`}
                     target='_blank'
                     rel='noopener noreferrer'
                 >
@@ -65,25 +62,17 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     }
 ]
 
-export default function SolDevrecentActivity() {
-    const SOLWallet = useWallet();
-
-    const fetchRecentActivity = async (SOLAddress: string) => {
-        const response = await userRecentBIT10BuyActivity({ paymentAddress: SOLAddress });
-        if (response === 'Error fetching user recent activity') {
-            toast.error('An error occurred while fetching user recent activity. Please try again!');
-        } else {
-            return response as PortfolioTableDataType[];
-        }
+export default function RecentActivity() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const fetchRecentActivity = async (address: string) => {
+        return [];
     };
 
     const recentActivityQuery = useQueries({
         queries: [
             {
                 queryKey: ['bit10RecentActivity'],
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                queryFn: () => SOLWallet.publicKey.toString() ? fetchRecentActivity(SOLWallet.publicKey.toString()) : toast.error('Wallet Address is undefined')
+                queryFn: () => fetchRecentActivity('')
             },
         ]
     })

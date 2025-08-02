@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { useLogin, usePrivy } from '@privy-io/react-auth'
+import { useLoginWithEmail, usePrivy, useSolanaWallets } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 import { addNewUser } from '@/actions/dbActions'
 import { toast } from 'sonner'
@@ -17,7 +17,6 @@ import PlugImg from '@/assets/wallet/plug.svg'
 import ETHLogo from '@/assets/wallet/ethereum-logo.svg'
 import EmailImg from '@/assets/wallet/email.svg'
 import { useConnect, useAccount, useDisconnect, useSwitchChain } from 'wagmi'
-// import { sepolia } from 'wagmi/chains'
 import MetamaskLogo from '@/assets/wallet/metamsak.svg'
 import PhantomLogo from '@/assets/wallet/phantom.svg'
 import CoinbaseLogo from '@/assets/wallet/coinbase.svg'
@@ -29,7 +28,8 @@ import TalismanLogo from '@/assets/wallet/talisman.jpg'
 import DefaultWallet from '@/assets/wallet/wallet.svg'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { motion } from 'framer-motion'
-import { ArrowLeft, WalletMinimal, Loader2 } from 'lucide-react'
+import { ArrowLeft, WalletMinimal, Loader2, Mail } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 
 const containerVariants = {
     visible: {
@@ -48,6 +48,12 @@ const cardVariantsRight = {
     hidden: { opacity: 0, x: 40 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: 'easeInOut' } },
 };
+
+const fadeInLeftSlow = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: 'easeOut' } },
+};
+
 
 const icpWallets = [
     { name: 'Plug', img: PlugImg }
@@ -72,14 +78,18 @@ export function ETHWalletIcon({ walletName, size = 24 }: { walletName: string; s
     const iconPath = getETHWalletIconPath(walletName);
 
     return (
-        <Image src={iconPath} alt={`${walletName} logo`} width={size} height={size} className="rounded-sm" />
+        <Image src={iconPath} alt={`${walletName} logo`} width={size} height={size} className='rounded-sm' />
     );
 }
 
 export default function WalletBtn() {
     const [open, setOpen] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [selectedChain, setSelectedChain] = useState<'icp' | 'sol_dev' | 'privy' | 'eth_sepolia' | null>(null);
+    const [selectedChain, setSelectedChain] = useState<'icp' | 'sol_dev' | 'eth_sepolia' | 'privy' | null>(null);
+    const [email, setEmail] = useState('');
+    const [code, setCode] = useState('');
+    const [showCodeInput, setShowCodeInput] = useState(false);
+
 
     const { isICPConnected, ICPAddress, connectICPWallet, disconnectICPWallet } = useICPWallet();
     // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -98,14 +108,32 @@ export default function WalletBtn() {
     const { switchChain: ethSwitchChain, isPending: isSwitching } = useSwitchChain();
 
     const router = useRouter();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const { login } = useLogin({
-        onComplete: ({ isNewUser }) => {
-            if (isNewUser) {
+
+    const { createWallet } = useSolanaWallets();
+
+    const { sendCode, loginWithCode } = useLoginWithEmail({
+        onComplete: (params) => {
+            if (params.isNewUser) {
+                void createWallet();
                 router.push('/newbie');
             }
         },
+        onError: (error) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            toast.error('Login failed. Try again!', error);
+        },
     });
+
+    const handleSendCode = async () => {
+        try {
+            await sendCode({ email });
+            setShowCodeInput(true);
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            toast.error('Failed to send confirmation code. Please try again!');
+        }
+    };
 
     useEffect(() => {
         const addUserToDB = async () => {
@@ -137,11 +165,11 @@ export default function WalletBtn() {
                         toast.error('An error occurred while setting up your account. Please try again!');
                     }
                 }
-            } else if (chain === 'privy') {
-                if (authenticated && privyUser?.wallet?.address) {
+            } else if (chain === 'eth_sepolia') {
+                if (ethAddress && ethIsConnected) {
                     try {
                         const result = await addNewUser({
-                            principalId: privyUser?.wallet?.address,
+                            principalId: ethAddress,
                         });
                         if (result === 'Error adding new user') {
                             toast.error('An error occurred while setting up your account. Please try again!');
@@ -151,11 +179,11 @@ export default function WalletBtn() {
                         toast.error('An error occurred while setting up your account. Please try again!');
                     }
                 }
-            } else if (chain === 'eth_sepolia') {
-                if (ethAddress && ethIsConnected) {
+            } else if (chain === 'privy') {
+                if (authenticated && privyUser?.wallet?.address) {
                     try {
                         const result = await addNewUser({
-                            principalId: ethAddress,
+                            principalId: privyUser?.wallet?.address,
                         });
                         if (result === 'Error adding new user') {
                             toast.error('An error occurred while setting up your account. Please try again!');
@@ -178,10 +206,10 @@ export default function WalletBtn() {
             setChain('sol_dev');
         } else if (isICPConnected) {
             setChain('icp');
-        } else if (authenticated) {
-            setChain('privy');
         } else if (ethIsConnected) {
             setChain('eth_sepolia');
+        } else if (authenticated) {
+            setChain('privy');
         } else {
             setChain(undefined);
         }
@@ -191,25 +219,34 @@ export default function WalletBtn() {
         switch (chain) {
             case 'icp':
                 disconnectICPWallet();
+                break;
             case 'sol_dev':
                 await disconnectSOLWallet();
                 setChain(undefined);
-            case 'privy':
-                await privyLogout();
-                setChain(undefined);
+                break;
             case 'eth_sepolia':
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 ethDisconnect();
                 setChain(undefined);
+                break;
+            case 'privy':
+                await privyLogout();
+                setChain(undefined);
+                break;
         }
+
+        setSelectedChain(null);
     };
 
-    const handleChainSelect = (chain: 'icp' | 'sol_dev' | 'eth_sepolia') => {
+    const handleChainSelect = (chain: 'icp' | 'sol_dev' | 'eth_sepolia' | 'privy') => {
         setSelectedChain(chain);
     };
 
     const handleBack = () => {
         setSelectedChain(null);
+        setShowCodeInput(false);
+        setEmail('');
+        setCode('');
     };
 
     const renderChainContent = () => {
@@ -347,6 +384,43 @@ export default function WalletBtn() {
                     </div>
                 );
 
+            case 'privy':
+                return (
+                    <div>
+                        {!showCodeInput ? (
+                            <div className='flex flex-col space-y-4 items-center justify-center px-2 md:px-8 animate-fade-right-slow'>
+                                <div className='flex flex-col space-y-1 w-full'>
+                                    <div className='text-lg'>You email</div>
+                                    <Input onChange={(e) => setEmail(e.currentTarget.value)} value={email} placeholder='Enter you email' type='email' className='dark:border-white' />
+                                </div>
+
+                                <div className='w-full'>
+                                    <Button onClick={handleSendCode} className='w-full'>Send confirmation code</Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <motion.div initial='hidden' animate='visible' variants={fadeInLeftSlow} className='flex flex-col space-y-4 items-center justify-center px-2 md:px-8'>
+                                <Mail size={56} />
+                                <div>
+                                    Enter confirmation code
+                                </div>
+                                <div>
+                                    Please check <b className='tracking-wider'>{email}</b> for an email from privy.io and enter your code below.
+                                </div>
+
+                                <div className='flex flex-col space-y-1 w-full'>
+                                    <Input onChange={(e) => setCode(e.currentTarget.value)} value={code} placeholder='Enter code' type='number' className='dark:border-white' />
+                                </div>
+
+                                <div className='w-full'>
+                                    <Button onClick={() => loginWithCode({ code })} className='w-full'>Verify code</Button>
+                                </div>
+
+                                <p className='text-center'>By Logining In or Signing Up, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                            </motion.div>
+                        )}
+                    </div>
+                )
 
             default:
                 return (
@@ -377,7 +451,7 @@ export default function WalletBtn() {
 
                         <motion.div variants={cardVariantsLeft}
                             className='rounded-md border hover:border-primary hover:text-primary p-4 flex flex-row items-center space-x-2 cursor-pointer'
-                            onClick={login}
+                            onClick={() => handleChainSelect('privy')}
                         >
                             <Image src={EmailImg} alt='Email' className='rounded' height='30' width='30' />
                             <div className='text-lg'>Connect with Email</div>
@@ -410,7 +484,7 @@ export default function WalletBtn() {
                                         </Button>
                                     </div>
                                 ) : (
-                                    'Select a Network or Use Email (Recommended for Beginners)'
+                                    'Select a Network or Use Email (Email is recommended for beginners)'
                                 )}
                             </DialogTitle>
                         </DialogHeader>

@@ -1,13 +1,10 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { PublicKey } from '@solana/web3.js'
 import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token'
-import { useWallet, useConnection } from '@solana/wallet-adapter-react'
+import { usePrivy } from '@privy-io/react-auth'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -19,25 +16,20 @@ const bit10Tokens = ['Test BIT10.DEFI', 'Test BIT10.BRC20', 'Test BIT10.TOP', 'T
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
 
-export default function SolDevbalanceAndAllocation() {
+export default function BalanceAndAlloactions() {
     const [selectedAllocationToken, setSelectedAllocationToken] = useState('Test BIT10.DEFI');
     const [innerRadius, setInnerRadius] = useState<number>(80);
 
-    const { publicKey } = useWallet();
+    const { user } = usePrivy();
+    const UserWallet = user?.wallet?.address;
     const { connection } = useConnection();
-    const wallet = useWallet();
-
-    const formatAddress = (id: string | undefined) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 4)}...${id.slice(-3)}`;
-    };
 
     const fetchBit10Balance = async (splMint: string, decimalPlaces: number) => {
         const tokenAddressPublicKey = new PublicKey(splMint);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        const publicKey = new PublicKey(UserWallet);
         const associatedTokenFrom = await getAssociatedTokenAddress(tokenAddressPublicKey, publicKey);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
@@ -197,16 +189,7 @@ export default function SolDevbalanceAndAllocation() {
     }));
 
     return (
-        <div className='flex flex-col space-y-4'>
-            <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
-                <h1 className='text-center md:text-start text-3xl font-bold animate-fade-left-slow'>
-                    Welcome back {wallet.publicKey ? formatAddress(wallet.publicKey.toString()) : 'Guest'}
-                </h1>
-                <Button className='animate-fade-right-slow' asChild>
-                    <Link href='/buy'>Buy BIT10 Token</Link>
-                </Button>
-            </div>
-
+        <div>
             {isLoading ? (
                 <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
                     <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow'>

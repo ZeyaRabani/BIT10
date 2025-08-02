@@ -1,17 +1,12 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
-import { useICPWallet } from '@/context/ICPWalletContext'
+import { PublicKey } from '@solana/web3.js'
+import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token'
+import { useWallet, useConnection } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Actor, HttpAgent } from '@dfinity/agent'
-import { Principal } from '@dfinity/principal'
-import { idlFactory } from '@/lib/bit10.did'
 import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
@@ -20,45 +15,26 @@ const bit10Tokens = ['Test BIT10.DEFI', 'Test BIT10.BRC20', 'Test BIT10.TOP', 'T
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
 
-export default function ICPBalanceAndAllocation() {
+export default function BalanceAndAlloactions() {
     const [selectedAllocationToken, setSelectedAllocationToken] = useState('Test BIT10.DEFI');
     const [innerRadius, setInnerRadius] = useState<number>(80);
 
-    const { ICPAddress } = useICPWallet();
+    const { publicKey } = useWallet();
+    const { connection } = useConnection();
 
-    const formatPrincipalId = (id: string | undefined) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 4)}...${id.slice(-3)}`;
-    };
+    const fetchBit10Balance = async (splMint: string, decimalPlaces: number) => {
+        const tokenAddressPublicKey = new PublicKey(splMint);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        const associatedTokenFrom = await getAssociatedTokenAddress(tokenAddressPublicKey, publicKey);
 
-    const fetchBit10Balance = async (canisterId: string) => {
-        const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        const fromAccount = await getAccount(connection, associatedTokenFrom);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const balance = ((parseFloat(fromAccount.amount.toString()) / 10 ** decimalPlaces).toFixed(4)).toString();
 
-        const agent = new HttpAgent({ host });
-        const actor = Actor.createActor(idlFactory, {
-            agent,
-            canisterId,
-        });
-
-        if (ICPAddress) {
-            const account = {
-                owner: Principal.fromText(ICPAddress),
-                subaccount: [],
-            };
-            if (actor && actor.icrc1_balance_of) {
-                try {
-                    const balance = await actor.icrc1_balance_of(account);
-                    return balance;
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                } catch (error) {
-                    toast.error('An error occurred while fetching user portfolio. Please try again!');
-                }
-            } else {
-                toast.error('An error occurred while fetching user portfolio. Please try again!');
-                return 0n;
-            }
-        }
+        return balance;
     }
 
     const fetchBit10Tokens = async (tokenPriceAPI: string) => {
@@ -106,20 +82,8 @@ export default function ICPBalanceAndAllocation() {
             },
             {
                 queryKey: ['bit10DEFIBalance'],
-                queryFn: () => fetchBit10Balance('hbs3g-xyaaa-aaaap-qhmna-cai')
+                queryFn: () => fetchBit10Balance('5bzHsBmXwX3U6yqKH8uoFgHrUNyoNJvMuAajsBbsHt5K', 9)
             },
-            {
-                queryKey: ['bit10BRC20Balance'],
-                queryFn: () => fetchBit10Balance('uv4pt-4qaaa-aaaap-qpuxa-cai')
-            },
-            {
-                queryKey: ['bit10TOPBalance'],
-                queryFn: () => fetchBit10Balance('wbckh-zqaaa-aaaap-qpuza-cai')
-            },
-            {
-                queryKey: ['bit10MEMEBalance'],
-                queryFn: () => fetchBit10Balance('yeoei-eiaaa-aaaap-qpvzq-cai')
-            }
         ],
     });
 
@@ -128,12 +92,9 @@ export default function ICPBalanceAndAllocation() {
     const bit10BRC20Tokens = bit10Queries[1].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
     const bit10TOPTokens = bit10Queries[2].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
     const bit10MEMETokens = bit10Queries[3].data as { id: number, name: string, symbol: string, tokenAddress: string, chain: string; price: number }[] | undefined;
-    const bit10DEFITokenBalance = bit10Queries[4].data as bigint | undefined;
-    const bit10BRC20TokenBalance = bit10Queries[5].data as bigint | undefined;
-    const bit10TOPTokenBalance = bit10Queries[6].data as bigint | undefined;
-    const bit10MEMETokenBalance = bit10Queries[7].data as bigint | undefined;
+    const bit10DEFITokenBalance = bit10Queries[4].data as number | undefined;
 
-    const totalBit10Tokens = (bit10DEFITokenBalance ?? 0n) + (bit10BRC20TokenBalance ?? 0n) + (bit10TOPTokenBalance ?? 0n) + (bit10MEMETokenBalance ?? 0n);
+    const totalBit10Tokens = (bit10DEFITokenBalance ?? 0);
 
     const selectedBit10Token = () => {
         if (selectedAllocationToken === 'Test BIT10.DEFI') {
@@ -171,7 +132,7 @@ export default function ICPBalanceAndAllocation() {
     }, []);
 
     const formatBit10 = (amount: number) => {
-        const num = Number(amount) / 100000000;
+        const num = Number(amount);
         const rounded = num.toFixed(5);
         return rounded.replace(/\.?0+$/, '');
     };
@@ -179,19 +140,7 @@ export default function ICPBalanceAndAllocation() {
     const tokenData = [
         {
             token: 'Test BIT10.DEFI',
-            balance: `${formatBit10(Number(bit10DEFITokenBalance))}`
-        },
-        {
-            token: 'Test BIT10.BRC20',
-            balance: `${formatBit10(Number(bit10BRC20TokenBalance))}`
-        },
-        {
-            token: 'Test BIT10.TOP',
-            balance: `${formatBit10(Number(bit10TOPTokenBalance))}`
-        },
-        {
-            token: 'Test BIT10.MEME',
-            balance: `${formatBit10(Number(bit10MEMETokenBalance))}`
+            balance: `${Number(bit10DEFITokenBalance)}`
         }
     ]
 
@@ -237,14 +186,7 @@ export default function ICPBalanceAndAllocation() {
     }));
 
     return (
-        <div className='flex flex-col space-y-4'>
-            <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
-                <h1 className='text-center md:text-start text-3xl font-bold animate-fade-left-slow'>Welcome back {formatPrincipalId(ICPAddress)}</h1>
-                <Button className='animate-fade-right-slow' asChild>
-                    <Link href='/buy'>Buy BIT10 Token</Link>
-                </Button>
-            </div>
-
+        <div>
             {isLoading ? (
                 <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
                     <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow'>
@@ -327,13 +269,13 @@ export default function ICPBalanceAndAllocation() {
                             </div>
                             <div className='flex w-full flex-col space-y-3'>
                                 <div className='flex flex-row items-center justify-start space-x-2'>
-                                    <p className='text-3xl font-semibold'>{formatBit10(Number(totalBit10Tokens))} Test BIT10</p>
+                                    <p className='text-3xl font-semibold'>{Number(totalBit10Tokens)} Test BIT10</p>
                                 </div>
                                 {/* {Number(formatBit10(bit10DEFI)) > 0 && (
-                                    <div>
-                                        <p className='text-xl font-semibold'>~ $ {(Number(formatBit10(bit10DEFI)) * totalSum).toFixed(9)}</p>
-                                    </div>
-                                )} */}
+                                <div>
+                                    <p className='text-xl font-semibold'>~ $ {(Number(formatBit10(bit10DEFI)) * totalSum).toFixed(9)}</p>
+                                </div>
+                            )} */}
                                 <div className='flex w-full flex-col space-y-3'>
                                     <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
                                     <div className='flex flex-col space-y-1 py-1'>

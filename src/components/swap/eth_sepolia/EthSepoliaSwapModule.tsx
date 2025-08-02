@@ -412,7 +412,7 @@ export default function EthSepoliaSwapModule() {
         const fromAmount = Number(form.watch('from_amount') || 0);
         const balance = Number(fromTokenBalance || 0);
 
-        if (fromAmount >= balance || fromAmount >= balance * 1.01) {
+        if (fromAmount >= balance || fromAmount >= balance * 1.01 && !swaping) {
             return 'Your balance is too low for this transaction';
         }
         if (selectedFromToken?.token_id === selectedToToken?.token_id) {

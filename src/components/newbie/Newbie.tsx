@@ -14,7 +14,7 @@ export default function Newbie() {
                     <CardTitle>New User Zone (Email Wallet)</CardTitle>
                 </CardHeader>
                 <CardContent className='flex flex-col space-y-4'>
-                    <div className='text-xl'>Welcome, {user?.email?.address}, to the BIT10 Testnet!</div>
+                    <div className='text-xl'>Welcome {user?.email?.address}, to the BIT10 Testnet!</div>
                     <div className='text-xl'>Your generated Solana Devnet wallet address is: <span className='font-semibold underline'>{user?.wallet?.address}</span></div>
                     <div className='text-xl'>Follow the guide below to get started with BIT10:</div>
                     <div className='flex flex-col space-y-1'>

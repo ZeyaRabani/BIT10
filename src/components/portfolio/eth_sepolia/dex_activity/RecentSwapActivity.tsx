@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-dex-portfolio'
 import type { PortfolioTableDataType } from '@/components/ui/data-table-dex-portfolio'
 
-const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
+const recentSwapTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
         accessorKey: 'tickIn',
         header: ({ column }) => (
@@ -75,10 +75,10 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     }
 ]
 
-export default function ETHSepoliaRecentActivity() {
+export default function RecentSwapActivity() {
     const { address } = useAccount();
 
-    const fetchRecentActivity = async (address: string) => {
+    const fetchRecentSwapActivity = async (address: string) => {
         const response = await userRecentDEXSwapActivity({ paymentAddress: address });
         if (response === 'Error fetching user recent DEX activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
@@ -90,36 +90,38 @@ export default function ETHSepoliaRecentActivity() {
     const recentActivityQuery = useQueries({
         queries: [
             {
-                queryKey: ['bit10RecentActivity'],
-                queryFn: () => address ? fetchRecentActivity(address) : toast.error('User address is undefined')
-            },
+                queryKey: ['bit10RecentDEXActivity'],
+                queryFn: () => address ? fetchRecentSwapActivity(address) : toast.error('User address is undefined')
+            }
         ]
     })
 
     const isLoading = recentActivityQuery.some(query => query.isLoading);
-    const recentActivityData = recentActivityQuery[0].data as PortfolioTableDataType[] | undefined;
+    const recentDEXActivityData = recentActivityQuery[0].data as PortfolioTableDataType[] | undefined;
 
     return (
         <div>
             {isLoading ? (
-                <Card className='dark:border-white animate-fade-bottom-up-slow'>
-                    <CardContent>
-                        <div className='flex flex-col h-full space-y-2 pt-8'>
-                            {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
-                                <Skeleton key={index} className={classes} />
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
+                <div className='flex flex-col space-y-4'>
+                    <Card className='dark:border-white animate-fade-bottom-up-slow'>
+                        <CardContent>
+                            <div className='flex flex-col h-full space-y-2 pt-8'>
+                                {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
+                                    <Skeleton key={index} className={classes} />
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             ) : (
                 <Card className='dark:border-white animate-fade-bottom-up-slow'>
                     <CardHeader>
-                        <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent activity</div>
+                        <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent swap activity</div>
                     </CardHeader>
                     <CardContent>
                         <DataTable
-                            columns={portfolioTableColumns}
-                            data={recentActivityData ?? []}
+                            columns={recentSwapTableColumns}
+                            data={recentDEXActivityData ?? []}
                             userSearchColumn='tickOutName'
                             inputPlaceHolder='Search by Received token name'
                         />

@@ -2,8 +2,7 @@
 "use server"
 
 import { db } from '@/server/db'
-import { userSignups, teUsers, teSwap, teRequestBtc, teLiquidityHub, referralJune2025, referralJune2025Tasks, teDexSwap } from '@/server/db/schema'
-
+import { userSignups, teUsers, teSwap, teRequestBtc, teLiquidityHub, teDexSwap } from '@/server/db/schema'
 import crypto from 'crypto'
 import { eq, desc, and } from 'drizzle-orm'
 
