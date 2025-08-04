@@ -45,7 +45,7 @@ const jsonFilePath = path.join(__dirname, '../../../data/bit10_brc20.json');
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
 if (!COINMARKETCAP_API_KEY) {
-    console.error("❌ COINMARKETCAP_API_KEY is not defined.");
+    console.error('❌ COINMARKETCAP_API_KEY is not defined.');
     process.exit(1);
 }
 
@@ -91,16 +91,16 @@ export const fetchAndUpdateBit10BRC20Data = async () => {
             const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
             cachedData = JSON.parse(fileContent);
         } catch (error) {
-            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
+            console.warn('⚠️ JSON file not found or unreadable. Creating a new one.');
         }
 
         cachedData['bit10_brc20_current_price'] = [newEntry];
 
         await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
 
-        console.log("✅ BIT10.BRC20 historical data updated successfully.");
+        console.log('✅ BIT10.BRC20 historical data updated successfully.');
     } catch (error) {
-        console.error("❌ Error updating BIT10.BRC20 data:", error);
+        console.error('❌ Error updating BIT10.BRC20 data:', error);
     }
 }
 
@@ -186,9 +186,9 @@ export const fetchAndUpdateBit10BRC20RebalanceData = async () => {
             });
         });
 
-        console.log("✅ BIT10.BRC20 Rebalance data updated successfully.");
+        console.log('✅ BIT10.BRC20 Rebalance data updated successfully.');
     } catch (error) {
-        console.error("❌ Error updating BIT10.BRC20 Rebalance data:", error);
+        console.error('❌ Error updating BIT10.BRC20 Rebalance data:', error);
     }
 }
 

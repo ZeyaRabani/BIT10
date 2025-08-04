@@ -14,6 +14,7 @@ type Coin = {
     quote: {
         USD: {
             price: number;
+            market_cap: number;
         };
     };
 }
@@ -39,7 +40,7 @@ const jsonFilePath = path.join(__dirname, '../../../data/bit10_top.json');
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
 if (!COINMARKETCAP_API_KEY) {
-    console.error("❌ COINMARKETCAP_API_KEY is not defined.");
+    console.error('❌ COINMARKETCAP_API_KEY is not defined.');
     process.exit(1);
 }
 
@@ -60,11 +61,12 @@ export const fetchAndUpdateBit10TOPData = async () => {
             id: coin.id,
             name: coin.name,
             symbol: coin.symbol,
+            market_cap: coin.quote.USD.market_cap,
             price: coin.quote.USD.price
         }));
 
-        const totalPrice = coinsData.reduce((sum, token) => sum + token.price, 0);
-        const tokenPrice = (totalPrice / coinsData.length) / 1000;
+        const totalPrice = coinsData.reduce((sum, token) => sum + token.market_cap, 0);
+        const tokenPrice = (totalPrice / 25000000000000) * 100; // 25T
         const timestmpz = new Date().toISOString();
 
         await db.transaction(async (tx) => {
@@ -82,22 +84,23 @@ export const fetchAndUpdateBit10TOPData = async () => {
             const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
             cachedData = JSON.parse(fileContent);
         } catch (error) {
-            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
+            console.warn('⚠️ JSON file not found or unreadable. Creating a new one.');
         }
 
         cachedData['bit10_top_current_price'] = [newEntry];
 
         await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
 
-        console.log("✅ BIT10.TOP historical data updated successfully.");
+        console.log('✅ BIT10.TOP historical data updated successfully.');
     } catch (error) {
-        console.error("❌ Error updating BIT10.TOP data:", error);
+        console.error('❌ Error updating BIT10.TOP data:', error);
     }
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10TOPData); // 30 sec
 cron.schedule('*/20 * * * *', fetchAndUpdateBit10TOPData); // 20 min
 
+// ToDo: Update logic for Market Cap
 export const fetchAndUpdateBit10TOPRebalanceData = async () => {
     try {
         const priceOfTokenToBuyResult = await db.select({
@@ -177,9 +180,9 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
             });
         });
 
-        console.log("✅ BIT10.TOP Rebalance data updated successfully.");
+        console.log('✅ BIT10.TOP Rebalance data updated successfully.');
     } catch (error) {
-        console.error("❌ Error updating BIT10.TOP Rebalance data:", error);
+        console.error('❌ Error updating BIT10.TOP Rebalance data:', error);
     }
 }
 

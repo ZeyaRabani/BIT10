@@ -23,7 +23,7 @@ const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 const API_URL = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=8916,4847,7334,4956,3701,8669`;
 
 if (!COINMARKETCAP_API_KEY) {
-    console.error("❌ COINMARKETCAP_API_KEY is not defined.");
+    console.error('❌ COINMARKETCAP_API_KEY is not defined.');
     process.exit(1);
 }
 
@@ -58,16 +58,16 @@ export const fetchAndUpdateBit10DEFIData = async () => {
             const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
             cachedData = JSON.parse(fileContent);
         } catch (error) {
-            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
+            console.warn('⚠️ JSON file not found or unreadable. Creating a new one.');
         }
 
         cachedData['bit10_defi_current_price'] = [newEntry];
 
         await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
 
-        console.log("✅ BIT10.DEFI data updated successfully.");
+        console.log('✅ BIT10.DEFI data updated successfully.');
     } catch (error) {
-        console.error("❌ Error updating BIT10.DEFI data:", error);
+        console.error('❌ Error updating BIT10.DEFI data:', error);
     }
 };
 

@@ -66,7 +66,7 @@ interface RebalanceData {
     bit10Data: CoinData[];
 }
 
-// Update this (temp. placeholder)
+// ToDo: (temp. placeholder)
 const bit10Allocation: WalletDataType[] = [
     { walletAddress: 'bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'] },
 

@@ -17,6 +17,7 @@ type Coin = {
     quote: {
         USD: {
             price: number;
+            market_cap: number;
         };
     };
 }
@@ -44,7 +45,7 @@ const jsonFilePath = path.join(__dirname, '../../../data/bit10_meme.json');
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
 if (!COINMARKETCAP_API_KEY) {
-    console.error("❌ COINMARKETCAP_API_KEY is not defined.");
+    console.error('❌ COINMARKETCAP_API_KEY is not defined.');
     process.exit(1);
 }
 
@@ -65,11 +66,12 @@ export const fetchAndUpdateBit10MEMEData = async () => {
             symbol: coin.symbol,
             chain: coin.platform?.slug ?? '',
             tokenAddress: coin.platform?.token_address ?? '',
+            market_cap: coin.quote.USD.market_cap,
             price: coin.quote.USD.price
         }));
 
-        const totalPrice = coinsData.reduce((sum, token) => sum + token.price, 0);
-        const tokenPrice = totalPrice / coinsData.length;
+        const totalPrice = coinsData.reduce((sum, token) => sum + token.market_cap, 0);
+        const tokenPrice = (totalPrice / 10000000000000) * 100; // 10T
         const timestmpz = new Date().toISOString();
 
         await db.transaction(async (tx) => {
@@ -87,22 +89,23 @@ export const fetchAndUpdateBit10MEMEData = async () => {
             const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
             cachedData = JSON.parse(fileContent);
         } catch (error) {
-            console.warn("⚠️ JSON file not found or unreadable. Creating a new one.");
+            console.warn('⚠️ JSON file not found or unreadable. Creating a new one.');
         }
 
         cachedData['bit10_meme_current_price'] = [newEntry];
 
         await fs.writeFile(jsonFilePath, JSON.stringify(cachedData, null, 2));
 
-        console.log("✅ BIT10.MEME historical data updated successfully.");
+        console.log('✅ BIT10.MEME historical data updated successfully.');
     } catch (error) {
-        console.error("❌ Error updating BIT10.MEME data:", error);
+        console.error('❌ Error updating BIT10.MEME data:', error);
     }
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBit10MEMEData); // 30 sec
 cron.schedule('*/20 * * * *', fetchAndUpdateBit10MEMEData); // 20 min
 
+// ToDo: Update logic for Market Cap
 export const fetchAndUpdateBit10MEMERebalanceData = async () => {
     try {
         const priceOfTokenToBuyResult = await db.select({
@@ -182,9 +185,9 @@ export const fetchAndUpdateBit10MEMERebalanceData = async () => {
             });
         });
 
-        console.log("✅ Test BIT10.MEME Rebalance data updated successfully.");
+        console.log('✅ Test BIT10.MEME Rebalance data updated successfully.');
     } catch (error) {
-        console.error("❌ Error updating Test BIT10.MEME Rebalance data:", error);
+        console.error('❌ Error updating Test BIT10.MEME Rebalance data:', error);
     }
 }
 
