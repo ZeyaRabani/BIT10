@@ -5,7 +5,7 @@ import { Card, CardTitle, CardContent, CardHeader, CardDescription, CardFooter }
 import { Skeleton } from '@/components/ui/skeleton'
 import AnimatedBackground from '@/components/ui/animated-background'
 import { CartesianGrid, XAxis, YAxis, LineChart, Line } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 import * as z from 'zod'
 import { Loader2 } from 'lucide-react'
@@ -304,22 +304,9 @@ export default function BIT10Comparison() {
                         </div>
                         <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0'>
                             <div className='relative flex flex-row space-x-2 items-center justify-center border dark:border-white rounded-md px-2 py-1.5'>
-                                <AnimatedBackground
-                                    defaultValue='10Y'
-                                    className='rounded bg-primary'
-                                    transition={{
-                                        ease: 'easeInOut',
-                                        duration: 0.2,
-                                    }}
-                                    onValueChange={(newActiveId) => handleTabChange(newActiveId)}
-                                >
+                                <AnimatedBackground defaultValue='10Y' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
                                     {tabs.map((label, index) => (
-                                        <button
-                                            key={index}
-                                            data-id={label}
-                                            type='button'
-                                            className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}
-                                        >
+                                        <button key={index} data-id={label} type='button' className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}>
                                             {label}
                                         </button>
                                     ))}
@@ -330,57 +317,20 @@ export default function BIT10Comparison() {
                     <CardContent className='flex flex-col space-y-4'>
                         {isLoading ? (
                             <div className='flex flex-col h-full space-y-2'>
-                                <Skeleton className='h-[300px] md:h-[380px] w-full' />
+                                <Skeleton className='h-[300px] md:h-[400px] w-full' />
                             </div>
                         ) : (
                             <div className='select-none -ml-4'>
                                 <ChartContainer config={investmentChartConfig} className='max-h-[300px] md:max-h-[380px] w-full'>
                                     <LineChart accessibilityLayer data={currentData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis
-                                            dataKey='day'
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickFormatter={tickFormatter}
-                                            stroke='#D5520E'
-                                        />
-                                        <YAxis
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickCount={5}
-                                            stroke='#D5520E'
-                                            tickFormatter={yAxisFormatter}
-                                        />
-                                        <ChartTooltip
-                                            cursor={false}
-                                            content={<ChartTooltipContent />}
-                                        />
-                                        <Line
-                                            dataKey='bit10TopValue'
-                                            type='linear'
-                                            stroke='green'
-                                            name={investmentChartConfig.bit10TopValue.label}
-                                            strokeWidth={2}
-                                            dot={false}
-                                        />
-                                        <Line
-                                            dataKey='btcValue'
-                                            type='linear'
-                                            stroke='orange'
-                                            name={investmentChartConfig.btcValue.label}
-                                            strokeWidth={2}
-                                            dot={false}
-                                        />
-                                        <Line
-                                            dataKey='sp500Value'
-                                            type='linear'
-                                            stroke='blue'
-                                            name={investmentChartConfig.sp500Value.label}
-                                            strokeWidth={2}
-                                            dot={false}
-                                        />
+                                        <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' />
+                                        <YAxis tickLine={true} axisLine={true} tickMargin={8} tickCount={5} stroke='#D5520E' tickFormatter={yAxisFormatter} />
+                                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                        <ChartLegend content={<ChartLegendContent />} />
+                                        <Line dataKey='bit10TopValue' type='linear' stroke='green' name={investmentChartConfig.bit10TopValue.label} strokeWidth={2} dot={false} />
+                                        <Line dataKey='btcValue' type='linear' stroke='orange' name={investmentChartConfig.btcValue.label} strokeWidth={2} dot={false} />
+                                        <Line dataKey='sp500Value' type='linear' stroke='blue' name={investmentChartConfig.sp500Value.label} strokeWidth={2} dot={false} />
                                     </LineChart>
                                 </ChartContainer>
                             </div>
@@ -394,7 +344,9 @@ export default function BIT10Comparison() {
                         <CardTitle>
                             BIT10 Investment Calculator
                         </CardTitle>
-                        <CardDescription>Estimate your returns and see how your investment would have grown over time.</CardDescription>
+                        <CardDescription>
+                            Estimate your returns and see how your investment would have grown over time.
+                        </CardDescription>
                     </CardHeader>
                     <Form {...form}>
                         <div onSubmit={form.handleSubmit(onSubmit)} className='flex-1 flex flex-col'>
