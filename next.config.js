@@ -79,6 +79,10 @@ const config = {
                 destination: '/api/bit10-token-request/:slug*',
             },
             {
+                source: '/bit10-comparison-data-:time',
+                destination: '/api/bit10-comparison-data/:time*',
+            },
+            {
                 source: '/bit10-historic-data-:index_fund-:time',
                 destination: '/api/bit10-historic-data/:index_fund/:time',
             },
