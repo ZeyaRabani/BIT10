@@ -485,7 +485,7 @@ export default function BIT10Comparison() {
                                             <div className='pt-2 border-t border-green-200 dark:border-green-800'>
                                                 <div className='flex justify-between text-xs text-gray-500 dark:text-gray-400'>
                                                     <span>Period:</span>
-                                                    <span>{new Date(calculationResult.startDate).toLocaleDateString()} - {new Date(calculationResult.endDate).toLocaleDateString()}</span>
+                                                    <span>From {new Date(calculationResult.startDate).toLocaleDateString()} to {new Date(calculationResult.endDate).toLocaleDateString()} (as of today)</span>
                                                 </div>
                                             </div>
                                         </div>
