@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-const tabs = ['10Y', '5Y', '3Y'];
+const tabs = ['10Y', '5Y', '3Y', '1Y'];
 
 type Bit10Entry = {
     date: string;
@@ -67,7 +67,7 @@ export default function BIT10Comparison() {
     };
 
     const fetchBit10Comparison = async (year: number) => {
-        const validYears = [3, 5, 10];
+        const validYears = [1, 3, 5, 10];
         if (!validYears.includes(year)) {
             toast.error('Invalid year selected.');
             return null;
@@ -104,6 +104,10 @@ export default function BIT10Comparison() {
                 queryKey: ['bit10TokenComparison3Y'],
                 queryFn: () => fetchBit10Comparison(3)
             },
+            {
+                queryKey: ['bit10TokenComparison1Y'],
+                queryFn: () => fetchBit10Comparison(1)
+            }
         ],
     });
 
@@ -114,6 +118,8 @@ export default function BIT10Comparison() {
     const bit10Comparison5Y = bit10Queries[1].data?.bit10_top ?? [];
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const bit10Comparison3Y = bit10Queries[2].data?.bit10_top ?? [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const bit10Comparison1Y = bit10Queries[3].data?.bit10_top ?? [];
 
     const investmentChartConfig = {
         bit10TopValue: {
@@ -179,7 +185,8 @@ export default function BIT10Comparison() {
         '10Y': processInvestmentData(bit10Comparison10Y),
         '5Y': processInvestmentData(bit10Comparison5Y),
         '3Y': processInvestmentData(bit10Comparison3Y),
-    }), [bit10Comparison10Y, bit10Comparison5Y, bit10Comparison3Y, processInvestmentData]);
+        '1Y': processInvestmentData(bit10Comparison1Y),
+    }), [bit10Comparison10Y, bit10Comparison5Y, bit10Comparison3Y, bit10Comparison1Y, processInvestmentData]);
 
     const currentData = investmentData[activeTab as keyof typeof investmentData];
 
@@ -289,7 +296,7 @@ export default function BIT10Comparison() {
             <div className='md:col-span-3'>
                 <Card className='dark:border-white animate-fade-left-slow'>
                     <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
-                        <div className='flex flex-1 flex-col justify-center gap-1 px-6 pb-3 sm:pb-0'>
+                        <div className='flex flex-1 flex-col justify-center gap-1 pb-3 sm:pb-0'>
                             <CardTitle>$100 Investment Growth Comparison</CardTitle>
                             <CardDescription>
                                 Performance of a $100 investment in each asset since tracking began
@@ -323,7 +330,7 @@ export default function BIT10Comparison() {
                     <CardContent className='flex flex-col space-y-4'>
                         {isLoading ? (
                             <div className='flex flex-col h-full space-y-2'>
-                                <Skeleton className='h-56 md:h-64 w-full' />
+                                <Skeleton className='h-[300px] md:h-[380px] w-full' />
                             </div>
                         ) : (
                             <div className='select-none -ml-4'>
@@ -485,7 +492,7 @@ export default function BIT10Comparison() {
                                             <div className='pt-2 border-t border-green-200 dark:border-green-800'>
                                                 <div className='flex justify-between text-xs text-gray-500 dark:text-gray-400'>
                                                     <span>Period:</span>
-                                                    <span>From {new Date(calculationResult.startDate).toLocaleDateString()} to {new Date(calculationResult.endDate).toLocaleDateString()} (as of today)</span>
+                                                    <span>From {new Date(calculationResult.startDate).toLocaleDateString()} to {new Date().toLocaleDateString('en-US')} (as of today)</span>
                                                 </div>
                                             </div>
                                         </div>
