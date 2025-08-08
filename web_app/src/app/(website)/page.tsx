@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
+import BIT10Comparison from './bit10Comparison'
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards'
 import Image from 'next/image'
 import DefinityDevImg from '@/assets/home/DFINITYDev.jpg'
@@ -117,6 +118,7 @@ export default function Page() {
       </AuroraBackground>
 
       <MaxWidthWrapper className='flex flex-col space-y-8 py-8'>
+        <BIT10Comparison />
         <div className='flex flex-col items-center space-y-2'>
           <motion.h1
             initial={{ opacity: 0.0, y: 80 }}

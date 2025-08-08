@@ -69,6 +69,10 @@ const config = {
                 destination: '/api/bit10-token-request',
             },
             {
+                source: '/bit10-comparison-data-:time',
+                destination: '/api/bit10-comparison-data/:time*',
+            },
+            {
                 source: '/bit10-mint-request',
                 destination: '/api/bit10-mint-request',
             },
