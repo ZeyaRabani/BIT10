@@ -448,7 +448,7 @@ export default function EthSepoliaSwapModule() {
 
             if (isConnected && matchingPool) {
                 const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
-                const canisterId = 'vlda4-oaaaa-aaaap-qp7cq-cai';
+                const canisterId = 't2vfi-5aaaa-aaaap-qqbfa-cai';
 
                 const agent = new HttpAgent({ host });
                 const actor = Actor.createActor(idlFactory, {
@@ -477,8 +477,8 @@ export default function EthSepoliaSwapModule() {
 
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                const txData = create_transaction.transaction_data;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                const txData = create_transaction.Ok.transaction_data;
 
                 const transaction = {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -508,69 +508,72 @@ export default function EthSepoliaSwapModule() {
 
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                const verifyAndSwap = await actor.verify_and_swap(txHash);
+                const verifyAndSwap = await actor.verify_and_swap({
+                    pool_id: matchingPool.pool_id,
+                    transaction_hash: txHash
+                });
 
                 const result = await newDEXSwap({
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    poolId: verifyAndSwap.Success.pool_id,
+                    poolId: verifyAndSwap.Ok.Success.pool_id,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    amountIn: verifyAndSwap.Success.amount_in,
+                    amountIn: verifyAndSwap.Ok.Success.amount_in,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    amountOut: verifyAndSwap.Success.amount_out,
+                    amountOut: verifyAndSwap.Ok.Success.amount_out,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    sourceChain: verifyAndSwap.Success.source_chain,
+                    sourceChain: verifyAndSwap.Ok.Success.source_chain,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    destinationChain: verifyAndSwap.Success.destination_chain,
+                    destinationChain: verifyAndSwap.Ok.Success.destination_chain,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    swapType: verifyAndSwap.Success.swap_type,
+                    swapType: verifyAndSwap.Ok.Success.swap_type,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    tickInWalletAddress: verifyAndSwap.Success.tick_in_wallet_address,
+                    tickInWalletAddress: verifyAndSwap.Ok.Success.tick_in_wallet_address,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    tickOutWalletAddress: verifyAndSwap.Success.tick_out_wallet_address,
+                    tickOutWalletAddress: verifyAndSwap.Ok.Success.tick_out_wallet_address,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    tokenInAddress: verifyAndSwap.Success.token_in_address,
+                    tokenInAddress: verifyAndSwap.Ok.Success.token_in_address,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    tokenOutAddress: verifyAndSwap.Success.token_out_address,
+                    tokenOutAddress: verifyAndSwap.Ok.Success.token_out_address,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    slippage: verifyAndSwap.Success.slippage,
+                    slippage: verifyAndSwap.Ok.Success.slippage,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    status: verifyAndSwap.Success.status,
+                    status: verifyAndSwap.Ok.Success.status,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    txHashIn: verifyAndSwap.Success.tx_hash_in,
+                    txHashIn: verifyAndSwap.Ok.Success.tx_hash_in,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    txHashOut: verifyAndSwap.Success.tx_hash_out,
+                    txHashOut: verifyAndSwap.Ok.Success.tx_hash_out,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    timestamp: Number(verifyAndSwap.Success.timestamp),
+                    timestamp: Number(verifyAndSwap.Ok.Success.timestamp),
                 })
 
                 if (result === 'DEX Swap was successful') {
@@ -968,7 +971,7 @@ export default function EthSepoliaSwapModule() {
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Minimum receive</div>
-                                            <div>{formatTokenAmount((form.watch('to_amount') || 0) * (1 - Number(form.watch('slippage') || 0) / 100))}</div>
+                                            <div>{formatTokenAmount((form.watch('to_amount') || 0) * (1 - Number(form.watch('slippage') || 0) / 100))} {form.watch('to_token')}</div>
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Liquidity Provider fee</div>

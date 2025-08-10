@@ -35,13 +35,9 @@ export const idlFactory = ({ IDL }) => {
     const TransactionResponse = IDL.Record({
         'transaction_data': TransactionData,
     });
-    const BlockTag = IDL.Variant({
-        'Earliest': IDL.Null,
-        'Safe': IDL.Null,
-        'Finalized': IDL.Null,
-        'Latest': IDL.Null,
-        'Number': IDL.Nat,
-        'Pending': IDL.Null,
+    const GetSwapHistoryByAddressArgs = IDL.Record({
+        'chain': IDL.Text,
+        'tick_in_wallet_address': IDL.Text,
     });
     const SwapResponse = IDL.Record({
         'source_chain': IDL.Text,
@@ -60,6 +56,10 @@ export const idlFactory = ({ IDL }) => {
         'tx_hash_out': IDL.Text,
         'slippage': IDL.Text,
     });
+    const VerifyAndSwapArgs = IDL.Record({
+        'transaction_hash': IDL.Text,
+        'pool_id': IDL.Text,
+    });
     const SwapResult = IDL.Variant({
         'Error': IDL.Text,
         'Success': SwapResponse,
@@ -67,15 +67,19 @@ export const idlFactory = ({ IDL }) => {
     return IDL.Service({
         'create_transaction': IDL.Func(
             [CreateTransactionArgs],
-            [TransactionResponse],
+            [IDL.Variant({ 'Ok': TransactionResponse, 'Err': IDL.Text })],
             [],
         ),
-        'ethereum_address': IDL.Func([], [IDL.Text], []),
-        'get_balance': IDL.Func([IDL.Opt(IDL.Text)], [IDL.Nat], []),
-        'get_transaction_count_for_address': IDL.Func([IDL.Text], [IDL.Nat], []),
-        'send_eth': IDL.Func([IDL.Text, IDL.Nat], [IDL.Text], []),
-        'transaction_count': IDL.Func([IDL.Opt(BlockTag)], [IDL.Nat], []),
-        'verify_and_swap': IDL.Func([IDL.Text], [SwapResult], []),
+        'get_swap_history_by_address': IDL.Func(
+            [GetSwapHistoryByAddressArgs],
+            [IDL.Variant({ 'Ok': IDL.Vec(SwapResponse), 'Err': IDL.Text })],
+            [],
+        ),
+        'verify_and_swap': IDL.Func(
+            [VerifyAndSwapArgs],
+            [IDL.Variant({ 'Ok': SwapResult, 'Err': IDL.Text })],
+            [],
+        ),
     });
 };
 export const init = ({ IDL }) => { return []; };
