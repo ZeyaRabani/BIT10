@@ -16,6 +16,7 @@ const links = {
     web: [
         { title: 'About', link: '/' },
         { title: 'Resources', link: '/resources' },
+        { title: 'Investment Calculator', link: '/investment-calculator' },
         { title: 'Whitepaper', link: '/whitepaper' }
     ],
     app: [

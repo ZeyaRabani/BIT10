@@ -13,6 +13,11 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
+import { format } from 'date-fns'
+import { CalendarIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
@@ -32,13 +37,18 @@ type ProcessedDataPoint = {
     sp500Value: number;
 };
 
-type CalculationResult = {
+type AssetComparison = {
+    name: string;
     initialInvestment: number;
     currentValue: number;
     totalReturn: number;
     percentageReturn: number;
+};
+
+type ComparisonResult = {
     startDate: string;
     endDate: string;
+    assets: AssetComparison[];
 };
 
 const FormSchema = z.object({
@@ -46,10 +56,12 @@ const FormSchema = z.object({
         .min(1, { message: 'Amount is required' })
         .transform((val) => Number(val))
         .refine((val) => !isNaN(val) && val > 0, { message: 'Must be a positive number' }),
-    initial_investment_start_year: z.string()
-        .min(1, { message: 'Start year is required' })
-        .transform((val) => Number(val))
-        .refine((val) => !isNaN(val) && val > 0 && val <= 10, { message: 'Must be between 1 and 10 years' }),
+    initial_investment_start_date: z.date({
+        required_error: 'Please choose a valid start date',
+    }),
+    initial_investment_end_date: z.date({
+        required_error: 'Please choose a valid end date after the start date',
+    }),
     initial_investment_token: z.string({
         required_error: 'Select a token'
     })
@@ -58,7 +70,7 @@ const FormSchema = z.object({
 export default function BIT10Comparison() {
     const [activeTab, setActiveTab] = useState('10Y');
     const [processing, setProcessing] = useState<boolean>(false);
-    const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
+    const [calculationResult, setCalculationResult] = useState<ComparisonResult | null>(null);
 
     const handleTabChange = (label: string | null) => {
         if (label) {
@@ -67,7 +79,7 @@ export default function BIT10Comparison() {
     };
 
     const fetchBit10Comparison = async (year: number) => {
-        const validYears = [1, 3, 5, 10];
+        const validYears = [1, 3, 5, 10, 15];
         if (!validYears.includes(year)) {
             toast.error('Invalid year selected.');
             return null;
@@ -107,6 +119,10 @@ export default function BIT10Comparison() {
             {
                 queryKey: ['bit10TokenComparison1Y'],
                 queryFn: () => fetchBit10Comparison(1)
+            },
+            {
+                queryKey: ['bit10TokenComparison15Y'],
+                queryFn: () => fetchBit10Comparison(15)
             }
         ],
     });
@@ -120,6 +136,8 @@ export default function BIT10Comparison() {
     const bit10Comparison3Y = bit10Queries[2].data?.bit10_top ?? [];
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const bit10Comparison1Y = bit10Queries[3].data?.bit10_top ?? [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const bit10ComparisonCalculator = bit10Queries[4].data?.bit10_top ?? [];
 
     const investmentChartConfig = {
         bit10TopValue: {
@@ -198,70 +216,87 @@ export default function BIT10Comparison() {
         (value: number) => `$${value}`, []
     );
 
+    const availableDatesSet = useMemo(() => {
+        return new Set(
+            bit10ComparisonCalculator.map(entry =>
+                new Date(entry.date).toDateString()
+            )
+        );
+    }, [bit10ComparisonCalculator]);
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
             initial_investment: '10',
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            initial_investment_start_year: '5',
+            initial_investment_start_date: new Date('2015-07-29'),
+            initial_investment_end_date: new Date('2025-08-05'),
             initial_investment_token: 'BIT10.TOP'
         },
     });
 
-    const calculateBIT10Return = (investmentAmount: number, yearsAgo: number): CalculationResult | null => {
-        if (!bit10Comparison10Y || bit10Comparison10Y.length === 0) {
+    const calculateAllReturns = (
+        investmentAmount: number,
+        startDate: Date,
+        endDate: Date
+    ): ComparisonResult | null => {
+        if (!bit10ComparisonCalculator || bit10ComparisonCalculator.length === 0) {
             return null;
         }
 
-        const targetDate = new Date();
-        targetDate.setFullYear(targetDate.getFullYear() - yearsAgo);
+        const findClosestEntry = (targetDate: Date) => {
+            return bit10ComparisonCalculator.reduce((closest, entry) => {
+                const entryDate = new Date(entry.date);
+                const diff = Math.abs(entryDate.getTime() - targetDate.getTime());
+                const closestDiff = Math.abs(
+                    new Date(closest.date).getTime() - targetDate.getTime()
+                );
+                return diff < closestDiff ? entry : closest;
+            });
+        };
 
-        let startIndex = 0;
-        let minDateDiff = Infinity;
+        const startEntry = findClosestEntry(startDate);
+        const endEntry = findClosestEntry(endDate);
 
-        for (let i = 0; i < bit10Comparison10Y.length; i++) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            const entryDate = new Date(bit10Comparison10Y[i].date);
-            const dateDiff = Math.abs(entryDate.getTime() - targetDate.getTime());
+        const tokens: { key: keyof Bit10Entry; name: string }[] = [
+            { key: 'bit10Top', name: 'BIT10.TOP' },
+            { key: 'btc', name: 'Bitcoin' },
+            { key: 'sp500', name: 'S&P500' },
+        ];
 
-            if (dateDiff < minDateDiff) {
-                minDateDiff = dateDiff;
-                startIndex = i;
+        const assets: AssetComparison[] = tokens.map(({ key, name }) => {
+            const startPrice = safeParseFloat(startEntry[key]);
+            const endPrice = safeParseFloat(endEntry[key]);
+
+            if (startPrice === 0) {
+                return {
+                    name,
+                    initialInvestment: investmentAmount,
+                    currentValue: 0,
+                    totalReturn: 0,
+                    percentageReturn: 0,
+                };
             }
-        }
 
-        const startEntry = bit10Comparison10Y[startIndex];
-        const endEntry = bit10Comparison10Y[bit10Comparison10Y.length - 1];
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        const startPrice = safeParseFloat(startEntry.bit10Top);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        const endPrice = safeParseFloat(endEntry.bit10Top);
+            const currentValue = investmentAmount * (endPrice / startPrice);
+            const totalReturn = currentValue - investmentAmount;
+            const percentageReturn =
+                ((currentValue - investmentAmount) / investmentAmount) * 100;
 
-        if (startPrice === 0) {
-            return null;
-        }
-
-        const currentValue = investmentAmount * (endPrice / startPrice);
-        const totalReturn = currentValue - investmentAmount;
-        const percentageReturn = ((currentValue - investmentAmount) / investmentAmount) * 100;
+            return {
+                name,
+                initialInvestment: investmentAmount,
+                currentValue: parseFloat(currentValue.toFixed(2)),
+                totalReturn: parseFloat(totalReturn.toFixed(2)),
+                percentageReturn: parseFloat(percentageReturn.toFixed(2)),
+            };
+        });
 
         return {
-            initialInvestment: investmentAmount,
-            currentValue: parseFloat(currentValue.toFixed(2)),
-            totalReturn: parseFloat(totalReturn.toFixed(2)),
-            percentageReturn: parseFloat(percentageReturn.toFixed(2)),
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
             startDate: startEntry.date,
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            endDate: endEntry.date
+            endDate: endEntry.date,
+            assets,
         };
     };
 
@@ -270,22 +305,21 @@ export default function BIT10Comparison() {
             setProcessing(true);
             setCalculationResult(null);
 
-            if (values.initial_investment_token === 'BIT10.TOP') {
-                const result = calculateBIT10Return(values.initial_investment, values.initial_investment_start_year);
+            const result = calculateAllReturns(
+                values.initial_investment,
+                values.initial_investment_start_date,
+                values.initial_investment_end_date
+            );
 
-                if (result) {
-                    setCalculationResult(result);
-                    toast.success('Investment calculation completed successfully!');
-                } else {
-                    toast.error('Unable to calculate returns. Please check your inputs and try again.');
-                }
+            if (result) {
+                setCalculationResult(result);
+                toast.success('Investment calculation completed successfully!');
+            } else {
+                toast.error('Unable to calculate returns. Please try again.');
             }
-
-            setProcessing(false);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            setProcessing(false);
-            toast.error('An error occurred while processing your request. Please try again!');
+            toast.error('An error occurred while processing your request.');
         } finally {
             setProcessing(false);
         }
@@ -321,7 +355,7 @@ export default function BIT10Comparison() {
                             </div>
                         ) : (
                             <div className='select-none -ml-4'>
-                                <ChartContainer config={investmentChartConfig} className='max-h-[300px] md:max-h-[380px] w-full'>
+                                <ChartContainer config={investmentChartConfig} className='max-h-[300px] md:max-h-[600px] w-full'>
                                     <LineChart accessibilityLayer data={currentData}>
                                         <CartesianGrid vertical={false} />
                                         <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' />
@@ -371,15 +405,60 @@ export default function BIT10Comparison() {
 
                                     <FormField
                                         control={form.control}
-                                        name='initial_investment_start_year'
+                                        name='initial_investment_start_date'
                                         render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Start Year</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} placeholder='Initial investment start year' type='number' className='dark:border-white' max={10} min={1} />
-                                                </FormControl>
+                                            <FormItem className='flex flex-col'>
+                                                <FormLabel>Date of Initial Investment</FormLabel>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                {field.value ? (
+                                                                    format(field.value, 'PPP')
+                                                                ) : (
+                                                                    <span>Select start date</span>
+                                                                )}
+                                                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className='w-auto p-0' align='start'>
+                                                        <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                    </PopoverContent>
+                                                </Popover>
                                                 <FormDescription>
-                                                    Enter how many years ago you started investing (max 10 years)
+                                                    When your investment begins
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name='initial_investment_end_date'
+                                        render={({ field }) => (
+                                            <FormItem className='flex flex-col'>
+                                                <FormLabel>Date of Final Investment</FormLabel>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                {field.value ? (
+                                                                    format(field.value, 'PPP')
+                                                                ) : (
+                                                                    <span>Select end date</span>
+                                                                )}
+                                                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className='w-auto p-0' align='start'>
+                                                        <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <FormDescription>
+                                                    When your investment ends
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -419,34 +498,56 @@ export default function BIT10Comparison() {
 
                                 {calculationResult && (
                                     <div className='w-full p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-900/20'>
-                                        <h3 className='font-semibold text-green-800 dark:text-green-200 mb-3'>Investment Results</h3>
-                                        <div className='space-y-2 text-sm'>
-                                            <div className='flex justify-between'>
-                                                <span className='text-gray-600 dark:text-gray-400'>Initial Investment:</span>
-                                                <span className='font-medium'>${calculationResult.initialInvestment.toLocaleString()}</span>
-                                            </div>
-                                            <div className='flex justify-between'>
-                                                <span className='text-gray-600 dark:text-gray-400'>Current Value:</span>
-                                                <span className='font-medium text-green-600 dark:text-green-400'>${calculationResult.currentValue.toLocaleString()}</span>
-                                            </div>
-                                            <div className='flex justify-between'>
-                                                <span className='text-gray-600 dark:text-gray-400'>Total Return:</span>
-                                                <span className={`font-medium ${calculationResult.totalReturn >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                                                    ${calculationResult.totalReturn.toLocaleString()}
-                                                </span>
-                                            </div>
-                                            <div className='flex justify-between'>
-                                                <span className='text-gray-600 dark:text-gray-400'>Percentage Return:</span>
-                                                <span className={`font-medium ${calculationResult.percentageReturn >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                                                    {calculationResult.percentageReturn >= 0 ? '+' : ''}{calculationResult.percentageReturn}%
-                                                </span>
-                                            </div>
-                                            <div className='pt-2 border-t border-green-200 dark:border-green-800'>
-                                                <div className='flex justify-between text-xs text-gray-500 dark:text-gray-400'>
-                                                    <span>Period:</span>
-                                                    <span>From {new Date(calculationResult.startDate).toLocaleDateString()} to {new Date().toLocaleDateString('en-US')} (as of today)</span>
-                                                </div>
-                                            </div>
+                                        <h3 className='font-semibold text-green-800 dark:text-green-200 mb-3'>
+                                            Investment Comparison
+                                        </h3>
+                                        <table className='w-full text-sm border-collapse'>
+                                            <thead>
+                                                <tr className='border-b border-green-200 dark:border-green-800'>
+                                                    <th className='text-left p-2'>Asset</th>
+                                                    <th className='text-center p-2'>Initial Investment</th>
+                                                    <th className='text-center p-2'>Current Value</th>
+                                                    <th className='text-center p-2'>Total Return</th>
+                                                    <th className='text-center p-2'>% Return</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {calculationResult.assets.map((asset) => (
+                                                    <tr
+                                                        key={asset.name}
+                                                        className='border-b border-green-200 dark:border-green-800 last:border-0'
+                                                    >
+                                                        <td className='p-2'>{asset.name}</td>
+                                                        <td className='p-2 text-right'>
+                                                            ${asset.initialInvestment.toLocaleString()}
+                                                        </td>
+                                                        <td className='p-2 text-right text-green-600 dark:text-green-400'>
+                                                            ${asset.currentValue.toLocaleString()}
+                                                        </td>
+                                                        <td
+                                                            className={`p-2 text-right ${asset.totalReturn >= 0
+                                                                ? 'text-green-600 dark:text-green-400'
+                                                                : 'text-red-600 dark:text-red-400'
+                                                                }`}
+                                                        >
+                                                            ${asset.totalReturn.toLocaleString()}
+                                                        </td>
+                                                        <td
+                                                            className={`p-2 text-right ${asset.percentageReturn >= 0
+                                                                ? 'text-green-600 dark:text-green-400'
+                                                                : 'text-red-600 dark:text-red-400'
+                                                                }`}
+                                                        >
+                                                            {asset.percentageReturn >= 0 ? '+' : ''}
+                                                            {asset.percentageReturn}%
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                        <div className='pt-2 text-xs text-gray-500 dark:text-gray-400'>
+                                            Period: From {new Date(calculationResult.startDate).toLocaleDateString()} to{' '}
+                                            {new Date(calculationResult.endDate).toLocaleDateString()}
                                         </div>
                                     </div>
                                 )}
