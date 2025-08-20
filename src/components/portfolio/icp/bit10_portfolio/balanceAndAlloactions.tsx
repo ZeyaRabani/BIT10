@@ -12,12 +12,12 @@ import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 
-const bit10Tokens = ['Test BIT10.DEFI', 'Test BIT10.BRC20', 'Test BIT10.TOP', 'Test BIT10.MEME'];
+const bit10Tokens = ['Test BIT10.TOP', 'Test BIT10.MEME'];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
 
 export default function BalanceAndAlloactions() {
-    const [selectedAllocationToken, setSelectedAllocationToken] = useState('Test BIT10.DEFI');
+    const [selectedAllocationToken, setSelectedAllocationToken] = useState('Test BIT10.TOP');
     const [innerRadius, setInnerRadius] = useState<number>(80);
 
     const { ICPAddress } = useICPWallet();
@@ -60,13 +60,7 @@ export default function BalanceAndAlloactions() {
 
         let data;
         let returnData;
-        if (tokenPriceAPI === 'bit10-latest-price-defi') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
-            returnData = data.data ?? 0;
-        } else if (tokenPriceAPI === 'bit10-latest-price-brc20') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, tokenAddress: string, symbol: string, price: number }> }
-            returnData = data.data ?? 0;
-        } else if (tokenPriceAPI === 'bit10-latest-price-top') {
+        if (tokenPriceAPI === 'bit10-latest-price-top') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         } else if (tokenPriceAPI === 'test-bit10-latest-price-meme') {
@@ -79,28 +73,12 @@ export default function BalanceAndAlloactions() {
     const bit10Queries = useQueries({
         queries: [
             {
-                queryKey: ['bit10DEFITokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-latest-price-defi')
-            },
-            {
-                queryKey: ['bit10BRC20TokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-latest-price-brc20')
-            },
-            {
                 queryKey: ['bit10TOPTokenList'],
                 queryFn: () => fetchBit10Tokens('bit10-latest-price-top')
             },
             {
                 queryKey: ['bit10MEMETokenList'],
                 queryFn: () => fetchBit10Tokens('test-bit10-latest-price-meme')
-            },
-            {
-                queryKey: ['bit10DEFIBalance'],
-                queryFn: () => fetchBit10Balance('hbs3g-xyaaa-aaaap-qhmna-cai')
-            },
-            {
-                queryKey: ['bit10BRC20Balance'],
-                queryFn: () => fetchBit10Balance('uv4pt-4qaaa-aaaap-qpuxa-cai')
             },
             {
                 queryKey: ['bit10TOPBalance'],
@@ -114,23 +92,15 @@ export default function BalanceAndAlloactions() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10DEFITokens = bit10Queries[0].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const bit10BRC20Tokens = bit10Queries[1].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
-    const bit10TOPTokens = bit10Queries[2].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const bit10MEMETokens = bit10Queries[3].data as { id: number, name: string, symbol: string, tokenAddress: string, chain: string; price: number }[] | undefined;
-    const bit10DEFITokenBalance = bit10Queries[4].data as bigint | undefined;
-    const bit10BRC20TokenBalance = bit10Queries[5].data as bigint | undefined;
-    const bit10TOPTokenBalance = bit10Queries[6].data as bigint | undefined;
-    const bit10MEMETokenBalance = bit10Queries[7].data as bigint | undefined;
+    const bit10TOPTokens = bit10Queries[0].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
+    const bit10MEMETokens = bit10Queries[1].data as { id: number, name: string, symbol: string, tokenAddress: string, chain: string; price: number }[] | undefined;
+    const bit10TOPTokenBalance = bit10Queries[2].data as bigint | undefined;
+    const bit10MEMETokenBalance = bit10Queries[3].data as bigint | undefined;
 
-    const totalBit10Tokens = (bit10DEFITokenBalance ?? 0n) + (bit10BRC20TokenBalance ?? 0n) + (bit10TOPTokenBalance ?? 0n) + (bit10MEMETokenBalance ?? 0n);
+    const totalBit10Tokens = (bit10TOPTokenBalance ?? 0n) + (bit10MEMETokenBalance ?? 0n);
 
     const selectedBit10Token = () => {
-        if (selectedAllocationToken === 'Test BIT10.DEFI') {
-            return bit10DEFITokens;
-        } else if (selectedAllocationToken === 'Test BIT10.BRC20') {
-            return bit10BRC20Tokens;
-        } else if (selectedAllocationToken === 'Test BIT10.TOP') {
+        if (selectedAllocationToken === 'Test BIT10.TOP') {
             return bit10TOPTokens;
         } else if (selectedAllocationToken === 'Test BIT10.MEME') {
             return bit10MEMETokens;
@@ -167,14 +137,6 @@ export default function BalanceAndAlloactions() {
     };
 
     const tokenData = [
-        {
-            token: 'Test BIT10.DEFI',
-            balance: `${formatBit10(Number(bit10DEFITokenBalance))}`
-        },
-        {
-            token: 'Test BIT10.BRC20',
-            balance: `${formatBit10(Number(bit10BRC20TokenBalance))}`
-        },
         {
             token: 'Test BIT10.TOP',
             balance: `${formatBit10(Number(bit10TOPTokenBalance))}`
@@ -312,11 +274,6 @@ export default function BalanceAndAlloactions() {
                                 <div className='flex flex-row items-center justify-start space-x-2'>
                                     <p className='text-3xl font-semibold'>{formatBit10(Number(totalBit10Tokens))} Test BIT10</p>
                                 </div>
-                                {/* {Number(formatBit10(bit10DEFI)) > 0 && (
-                                    <div>
-                                        <p className='text-xl font-semibold'>~ $ {(Number(formatBit10(bit10DEFI)) * totalSum).toFixed(9)}</p>
-                                    </div>
-                                )} */}
                                 <div className='flex w-full flex-col space-y-3'>
                                     <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
                                     <div className='flex flex-col space-y-1 py-1'>

@@ -112,14 +112,6 @@ export default function RebalanceCollateral() {
     const bit10Queries = useQueries({
         queries: [
             {
-                queryKey: ['bit10BRC20TokenPrice'],
-                queryFn: () => fetchBit10Price('bit10-latest-price-brc20')
-            },
-            {
-                queryKey: ['bit10BRC20TokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-latest-rebalance-brc20')
-            },
-            {
                 queryKey: ['bit10TOPTokenPrice'],
                 queryFn: () => fetchBit10Price('bit10-latest-price-top')
             },
@@ -139,8 +131,8 @@ export default function RebalanceCollateral() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10BRC20Price = bit10Queries[0].data;
-    const bit10BRC20Tokens = bit10Queries[1].data as {
+    const bit10TOPPrice = bit10Queries[0].data;
+    const bit10TOPTokens = bit10Queries[1].data as {
         timestmpz: string,
         indexValue: number,
         priceOfTokenToBuy: number,
@@ -149,18 +141,8 @@ export default function RebalanceCollateral() {
         removed: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
         retained: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
     };
-    const bit10TOPPrice = bit10Queries[2].data;
-    const bit10TOPTokens = bit10Queries[3].data as {
-        timestmpz: string,
-        indexValue: number,
-        priceOfTokenToBuy: number,
-        newTokens: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        added: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        removed: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        retained: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
-    };
-    const bit10MEMEPrice = bit10Queries[4].data;
-    const bit10MEMETokens = bit10Queries[5].data as {
+    const bit10MEMEPrice = bit10Queries[2].data;
+    const bit10MEMETokens = bit10Queries[3].data as {
         timestmpz: string,
         indexValue: number,
         priceOfTokenToBuy: number,
@@ -201,16 +183,6 @@ export default function RebalanceCollateral() {
     };
 
     const initialBit10RebalanceData: RebalanceData[] = [
-        {
-            bit10Name: 'Test BIT10.BRC20',
-            bit10RebalanceHistory: 'brc20',
-            bit10Token: {
-                newTokens: bit10BRC20Tokens?.newTokens || [],
-                priceOfTokenToBuy: bit10BRC20Tokens?.priceOfTokenToBuy || 0
-            },
-            bit10Price: bit10BRC20Price?.tokenPrice ?? 0,
-            bit10Data: bit10BRC20Price?.data ?? []
-        },
         {
             bit10Name: 'Test BIT10.TOP',
             bit10RebalanceHistory: 'top',

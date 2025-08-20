@@ -121,7 +121,7 @@ export const newTokenBuy = async ({ newTokenBuyId, principalId, tickInName, tick
     }
 };
 
-export const userRecentDEXSwapActivity = async ({ paymentAddress }: { paymentAddress: string }) => {
+export const userRecentDEXSwapActivity = async ({ source_chain, paymentAddress }: { source_chain: string, paymentAddress: string }) => {
     try {
         const data = await db.select({
             status: teDexSwap.status,
@@ -135,7 +135,10 @@ export const userRecentDEXSwapActivity = async ({ paymentAddress }: { paymentAdd
             timestamp: teDexSwap.timestamp
         })
             .from(teDexSwap)
-            .where(eq(teDexSwap.tickInWalletAddress, paymentAddress.toLowerCase()))
+            .where(and(
+                eq(teDexSwap.tickInWalletAddress, paymentAddress.toLowerCase()),
+                eq(teDexSwap.sourceChain, source_chain)
+            ))
             .orderBy(desc(teDexSwap.timestamp));
         return data;
     } catch (error) {

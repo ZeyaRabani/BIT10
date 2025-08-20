@@ -24,16 +24,16 @@ export default function ETHSepoliaOverview() {
     const bit10Queries = useQueries({
         queries: [
             {
-                queryKey: ['bit10DEFIBalance'],
+                queryKey: ['bit10TOPBalance'],
                 queryFn: () => fetchBit10Balance()
             },
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10DEFITokenBalance = bit10Queries[0].data!;
+    const bit10TOPTokenBalance = bit10Queries[0].data!;
 
-    const totalBit10Tokens = (bit10DEFITokenBalance ?? 0);
+    const totalBit10Tokens = (bit10TOPTokenBalance ?? 0);
 
     const formatTokenAmount = (value: number | null | undefined): string => {
         if (value === null || value === undefined || isNaN(value)) return '0';

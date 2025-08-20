@@ -45,6 +45,7 @@ export default function SolDevOverview() {
         ],
     });
 
+    // ToDo: Remove Test BIT10.DEFI
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10DEFITokenBalance = bit10Queries[0].data as number | undefined;
 

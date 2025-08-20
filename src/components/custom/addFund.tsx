@@ -72,6 +72,7 @@ export default function AddFund() {
     }, []);
 
     const fetchTokenPrice = async () => {
+        // ToDo: Remove stablecoins from the list
         const response = await fetch('token-list');
 
         if (!response.ok) {

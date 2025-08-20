@@ -1,7 +1,7 @@
 import React from 'react'
 import InformationCard from '@/components/InformationCard'
 
-export default function SolDevILPModule() {
+export default function ETHSepoliaILPModule() {
     return (
         <div>
             <InformationCard message='Instant Liquidity Provider feature will be available soon on Ethereum Sepolia' />

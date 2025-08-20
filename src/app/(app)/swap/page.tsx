@@ -1,15 +1,11 @@
 "use client"
 
 import React, { Suspense } from 'react'
-import { useChain } from '@/context/ChainContext'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import Preloader from '@/components/Preloader'
 import Swap from '@/components/swap/Swap'
-import InformationCard from '@/components/InformationCard'
 
 export default function Page() {
-    const { chain } = useChain();
-
     return (
         <div className='relative'>
             <div className='absolute inset-0 overflow-hidden h-[80vh] z-0 pointer-events-none'>
@@ -32,15 +28,9 @@ export default function Page() {
             </div>
 
             <MaxWidthWrapper className='py-4 z-10 relative'>
-                {chain ? (
-                    <Suspense fallback={<Preloader />}>
-                        <Swap />
-                    </Suspense>
-                ) : (
-                    <Suspense fallback={<Preloader />}>
-                        <InformationCard message='Connect your wallet to Swap tokens' />
-                    </Suspense>
-                )}
+                <Suspense fallback={<Preloader />}>
+                    <Swap />
+                </Suspense>
             </MaxWidthWrapper>
         </div>
     )

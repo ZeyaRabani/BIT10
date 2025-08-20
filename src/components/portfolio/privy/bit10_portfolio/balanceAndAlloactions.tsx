@@ -12,7 +12,8 @@ import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 
-const bit10Tokens = ['Test BIT10.DEFI', 'Test BIT10.BRC20', 'Test BIT10.TOP', 'Test BIT10.MEME'];
+// ToDo: Remove Test BIT10.DEFI
+const bit10Tokens = ['Test BIT10.DEFI', 'Test BIT10.TOP', 'Test BIT10.MEME'];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
 
@@ -52,9 +53,6 @@ export default function BalanceAndAlloactions() {
         if (tokenPriceAPI === 'bit10-latest-price-defi') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
-        } else if (tokenPriceAPI === 'bit10-latest-price-brc20') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, tokenAddress: string, symbol: string, price: number }> }
-            returnData = data.data ?? 0;
         } else if (tokenPriceAPI === 'bit10-latest-price-top') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
@@ -70,10 +68,6 @@ export default function BalanceAndAlloactions() {
             {
                 queryKey: ['bit10DEFITokenList'],
                 queryFn: () => fetchBit10Tokens('bit10-latest-price-defi')
-            },
-            {
-                queryKey: ['bit10BRC20TokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-latest-price-brc20')
             },
             {
                 queryKey: ['bit10TOPTokenList'],
@@ -92,18 +86,15 @@ export default function BalanceAndAlloactions() {
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10DEFITokens = bit10Queries[0].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const bit10BRC20Tokens = bit10Queries[1].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
-    const bit10TOPTokens = bit10Queries[2].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const bit10MEMETokens = bit10Queries[3].data as { id: number, name: string, symbol: string, tokenAddress: string, chain: string; price: number }[] | undefined;
-    const bit10DEFITokenBalance = bit10Queries[4].data as number | undefined;
+    const bit10TOPTokens = bit10Queries[1].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
+    const bit10MEMETokens = bit10Queries[2].data as { id: number, name: string, symbol: string, tokenAddress: string, chain: string; price: number }[] | undefined;
+    const bit10DEFITokenBalance = bit10Queries[3].data as number | undefined;
 
     const totalBit10Tokens = (bit10DEFITokenBalance ?? 0);
 
     const selectedBit10Token = () => {
         if (selectedAllocationToken === 'Test BIT10.DEFI') {
             return bit10DEFITokens;
-        } else if (selectedAllocationToken === 'Test BIT10.BRC20') {
-            return bit10BRC20Tokens;
         } else if (selectedAllocationToken === 'Test BIT10.TOP') {
             return bit10TOPTokens;
         } else if (selectedAllocationToken === 'Test BIT10.MEME') {

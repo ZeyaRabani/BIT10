@@ -26,6 +26,8 @@ import RainbowLogo from '@/assets/wallet/rainbow.png'
 import ExodusLogo from '@/assets/wallet/exodus.svg'
 import TalismanLogo from '@/assets/wallet/talisman.jpg'
 import DefaultWallet from '@/assets/wallet/wallet.svg'
+import { useBSCWallet } from '@/context/BSCWalletContext'
+import BSCLogo from '@/assets/wallet/bsc-logo.svg'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { motion } from 'framer-motion'
 import { ArrowLeft, WalletMinimal, Loader2, Mail } from 'lucide-react'
@@ -85,7 +87,7 @@ export function ETHWalletIcon({ walletName, size = 24 }: { walletName: string; s
 export default function WalletBtn() {
     const [open, setOpen] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [selectedChain, setSelectedChain] = useState<'icp' | 'sol_dev' | 'eth_sepolia' | 'privy' | null>(null);
+    const [selectedChain, setSelectedChain] = useState<'icp' | 'sol_dev' | 'eth_sepolia' | 'bsc_testnet' | 'privy' | null>(null);
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
     const [showCodeInput, setShowCodeInput] = useState(false);
@@ -106,6 +108,9 @@ export default function WalletBtn() {
     const { disconnect: ethDisconnect } = useDisconnect();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { switchChain: ethSwitchChain, isPending: isSwitching } = useSwitchChain();
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const { account: bscAddress, isConnected: bscIsConnected, isConnecting: bscIsConnecting, connectWallet: bscConnectWallet, disconnectWallet: bscDisconnectWallet } = useBSCWallet();
 
     const router = useRouter();
 
@@ -179,6 +184,20 @@ export default function WalletBtn() {
                         toast.error('An error occurred while setting up your account. Please try again!');
                     }
                 }
+            } else if (chain === 'bsc_testnet') {
+                if (bscAddress && bscIsConnected) {
+                    try {
+                        const result = await addNewUser({
+                            principalId: bscAddress,
+                        });
+                        if (result === 'Error adding new user') {
+                            toast.error('An error occurred while setting up your account. Please try again!');
+                        }
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    } catch (error) {
+                        toast.error('An error occurred while setting up your account. Please try again!');
+                    }
+                }
             } else if (chain === 'privy') {
                 if (authenticated && privyUser?.wallet?.address) {
                     try {
@@ -199,21 +218,80 @@ export default function WalletBtn() {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         addUserToDB();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [authenticated, privyUser?.wallet?.address, ICPAddress, SOLWallet.publicKey, publicKey, isICPConnected, isSOLConnected, ethAddress]);
+    }, [authenticated, privyUser?.wallet?.address, ICPAddress, SOLWallet.publicKey, publicKey, isICPConnected, isSOLConnected, ethAddress, bscAddress, bscIsConnected]);
+
+    // Add this useEffect to properly detect BSC vs ETH
+    useEffect(() => {
+        const checkBSCConnection = async () => {
+            if (ethIsConnected && ethAddress) {
+                // Check if we're actually on BSC Testnet
+                const bscChainId = localStorage.getItem('bscChainId');
+                const walletChain = localStorage.getItem('walletChain');
+
+                if (walletChain === 'bsc_testnet' || bscChainId === '0x61' || bscIsConnected) {
+                    setChain('bsc_testnet');
+                } else {
+                    setChain('eth_sepolia');
+                }
+            }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        checkBSCConnection();
+    }, [ethIsConnected, ethAddress, bscIsConnected, setChain]);
 
     useEffect(() => {
-        if (isSOLConnected) {
+        if (isSOLConnected && SOLWallet.publicKey) {
             setChain('sol_dev');
-        } else if (isICPConnected) {
+        } else if (isICPConnected && ICPAddress) {
             setChain('icp');
-        } else if (ethIsConnected) {
-            setChain('eth_sepolia');
-        } else if (authenticated) {
+        } else if (bscIsConnected && bscAddress) {
+            setChain('bsc_testnet');
+        } else if (ethIsConnected && ethAddress) {
+            const walletChain = localStorage.getItem('walletChain');
+            const bscChainId = localStorage.getItem('bscChainId');
+
+            if (walletChain === 'bsc_testnet' || bscChainId === '0x61') {
+            } else {
+                setChain('eth_sepolia');
+            }
+        } else if (authenticated && privyUser?.wallet?.address) {
             setChain('privy');
         } else {
             setChain(undefined);
         }
-    }, [isICPConnected, isSOLConnected, authenticated, ethIsConnected, setChain]);
+    }, [isICPConnected, isSOLConnected, authenticated, ethIsConnected, bscIsConnected,
+        ICPAddress, SOLWallet.publicKey, ethAddress, bscAddress, privyUser?.wallet?.address, setChain]);
+
+    // Add this useEffect to clean up chain state when all connections are lost
+    useEffect(() => {
+        // If no wallet is connected, ensure chain is undefined
+        if (!isICPConnected && !isSOLConnected && !ethIsConnected && !bscIsConnected && !authenticated) {
+            setChain(undefined);
+        }
+
+        if (!bscIsConnected && ethIsConnected) {
+            const walletChain = localStorage.getItem('walletChain');
+            if (walletChain === 'bsc_testnet') {
+                localStorage.removeItem('walletChain');
+                localStorage.removeItem('bscChainId');
+            }
+        }
+    }, [isICPConnected, isSOLConnected, ethIsConnected, bscIsConnected, authenticated, setChain]);
+
+    useEffect(() => {
+        if (chain === 'icp' && !isICPConnected) {
+            setChain(undefined);
+        } else if (chain === 'sol_dev' && !isSOLConnected) {
+            setChain(undefined);
+        } else if (chain === 'eth_sepolia' && !ethIsConnected) {
+            setChain(undefined);
+        } else if (chain === 'bsc_testnet' && !bscIsConnected) {
+            setChain(undefined);
+        } else if (chain === 'privy' && !authenticated) {
+            setChain(undefined);
+        }
+    }, [chain, isICPConnected, isSOLConnected, ethIsConnected, bscIsConnected, authenticated, setChain]);
 
     const handleDisconnect = async () => {
         switch (chain) {
@@ -222,23 +300,28 @@ export default function WalletBtn() {
                 break;
             case 'sol_dev':
                 await disconnectSOLWallet();
-                setChain(undefined);
                 break;
             case 'eth_sepolia':
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 ethDisconnect();
-                setChain(undefined);
+                localStorage.removeItem('walletChain');
+                localStorage.removeItem('bscChainId');
+                break;
+            case 'bsc_testnet':
+                bscDisconnectWallet();
+                ethDisconnect();
+                localStorage.removeItem('walletChain');
+                localStorage.removeItem('bscChainId');
                 break;
             case 'privy':
                 await privyLogout();
-                setChain(undefined);
                 break;
         }
 
+        setChain(undefined);
         setSelectedChain(null);
     };
 
-    const handleChainSelect = (chain: 'icp' | 'sol_dev' | 'eth_sepolia' | 'privy') => {
+    const handleChainSelect = (chain: 'icp' | 'sol_dev' | 'eth_sepolia' | 'bsc_testnet' | 'privy') => {
         setSelectedChain(chain);
     };
 
@@ -384,6 +467,41 @@ export default function WalletBtn() {
                     </div>
                 );
 
+            case 'bsc_testnet':
+                const handleBSCWalletSelect = async () => {
+                    setIsConnecting(true);
+                    setOpen(false);
+                    try {
+                        if (ethIsConnected) {
+                            ethDisconnect();
+                        }
+
+                        await bscConnectWallet();
+                        setChain('bsc_testnet');
+                        localStorage.setItem('walletChain', 'bsc_testnet');
+                        handleBack();
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    } catch (error) {
+                        toast.error('Failed to connect BSC wallet');
+                    } finally {
+                        setIsConnecting(false);
+                    }
+                };
+
+                return (
+                    <div className='flex flex-col justify-between space-y-2 h-[22rem] md:h-72'>
+                        <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='grid md:grid-cols-2 gap-2 items-center overflow-x-hidden'>
+                            <motion.div variants={cardVariantsRight}>
+                                <Button variant='outline' className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white' onClick={handleBSCWalletSelect} disabled={bscIsConnecting}>
+                                    <Image height={30} width={30} src={MetamaskLogo} alt='Metamask' className='rounded' />
+                                    <div className='text-lg md:text-xl overflow-hidden'>Metamask</div>
+                                </Button>
+                            </motion.div>
+                        </motion.div>
+                        <p className='text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                    </div>
+                );
+
             case 'privy':
                 return (
                     <div>
@@ -451,6 +569,14 @@ export default function WalletBtn() {
 
                         <motion.div variants={cardVariantsLeft}
                             className='rounded-md border hover:border-primary hover:text-primary p-4 flex flex-row items-center space-x-2 cursor-pointer'
+                            onClick={() => handleChainSelect('bsc_testnet')}
+                        >
+                            <Image src={BSCLogo} alt='BSC' className='rounded' height='30' width='30' />
+                            <div className='text-lg'>Binance Smart Chain Testnet</div>
+                        </motion.div>
+
+                        <motion.div variants={cardVariantsLeft}
+                            className='rounded-md border hover:border-primary hover:text-primary p-4 flex flex-row items-center space-x-2 cursor-pointer'
                             onClick={() => handleChainSelect('privy')}
                         >
                             <Image src={EmailImg} alt='Email' className='rounded' height='30' width='30' />
@@ -463,7 +589,7 @@ export default function WalletBtn() {
 
     return (
         <div>
-            {isICPConnected || isSOLConnected || authenticated || ethIsConnected ? (
+            {isICPConnected || isSOLConnected || authenticated || ethIsConnected || bscIsConnected ? (
                 <Button variant='destructive' onClick={handleDisconnect} className='w-full'>Disconnect wallet</Button>
             ) : (
                 <Dialog open={open} onOpenChange={setOpen}>

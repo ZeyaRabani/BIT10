@@ -226,10 +226,6 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
     const bit10Queries = useQueries({
         queries: [
             {
-                queryKey: ['bit10BRC20Rebalance'],
-                queryFn: () => fetchBit10RebalanceHistory('brc20')
-            },
-            {
                 queryKey: ['bit10TOPRebalance'],
                 queryFn: () => fetchBit10RebalanceHistory('top')
             },
@@ -241,14 +237,11 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10BRC20RebalanceHistory = bit10Queries[0].data;
-    const bit10TOPRebalanceHistory = bit10Queries[1].data;
-    const bit10MEMERebalanceHistory = bit10Queries[2].data;
+    const bit10TOPRebalanceHistory = bit10Queries[0].data;
+    const bit10MEMERebalanceHistory = bit10Queries[1].data;
 
     const bit10Token = (): Bit10RebalanceEntry[] => {
-        if (pathname === '/collateral/brc20') {
-            return bit10BRC20RebalanceHistory ?? [];
-        } else if (pathname === '/collateral/top') {
+        if (pathname === '/collateral/top') {
             return bit10TOPRebalanceHistory ?? [];
         } else if (pathname === '/collateral/meme') {
             return bit10MEMERebalanceHistory ?? [];

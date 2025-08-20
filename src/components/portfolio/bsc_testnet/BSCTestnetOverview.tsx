@@ -1,8 +1,5 @@
 import React from 'react'
-import { PublicKey } from '@solana/web3.js'
-import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token'
-import { usePrivy } from '@privy-io/react-auth'
-import { useConnection } from '@solana/wallet-adapter-react'
+import { useAccount } from 'wagmi'
 import { useQueries } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -11,10 +8,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BadgeDollarSign, Waves, HandCoins, Banknote } from 'lucide-react'
 
-export default function PrivyOverview() {
-    const { user } = usePrivy();
-    const UserWallet = user?.wallet?.address;
-    const { connection } = useConnection();
+export default function BSCTestnetOverview() {
+    const { address } = useAccount();
 
     const formatAddress = (id: string | undefined) => {
         if (!id) return '';
@@ -22,36 +17,23 @@ export default function PrivyOverview() {
         return `${id.slice(0, 4)}...${id.slice(-3)}`;
     };
 
-    const fetchBit10Balance = async (splMint: string, decimalPlaces: number) => {
-        const tokenAddressPublicKey = new PublicKey(splMint);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-        const publicKey = new PublicKey(UserWallet);
-        const associatedTokenFrom = await getAssociatedTokenAddress(tokenAddressPublicKey, publicKey);
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-        const fromAccount = await getAccount(connection, associatedTokenFrom);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        const balance = ((parseFloat(fromAccount.amount.toString()) / 10 ** decimalPlaces).toFixed(4)).toString();
-
-        return balance;
+    const fetchBit10Balance = async () => {
+        return 0;
     }
 
-    // ToDo: Remove Test BIT10.DEFI
     const bit10Queries = useQueries({
         queries: [
             {
-                queryKey: ['bit10DEFIBalance'],
-                queryFn: () => fetchBit10Balance('5bzHsBmXwX3U6yqKH8uoFgHrUNyoNJvMuAajsBbsHt5K', 9)
+                queryKey: ['bit10TOPBalance'],
+                queryFn: () => fetchBit10Balance()
             },
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10DEFITokenBalance = bit10Queries[0].data as number | undefined;
+    const bit10TOPTokenBalance = bit10Queries[0].data!;
 
-    const totalBit10Tokens = (bit10DEFITokenBalance ?? 0);
+    const totalBit10Tokens = (bit10TOPTokenBalance ?? 0);
 
     const formatTokenAmount = (value: number | null | undefined): string => {
         if (value === null || value === undefined || isNaN(value)) return '0';
@@ -75,7 +57,7 @@ export default function PrivyOverview() {
         <div className='flex flex-col space-y-4'>
             <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
                 <h1 className='text-center md:text-start text-3xl font-bold animate-fade-left-slow'>
-                    Welcome back {UserWallet ? formatAddress(UserWallet.toString()) : 'Guest'}
+                    Welcome back {address ? formatAddress(address) : 'Guest'}
                 </h1>
                 <Button className='animate-fade-right-slow' asChild>
                     <Link href='/buy'>Buy BIT10 Token</Link>
@@ -106,7 +88,7 @@ export default function PrivyOverview() {
                                         <BadgeDollarSign />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        {formatTokenAmount(Number(totalBit10Tokens))} BIT10
+                                        {formatTokenAmount(totalBit10Tokens)} BIT10
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>
@@ -174,6 +156,6 @@ export default function PrivyOverview() {
                     </div>
                 )}
             </TooltipProvider>
-        </div>
+        </div >
     )
 }

@@ -6,6 +6,7 @@ import { ChainProvider } from '@/context/ChainContext'
 import { ICPWalletProvider } from '@/context/ICPWalletContext'
 import { SOLWalletProvider } from '@/context/SOLWalletContext'
 import { ETHWalletProvider } from '@/context/ETHWalletContext'
+import { BSCWalletProvider } from '@/context/BSCWalletContext'
 import { ThemeProvider } from '@/components/theme-provider'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -19,9 +20,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 <ChainProvider>
                     <ICPWalletProvider>
                         <SOLWalletProvider>
-                            <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-                                {children}
-                            </ThemeProvider>
+                            <BSCWalletProvider>
+                                <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+                                    {children}
+                                </ThemeProvider>
+                            </BSCWalletProvider>
                         </SOLWalletProvider>
                     </ICPWalletProvider>
                 </ChainProvider>

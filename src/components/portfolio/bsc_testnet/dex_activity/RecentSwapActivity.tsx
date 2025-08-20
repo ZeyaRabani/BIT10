@@ -47,7 +47,7 @@ export default function RecentSwapActivity() {
     const { address } = useAccount();
 
     const fetchRecentSwapActivity = async (address: string) => {
-        const response = await userRecentDEXSwapActivity({ source_chain: 'Ethereum', paymentAddress: address });
+        const response = await userRecentDEXSwapActivity({ source_chain: 'Binance Smart Chain', paymentAddress: address });
         if (response === 'Error fetching user recent DEX activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
         } else {

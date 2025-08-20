@@ -5,8 +5,9 @@ import { type ColumnDef, type ColumnFiltersState, type SortingState, type Visibi
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
-import { Search, X } from 'lucide-react'
+import { Search, X, ExternalLink } from 'lucide-react'
 
 export type PortfolioTableDataType = {
     status: string,
@@ -62,6 +63,24 @@ export function DataTable<TData, TValue>({
         table.getColumn(userSearchColumn)?.setFilterValue('');
     };
 
+    const formatTokenAmount = (value: number | null | undefined): string => {
+        if (value === null || value === undefined || isNaN(value)) return '0';
+        if (value === 0) return '0';
+        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
+        const [integerPart, decimalPart = ''] = strValue.split('.');
+        const formattedInteger = Number(integerPart).toLocaleString();
+
+        if (!decimalPart) return formattedInteger || '0';
+
+        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
+
+        if (firstNonZeroIndex === -1) return formattedInteger || '0';
+
+        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
+
+        return `${formattedInteger}.${trimmedDecimal}`;
+    };
+
     const formatDate = (dateInput: string | number | Date): string => {
         let date: Date;
 
@@ -98,38 +117,94 @@ export function DataTable<TData, TValue>({
     };
 
     const getTokenName = (tokenAddress: string): string => {
-        switch (tokenAddress) {
-            case '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238':
-                return 'USDC';
-            case '0x0000000000000000000000000000000000000000':
-                return 'ETH';
+        const normalizedAddress = tokenAddress.toLowerCase();
+
+        switch (normalizedAddress) {
+            case '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238'.toLocaleLowerCase():
+                return 'USDC (on Ethereum)';
+            case '0x0000000000000000000000000000000000000000e'.toLocaleLowerCase():
+                return 'ETH (on Ethereum)';
+            case '0x0000000000000000000000000000000000000000'.toLocaleLowerCase():
+                return 'ETH (on Ethereum)';
+            case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
+                return 'tBNB (on Binance Smart Chain)';
+            case '0x64544969ed7ebf5f083679233325356ebe738930'.toLocaleLowerCase():
+                return 'USDC (on Binance Smart Chain)';
+            case '0x6Ce8da28e2f864420840cf74474eff5fd80e65b8'.toLocaleLowerCase():
+                return 'BTCB (on Binance Smart Chain)';
             default:
-                return 'Unknown';
+                return tokenAddress;
+        }
+    };
+
+    const getTokenExplorer = (tokenAddress: string): string => {
+        const normalizedAddress = tokenAddress.toLowerCase();
+        switch (normalizedAddress) {
+            case '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238'.toLocaleLowerCase():
+                return 'https://sepolia.etherscan.io/tx';
+            case '0x0000000000000000000000000000000000000000e'.toLocaleLowerCase():
+                return 'https://sepolia.etherscan.io/tx';
+            case '0x0000000000000000000000000000000000000000'.toLocaleLowerCase():
+                return 'https://sepolia.etherscan.io/tx';
+            case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
+                return 'https://testnet.bscscan.com/tx/'
+            case '0x64544969ed7ebf5f083679233325356ebe738930'.toLocaleLowerCase():
+                return 'https://testnet.bscscan.com/tx/'
+            case '0x6ce8da28e2f864420840cf74474eff5fd80e65b8'.toLocaleLowerCase():
+                return 'https://testnet.bscscan.com/tx/'
+            default:
+                return 'https://sepolia.etherscan.io/tx';
         }
     };
 
     const renderCellContent = (cell: CellContext<PortfolioTableDataType, unknown>, row: { original: PortfolioTableDataType }) => {
         switch (cell.column.id) {
-            case 'tickIn':
+            case 'from':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {Number(row.original.amountIn).toFixed(4)}
+                            {formatTokenAmount(Number(row.original.amountIn))}
                         </div>
                         <div>{getTokenName(row.original.tokenInAddress)}</div>
                     </div>
                 );
-            case 'tickOutName':
+            case 'to':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {Number(row.original.amountOut).toFixed(4)}
+                            {formatTokenAmount(Number(row.original.amountOut))}
                         </div>
                         <div>{getTokenName(row.original.tokenOutAddress)}</div>
                     </div>
                 );
-            case 'tokenBoughtAt':
+            case 'token_swap_on':
                 return formatDate(row.original.timestamp);
+            case 'view_inbound_transaction':
+                return (
+                    <a
+                        href={`${getTokenExplorer(row.original.tokenInAddress)}${getTokenExplorer(row.original.tokenInAddress).endsWith('/') ? '' : '/'}${row.original.txHashIn}`}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                    >
+                        <Button>
+                            View Transaction
+                            <ExternalLink className='ml-1 w-4 h-4' />
+                        </Button>
+                    </a>
+                )
+            case 'view_outbound_transaction':
+                return (
+                    <a
+                        href={`${getTokenExplorer(row.original.tokenOutAddress.toLowerCase())}${getTokenExplorer(row.original.tokenOutAddress.toLowerCase()).endsWith('/') ? '' : '/'}${row.original.txHashOut}`}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                    >
+                        <Button>
+                            View Transaction
+                            <ExternalLink className='ml-1 w-4 h-4' />
+                        </Button>
+                    </a>
+                )
             default:
                 return cell.column.columnDef.cell ? flexRender(cell.column.columnDef.cell, cell) : null;
         }

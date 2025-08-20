@@ -53,14 +53,6 @@ export default function ICPOverview() {
     const bit10Queries = useQueries({
         queries: [
             {
-                queryKey: ['bit10DEFIBalance'],
-                queryFn: () => fetchBit10Balance('hbs3g-xyaaa-aaaap-qhmna-cai')
-            },
-            {
-                queryKey: ['bit10BRC20Balance'],
-                queryFn: () => fetchBit10Balance('uv4pt-4qaaa-aaaap-qpuxa-cai')
-            },
-            {
                 queryKey: ['bit10TOPBalance'],
                 queryFn: () => fetchBit10Balance('wbckh-zqaaa-aaaap-qpuza-cai')
             },
@@ -72,12 +64,10 @@ export default function ICPOverview() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10DEFITokenBalance = bit10Queries[0].data as bigint | undefined;
-    const bit10BRC20TokenBalance = bit10Queries[1].data as bigint | undefined;
-    const bit10TOPTokenBalance = bit10Queries[2].data as bigint | undefined;
-    const bit10MEMETokenBalance = bit10Queries[3].data as bigint | undefined;
+    const bit10TOPTokenBalance = bit10Queries[0].data as bigint | undefined;
+    const bit10MEMETokenBalance = bit10Queries[1].data as bigint | undefined;
 
-    const totalBit10Tokens = Number((bit10DEFITokenBalance ?? 0n) + (bit10BRC20TokenBalance ?? 0n) + (bit10TOPTokenBalance ?? 0n) + (bit10MEMETokenBalance ?? 0n)) / 100000000;
+    const totalBit10Tokens = Number((bit10TOPTokenBalance ?? 0n) + (bit10MEMETokenBalance ?? 0n)) / 100000000;
 
     const formatTokenAmount = (value: number | null | undefined): string => {
         if (value === null || value === undefined || isNaN(value)) return '0';

@@ -27,6 +27,8 @@ export type UnisatWalletInterface = {
 declare global {
     interface Window {
         unisat: UnisatWalletInterface;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ethereum?: any;
         ic: {
             plug: {
                 requestConnect: (options: { whitelist: string[] }) => Promise<void>;
