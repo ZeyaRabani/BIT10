@@ -1,0 +1,89 @@
+type BscNetwork = variant { 
+    Testnet 
+};
+
+type EthereumNetwork = variant { 
+    Mainnet;
+    Sepolia
+};
+
+type EcdsaKeyName = variant { 
+    TestKeyLocalDevelopment;
+    TestKey1;
+    ProductionKey1
+};
+
+type InitArg = record {
+    bsc_network: opt BscNetwork;
+    ethereum_network: opt EthereumNetwork;
+    ecdsa_key_name: opt EcdsaKeyName;
+};
+
+type SwapResponse = record {
+    pool_id: text;
+    tick_in_wallet_address: text;
+    tick_out_wallet_address: text;
+    swap_type: text;
+    source_chain: text;
+    destination_chain: text;
+    token_in_address: text;
+    token_out_address: text;
+    amount_in: text;
+    amount_out: text;
+    slippage: text;
+    tx_hash_in: text;
+    tx_hash_out: text;
+    status: text;
+    timestamp: nat64;
+};
+
+type CreateTransactionArgs = record {
+    pool_id: text;
+    tick_in_wallet_address: text;
+    tick_out_wallet_address: text;
+    swap_type: text;
+    source_chain: text;
+    destination_chain: text;
+    token_in_address: text;
+    token_out_address: text;
+    amount_in: text;
+    expected_amount_out: text;
+    slippage: text;
+};
+
+type TransactionData = record {
+    tx_type: text;
+    blockchain: text;
+    from: text;
+    to: text;
+    value: text;
+    data: text;
+    gas_limit: text;
+    max_priority_fee_per_gas: text;
+    max_fee_per_gas: text;
+    nonce: text;
+    chain_id: nat64;
+};
+
+type TransactionResponse = record {
+    transaction_data: TransactionData;
+};
+
+type SwapResult = variant { 
+    Success: SwapResponse; 
+    Error: text 
+};
+
+type VerifyAndSwapArgs = record {
+    source_chain: text;
+    transaction_hash: text;
+};
+
+service : (opt InitArg) -> {
+    bsc_address: () -> (text);
+    ethereum_address: () -> (text);
+    create_transaction: (CreateTransactionArgs) -> (TransactionResponse);
+    verify_and_swap: (VerifyAndSwapArgs) -> (SwapResult);
+    get_swap_history: () -> (vec SwapResponse) query;
+    get_swap_history_by_address: (text) -> (vec SwapResponse) query;
+};

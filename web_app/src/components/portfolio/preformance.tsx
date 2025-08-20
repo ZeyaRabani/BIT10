@@ -12,16 +12,18 @@ import { CartesianGrid, XAxis, YAxis, LineChart, Line } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 
-const tabs = ['24H', '7D', '30D', '60D'];
+const tabs = ['30D', '60D', '1Y', '3Y'];
 
 type Bit10Entry = {
-    timestmpz: string;
-    tokenPrice: number;
+    date: string;
+    bit10Top: string;
+    btc: string;
+    sp500: string;
 };
 
-export default function Preformance() {
-    const [selectedPreformanceToken, setSelectedPreformanceToken] = useState('BIT10.DEFI');
-    const [activeTab, setActiveTab] = useState('24H');
+export default function Bit10Preformance() {
+    const [selectedPreformanceToken, setSelectedPreformanceToken] = useState('Test BIT10.TOP');
+    const [activeTab, setActiveTab] = useState('30D');
 
     const handleTabChange = (label: string | null) => {
         if (label) {
@@ -29,43 +31,37 @@ export default function Preformance() {
         }
     }
 
-    const fetchBit10Preformance = async (tokenPreformance: string) => {
-        const response = await fetch(tokenPreformance);
+    const fetchBit10Preformance = async () => {
+        try {
+            const response = await fetch(`bit10-comparison-data-3`);
 
-        if (!response.ok) {
-            toast.error('Error fetching BIT10 Preformance. Please try again!');
-        }
+            if (!response.ok) {
+                toast.error('Error fetching BIT10 Performance. Please try again!');
+                return null;
+            }
 
-        let data;
-        let returnData;
-        if (tokenPreformance === 'bit10-historic-data-defi-60') {
-            data = await response.json() as { bit10_defi: Bit10Entry[] }
-            returnData = { bit10_defi: data.bit10_defi.reverse() };
-        } else if (tokenPreformance === 'bit10-historic-data-top-60') {
-            data = await response.json() as { bit10_top: Bit10Entry[] }
-            returnData = { bit10_top: data.bit10_top.reverse() };
+            const data = await response.json() as { bit10_top: Bit10Entry[] };
+            return { bit10_top: data.bit10_top.reverse() };
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            toast.error('Network error. Please try again!');
+            return null;
         }
-        return returnData;
     };
 
     const bit10Queries = useQueries({
         queries: [
             {
-                queryKey: ['bit10DEFITokenPreformance60d'],
-                queryFn: () => fetchBit10Preformance('bit10-historic-data-defi-60')
-            },
-            {
-                queryKey: ['bit10TOPTokenPreformance60d'],
-                queryFn: () => fetchBit10Preformance('bit10-historic-data-top-60')
+                queryKey: ['bit10TOPTokenPreformance10Y'],
+                queryFn: () => fetchBit10Preformance()
             }
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10DEFIPreformance60D = bit10Queries[0].data ?? { bit10_defi: [] };
-    const bit10TOPPreformance60D = bit10Queries[1].data ?? { bit10_top: [] };
+    const bit10TOPPreformance10Y = bit10Queries[0].data?.bit10_top ?? [];
 
-    const getBit10Preformance = (data: Bit10Entry[], daysBack: number) => {
+    const getBit10Performance = (data: Bit10Entry[], range: string) => {
         if (!data || data.length === 0) {
             return [];
         }
@@ -74,47 +70,40 @@ export default function Preformance() {
         if (!latestEntry) {
             return [];
         }
-        const latestDate = new Date(latestEntry.timestmpz);
+        const latestDate = new Date(latestEntry.date);
 
-        const sevenDaysAgo = new Date(latestDate.getTime() - daysBack * 24 * 60 * 60 * 1000);
+        let startDate: Date;
+
+        switch (range) {
+            case '30D':
+                startDate = new Date(latestDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+                break;
+            case '60D':
+                startDate = new Date(latestDate.getTime() - 60 * 24 * 60 * 60 * 1000);
+                break;
+            case '1Y':
+                startDate = new Date(latestDate);
+                startDate.setFullYear(startDate.getFullYear() - 1);
+                break;
+            case '3Y':
+                startDate = new Date(latestDate);
+                startDate.setFullYear(startDate.getFullYear() - 3);
+                break;
+            default:
+                return [];
+        }
 
         const filteredData = data.filter(entry => {
-            const entryDate = new Date(entry.timestmpz);
-            return entryDate >= sevenDaysAgo && entryDate <= latestDate;
+            const entryDate = new Date(entry.date);
+            return entryDate >= startDate && entryDate <= latestDate;
         });
 
         return filteredData;
     };
 
-    const selectedBit10Token24H = () => {
-        if (selectedPreformanceToken === 'BIT10.DEFI') {
-            return getBit10Preformance(bit10DEFIPreformance60D.bit10_defi ?? [], 1);
-        } else if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBit10Preformance(bit10TOPPreformance60D.bit10_top ?? [], 1);
-        } else {
-            return null;
-        }
-    };
-
-    const tokens24H = selectedBit10Token24H();
-
-    const selectedBit10Token7D = () => {
-        if (selectedPreformanceToken === 'BIT10.DEFI') {
-            return getBit10Preformance(bit10DEFIPreformance60D.bit10_defi ?? [], 7);
-        } else if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBit10Preformance(bit10TOPPreformance60D.bit10_top ?? [], 7);
-        } else {
-            return null;
-        }
-    };
-
-    const tokens7D = selectedBit10Token7D();
-
     const selectedBit10Token30D = () => {
-        if (selectedPreformanceToken === 'BIT10.DEFI') {
-            return getBit10Preformance(bit10DEFIPreformance60D.bit10_defi ?? [], 30);
-        } else if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBit10Preformance(bit10TOPPreformance60D.bit10_top ?? [], 30);
+        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+            return getBit10Performance(bit10TOPPreformance10Y, '30D');
         } else {
             return null;
         }
@@ -123,10 +112,8 @@ export default function Preformance() {
     const tokens30D = selectedBit10Token30D();
 
     const selectedBit10Token60D = () => {
-        if (selectedPreformanceToken === 'BIT10.DEFI') {
-            return getBit10Preformance(bit10DEFIPreformance60D.bit10_defi ?? [], 60);
-        } else if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBit10Preformance(bit10TOPPreformance60D.bit10_top ?? [], 60);
+        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+            return getBit10Performance(bit10TOPPreformance10Y, '60D');
         } else {
             return null;
         }
@@ -134,11 +121,29 @@ export default function Preformance() {
 
     const tokens60D = selectedBit10Token60D();
 
+    const selectedBit10Token1Y = () => {
+        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+            return getBit10Performance(bit10TOPPreformance10Y, '1Y');
+        } else {
+            return null;
+        }
+    };
+
+    const tokens1Y = selectedBit10Token1Y();
+
+    const selectedBit10Token3Y = () => {
+        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+            return getBit10Performance(bit10TOPPreformance10Y, '3Y');
+        } else {
+            return null;
+        }
+    };
+
+    const tokens3Y = selectedBit10Token3Y();
+
     const selectedBit10TokenChange = () => {
-        if (selectedPreformanceToken === 'BIT10.DEFI') {
-            return bit10DEFIPreformance60D.bit10_defi;
-        } else if (selectedPreformanceToken === 'BIT10.TOP') {
-            return bit10TOPPreformance60D.bit10_top;
+        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+            return bit10TOPPreformance10Y;
         } else {
             return null;
         }
@@ -146,46 +151,61 @@ export default function Preformance() {
 
     const tokensChange = selectedBit10TokenChange();
 
-    const getPercentageChange = (data: Bit10Entry[], daysBack: number) => {
+    const getPercentageChange = (data: Bit10Entry[], range: string) => {
         if (!data || data.length < 2) return 0;
 
         const lastEntry = data[data.length - 1];
         if (!lastEntry) return 0;
 
-        const currentPrice = lastEntry.tokenPrice ?? 0;
-        const timestamp = lastEntry.timestmpz;
+        const currentPrice = lastEntry.bit10Top ?? 0;
+        const timestamp = lastEntry.date;
         if (!timestamp) return 0;
 
         const now = new Date(timestamp);
-        const oneDayAgo = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
+        let targetDate: Date;
+
+        if (range === '30D') {
+            targetDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        } else if (range === '60D') {
+            targetDate = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+        } else if (range === '1Y') {
+            targetDate = new Date(now);
+            targetDate.setFullYear(targetDate.getFullYear() - 1);
+        } else if (range === '3Y') {
+            targetDate = new Date(now);
+            targetDate.setFullYear(targetDate.getFullYear() - 3);
+        } else {
+            return 0;
+        }
+
         let closestEntry = data[0];
-        if (!closestEntry?.timestmpz) return 0;
-        let closestDiff = Math.abs(new Date(closestEntry.timestmpz).getTime() - oneDayAgo.getTime());
+        if (!closestEntry?.date) return 0;
+        let closestDiff = Math.abs(new Date(closestEntry.date).getTime() - targetDate.getTime());
 
         for (let i = 1; i < data.length; i++) {
             const entry = data[i];
-            if (!entry?.timestmpz) continue;
-            const diff = Math.abs(new Date(entry.timestmpz).getTime() - oneDayAgo.getTime());
+            if (!entry?.date) continue;
+            const diff = Math.abs(new Date(entry.date).getTime() - targetDate.getTime());
             if (diff < closestDiff) {
                 closestDiff = diff;
-                closestEntry = data[i];
+                closestEntry = entry;
             }
         }
 
         if (!closestEntry) return 0;
-        const previousPrice = closestEntry.tokenPrice ?? 0;
-        return ((currentPrice - previousPrice) / previousPrice) * 100;
+        const previousPrice = Number(closestEntry.bit10Top) || 0;
+
+        if (previousPrice === 0) return 0;
+        return ((Number(currentPrice) - previousPrice) / previousPrice) * 100;
     };
 
-    const percentageChange1Day = getPercentageChange(tokensChange ?? [], 1);
-    const percentageChange7Day = getPercentageChange(tokensChange ?? [], 7);
-    const percentageChange30Day = getPercentageChange(tokensChange ?? [], 30);
-    const percentageChange60Day = getPercentageChange(tokensChange ?? [], 60);
+    const percentageChange30Days = getPercentageChange(tokensChange ?? [], '30D');
+    const percentageChange60Days = getPercentageChange(tokensChange ?? [], '60D');
+    const percentageChange1Year = getPercentageChange(tokensChange ?? [], '1Y');
+    const percentageChange3Year = getPercentageChange(tokensChange ?? [], '3Y');
 
     const bit10PreformanceTokenDataName = () => {
-        if (selectedPreformanceToken === 'BIT10.DEFI') {
-            return 'bit10DEFI';
-        } else if (selectedPreformanceToken === 'BIT10.TOP') {
+        if (selectedPreformanceToken === 'Test BIT10.TOP') {
             return 'bit10TOP';
         } else {
             return 'bit10';
@@ -194,18 +214,13 @@ export default function Preformance() {
 
     const tokenDataName = bit10PreformanceTokenDataName();
 
-    const bit10Tokens = ['BIT10.DEFI', 'BIT10.TOP'];
+    const bit10Tokens = ['Test BIT10.TOP'];
 
     const bit10PreformanceTokenName = () => {
-        if (selectedPreformanceToken === 'BIT10.DEFI') {
-            return {
-                name: 'bit10DEFI',
-                indexFundName: 'BIT10.DEFI'
-            };
-        } else if (selectedPreformanceToken === 'BIT10.TOP') {
+        if (selectedPreformanceToken === 'Test BIT10.TOP') {
             return {
                 name: 'bit10TOP',
-                indexFundName: 'BIT10.TOP'
+                indexFundName: 'Test BIT10.TOP'
             };
         } else {
             return {
@@ -223,79 +238,67 @@ export default function Preformance() {
         }
     };
 
-    const bit10Preformance24hChartData = tokens24H?.map((entry) => {
-        const date = new Date(entry.timestmpz);
+    const bit10Preformance30DChartData = tokens30D?.map((entry) => {
+        const date = new Date(entry.date);
         const formatter = new Intl.DateTimeFormat('en-US', {
             timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             year: 'numeric',
             month: 'short',
             day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
             hour12: false,
         });
 
         return {
             day: formatter.format(date),
-            [tokenDataName]: parseFloat(entry.tokenPrice.toFixed(4)),
+            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(4)),
         };
     });
 
-    const bit10Preformance7dChartData = tokens7D?.filter((_, index) => index % 4 === 0).map((entry) => {
-        const date = new Date(entry.timestmpz);
+    const bit10Preformance60DChartData = tokens60D?.map((entry) => {
+        const date = new Date(entry.date);
         const formatter = new Intl.DateTimeFormat('en-US', {
             timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             year: 'numeric',
             month: 'short',
             day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
             hour12: false,
         });
 
         return {
             day: formatter.format(date),
-            [tokenDataName]: parseFloat(entry.tokenPrice.toFixed(4)),
+            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(4)),
         };
     });
 
-    const bit10Preformance30dChartData = tokens30D?.filter((_, index) => index % 48 === 0).map((entry) => {
-        const date = new Date(entry.timestmpz);
+    const bit10Preformance1YChartData = tokens1Y?.map((entry) => {
+        const date = new Date(entry.date);
         const formatter = new Intl.DateTimeFormat('en-US', {
             timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             year: 'numeric',
             month: 'short',
             day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
             hour12: false,
         });
 
         return {
             day: formatter.format(date),
-            [tokenDataName]: parseFloat(entry.tokenPrice.toFixed(4)),
+            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(4)),
         };
     });
 
-    const bit10Preformance60dChartData = tokens60D?.filter((_, index) => index % 48 === 0).map((entry) => {
-        const date = new Date(entry.timestmpz);
+    const bit10Preformance3YChartData = tokens3Y?.map((entry) => {
+        const date = new Date(entry.date);
         const formatter = new Intl.DateTimeFormat('en-US', {
             timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             year: 'numeric',
             month: 'short',
             day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
             hour12: false,
         });
 
         return {
             day: formatter.format(date),
-            [tokenDataName]: parseFloat(entry.tokenPrice.toFixed(4)),
+            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(4)),
         };
     });
 
@@ -314,7 +317,7 @@ export default function Preformance() {
             ) : (
                 <Card className='dark:border-white md:col-span-2 animate-fade-right-slow'>
                     <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
-                        <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Performance</div>
+                        <div className='text-2xl md:text-4xl text-center md:text-start'>Test BIT10 Performance</div>
                         <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0'>
                             <Select onValueChange={setSelectedPreformanceToken} defaultValue={selectedPreformanceToken}>
                                 <SelectTrigger className='w-[180px] dark:border-white'>
@@ -330,7 +333,7 @@ export default function Preformance() {
                             </Select>
                             <div className='relative flex flex-row space-x-2 items-center justify-center border dark:border-white rounded-md px-2 py-1.5'>
                                 <AnimatedBackground
-                                    defaultValue='24H'
+                                    defaultValue='30D'
                                     className='rounded bg-primary'
                                     transition={{
                                         ease: 'easeInOut',
@@ -357,41 +360,13 @@ export default function Preformance() {
                             <Card className='flex flex-col h-full w-full'>
                                 <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                     <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
-                                        24H %
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
-                                    <Triangle fill={percentageChange1Day >= 0 ? 'green' : 'red'} color={percentageChange1Day >= 0 ? 'green' : 'red'} className={percentageChange1Day > 0 ? '' : 'rotate-180'} />
-                                    <p className='font-bold tracking-wider'>
-                                        {percentageChange1Day.toFixed(2)}%
-                                    </p>
-                                </CardContent>
-                            </Card>
-
-                            <Card className='flex flex-col h-full w-full'>
-                                <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                                    <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
-                                        7D %
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
-                                    <Triangle fill={percentageChange7Day >= 0 ? 'green' : 'red'} color={percentageChange7Day >= 0 ? 'green' : 'red'} className={percentageChange7Day > 0 ? '' : 'rotate-180'} />
-                                    <p className='font-bold tracking-wider'>
-                                        {percentageChange7Day.toFixed(2)}%
-                                    </p>
-                                </CardContent>
-                            </Card>
-
-                            <Card className='flex flex-col h-full w-full'>
-                                <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                                    <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                         30D %
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
-                                    <Triangle fill={percentageChange30Day >= 0 ? 'green' : 'red'} color={percentageChange30Day >= 0 ? 'green' : 'red'} className={percentageChange30Day > 0 ? '' : 'rotate-180'} />
+                                    <Triangle fill={percentageChange30Days >= 0 ? 'green' : 'red'} color={percentageChange30Days >= 0 ? 'green' : 'red'} className={percentageChange30Days > 0 ? '' : 'rotate-180'} />
                                     <p className='font-bold tracking-wider'>
-                                        {percentageChange30Day.toFixed(2)}%
+                                        {percentageChange30Days.toFixed(2)}%
                                     </p>
                                 </CardContent>
                             </Card>
@@ -403,68 +378,46 @@ export default function Preformance() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
-                                    <Triangle fill={percentageChange60Day >= 0 ? 'green' : 'red'} color={percentageChange60Day >= 0 ? 'green' : 'red'} className={percentageChange60Day > 0 ? '' : 'rotate-180'} />
+                                    <Triangle fill={percentageChange60Days >= 0 ? 'green' : 'red'} color={percentageChange60Days >= 0 ? 'green' : 'red'} className={percentageChange60Days > 0 ? '' : 'rotate-180'} />
                                     <p className='font-bold tracking-wider'>
-                                        {percentageChange60Day.toFixed(2)}%
+                                        {percentageChange60Days.toFixed(2)}%
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className='flex flex-col h-full w-full'>
+                                <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                                    <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
+                                        1Y %
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
+                                    <Triangle fill={percentageChange1Year >= 0 ? 'green' : 'red'} color={percentageChange1Year >= 0 ? 'green' : 'red'} className={percentageChange1Year > 0 ? '' : 'rotate-180'} />
+                                    <p className='font-bold tracking-wider'>
+                                        {percentageChange1Year.toFixed(2)}%
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className='flex flex-col h-full w-full'>
+                                <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                                    <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
+                                        3Y %
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
+                                    <Triangle fill={percentageChange3Year >= 0 ? 'green' : 'red'} color={percentageChange3Year >= 0 ? 'green' : 'red'} className={percentageChange3Year > 0 ? '' : 'rotate-180'} />
+                                    <p className='font-bold tracking-wider'>
+                                        {percentageChange3Year.toFixed(2)}%
                                     </p>
                                 </CardContent>
                             </Card>
                         </div>
                         <div className='select-none -ml-12 md:-ml-8'>
                             {
-                                activeTab === '24H' &&
-                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
-                                    <LineChart accessibilityLayer data={bit10Preformance24hChartData}>
-                                        <CartesianGrid vertical={false} />
-                                        <XAxis
-                                            dataKey='day'
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke="#D5520E"
-                                        />
-                                        <YAxis
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickCount={3}
-                                            stroke="#D5520E"
-                                        />
-                                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                        <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
-                                    </LineChart>
-                                </ChartContainer>
-                            }
-                            {
-                                activeTab === '7D' &&
-                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
-                                    <LineChart accessibilityLayer data={bit10Preformance7dChartData}>
-                                        <CartesianGrid vertical={false} />
-                                        <XAxis
-                                            dataKey='day'
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke="#D5520E"
-                                        />
-                                        <YAxis
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickCount={3}
-                                            stroke="#D5520E"
-                                        />
-                                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                        <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
-                                    </LineChart>
-                                </ChartContainer>
-                            }
-                            {
                                 activeTab === '30D' &&
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
-                                    <LineChart accessibilityLayer data={bit10Preformance30dChartData}>
+                                    <LineChart accessibilityLayer data={bit10Preformance30DChartData}>
                                         <CartesianGrid vertical={false} />
                                         <XAxis
                                             dataKey='day'
@@ -489,7 +442,57 @@ export default function Preformance() {
                             {
                                 activeTab === '60D' &&
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
-                                    <LineChart accessibilityLayer data={bit10Preformance60dChartData}>
+                                    <LineChart accessibilityLayer data={bit10Preformance60DChartData}>
+                                        <CartesianGrid vertical={false} />
+                                        <XAxis
+                                            dataKey='day'
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
+                                            stroke="#D5520E"
+                                        />
+                                        <YAxis
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickCount={3}
+                                            stroke="#D5520E"
+                                        />
+                                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                        <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                    </LineChart>
+                                </ChartContainer>
+                            }
+                            {
+                                activeTab === '1Y' &&
+                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                    <LineChart accessibilityLayer data={bit10Preformance1YChartData}>
+                                        <CartesianGrid vertical={false} />
+                                        <XAxis
+                                            dataKey='day'
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
+                                            stroke="#D5520E"
+                                        />
+                                        <YAxis
+                                            tickLine={true}
+                                            axisLine={true}
+                                            tickMargin={8}
+                                            tickCount={3}
+                                            stroke="#D5520E"
+                                        />
+                                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                        <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                    </LineChart>
+                                </ChartContainer>
+                            }
+                            {
+                                activeTab === '3Y' &&
+                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                    <LineChart accessibilityLayer data={bit10Preformance3YChartData}>
                                         <CartesianGrid vertical={false} />
                                         <XAxis
                                             dataKey='day'

@@ -64,7 +64,6 @@ const bit10Amount = [
 ]
 
 const bit10Token = [
-    // { label: 'BIT10.DEFI', value: 'BIT10.DEFI', img: BIT10Img as StaticImageData, address: 'bin4j-cyaaa-aaaap-qh7tq-cai', slug: ['defi'] },
     { label: 'BIT10.TOP', value: 'BIT10.TOP', img: BIT10Img as StaticImageData, address: 'g37b3-lqaaa-aaaap-qp4hq-cai', slug: ['top crypto'] },
 ]
 
@@ -144,11 +143,6 @@ export default function Buy() {
     const bit10PriceQueries = useQueries({
         queries: [
             {
-                queryKey: ['bit10DEFITokenPrice'],
-                queryFn: () => fetchBit10Price('bit10-latest-price-defi'),
-                refetchInterval: 1800000, // 30 min.
-            },
-            {
                 queryKey: ['bit10TOPTokenPrice'],
                 queryFn: () => fetchBit10Price('bit10-latest-price-top'),
                 refetchInterval: 1800000,
@@ -172,11 +166,10 @@ export default function Buy() {
     });
 
     const isLoading = useMemo(() => bit10PriceQueries.some(query => query.isLoading), [bit10PriceQueries]);
-    const bit10DEFIPrice = useMemo(() => bit10PriceQueries[0].data, [bit10PriceQueries]);
-    const bit10TOPPrice = useMemo(() => bit10PriceQueries[1].data, [bit10PriceQueries]);
-    const icpWalletBalance = useMemo(() => bit10PriceQueries[2].data, [bit10PriceQueries]);
-    const ckBTCWalletBalance = useMemo(() => bit10PriceQueries[3].data, [bit10PriceQueries]);
-    const ckETHWalletBalance = useMemo(() => bit10PriceQueries[4].data, [bit10PriceQueries]);
+    const bit10TOPPrice = useMemo(() => bit10PriceQueries[0].data, [bit10PriceQueries]);
+    const icpWalletBalance = useMemo(() => bit10PriceQueries[1].data, [bit10PriceQueries]);
+    const ckBTCWalletBalance = useMemo(() => bit10PriceQueries[2].data, [bit10PriceQueries]);
+    const ckETHWalletBalance = useMemo(() => bit10PriceQueries[3].data, [bit10PriceQueries]);
 
     const fetchPayWithPrice = useCallback(async (currency: string) => {
         const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);
@@ -267,10 +260,7 @@ export default function Buy() {
 
     const bit10TokenPrice = (): number => {
         const bit10Token = form.watch('receive_token');
-        if (bit10Token === 'BIT10.DEFI') {
-            return bit10DEFIPrice ?? 0;
-        }
-        else if (bit10Token === 'BIT10.TOP') {
+        if (bit10Token === 'BIT10.TOP') {
             return bit10TOPPrice ?? 0;
         }
         else {

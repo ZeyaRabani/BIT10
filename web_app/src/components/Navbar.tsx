@@ -22,8 +22,7 @@ const links = {
     app: [
         { title: 'Swap', link: '/swap' },
         { title: 'Portfolio', link: '/portfolio' },
-        { title: 'Collateral', link: '/collateral' },
-        { title: 'Referral', link: '/referral' }
+        { title: 'Collateral', link: '/collateral' }
     ]
 };
 

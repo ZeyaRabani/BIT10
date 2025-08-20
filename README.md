@@ -9,7 +9,7 @@ For the World Computer Hacker League (WCHL) 2025, we have created the following 
 - Loom Overview: [loom.com/share/db31b0fcfceb4738828cebd976c7e8fb](https://www.loom.com/share/db31b0fcfceb4738828cebd976c7e8fb)
 - Auto-Rebalancing Demo: [youtube.com/watch?v=ICuc97bdzbw](https://www.youtube.com/watch?v=ICuc97bdzbw)
 - BIT10 Technical Demo: [youtube.com/watch?v=NdYtbdXXe1Y](https://www.youtube.com/watch?v=NdYtbdXXe1Y)
-- BIT10 Testnet DEX Demo: [youtube.com/watch?v=zTjBIXnzJ1s ](https://www.youtube.com/watch?v=zTjBIXnzJ1s )
+- BIT10 Testnet DEX Demo: [youtube.com/watch?v=zTjBIXnzJ1s ](https://www.youtube.com/watch?v=zTjBIXnzJ1s)
 
 ## 🚀 The Problem
 
@@ -36,7 +36,7 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 
 ⚠️ Steps to run the canister and the related architecture diagrams are present in their respective folders.
 
-- **`icp_canister/`** - Contains all the canisters on ICP
+- **`icp_canister/`** - Contains all the canisters on ICP.
 
   - **`asset_storage/`** - Contains canister code for storing different token types:
     - `bsc_asset_storage/` - Stores BNB and BEP20 tokens.
@@ -45,9 +45,13 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
     - `sui_asset_storage/` - Stores SUI tokens.
     - `trx_asset_storage/` - Stores TRX tokens.
 
-  - **`buy_bit10/`** - Swap logic (buying BIT10 tokens) on ICP.
+  - **`buy_bit10/`** - Swap logic for buying and selling BIT10 tokens on ICP.
   
-  - **`dex/`** - DEX Swap logic (buying tokens on same and cross-chain) on ICP.
+  - **`dex/`** - DEX swap logic for same-chain and cross-chain token swaps on ICP.
+    - `testnet_dex_router/` - Canister code for the DEX router.
+    - `testnet_dex_eth_asset_storage/` - Canister code for swapping tokens on Ethereum.
+    - `testnet_dex_bsc_asset_storage/` - Canister code for swapping token on BSC.
+    - `testnet_dex_bsc_eth_asset_storage/` - Canister code for swapping token between BSC and Ethereum.
 
   - **`liquidity_hub/`**
     - `testnet_liquidity_hub/` - Canister code for the Liquidity Hub on ICP testnet.
@@ -58,31 +62,6 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 - **`server/`** - Lightweight Node.js server for serving data to the web app.
 
 - **`web_app/`** - Contains frontend code for the BIT10 application.
-
-<!-- * **`asset_storage/`** - Contains canister code for storing different token types:
-
-  * `bsc_asset_storage/` - Stores BNB and BEP20 tokens.
-  * `erc20_asset_storage/` - Stores ETH and ERC-20 tokens.
-  * `icp_asset_storage/` - Stores ICP tokens.
-  * `sui_asset_storage/` - Stores SUI tokens.
-  * `trx_asset_storage/` - Stores TRX tokens.
-
-* **`swap/`**
-
-  * `sol_dev/` - Swap logic (buying BIT10 tokens with SOL) on Solana Devnet.
-
-* **`liquidity_hub/`**
-
-  * `icp/`
-
-    * `testnet_liquidity_hub/` - Canister code for the Liquidity Hub on ICP testnet.
-
-* **`oracle/`** - Canister code for price oracle functionality.
-
-* **`server/`** - Lightweight Node.js server for serving data to the web app.
-
-* **`web_app/`** - Contains frontend code for the BIT10 application. -->
-
 
 ## 🛠 Tech Stack
 
@@ -97,7 +76,7 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 - BIT10.BTC Faucet: [5wxtf-uqaaa-aaaap-qpvha-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=5wxtf-uqaaa-aaaap-qpvha-cai)
 - BIT10 Exchange Canister: [6phs7-6yaaa-aaaap-qpvoq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=6phs7-6yaaa-aaaap-qpvoq-cai)
 - BIT10 Testnet Liquidity Hub: [jskxc-iiaaa-aaaap-qpwrq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=jskxc-iiaaa-aaaap-qpwrq-cai)
-- BIT10 Testnet DEX: [vlda4-oaaaa-aaaap-qp7cq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=vlda4-oaaaa-aaaap-qp7cq-cai)
+- BIT10 Testnet DEX: [t2vfi-5aaaa-aaaap-qqbfa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=t2vfi-5aaaa-aaaap-qqbfa-cai)
 - BIT10.BTC: [eegan-kqaaa-aaaap-qhmgq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=eegan-kqaaa-aaaap-qhmgq-cai)
 - Test BIT10.DEFI: [hbs3g-xyaaa-aaaap-qhmna-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=hbs3g-xyaaa-aaaap-qhmna-cai)
 - Test BIT10.BRC20: [uv4pt-4qaaa-aaaap-qpuxa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=uv4pt-4qaaa-aaaap-qpuxa-cai)

@@ -3,13 +3,16 @@ import { bit10Comparison } from '../db/schema'
 import { desc, gte } from 'drizzle-orm'
 import type { IncomingMessage, ServerResponse } from 'http'
 import NodeCache from 'node-cache'
+import cron from 'node-cron'
 
-const cache = new NodeCache({ stdTTL: 86400 }); // 24 hr
+const cache = new NodeCache({ stdTTL: 86400 }); // 24 hr TTL (seconds)
+
+const YEARS_TO_CACHE = [1, 3, 5, 10, 15];
 
 async function fetchData(years: number) {
     try {
         const now = new Date();
-        const startDate = new Date(now.setFullYear(now.getFullYear() - years)).toISOString();
+        const startDateCalc = new Date(now.getFullYear() - years, now.getMonth(), now.getDate());
 
         const result = await db.select({
             date: bit10Comparison.date,
@@ -18,7 +21,7 @@ async function fetchData(years: number) {
             sp500: bit10Comparison.sp500
         })
             .from(bit10Comparison)
-            .where(gte(bit10Comparison.date, startDate))
+            .where(gte(bit10Comparison.date, startDateCalc.toISOString()))
             .orderBy(desc(bit10Comparison.date))
             .execute();
 
@@ -34,16 +37,38 @@ async function getCachedData(years: number) {
     let cachedData = cache.get(cacheKey);
 
     if (cachedData === undefined) {
+        console.log(`Cache miss for key: ${cacheKey}. Fetching data...`);
         cachedData = await fetchData(years);
         if (cachedData) {
             cache.set(cacheKey, cachedData);
+            console.log(`Data fetched and cached for key: ${cacheKey}`);
         } else {
             cache.set(cacheKey, [], 300);
+            console.warn(`Failed to fetch data for key: ${cacheKey}. Caching empty array for 5 min.`);
         }
+    } else {
+        console.log(`Cache hit for key: ${cacheKey}`);
     }
 
     return cachedData;
 }
+
+async function warmUpCache() {
+    console.log('Initiating cache warm-up...');
+    for (const years of YEARS_TO_CACHE) {
+        await getCachedData(years);
+    }
+    console.log('Cache warm-up completed.');
+}
+
+cron.schedule('0 16 * * *', async () => { // 4 PM ET
+    console.log('Running scheduled cache refresh (4 PM ET)...');
+    await warmUpCache().catch(error => console.error('Error during scheduled cache refresh:', error));
+}, {
+    timezone: 'America/New_York'
+});
+
+warmUpCache().catch(error => console.error('Error during initial cache warm-up:', error));
 
 export const handleBit10ComparisonData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {

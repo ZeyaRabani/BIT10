@@ -16,12 +16,12 @@ import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 
-const bit10Tokens = ['BIT10.DEFI', 'BIT10.TOP'];
+const bit10Tokens = ['BIT10.TOP'];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
 
 export default function BalanceAndAllocation() {
-    const [selectedAllocationToken, setSelectedAllocationToken] = useState('BIT10.DEFI');
+    const [selectedAllocationToken, setSelectedAllocationToken] = useState('BIT10.TOP');
     const [innerRadius, setInnerRadius] = useState<number>(80);
 
     const { principalId } = useWallet();
@@ -70,10 +70,7 @@ export default function BalanceAndAllocation() {
 
         let data;
         let returnData;
-        if (tokenPriceAPI === 'bit10-latest-price-defi') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
-            returnData = data.data ?? 0;
-        } else if (tokenPriceAPI === 'bit10-latest-price-top') {
+        if (tokenPriceAPI === 'bit10-latest-price-top') {
             data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, tokenAddress: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         }
@@ -82,10 +79,6 @@ export default function BalanceAndAllocation() {
 
     const bit10Queries = useQueries({
         queries: [
-            {
-                queryKey: ['bit10DEFITokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-latest-price-defi')
-            },
             {
                 queryKey: ['bit10TOPTokenList'],
                 queryFn: () => fetchBit10Tokens('bit10-latest-price-top')
@@ -102,20 +95,17 @@ export default function BalanceAndAllocation() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10DEFITokens = bit10Queries[0].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const bit10TOPTokens = bit10Queries[1].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
-    const bit10DEFITokenBalance = bit10Queries[2].data as bigint | undefined;
-    const bit10TOPTokenBalance = bit10Queries[3].data as bigint | undefined;
+    const bit10TOPTokens = bit10Queries[0].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
+    const bit10DEFITokenBalance = bit10Queries[1].data as bigint | undefined;
+    const bit10TOPTokenBalance = bit10Queries[2].data as bigint | undefined;
 
     const totalBit10Tokens = (bit10DEFITokenBalance ?? 0n) + (bit10TOPTokenBalance ?? 0n);
 
     const selectedBit10Token = () => {
-        if (selectedAllocationToken === 'BIT10.DEFI') {
-            return bit10DEFITokens;
-        } else if (selectedAllocationToken === 'BIT10.TOP') {
-            return bit10TOPTokens;
+        if (selectedAllocationToken === 'BIT10.TOP') {
+            return bit10TOPTokens ?? [];
         } else {
-            return null;
+            return [];
         }
     };
 
@@ -140,7 +130,7 @@ export default function BalanceAndAllocation() {
         };
     }, []);
 
-    const formatBit10DEFI = (amount: number) => {
+    const formatBIT10 = (amount: number) => {
         const num = Number(amount) / 100000000;
         const rounded = num.toFixed(5);
         return rounded.replace(/\.?0+$/, '');
@@ -149,11 +139,11 @@ export default function BalanceAndAllocation() {
     const tokenData = [
         {
             token: 'BIT10.DEFI',
-            balance: `${formatBit10DEFI(Number(bit10DEFITokenBalance))}`
+            balance: `${formatBIT10(Number(bit10DEFITokenBalance))}`
         },
         {
             token: 'BIT10.TOP',
-            balance: `${formatBit10DEFI(Number(bit10TOPTokenBalance))}`
+            balance: `${formatBIT10(Number(bit10TOPTokenBalance))}`
         }
     ]
 
@@ -170,7 +160,7 @@ export default function BalanceAndAllocation() {
     };
 
     const bit10BalancePieChartData =
-        Number(formatBit10DEFI(Number(totalBit10Tokens))) == 0
+        Number(formatBIT10(Number(totalBit10Tokens))) == 0
             ?
             [{ name: 'No Data', value: 1, fill: '#ebebe0' }]
             :
@@ -241,7 +231,7 @@ export default function BalanceAndAllocation() {
                                     className='aspect-square max-h-[300px]'
                                 >
                                     <PieChart>
-                                        {Number(formatBit10DEFI(Number(totalBit10Tokens))) > 0 && (
+                                        {Number(formatBIT10(Number(totalBit10Tokens))) > 0 && (
                                             <ChartTooltip
                                                 cursor={false}
                                                 content={<ChartTooltipContent hideLabel />}
@@ -269,7 +259,7 @@ export default function BalanceAndAllocation() {
                                                                     y={viewBox.cy}
                                                                     className='fill-foreground text-3xl font-bold'
                                                                 >
-                                                                    {formatBit10DEFI(Number(totalBit10Tokens))}
+                                                                    {formatBIT10(Number(totalBit10Tokens))}
                                                                 </tspan>
                                                                 <tspan
                                                                     x={viewBox.cx}
@@ -289,13 +279,8 @@ export default function BalanceAndAllocation() {
                             </div>
                             <div className='flex w-full flex-col space-y-3'>
                                 <div className='flex flex-row items-center justify-start space-x-2'>
-                                    <p className='text-3xl font-semibold'>{formatBit10DEFI(Number(totalBit10Tokens))} BIT10</p>
+                                    <p className='text-3xl font-semibold'>{formatBIT10(Number(totalBit10Tokens))} BIT10</p>
                                 </div>
-                                {/* {Number(formatBit10DEFI(bit10DEFI)) > 0 && (
-                                    <div>
-                                        <p className='text-xl font-semibold'>~ $ {(Number(formatBit10DEFI(bit10DEFI)) * totalSum).toFixed(9)}</p>
-                                    </div>
-                                )} */}
                                 <div className='flex w-full flex-col space-y-3'>
                                     <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
                                     <div className='flex flex-col space-y-1 py-1'>
@@ -303,7 +288,7 @@ export default function BalanceAndAllocation() {
                                             <div>Token Name</div>
                                             <div>No. of Tokens</div>
                                         </div>
-                                        {Number(formatBit10DEFI(Number(totalBit10Tokens))) == 0 ? (
+                                        {Number(formatBIT10(Number(totalBit10Tokens))) == 0 ? (
                                             <div className='text-center'>You currently own no BIT10 tokens</div>
                                         ) : (
                                             <>

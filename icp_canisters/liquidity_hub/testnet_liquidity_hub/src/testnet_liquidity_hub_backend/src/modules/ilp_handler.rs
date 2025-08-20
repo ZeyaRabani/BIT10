@@ -125,7 +125,7 @@ async fn get_price_feed() -> Result<PriceFeed, String> {
     let price_result: Result<(Option<PriceFeed>,), _> = ic_cdk::call(
         PRICE_FEED_CANISTER_ID,
         "get_value",
-        ("01JJ6Z5FV8CD9A32ZNWN2ECZ1K",)
+        ("2374178234y3749",)
     ).await;
 
     match price_result {

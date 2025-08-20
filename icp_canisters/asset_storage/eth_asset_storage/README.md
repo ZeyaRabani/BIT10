@@ -25,7 +25,7 @@ flowchart TD
     State -->|Balances, Nonces| Storage[Stable Storage]
 ```
 
-### 🛠️ System Components
+## 🛠️ System Components
 
 - Canister: Main logic for asset management and Ethereum interaction
 - State Management: Tracks balances, nonces, and user mappings

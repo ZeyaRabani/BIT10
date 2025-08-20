@@ -27,7 +27,7 @@ flowchart TD
     E -.->|Collateral Management| B
 ```
 
-### 🛠️ System Components
+## 🛠️ System Components
 
 - TRX Asset Storage Canister: Manages TRX collateral and exposes APIs for deposit, withdrawal, and balance queries.
 - TRX Collateral State: Stores the state of TRX assets and related metadata.

@@ -1,0 +1,72 @@
+type BscNetwork = variant {
+    Testnet;
+};
+
+type EcdsaKeyName = variant {
+    TestKeyLocalDevelopment;
+    TestKey1;
+    ProductionKey1;
+};
+
+type InitArg = record {
+    bsc_network: opt BscNetwork;
+    ecdsa_key_name: opt EcdsaKeyName;
+};
+
+type CreateTransactionArgs = record {
+    pool_id: text;
+    tick_in_wallet_address: text;
+    tick_out_wallet_address: text;
+    swap_type: text;
+    source_chain: text;
+    destination_chain: text;
+    token_in_address: text;
+    token_out_address: text;
+    amount_in: text;
+    expected_amount_out: text;
+    slippage: text;
+};
+
+type TransactionData = record {
+    from: text;
+    to: text;
+    value: text;
+    data: text;
+};
+
+type TransactionResponse = record {
+    transaction_data: TransactionData;
+};
+
+type SwapResponse = record {
+    pool_id: text;
+    tick_in_wallet_address: text;
+    tick_out_wallet_address: text;
+    swap_type: text;
+    source_chain: text;
+    destination_chain: text;
+    token_in_address: text;
+    token_out_address: text;
+    amount_in: text;
+    amount_out: text;
+    slippage: text;
+    tx_hash_in: text;
+    tx_hash_out: text;
+    status: text;
+    timestamp: nat64;
+};
+
+type SwapResult = variant {
+    Success: SwapResponse;
+    Error: text;
+};
+
+service : (opt InitArg) -> {
+    create_transaction: (CreateTransactionArgs) -> (TransactionResponse);
+    
+    verify_and_swap: (text) -> (SwapResult);
+    
+    get_swap_history: () -> (vec SwapResponse) query;
+    
+    get_swap_history_by_address: (text) -> (vec SwapResponse) query;
+}

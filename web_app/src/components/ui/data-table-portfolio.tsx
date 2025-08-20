@@ -62,6 +62,24 @@ export function DataTable<TData, TValue>({
         table.getColumn(userSearchColumn)?.setFilterValue('');
     };
 
+    const formatTokenAmount = (value: number | null | undefined): string => {
+        if (value === null || value === undefined || isNaN(value)) return '0';
+        if (value === 0) return '0';
+        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
+        const [integerPart, decimalPart = ''] = strValue.split('.');
+        const formattedInteger = Number(integerPart).toLocaleString();
+
+        if (!decimalPart) return formattedInteger ?? '0';
+
+        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
+
+        if (firstNonZeroIndex === -1) return formattedInteger ?? '0';
+
+        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
+
+        return `${formattedInteger}.${trimmedDecimal}`;
+    };
+
     const formatDate = (dateInput: Date | string): string => {
         const date = new Date(dateInput);
         const addOrdinalSuffix = (day: number): string => {
@@ -97,7 +115,7 @@ export function DataTable<TData, TValue>({
             case 'tickIn':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{(parseFloat(row.original.tickInAmount) / 100000000).toFixed(8)}</div>
+                        <div>{formatTokenAmount(parseFloat(row.original.tickInAmount) / 100000000)}</div>
                         <div>{row.original.tickInName}</div>
                     </div>
                 );
@@ -105,9 +123,9 @@ export function DataTable<TData, TValue>({
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {row.original.transactionType === "Swap"
+                            {row.original.transactionType === 'Swap'
                                 ? row.original.tickOutAmount
-                                : (parseFloat(row.original.tickOutAmount) / 100000000).toFixed(8)}
+                                : formatTokenAmount(parseFloat(row.original.tickOutAmount) / 100000000)}
                         </div>
                         <div>{row.original.tickOutName}</div>
                     </div>

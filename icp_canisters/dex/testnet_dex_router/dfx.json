@@ -1,0 +1,17 @@
+{
+    "canisters": {
+        "testnet_dex_router_backend": {
+            "candid": "src/testnet_dex_router_backend/testnet_dex_router_backend.did",
+            "package": "testnet_dex_router_backend",
+            "type": "rust"
+        }
+    },
+    "defaults": {
+        "build": {
+            "args": "",
+            "packtool": ""
+        }
+    },
+    "output_env_file": ".env",
+    "version": 1
+}

@@ -1,0 +1,77 @@
+type CreateTransactionArgs = record {
+    pool_id: text;
+    tick_in_wallet_address: text;
+    tick_out_wallet_address: text;
+    swap_type: text;
+    source_chain: text;
+    destination_chain: text;
+    token_in_address: text;
+    token_out_address: text;
+    amount_in: text;
+    expected_amount_out: text;
+    slippage: text;
+};
+
+type TransactionData = record {
+    tx_type: opt text;
+    blockchain: opt text;
+    from: text;
+    to: text;
+    value: text;
+    data: text;
+    gas_limit: opt text;
+    max_priority_fee_per_gas: opt text;
+    max_fee_per_gas: opt text;
+    nonce: opt text;
+    chain_id: opt nat64;
+};
+
+type TransactionResponse = record {
+    transaction_data: TransactionData;
+};
+
+type SwapResponse = record {
+    pool_id: text;
+    tick_in_wallet_address: text;
+    tick_out_wallet_address: text;
+    swap_type: text;
+    source_chain: text;
+    destination_chain: text;
+    token_in_address: text;
+    token_out_address: text;
+    amount_in: text;
+    amount_out: text;
+    slippage: text;
+    tx_hash_in: text;
+    tx_hash_out: text;
+    status: text;
+    timestamp: nat64;
+};
+
+type SwapResult = variant {
+    Success: SwapResponse;
+    Error: text;
+};
+
+type VerifyAndSwapArgs = record {
+    pool_id: text;
+    transaction_hash: text;
+};
+
+type CrossChainVerifyAndSwapArgs = record {
+    pool_id: text;
+    source_chain: text;
+    transaction_hash: text;
+};
+
+type GetSwapHistoryByAddressArgs = record {
+    chain: text;
+    tick_in_wallet_address: text;
+};
+
+service : {
+    create_transaction: (CreateTransactionArgs) -> (variant { Ok: TransactionResponse; Err: text });
+    verify_and_swap: (VerifyAndSwapArgs) -> (variant { Ok: SwapResult; Err: text });
+    cross_chain_verify_and_swap: (CrossChainVerifyAndSwapArgs) -> (variant { Ok: SwapResult; Err: text });
+    get_swap_history_by_address: (GetSwapHistoryByAddressArgs) -> (variant { Ok: vec SwapResponse; Err: text });
+}

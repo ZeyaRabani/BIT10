@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/testnet_dex_router_backend"
+]
+resolver = "2"
