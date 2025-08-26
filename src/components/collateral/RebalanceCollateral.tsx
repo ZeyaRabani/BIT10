@@ -8,6 +8,7 @@ import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Badge } from '@/components/ui/badge'
 import { History, ExternalLink } from 'lucide-react'
+import { formatAmount } from '@/lib/utils'
 
 // temp
 interface WalletDataType {
@@ -37,6 +38,7 @@ type CoinSetData = {
     name: string;
     symbol: string;
     tokenAddress?: string;
+    market_cap: number;
     chain?: string;
     noOfTokens: number;
     price: number;
@@ -135,20 +137,20 @@ export default function RebalanceCollateral() {
         timestmpz: string,
         indexValue: number,
         priceOfTokenToBuy: number,
-        newTokens: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        added: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        removed: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        retained: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
+        newTokens: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        added: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        removed: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        retained: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
     };
     const bit10MEMEPrice = bit10Queries[2].data;
     const bit10MEMETokens = bit10Queries[3].data as {
         timestmpz: string,
         indexValue: number,
         priceOfTokenToBuy: number,
-        newTokens: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        added: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        removed: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        retained: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
+        newTokens: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        added: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        removed: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        retained: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
     };
 
     useEffect(() => {
@@ -219,11 +221,15 @@ export default function RebalanceCollateral() {
     };
 
     const generatePieChartData = (tokens: CoinSetData[]) => {
-        return tokens?.map((token, index) => ({
+        if (!tokens || tokens.length === 0) return [];
+
+        const totalMarketCap = tokens.reduce((sum, token) => sum + token.market_cap, 0);
+
+        return tokens.map((token, index) => ({
             name: token.symbol,
-            value: 100 / (tokens?.length || 1),
+            value: parseFloat(((token.market_cap / totalMarketCap) * 100).toFixed(4)),
             fill: color[index % color.length],
-        })) || [];
+        }));
     };
 
     const bit10RebalanceData = initialBit10RebalanceData.map(data => {
@@ -346,32 +352,57 @@ export default function RebalanceCollateral() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {data.bit10Token.newTokens.map((token, index) => {
-                                                    const bit10Token = `${data.bit10Name}`
-                                                    const foundAllocation = bit10Allocation.find(allocation =>
-                                                        allocation.tokenId?.includes(token.id.toString())
-                                                    ) ?? bit10Allocation.find(allocation =>
-                                                        !allocation.tokenId && allocation.bit10.includes(bit10Token)
-                                                    );
-                                                    const foundCollateralPrice = data.bit10Data.find((collateral: { id: number }) =>
-                                                        collateral.id.toString() === token.id.toString()
-                                                    );
-                                                    return (
+                                                {data.bit10Token.newTokens
+                                                    .map((token, index) => {
+                                                        const bit10Token = `${data.bit10Name}`;
+                                                        const foundAllocation = bit10Allocation.find(allocation =>
+                                                            allocation.tokenId?.includes(token.id.toString())
+                                                        ) ?? bit10Allocation.find(allocation =>
+                                                            !allocation.tokenId && allocation.bit10.includes(bit10Token)
+                                                        );
+
+                                                        const foundCollateralPrice = data.bit10Data.find(
+                                                            (collateral: { id: number }) =>
+                                                                collateral.id.toString() === token.id.toString()
+                                                        );
+
+                                                        const totalCollateral = foundCollateralPrice
+                                                            ? token.noOfTokens * foundCollateralPrice.price
+                                                            : 0;
+
+                                                        return {
+                                                            token,
+                                                            foundAllocation,
+                                                            foundCollateralPrice,
+                                                            totalCollateral,
+                                                            index,
+                                                        };
+                                                    })
+                                                    .sort((a, b) => b.totalCollateral - a.totalCollateral)
+                                                    .map(({ token, foundAllocation, foundCollateralPrice, totalCollateral, index }) => (
                                                         <tr key={token.id} className='hover:bg-accent p-1 rounded'>
                                                             <td className='flex items-center space-x-1'>
-                                                                <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
+                                                                <div
+                                                                    className='w-3 h-3 rounded'
+                                                                    style={{ backgroundColor: color[index % color.length] }}
+                                                                ></div>
                                                                 <span>{token.symbol}</span>
                                                                 <span>({formatWallet(foundAllocation?.walletAddress)})</span>
-                                                                <a href={foundAllocation?.explorerAddress} target='_blank' rel='noopener noreferrer'>
+                                                                <a
+                                                                    href={foundAllocation?.explorerAddress}
+                                                                    target='_blank'
+                                                                    rel='noopener noreferrer'
+                                                                >
                                                                     <ExternalLink size={16} className='text-primary' />
                                                                 </a>
                                                             </td>
                                                             <td>
-                                                                {foundCollateralPrice ? `${(token.noOfTokens * foundCollateralPrice?.price).toFixed(4)} USD` : 'Price not available'}
+                                                                {foundCollateralPrice
+                                                                    ? `${formatAmount(totalCollateral)} USD`
+                                                                    : 'Price not available'}
                                                             </td>
                                                         </tr>
-                                                    );
-                                                })}
+                                                    ))}
                                             </tbody>
                                         </table>
                                     </div>
