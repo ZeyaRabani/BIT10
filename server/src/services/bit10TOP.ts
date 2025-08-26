@@ -61,11 +61,11 @@ export const fetchAndUpdateBit10TOPData = async () => {
             id: coin.id,
             name: coin.name,
             symbol: coin.symbol,
-            market_cap: coin.quote.USD.market_cap,
+            marketCap: coin.quote.USD.market_cap,
             price: coin.quote.USD.price
         }));
 
-        const totalPrice = coinsData.reduce((sum, token) => sum + token.market_cap, 0);
+        const totalPrice = coinsData.reduce((sum, token) => sum + token.marketCap, 0);
         const tokenPrice = (totalPrice / 25000000000000) * 100; // 25T
         const timestmpz = new Date().toISOString();
 

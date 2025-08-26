@@ -66,11 +66,11 @@ export const fetchAndUpdateBit10MEMEData = async () => {
             symbol: coin.symbol,
             chain: coin.platform?.slug ?? '',
             tokenAddress: coin.platform?.token_address ?? '',
-            market_cap: coin.quote.USD.market_cap,
+            marketCap: coin.quote.USD.market_cap,
             price: coin.quote.USD.price
         }));
 
-        const totalPrice = coinsData.reduce((sum, token) => sum + token.market_cap, 0);
+        const totalPrice = coinsData.reduce((sum, token) => sum + token.marketCap, 0);
         const tokenPrice = (totalPrice / 10000000000000) * 100; // 10T
         const timestmpz = new Date().toISOString();
 

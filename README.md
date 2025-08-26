@@ -4,12 +4,14 @@ BIT10 pioneers the concept of an "S&P 500 for crypto assets." It provides users 
 
 ## 🖥️ Presentation
 
-For the World Computer Hacker League (WCHL) 2025, we have created the following demo videos to help you better understand BIT10. Please start by watching the Loom video presentation — it provides a smooth walkthrough of the platform.
+For the World Computer Hacker League (WCHL) 2025, we have created the following demo videos to help you better understand BIT10. Please start by watching the Loom video presentation - it provides a smooth walkthrough of the platform.
 
-- Loom Overview: [loom.com/share/db31b0fcfceb4738828cebd976c7e8fb](https://www.loom.com/share/db31b0fcfceb4738828cebd976c7e8fb)
-- Auto-Rebalancing Demo: [youtube.com/watch?v=ICuc97bdzbw](https://www.youtube.com/watch?v=ICuc97bdzbw)
-- BIT10 Technical Demo: [youtube.com/watch?v=NdYtbdXXe1Y](https://www.youtube.com/watch?v=NdYtbdXXe1Y)
-- BIT10 Testnet DEX Demo: [youtube.com/watch?v=zTjBIXnzJ1s ](https://www.youtube.com/watch?v=zTjBIXnzJ1s)
+- Pitch Video: [youtu.be/Mceef9ahg_A](https://youtu.be/Mceef9ahg_A)
+- WCHL National Round BIT10 Demo: [youtube.com/watch?v=YQdF3uXAY4A](https://www.youtube.com/watch?v=YQdF3uXAY4A)
+- WCHL National Round Cross Chain Lending and Borrowing: [youtube.com/watch?v=DCkX21094Ng](https://www.youtube.com/watch?v=DCkX21094Ng)
+- WCHL National Round Cross Chain DEX: [youtube.com/watch?v=sEe__ZwVW8U](https://www.youtube.com/watch?v=sEe__ZwVW8U)
+- WCHL National Round Market Cap Rebalance: [youtube.com/watch?v=UQW2NAXfGts](https://www.youtube.com/watch?v=UQW2NAXfGts)
+- WCHL National Round AI Portfolio Manager: [youtube.com/watch?v=tVY_6PrMrU4](https://www.youtube.com/watch?v=tVY_6PrMrU4)
 
 ## 🚀 The Problem
 
@@ -47,11 +49,16 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 
   - **`buy_bit10/`** - Swap logic for buying and selling BIT10 tokens on ICP.
   
+  - **`ai_portfolio_manager/`** - AI Portfolio Manager canister running on ICP.
+  
   - **`dex/`** - DEX swap logic for same-chain and cross-chain token swaps on ICP.
     - `testnet_dex_router/` - Canister code for the DEX router.
     - `testnet_dex_eth_asset_storage/` - Canister code for swapping tokens on Ethereum.
     - `testnet_dex_bsc_asset_storage/` - Canister code for swapping token on BSC.
     - `testnet_dex_bsc_eth_asset_storage/` - Canister code for swapping token between BSC and Ethereum.
+
+  - **`lending_and_borrowing/`**
+    - `testnet_lending_and_borrowing/` - Canister code for the Cross-Chain Lending and Borrowing on ICP testnet.
 
   - **`liquidity_hub/`**
     - `testnet_liquidity_hub/` - Canister code for the Liquidity Hub on ICP testnet.
@@ -73,10 +80,12 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 ## 🔗 ICP Canisters
 
 - Oracle: [egcpt-yyaaa-aaaap-qp4ia-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=egcpt-yyaaa-aaaap-qp4ia-cai)
+- AI Portfolio Manager: [anic3-viaaa-aaaap-qqcaq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=anic3-viaaa-aaaap-qqcaq-cai)
 - BIT10.BTC Faucet: [5wxtf-uqaaa-aaaap-qpvha-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=5wxtf-uqaaa-aaaap-qpvha-cai)
 - BIT10 Exchange Canister: [6phs7-6yaaa-aaaap-qpvoq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=6phs7-6yaaa-aaaap-qpvoq-cai)
 - BIT10 Testnet Liquidity Hub: [jskxc-iiaaa-aaaap-qpwrq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=jskxc-iiaaa-aaaap-qpwrq-cai)
 - BIT10 Testnet DEX: [t2vfi-5aaaa-aaaap-qqbfa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=t2vfi-5aaaa-aaaap-qqbfa-cai)
+- BIT10 Testnet Cross-Chain Lending and Borrowing: [dp57e-fyaaa-aaaap-qqclq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=dp57e-fyaaa-aaaap-qqclq-cai)
 - BIT10.BTC: [eegan-kqaaa-aaaap-qhmgq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=eegan-kqaaa-aaaap-qhmgq-cai)
 - Test BIT10.DEFI: [hbs3g-xyaaa-aaaap-qhmna-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=hbs3g-xyaaa-aaaap-qhmna-cai)
 - Test BIT10.BRC20: [uv4pt-4qaaa-aaaap-qpuxa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=uv4pt-4qaaa-aaaap-qpuxa-cai)
