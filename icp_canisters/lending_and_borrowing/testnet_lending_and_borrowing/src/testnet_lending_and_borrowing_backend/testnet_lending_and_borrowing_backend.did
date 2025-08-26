@@ -1,0 +1,59 @@
+type LendArgs = record {
+    lender_address: text;
+    token_chain: text;
+    token_address: text;
+    token_amount: nat64;
+};
+
+type LendResponseData = record {
+    lender_address: text;
+    token_chain: text;
+    token_address: text;
+    token_amount: nat64;
+    token_sent_trx_hash: text;
+    interest_rate: text;
+    status: text;
+    opened_at: text;
+};
+
+type LendResponse = variant {
+    Ok: LendResponseData;
+    Err: text;
+};
+
+type BorrowArgs = record {
+    borrower_address: text;
+    borrow_token_chain: text;
+    borrow_token_address: text;
+    borrow_token_amount: nat64;
+    collateral_address: text;
+    collateral_chain: text;
+    collateral_amount: nat64;
+    borrow_wallet_address: text;
+};
+
+type BorrowResponseData = record {
+    borrower_address: text;
+    borrow_token_chain: text;
+    borrow_token_address: text;
+    borrow_token_amount: text;
+    borrow_trx_hash: text;
+    collateral_address: text;
+    collateral_chain: text;
+    collateral_amount: text;
+    collateral_trx_hash: text;
+    borrow_wallet_address: text;
+    interest_rate: text;
+    status: text;
+    opened_at: text;
+};
+
+type BorrowResponse = variant {
+    Ok: BorrowResponseData;
+    Err: text;
+};
+
+service : {
+    lend: (LendArgs) -> (LendResponse);
+    borrow: (BorrowArgs) -> (BorrowResponse);
+}

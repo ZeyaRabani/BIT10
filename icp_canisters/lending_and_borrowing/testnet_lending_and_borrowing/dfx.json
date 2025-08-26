@@ -1,0 +1,17 @@
+{
+    "canisters": {
+        "testnet_lending_and_borrowing_backend": {
+            "candid": "src/testnet_lending_and_borrowing_backend/testnet_lending_and_borrowing_backend.did",
+            "package": "testnet_lending_and_borrowing_backend",
+            "type": "rust"
+        }
+    },
+    "defaults": {
+        "build": {
+            "args": "",
+            "packtool": ""
+        }
+    },
+    "output_env_file": ".env",
+    "version": 1
+}

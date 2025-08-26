@@ -1,0 +1,28 @@
+{
+    "canisters": {
+        "ai_portfolio_manager_backend": {
+            "candid": "src/ai_portfolio_manager_backend/ai_portfolio_manager_backend.did",
+            "package": "ai_portfolio_manager_backend",
+            "type": "rust"
+        },
+        "llm": {
+            "candid": "https://github.com/dfinity/llm/releases/latest/download/llm-canister-ollama.did",
+            "type": "custom",
+            "specified_id": "w36hm-eqaaa-aaaal-qr76a-cai",
+            "remote": {
+                "id": {
+                    "ic": "w36hm-eqaaa-aaaal-qr76a-cai"
+                }
+            },
+            "wasm": "https://github.com/dfinity/llm/releases/latest/download/llm-canister-ollama.wasm"
+        }
+    },
+    "defaults": {
+        "build": {
+            "args": "",
+            "packtool": ""
+        }
+    },
+    "output_env_file": ".env",
+    "version": 1
+}

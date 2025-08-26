@@ -1,0 +1,12 @@
+type ToolFunction = record { name : text; arguments : vec record { value : text; name : text } };
+type ToolCall = record { id : text; function : ToolFunction };
+type ChatMessage = variant {
+  system : record { content : text };
+  user : record { content : text };
+  assistant : record { content : opt text; tool_calls : vec ToolCall };
+  tool : record { content : text; tool_call_id : text };
+};
+
+service : {
+  chat : (vec ChatMessage) -> (text);
+}

@@ -7,11 +7,16 @@ BIT10 pioneers the concept of an "S&P 500 for crypto assets." It provides users 
 For the World Computer Hacker League (WCHL) 2025, we have created the following demo videos to help you better understand BIT10. Please start by watching the Loom video presentation - it provides a smooth walkthrough of the platform.
 
 - Pitch Video: [youtu.be/Mceef9ahg_A](https://youtu.be/Mceef9ahg_A)
+- Pitch Deck: [BIT10 WCHL Deck.pdf](https://github.com/user-attachments/files/21993258/BIT10.WCHL.Deck.pdf)
 - WCHL National Round BIT10 Demo: [youtube.com/watch?v=YQdF3uXAY4A](https://www.youtube.com/watch?v=YQdF3uXAY4A)
 - WCHL National Round Cross Chain Lending and Borrowing: [youtube.com/watch?v=DCkX21094Ng](https://www.youtube.com/watch?v=DCkX21094Ng)
 - WCHL National Round Cross Chain DEX: [youtube.com/watch?v=sEe__ZwVW8U](https://www.youtube.com/watch?v=sEe__ZwVW8U)
 - WCHL National Round Market Cap Rebalance: [youtube.com/watch?v=UQW2NAXfGts](https://www.youtube.com/watch?v=UQW2NAXfGts)
 - WCHL National Round AI Portfolio Manager: [youtube.com/watch?v=tVY_6PrMrU4](https://www.youtube.com/watch?v=tVY_6PrMrU4)
+
+### Extra instructions on how to use the entire system and FAQ's are in the Part 3 of the Gitbook.
+
+- [gitbook.bit10.app](https://gitbook.bit10.app)
 
 ## 🚀 The Problem
 

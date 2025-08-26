@@ -13,10 +13,10 @@ export async function GET(request: NextRequest, context: { params: Promise<{ ind
                 timestmpz: string,
                 indexValue: number,
                 priceOfTokenToBuy: number,
-                newTokens: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress: string }[];
-                added: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress: string }[];
-                removed: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress: string }[];
-                retained: { id: number, name: string, symbol: string, price: number, noOfTokens: number, tokenAddress: string }[];
+                newTokens: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress: string }[];
+                added: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress: string }[];
+                removed: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress: string }[];
+                retained: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress: string }[];
             }[]
         };
 

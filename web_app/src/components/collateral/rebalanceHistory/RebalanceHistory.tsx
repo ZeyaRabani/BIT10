@@ -8,6 +8,7 @@ import React from 'react'
 import { usePathname } from 'next/navigation'
 import InformationCard from '@/components/InformationCard'
 import { useQueries } from '@tanstack/react-query'
+import { formatAmount } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -35,11 +36,11 @@ type Bit10RebalanceEntry = {
 const RebalanceSwapsTable = ({
     initialTokens,
     rebalanceTokens,
-    formatTokenAmount
+    formatAmount
 }: {
     initialTokens: CoinSetData[],
     rebalanceTokens: CoinSetData[],
-    formatTokenAmount: (value: number) => string
+    formatAmount: (value: number) => string
 }) => {
     if (!initialTokens?.length || !rebalanceTokens?.length) return null;
 
@@ -54,7 +55,7 @@ const RebalanceSwapsTable = ({
 
         if (rebalanceToken) {
             const diff = rebalanceToken.noOfTokens - initialToken.noOfTokens;
-            if (Math.abs(diff) > 0.000001) {
+            if (Math.abs(diff) > 0.00000000000000001) {
                 const swap = {
                     symbol,
                     name: initialToken.name,
@@ -173,7 +174,7 @@ const RebalanceSwapsTable = ({
                                 {pair.from.name} ({pair.from.symbol})
                             </TableCell>
                             <TableCell className='text-right text-red-600'>
-                                {formatTokenAmount(pair.fromAmount)}
+                                {formatAmount(pair.fromAmount)}
                             </TableCell>
                             <TableCell className='text-center'>→</TableCell>
                             <TableCell className='text-green-600'>
@@ -182,10 +183,10 @@ const RebalanceSwapsTable = ({
                             </TableCell>
                             <TableCell className='text-right text-green-600'>
                                 {/* @ts-ignore */}
-                                {formatTokenAmount(pair.toAmount)}
+                                {formatAmount(pair.toAmount)}
                             </TableCell>
                             <TableCell className='text-right'>
-                                ${formatTokenAmount(pair.valueUSD)}
+                                ${formatAmount(pair.valueUSD)}
                             </TableCell>
                         </TableRow>
                     ))}
@@ -231,23 +232,6 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
 
     const selectedBit10Token = bit10Token();
 
-    const formatTokenAmount = (value: number): string => {
-        if (value === 0) return '0';
-
-        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
-        const [integerPart, decimalPart = ''] = strValue.split('.');
-
-        if (!decimalPart) return integerPart ?? '0';
-
-        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
-
-        if (firstNonZeroIndex === -1) return integerPart ?? '0';
-
-        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
-
-        return `${integerPart}.${trimmedDecimal}`;
-    };
-
     return (
         <div className='py-4'>
             {isLoading ? (
@@ -272,8 +256,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                     return (
                                         <div key={entry.timestmpz} className='border p-4 rounded-lg'>
                                             <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                                            <p className='text-lg'>Index Value: {entry.indexValue.toFixed(4)} USD</p>
-                                            <p className='text-lg'>Total Collateral: {(entry.priceOfTokenToBuy * entry.newTokens.length).toFixed(4)} USD</p>
+                                            <p className='text-lg'>Index Value: {formatAmount(entry.indexValue)} USD</p>
+                                            <p className='text-lg'>Total Collateral: {formatAmount(entry.priceOfTokenToBuy * entry.newTokens.length)} USD</p>
                                             <h3 className='font-medium my-2'>
                                                 Allocation (Effective {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
                                             </h3>
@@ -290,8 +274,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                         {entry.newTokens.map((token) => (
                                                             <TableRow key={token.id}>
                                                                 <TableCell>{token.symbol}</TableCell>
-                                                                <TableCell>${formatTokenAmount(token.price)}</TableCell>
-                                                                <TableCell>{formatTokenAmount(token.noOfTokens)}</TableCell>
+                                                                <TableCell>${formatAmount(token.price)}</TableCell>
+                                                                <TableCell>{formatAmount(token.noOfTokens)}</TableCell>
                                                             </TableRow>
                                                         ))}
                                                     </TableBody>
@@ -330,8 +314,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     {nextEntry.newTokens.map((token) => (
                                                         <TableRow key={token.id}>
                                                             <TableCell>{token.symbol}</TableCell>
-                                                            <TableCell>${formatTokenAmount(token.price)}</TableCell>
-                                                            <TableCell>{formatTokenAmount(token.noOfTokens)}</TableCell>
+                                                            <TableCell>${formatAmount(token.price)}</TableCell>
+                                                            <TableCell>{formatAmount(token.noOfTokens)}</TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
@@ -348,8 +332,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     {entry.newTokens.map((token) => (
                                                         <TableRow key={token.id}>
                                                             <TableCell>{token.symbol}</TableCell>
-                                                            <TableCell>${formatTokenAmount(token.price)}</TableCell>
-                                                            <TableCell>{formatTokenAmount(token.noOfTokens)}</TableCell>
+                                                            <TableCell>${formatAmount(token.price)}</TableCell>
+                                                            <TableCell>{formatAmount(token.noOfTokens)}</TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
@@ -360,7 +344,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                 // @ts-ignore
                                                 initialTokens={nextEntry.newTokens}
                                                 rebalanceTokens={entry.newTokens}
-                                                formatTokenAmount={formatTokenAmount}
+                                                formatAmount={formatAmount}
                                             />
                                         </div>
                                     </div>

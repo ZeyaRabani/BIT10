@@ -95,7 +95,7 @@ export default function BalanceAndAllocation() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10TOPTokens = bit10Queries[0].data as { id: number, name: string, symbol: string, tokenAddress: string, price: number }[] | undefined;
+    const bit10TOPTokens = bit10Queries[0].data as { id: number, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
     const bit10DEFITokenBalance = bit10Queries[1].data as bigint | undefined;
     const bit10TOPTokenBalance = bit10Queries[2].data as bigint | undefined;
 
@@ -109,7 +109,8 @@ export default function BalanceAndAllocation() {
         }
     };
 
-    const tokens = selectedBit10Token();
+    const rawTokens = selectedBit10Token();
+    const tokens = (Array.isArray(rawTokens) ? rawTokens : []) as { symbol: string; marketCap: number }[];
 
     useEffect(() => {
         const handleResize = () => {
@@ -182,9 +183,11 @@ export default function BalanceAndAllocation() {
         )
     };
 
-    const bit10AllocationPieChartData = tokens?.map((token, index) => ({
+    const totalMarketCap = tokens.reduce((sum, token) => sum + token.marketCap, 0);
+
+    const bit10AllocationPieChartData = tokens.map((token, index) => ({
         name: token.symbol,
-        value: 100 / tokens.length,
+        value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(4)),
         fill: color[index % color.length],
     }));
 
@@ -378,13 +381,19 @@ export default function BalanceAndAllocation() {
                             <div className='flex w-full flex-col space-y-3'>
                                 <h1 className='text-2xl'>{selectedAllocationToken} Allocations</h1>
                                 <div className='flex flex-col'>
-                                    {tokens?.map((token, index) => (
-                                        <div key={index} className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'>
+                                    {tokens?.sort((a, b) => b.marketCap - a.marketCap).map((token, index) => (
+                                        <div
+                                            key={index}
+                                            className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'
+                                        >
                                             <div className='flex flex-row items-center space-x-1'>
-                                                <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
+                                                <div
+                                                    className='w-3 h-3 rounded'
+                                                    style={{ backgroundColor: color[index % color.length] }}
+                                                ></div>
                                                 <div>{token.symbol}</div>
                                             </div>
-                                            <div>{(100 / tokens.length).toFixed(3)} %</div>
+                                            <div>{((token.marketCap / totalMarketCap) * 100).toFixed(3)} %</div>
                                         </div>
                                     ))}
                                 </div>
