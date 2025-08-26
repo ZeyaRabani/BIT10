@@ -4,6 +4,7 @@ import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token'
 import { usePrivy } from '@privy-io/react-auth'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
+import { formatAmount } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -36,7 +37,15 @@ export default function PrivyOverview() {
         const balance = ((parseFloat(fromAccount.amount.toString()) / 10 ** decimalPlaces).toFixed(4)).toString();
 
         return balance;
-    }
+    };
+
+    const fetchUserActiveLoansCount = async () => {
+        return 0;
+    };
+
+    const fetchUserActiveTokensCount = async () => {
+        return 0;
+    };
 
     // ToDo: Remove Test BIT10.DEFI
     const bit10Queries = useQueries({
@@ -45,31 +54,23 @@ export default function PrivyOverview() {
                 queryKey: ['bit10DEFIBalance'],
                 queryFn: () => fetchBit10Balance('5bzHsBmXwX3U6yqKH8uoFgHrUNyoNJvMuAajsBbsHt5K', 9)
             },
+            {
+                queryKey: ['userActiveLoansCount'],
+                queryFn: () => fetchUserActiveLoansCount()
+            },
+            {
+                queryKey: ['userActiveTokensCount'],
+                queryFn: () => fetchUserActiveTokensCount()
+            }
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10DEFITokenBalance = bit10Queries[0].data as number | undefined;
+    const userActiveLoans = bit10Queries[1].data;
+    const userActiveTokens = bit10Queries[2].data;
 
     const totalBit10Tokens = (bit10DEFITokenBalance ?? 0);
-
-    const formatTokenAmount = (value: number | null | undefined): string => {
-        if (value === null || value === undefined || isNaN(value)) return '0';
-        if (value === 0) return '0';
-        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
-        const [integerPart, decimalPart = ''] = strValue.split('.');
-        const formattedInteger = Number(integerPart).toLocaleString();
-
-        if (!decimalPart) return formattedInteger || '0';
-
-        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
-
-        if (firstNonZeroIndex === -1) return formattedInteger || '0';
-
-        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
-
-        return `${formattedInteger}.${trimmedDecimal}`;
-    };
 
     return (
         <div className='flex flex-col space-y-4'>
@@ -106,7 +107,7 @@ export default function PrivyOverview() {
                                         <BadgeDollarSign />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        {formatTokenAmount(Number(totalBit10Tokens))} BIT10
+                                        {formatAmount(Number(totalBit10Tokens))} BIT10
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>
@@ -144,7 +145,7 @@ export default function PrivyOverview() {
                                         <HandCoins />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        0 Loans
+                                        {userActiveLoans} {Number(userActiveLoans) > 1 ? 'Loans' : 'Loan'}
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>
@@ -163,7 +164,7 @@ export default function PrivyOverview() {
                                         <Banknote />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        0 Tokens
+                                        {userActiveTokens} {Number(userActiveTokens) > 1 ? 'Tokens' : 'Token'}
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>

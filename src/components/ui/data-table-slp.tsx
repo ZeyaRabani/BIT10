@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
+import { formatAmount } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { Badge } from '@/components/ui/badge'
@@ -50,24 +51,6 @@ export function DataTable<TData, TValue>({
         },
     });
 
-    const formatTokenAmount = (value: number | null | undefined): string => {
-        if (value === null || value === undefined || isNaN(value)) return '0';
-        if (value === 0) return '0';
-        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
-        const [integerPart, decimalPart = ''] = strValue.split('.');
-        const formattedInteger = Number(integerPart).toLocaleString();
-
-        if (!decimalPart) return formattedInteger ?? '0';
-
-        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
-
-        if (firstNonZeroIndex === -1) return formattedInteger ?? '0';
-
-        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
-
-        return `${formattedInteger}.${trimmedDecimal}`;
-    };
-
     const formatDate = (dateInput: Date | string): string => {
         const date = new Date(dateInput);
         const addOrdinalSuffix = (day: number): string => {
@@ -103,7 +86,7 @@ export function DataTable<TData, TValue>({
             case 'staked_amount':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{formatTokenAmount(row.original.tickInAmount / 100000000)}</div>
+                        <div>{formatAmount(row.original.tickInAmount / 100000000)}</div>
                         <div>{row.original.tickInName}</div>
                         <div>
                             {row.original.duration > 0 && `for ${row.original.duration} day`}

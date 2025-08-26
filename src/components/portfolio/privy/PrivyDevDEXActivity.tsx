@@ -1,10 +1,11 @@
 import React from 'react'
-import InformationCard from '@/components/InformationCard'
+import RecentSwapActivity from './dex_activity/RecentSwapActivity'
 
-export default function PrivyDevDEXActivity() {
+export default function PrivyDEXActivity() {
     return (
         <div className='flex flex-col space-y-4'>
-            <InformationCard message='DEX will be available on Solana Devent soon.' />
+            <RecentSwapActivity />
+            {/* ToDo: Also add Liquidity Positions Table */}
         </div>
     )
 }

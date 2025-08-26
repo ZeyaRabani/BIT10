@@ -1,10 +1,12 @@
 import React from 'react'
-import InformationCard from '@/components/InformationCard'
+import LendingActivity from './manage_lending_and_borrowing/lendingActivity'
+import BorrowingActivity from './manage_lending_and_borrowing/borrowingActivity'
 
 export default function SolDevLendingAndBorrowing() {
     return (
-        <div>
-            <InformationCard message='Lending and borrowing will be available on Solana Devent soon.' />
+        <div className='flex flex-col space-y-4'>
+            <LendingActivity />
+            <BorrowingActivity />
         </div>
     )
 }

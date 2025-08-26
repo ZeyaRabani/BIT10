@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { usePrivy } from '@privy-io/react-auth'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { formatAddress, formatAmount } from '@/lib/utils'
 import { type Program } from '@project-serum/anchor'
 import { PublicKey, Keypair, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { type TeSwap } from '@/lib/te_swap.idl'
@@ -116,7 +117,7 @@ export default function PrivySwapModule() {
                     }
                     const publicKey = new PublicKey(userPublicKey);
                     const balanceLamports = await connection.getBalance(publicKey);
-                    const balanceSOL = formatTokenAmount(balanceLamports / LAMPORTS_PER_SOL);
+                    const balanceSOL = formatAmount(balanceLamports / LAMPORTS_PER_SOL);
 
                     return balanceSOL;
                 } else {
@@ -216,24 +217,6 @@ export default function PrivySwapModule() {
     };
 
     const selectedBit10TokenPrice = bit10TokenPrice();
-
-    const formatTokenAmount = (value: number | null | undefined): string => {
-        if (value === null || value === undefined || isNaN(value)) return '0';
-        if (value === 0) return '0';
-        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
-        const [integerPart, decimalPart = ''] = strValue.split('.');
-        const formattedInteger = Number(integerPart).toLocaleString();
-
-        if (!decimalPart) return formattedInteger ?? '0';
-
-        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
-
-        if (firstNonZeroIndex === -1) return formattedInteger ?? '0';
-
-        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
-
-        return `${formattedInteger}.${trimmedDecimal}`;
-    };
 
     const swapDisabledConditions = !authenticated || swaping || payingTokenPrice == '0' || selectedBit10TokenPrice == 0;
 
@@ -433,12 +416,6 @@ export default function PrivySwapModule() {
         );
     }, [receiveTokenSearch]);
 
-    const formatAddress = (id: string) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 9)}.....${id.slice(-9)}`;
-    };
-
     return (
         <div className='flex flex-col items-center justify-center py-4'>
             {isLoading ? (
@@ -550,12 +527,12 @@ export default function PrivySwapModule() {
                                             <div>Pay with</div>
                                             <div className='flex flex-row space-x-1 items-center'>
                                                 <Wallet size={16} />
-                                                <p>{formatTokenAmount(Number(payingTokenBalance))}</p>
+                                                <p>{formatAmount(Number(payingTokenBalance))}</p>
                                             </div>
                                         </div>
                                         <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                             <div className='text-4xl text-center md:text-start'>
-                                                {selectedBit10TokenPrice ? formatTokenAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.03) : '0'}
+                                                {selectedBit10TokenPrice ? formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.03) : '0'}
                                             </div>
 
                                             <div className='grid grid-cols-5 items-center'>
@@ -633,18 +610,18 @@ export default function PrivySwapModule() {
                                                 <Tooltip delayDuration={300}>
                                                     <TooltipTrigger asChild>
                                                         <div className='flex flex-row space-x-1'>
-                                                            $ {selectedBit10TokenPrice ? formatTokenAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))) * 1.03) : '0'}
+                                                            $ {selectedBit10TokenPrice ? formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))) * 1.03) : '0'}
                                                             <Info className='w-5 h-5 cursor-pointer ml-1' />
                                                         </div>
                                                     </TooltipTrigger>
                                                     <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                                         Price in {form.watch('payment_token')} + 1% Management fee <br />
-                                                        $ {formatTokenAmount(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatTokenAmount(0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatTokenAmount((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))))}
+                                                        $ {formatAmount(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatAmount(0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatAmount((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice?.toFixed(4) ?? '0'))))}
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
                                             <div>
-                                                1 {form.watch('payment_token')} = $ {formatTokenAmount(parseFloat(payingTokenPrice))}
+                                                1 {form.watch('payment_token')} = $ {formatAmount(parseFloat(payingTokenPrice))}
                                             </div>
                                         </div>
                                     </div>
@@ -751,9 +728,9 @@ export default function PrivySwapModule() {
                                         </div>
 
                                         <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                                            <div>$ {formatTokenAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))))}</div>
+                                            <div>$ {formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBit10TokenPrice.toFixed(4))))}</div>
                                             <div>
-                                                1 {form.watch('receive_token')} = $ {formatTokenAmount(selectedBit10TokenPrice)}
+                                                1 {form.watch('receive_token')} = $ {formatAmount(selectedBit10TokenPrice)}
                                             </div>
                                         </div>
                                     </div>
@@ -773,7 +750,7 @@ export default function PrivySwapModule() {
                                             </div>
                                             <div className='flex flex-row items-center justify-between space-x-2'>
                                                 <div>Minimum receive</div>
-                                                <div>{formatTokenAmount(parseFloat(form.watch('receive_amount') || '0') * (1 - Number(form.watch('slippage') || 0) / 100))}</div>
+                                                <div>{formatAmount(parseFloat(form.watch('receive_amount') || '0') * (1 - Number(form.watch('slippage') || 0) / 100))}</div>
                                             </div>
                                             <div className='flex flex-row items-center justify-between space-x-2'>
                                                 <div>Management Fee</div>
@@ -795,11 +772,11 @@ export default function PrivySwapModule() {
                                             </div>
                                             <div className='flex flex-row items-center justify-between space-x-2'>
                                                 <div>Exchange Rate</div>
-                                                <div>1 {form.watch('payment_token')} = {selectedBit10TokenPrice > 0 ? formatTokenAmount(parseFloat(payingTokenPrice) / selectedBit10TokenPrice) : '0'} {form.watch('receive_token')}</div>
+                                                <div>1 {form.watch('payment_token')} = {selectedBit10TokenPrice > 0 ? formatAmount(parseFloat(payingTokenPrice) / selectedBit10TokenPrice) : '0'} {form.watch('receive_token')}</div>
                                             </div>
                                             <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
                                                 <div>Expected Output</div>
-                                                <div>{formatTokenAmount(parseFloat(form.watch('receive_amount')))} {form.watch('receive_token')}</div>
+                                                <div>{formatAmount(parseFloat(form.watch('receive_amount')))} {form.watch('receive_token')}</div>
                                             </div>
                                         </AccordionContent>
                                     </AccordionItem>

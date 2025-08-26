@@ -1,10 +1,11 @@
 import React from 'react'
-import InformationCard from '@/components/InformationCard'
+import RecentSwapActivity from './dex_activity/RecentSwapActivity'
 
 export default function ICPDEXActivity() {
     return (
         <div className='flex flex-col space-y-4'>
-            <InformationCard message='DEX will be available on ICP soon.' />
+            <RecentSwapActivity />
+            {/* ToDo: Also add Liquidity Positions Table */}
         </div>
     )
 }

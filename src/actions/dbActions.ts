@@ -2,9 +2,9 @@
 "use server"
 
 import { db } from '@/server/db'
-import { userSignups, teUsers, teSwap, teRequestBtc, teLiquidityHub, teDexSwap } from '@/server/db/schema'
+import { userSignups, teUsers, teSwap, teRequestBtc, teLiquidityHub, teDexSwap, teLend, teBorrow } from '@/server/db/schema'
 import crypto from 'crypto'
-import { eq, desc, and } from 'drizzle-orm'
+import { eq, desc, and, count, countDistinct } from 'drizzle-orm'
 
 interface NewTokenBuy {
     newTokenBuyId: string;
@@ -50,6 +50,33 @@ interface NewDEXSwap {
     txHashIn: string;
     txHashOut: string;
     timestamp: number;
+}
+
+interface NewTokenLend {
+    lenderAddress: string,
+    tokenChain: string,
+    tokenAddress: string,
+    tokenAmount: string,
+    tokenSentTrxHash: string,
+    interestRate: string,
+    status: string,
+    openedAt: number
+}
+
+interface NewTokenBorrow {
+    borrowerAddress: string,
+    borrowTokenChain: string,
+    borrowTokenAddress: string,
+    borrowTokenAmount: string,
+    borrowTrxHash: string,
+    collateralAddress: string,
+    collateralChain: string,
+    collateralAmount: string,
+    collateralTrxHash: string,
+    borrowWalletAddress: string,
+    interestRate: string,
+    status: string,
+    openedAt: number
 }
 
 export const addUserSignUps = async ({ email }: { email: string }) => {
@@ -115,7 +142,7 @@ export const newTokenBuy = async ({ newTokenBuyId, principalId, tickInName, tick
             network: network
         });
 
-        return 'Token swap successfully'
+        return 'Token swap successfully';
     } catch (error) {
         return 'Error swaping tokens';
     }
@@ -233,7 +260,7 @@ export const newLiquidityProvider = async ({ newLiquidationId, tickInAddress, ti
             transactionTimestamp: transactionTimestamp
         });
 
-        return 'Staking successfully'
+        return 'Staking successfully';
     } catch (error) {
         return 'Error staking tokens';
     }
@@ -281,8 +308,135 @@ export const newDEXSwap = async ({ poolId, amountIn, amountOut, sourceChain, des
             timestamp: timestamp
         });
 
-        return 'DEX Swap was successful'
+        return 'DEX Swap was successful';
     } catch (error) {
         return 'Error swapping tokens';
     }
 };
+
+export const newTokenLend = async ({ lenderAddress, tokenChain, tokenAddress, tokenAmount, tokenSentTrxHash, interestRate, status, openedAt }: NewTokenLend) => {
+    try {
+        await db.insert(teLend).values({
+            lenderAddress: lenderAddress,
+            tokenChain: tokenChain,
+            tokenAddress: tokenAddress,
+            tokenAmount: tokenAmount,
+            tokenSentTrxHash: tokenSentTrxHash,
+            interestRate: interestRate,
+            status: status,
+            openedAt: openedAt
+        });
+
+        return 'Lending successfully';
+    } catch (error) {
+        return 'Error lending tokens';
+    }
+};
+
+export const newTokenBorrow = async ({ borrowerAddress, borrowTokenChain, borrowTokenAddress, borrowTokenAmount, borrowTrxHash, collateralAddress, collateralChain, collateralAmount, collateralTrxHash, borrowWalletAddress, interestRate, status, openedAt }: NewTokenBorrow) => {
+    try {
+        await db.insert(teBorrow).values({
+            borrowerAddress: borrowerAddress,
+            borrowTokenChain: borrowTokenChain,
+            borrowTokenAddress: borrowTokenAddress,
+            borrowTokenAmount: borrowTokenAmount,
+            borrowTrxHash: borrowTrxHash,
+            collateralAddress: collateralAddress,
+            collateralChain: collateralChain,
+            collateralAmount: collateralAmount,
+            collateralTrxHash: collateralTrxHash,
+            borrowWalletAddress: borrowWalletAddress,
+            interestRate: interestRate,
+            status: status,
+            openedAt: openedAt
+        });
+
+        return 'Borrowing successfully';
+    } catch (error) {
+        return 'Error borrowing tokens';
+    }
+};
+
+export const userRecentLendActivity = async ({ source_chain, address }: { source_chain: string, address: string }) => {
+    try {
+        const data = await db.select({
+            status: teLend.status,
+            lenderAddress: teLend.lenderAddress,
+            tokenAddress: teLend.tokenAddress,
+            tokenAmount: teLend.tokenAmount,
+            tokenChain: teLend.tokenChain,
+            interestRate: teLend.interestRate,
+            lendStatus: teLend.status,
+            openedAt: teLend.openedAt
+        })
+            .from(teLend)
+            .where(and(
+                eq(teLend.lenderAddress, address.toLowerCase()),
+                eq(teLend.tokenChain, source_chain)
+            ))
+            .orderBy(desc(teLend.openedAt));
+        return data;
+    } catch (error) {
+        return 'Error fetching user lending activity';
+    }
+}
+
+export const userRecentBorrowActivity = async ({ source_chain, address }: { source_chain: string, address: string }) => {
+    try {
+        const data = await db.select({
+            status: teBorrow.status,
+            lenderAddress: teBorrow.borrowerAddress,
+            borrowTokenChain: teBorrow.borrowTokenChain,
+            borrowTokenAddress: teBorrow.borrowTokenAddress,
+            borrowTokenAmount: teBorrow.borrowTokenAmount,
+            collateralAddress: teBorrow.collateralAddress,
+            collateralAmount: teBorrow.collateralAmount,
+            collateralChain: teBorrow.collateralChain,
+            interestRate: teBorrow.interestRate,
+            openedAt: teBorrow.openedAt
+        })
+            .from(teBorrow)
+            .where(and(
+                eq(teBorrow.borrowerAddress, address.toLowerCase()),
+                eq(teBorrow.borrowTokenChain, source_chain)
+            ))
+            .orderBy(desc(teBorrow.openedAt));
+        return data;
+    } catch (error) {
+        return 'Error fetching user borrowing activity';
+    }
+}
+
+export const userActiveLoansCount = async ({ source_chain, address }: { source_chain: string, address: string }) => {
+    try {
+        const data = await db.select({
+            count: count(),
+        })
+            .from(teBorrow)
+            .where(and(
+                eq(teBorrow.borrowerAddress, address.toLowerCase()),
+                eq(teBorrow.borrowTokenChain, source_chain),
+                eq(teBorrow.status, 'Active')
+            ));
+        return data[0]?.count ?? 0;
+    } catch (error) {
+        return 'Error fetching user borrow activity';
+    }
+}
+
+export const userActiveTokensCount = async ({ source_chain, address }: { source_chain: string, address: string }) => {
+    try {
+        const data = await db
+            .select({
+                count: countDistinct(teBorrow.borrowerAddress),
+            })
+            .from(teBorrow)
+            .where(and(
+                eq(teBorrow.borrowTokenChain, source_chain),
+                eq(teBorrow.status, 'Active')
+            ));
+        return data[0]?.count ?? 0;
+    } catch (error) {
+        return 'Error fetching user borrow activity';
+    }
+}

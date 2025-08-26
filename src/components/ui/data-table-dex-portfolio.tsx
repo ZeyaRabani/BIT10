@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
+import { formatAmount } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -61,24 +62,6 @@ export function DataTable<TData, TValue>({
     const clearSearch = () => {
         setColumnFilters([]);
         table.getColumn(userSearchColumn)?.setFilterValue('');
-    };
-
-    const formatTokenAmount = (value: number | null | undefined): string => {
-        if (value === null || value === undefined || isNaN(value)) return '0';
-        if (value === 0) return '0';
-        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
-        const [integerPart, decimalPart = ''] = strValue.split('.');
-        const formattedInteger = Number(integerPart).toLocaleString();
-
-        if (!decimalPart) return formattedInteger || '0';
-
-        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
-
-        if (firstNonZeroIndex === -1) return formattedInteger || '0';
-
-        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
-
-        return `${formattedInteger}.${trimmedDecimal}`;
     };
 
     const formatDate = (dateInput: string | number | Date): string => {
@@ -163,7 +146,7 @@ export function DataTable<TData, TValue>({
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {formatTokenAmount(Number(row.original.amountIn))}
+                            {formatAmount(Number(row.original.amountIn))}
                         </div>
                         <div>{getTokenName(row.original.tokenInAddress)}</div>
                     </div>
@@ -172,7 +155,7 @@ export function DataTable<TData, TValue>({
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {formatTokenAmount(Number(row.original.amountOut))}
+                            {formatAmount(Number(row.original.amountOut))}
                         </div>
                         <div>{getTokenName(row.original.tokenOutAddress)}</div>
                     </div>

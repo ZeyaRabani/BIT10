@@ -47,7 +47,7 @@ export const ICPWalletProvider: React.FC<React.PropsWithChildren<object>> = ({ c
     const disconnectICPWallet = () => {
         setICPAddress(undefined);
         setChain(undefined);
-        toast.success('Wallet disConnected successfully!');
+        toast.success('Wallet disconnected successfully!');
     };
 
     return (

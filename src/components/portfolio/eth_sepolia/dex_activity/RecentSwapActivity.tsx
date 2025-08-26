@@ -90,7 +90,7 @@ export default function RecentSwapActivity() {
                         <DataTable
                             columns={recentSwapTableColumns}
                             data={recentDEXActivityData ?? []}
-                            userSearchColumn='tickOutName'
+                            userSearchColumn='to'
                             inputPlaceHolder='Search by Received token name'
                         />
                     </CardContent>

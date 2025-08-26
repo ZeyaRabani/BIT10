@@ -2,6 +2,7 @@ import React from 'react'
 import { useAccount } from 'wagmi'
 import { useQueries } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
+import { formatAmount } from '@/lib/utils'
 import Link from 'next/link'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -19,7 +20,15 @@ export default function ETHSepoliaOverview() {
 
     const fetchBit10Balance = async () => {
         return 0;
-    }
+    };
+
+    const fetchUserActiveLoansCount = async () => {
+        return 0;
+    };
+
+    const fetchUserActiveTokensCount = async () => {
+        return 0;
+    };
 
     const bit10Queries = useQueries({
         queries: [
@@ -27,31 +36,23 @@ export default function ETHSepoliaOverview() {
                 queryKey: ['bit10TOPBalance'],
                 queryFn: () => fetchBit10Balance()
             },
+            {
+                queryKey: ['userActiveLoansCount'],
+                queryFn: () => fetchUserActiveLoansCount()
+            },
+            {
+                queryKey: ['userActiveTokensCount'],
+                queryFn: () => fetchUserActiveTokensCount()
+            }
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10TOPTokenBalance = bit10Queries[0].data!;
+    const userActiveLoans = bit10Queries[1].data;
+    const userActiveTokens = bit10Queries[2].data;
 
     const totalBit10Tokens = (bit10TOPTokenBalance ?? 0);
-
-    const formatTokenAmount = (value: number | null | undefined): string => {
-        if (value === null || value === undefined || isNaN(value)) return '0';
-        if (value === 0) return '0';
-        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
-        const [integerPart, decimalPart = ''] = strValue.split('.');
-        const formattedInteger = Number(integerPart).toLocaleString();
-
-        if (!decimalPart) return formattedInteger || '0';
-
-        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
-
-        if (firstNonZeroIndex === -1) return formattedInteger || '0';
-
-        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
-
-        return `${formattedInteger}.${trimmedDecimal}`;
-    };
 
     return (
         <div className='flex flex-col space-y-4'>
@@ -88,7 +89,7 @@ export default function ETHSepoliaOverview() {
                                         <BadgeDollarSign />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        {formatTokenAmount(totalBit10Tokens)} BIT10
+                                        {formatAmount(Number(totalBit10Tokens))} BIT10
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>
@@ -126,7 +127,7 @@ export default function ETHSepoliaOverview() {
                                         <HandCoins />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        0 Loans
+                                        {userActiveLoans} {Number(userActiveLoans) > 1 ? 'Loans' : 'Loan'}
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>
@@ -145,7 +146,7 @@ export default function ETHSepoliaOverview() {
                                         <Banknote />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        0 Tokens
+                                        {userActiveTokens} {Number(userActiveTokens) > 1 ? 'Tokens' : 'Token'}
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>

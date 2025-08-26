@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { formatAddress } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/lib/utils'
@@ -216,12 +217,6 @@ export default function VerifyTransaction() {
     const [fromTokenSearch, setFromTokenSearch] = useState('');
     const [toTokenDialogOpen, setToTokenDialogOpen] = useState(false);
     const [toTokenSearch, setToTokenSearch] = useState('');
-
-    const formatAddress = (id: string) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 9)}.....${id.slice(-9)}`;
-    };
 
     const filteredFromTokens = useMemo(() => {
         if (!fromTokenSearch && fromTokenChainFilter === 'all') return supportedToken

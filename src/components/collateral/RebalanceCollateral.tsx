@@ -63,23 +63,22 @@ interface RebalanceData {
     bit10Data: CoinData[];
 }
 
-// temp
+// ToDo: (temp. placeholder)
 const bit10Allocation: WalletDataType[] = [
-    { walletAddress: 'bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['Test BIT10.BRC20'] },
-    { walletAddress: '0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', explorerAddress: 'https://sepolia.etherscan.io/address/0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', bit10: ['Test BIT10.TOP'] },
-    { walletAddress: 'bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', explorerAddress: 'https://mempool.space/testnet/address/tb1qdlpdtgc5vjww3e4pxjayamgru0cyjts7mnrdpe', bit10: ['Test BIT10.BRC20'], tokenId: ['1'] },
-    { walletAddress: '0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', explorerAddress: 'https://sepolia.etherscan.io/address/0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', bit10: ['Test BIT10.TOP'], tokenId: ['2'] },
-    { walletAddress: 'r9tHXBk9VNDkM15muGHZDVB6Z7BGUVYGSP', explorerAddress: 'https://testnet.xrpl.org/accounts/r9tHXBk9VNDkM15muGHZDVB6Z7BGUVYGSP', bit10: ['Test BIT10.TOP'], tokenId: ['52'] },
-    { walletAddress: '0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', explorerAddress: 'https://testnet.bscscan.com/address/0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', bit10: ['Test BIT10.TOP'], tokenId: ['1839'] },
-    { walletAddress: 'EVcodbVbJT9hk4iu9GHy3mzCCPEYewgv4CMJtki9mLtB', explorerAddress: 'https://explorer.solana.com/address/EVcodbVbJT9hk4iu9GHy3mzCCPEYewgv4CMJtki9mLtB?cluster=devnet', bit10: ['Test BIT10.TOP'], tokenId: ['5426'] },
-    { walletAddress: '0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', explorerAddress: 'https://explorer-testnet.dogechain.dog/address/0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', bit10: ['Test BIT10.TOP', 'Test BIT10.MEME'], tokenId: ['74'] },
-    { walletAddress: '01884c76b749fb4980cf8556a414b74c994484a4253154bc2c310bb7e9d3c70add7c317b46d7226cad99dc86cfcff3f6443f2a840688652158', explorerAddress: 'https://preview.cardanoscan.io/address/01884c76b749fb4980cf8556a414b74c994484a4253154bc2c310bb7e9d3c70add7c317b46d7226cad99dc86cfcff3f6443f2a840688652158', bit10: ['Test BIT10.TOP'], tokenId: ['2010'] },
-    { walletAddress: 'TMKh1gEjFu29grCJRFuDVaPKTWSDkTu1JZ', explorerAddress: 'https://nile.tronscan.org/#/address/TMKh1gEjFu29grCJRFuDVaPKTWSDkTu1JZ', bit10: ['Test BIT10.TOP'], tokenId: ['1958'] },
-    { walletAddress: '0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', explorerAddress: 'https://sepolia.etherscan.io/address/0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', bit10: ['Test BIT10.TOP'], tokenId: ['1975'] },
+    { walletAddress: 'bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'] },
+
+    { walletAddress: '0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', bit10: ['BIT10.TOP'], tokenId: ['1027', '1975'] },
+    { walletAddress: 'bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', explorerAddress: 'https://mempool.space/address/bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', bit10: ['BIT10.TOP'], tokenId: ['1'] },
+    { walletAddress: '0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', explorerAddress: 'https://bscscan.com/address/0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', bit10: ['BIT10.TOP'], tokenId: ['52', '1839', '74', '2010', '1831'] },
+    { walletAddress: 'KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', explorerAddress: 'https://explorer.solana.com/address/KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', bit10: ['BIT10.TOP'], tokenId: ['5426'] },
+    { walletAddress: 'TXHicWyMh8pBryemgawayVztrxVx75dtzb', explorerAddress: 'https://tronscan.org/#/address/TXHicWyMh8pBryemgawayVztrxVx75dtzb', bit10: ['BIT10.TOP'], tokenId: ['1958'] },
+    { walletAddress: '0x545a402305d54bf34b588c169b51c24f8d1b4c01', explorerAddress: 'https://app.hyperliquid.xyz/explorer/address/0x545a402305d54bf34b588c169b51c24f8d1b4c01', bit10: ['BIT10.TOP'], tokenId: ['32196'] },
+    { walletAddress: '0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', explorerAddress: 'https://suiscan.xyz/mainnet/account/0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', bit10: ['BIT10.TOP'], tokenId: ['20947'] },
+    { walletAddress: 'GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', explorerAddress: 'https://stellar.expert/explorer/public/account/GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', bit10: ['BIT10.TOP'], tokenId: ['512'] },
+
     { walletAddress: 'EVcodbVbJT9hk4iu9GHy3mzCCPEYewgv4CMJtki9mLtB', explorerAddress: 'https://explorer.solana.com/address/EVcodbVbJT9hk4iu9GHy3mzCCPEYewgv4CMJtki9mLtB?cluster=devnet', bit10: ['Test BIT10.MEME'] },
-
-
     { walletAddress: '0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', explorerAddress: 'https://sepolia.etherscan.io/address/0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', bit10: ['Test BIT10.MEME'], tokenId: ['5994', '24478', '23095', '10804', '28081'] },
+
 ];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];

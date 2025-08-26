@@ -97,7 +97,7 @@ export default function BalanceAndAlloactions() {
     const bit10TOPTokenBalance = bit10Queries[2].data as bigint | undefined;
     const bit10MEMETokenBalance = bit10Queries[3].data as bigint | undefined;
 
-    const totalBit10Tokens = (bit10TOPTokenBalance ?? 0n) + (bit10MEMETokenBalance ?? 0n);
+    const totalBit10Tokens = BigInt(bit10TOPTokenBalance ?? 0n) + BigInt(bit10MEMETokenBalance ?? 0n);
 
     const selectedBit10Token = () => {
         if (selectedAllocationToken === 'Test BIT10.TOP') {

@@ -4,6 +4,8 @@ import { Actor, HttpAgent } from '@dfinity/agent'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10.did'
 import { toast } from 'sonner'
+import { formatAmount } from '@/lib/utils'
+import { userActiveLoansCount, userActiveTokensCount } from '@/actions/dbActions'
 import { useQueries } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -48,7 +50,25 @@ export default function ICPOverview() {
                 return 0n;
             }
         }
-    }
+    };
+
+    const fetchUserActiveLoansCount = async (address: string) => {
+        const response = await userActiveLoansCount({ source_chain: 'ICP', address: address });
+        if (response === 'Error fetching user borrow activity') {
+            toast.error('An error occurred while fetching user borrow activity. Please try again!');
+        } else {
+            return response;
+        }
+    };
+
+    const fetchUserActiveTokensCount = async (address: string) => {
+        const response = await userActiveTokensCount({ source_chain: 'ICP', address: address });
+        if (response === 'Error fetching user borrow activity') {
+            toast.error('An error occurred while fetching user borrow activity. Please try again!');
+        } else {
+            return response;
+        }
+    };
 
     const bit10Queries = useQueries({
         queries: [
@@ -59,6 +79,14 @@ export default function ICPOverview() {
             {
                 queryKey: ['bit10MEMEBalance'],
                 queryFn: () => fetchBit10Balance('yeoei-eiaaa-aaaap-qpvzq-cai')
+            },
+            {
+                queryKey: ['userActiveLoansCount'],
+                queryFn: () => ICPAddress ? fetchUserActiveLoansCount(ICPAddress) : fetchUserActiveLoansCount('')
+            },
+            {
+                queryKey: ['userActiveTokensCount'],
+                queryFn: () => ICPAddress ? fetchUserActiveTokensCount(ICPAddress) : fetchUserActiveTokensCount('')
             }
         ],
     });
@@ -66,26 +94,10 @@ export default function ICPOverview() {
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10TOPTokenBalance = bit10Queries[0].data as bigint | undefined;
     const bit10MEMETokenBalance = bit10Queries[1].data as bigint | undefined;
+    const userActiveLoans = bit10Queries[2].data;
+    const userActiveTokens = bit10Queries[3].data;
 
-    const totalBit10Tokens = Number((bit10TOPTokenBalance ?? 0n) + (bit10MEMETokenBalance ?? 0n)) / 100000000;
-
-    const formatTokenAmount = (value: number | null | undefined): string => {
-        if (value === null || value === undefined || isNaN(value)) return '0';
-        if (value === 0) return '0';
-        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
-        const [integerPart, decimalPart = ''] = strValue.split('.');
-        const formattedInteger = Number(integerPart).toLocaleString();
-
-        if (!decimalPart) return formattedInteger || '0';
-
-        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
-
-        if (firstNonZeroIndex === -1) return formattedInteger || '0';
-
-        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
-
-        return `${formattedInteger}.${trimmedDecimal}`;
-    };
+    const totalBit10Tokens = Number((BigInt(bit10TOPTokenBalance ?? 0n) + BigInt(bit10MEMETokenBalance ?? 0n))) / 100000000;
 
     return (
         <div className='flex flex-col space-y-4'>
@@ -122,7 +134,7 @@ export default function ICPOverview() {
                                         <BadgeDollarSign />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        {formatTokenAmount(totalBit10Tokens)} BIT10
+                                        {formatAmount(totalBit10Tokens)} BIT10
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>
@@ -160,7 +172,7 @@ export default function ICPOverview() {
                                         <HandCoins />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        0 Loans
+                                        {userActiveLoans} {Number(userActiveLoans) > 1 ? 'Loans' : 'Loan'}
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>
@@ -179,7 +191,7 @@ export default function ICPOverview() {
                                         <Banknote />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        0 Tokens
+                                        {userActiveTokens} {Number(userActiveTokens) > 1 ? 'Tokens' : 'Token'}
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>

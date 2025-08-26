@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useChain } from '@/context/ChainContext'
 import { useAccount, useWalletClient, usePublicClient } from 'wagmi'
 import { toast } from 'sonner'
+import { formatAddress, formatAmount } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/lib/utils'
@@ -267,30 +268,6 @@ export default function Swap() {
     const { address } = useAccount();
     const { data: walletClient } = useWalletClient();
     const publicClient = usePublicClient();
-
-    const formatTokenAmount = (value: number | null | undefined): string => {
-        if (value === null || value === undefined || isNaN(value)) return '0';
-        if (value === 0) return '0';
-        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
-        const [integerPart, decimalPart = ''] = strValue.split('.');
-        const formattedInteger = Number(integerPart).toLocaleString();
-
-        if (!decimalPart) return formattedInteger || '0';
-
-        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
-
-        if (firstNonZeroIndex === -1) return formattedInteger || '0';
-
-        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
-
-        return `${formattedInteger}.${trimmedDecimal}`;
-    };
-
-    const formatAddress = (id: string) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 9)}.....${id.slice(-9)}`;
-    };
 
     const filteredFromTokens = useMemo(() => {
         if (!fromTokenSearch && fromTokenChainFilter === 'all') return supportedToken
@@ -686,13 +663,9 @@ export default function Swap() {
             const toToken = selectedToToken;
 
             if (chain === 'eth_sepolia') {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unused-vars
                 await createSepoliaTransaction(matchingPool, fromToken, toToken, values, address, walletClient);
-                // toast.success('Swap successful!');
             } else if (chain === 'bsc_testnet') {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 await createBscTestnetTransaction(matchingPool, fromToken, toToken, values, address);
-                // toast.success('Swap successful!');
             } else {
                 toast.error('Unsupported chain');
             }
@@ -837,7 +810,7 @@ export default function Swap() {
                                         <div>From</div>
                                         <div className='flex flex-row space-x-1 items-center'>
                                             <Wallet size={16} />
-                                            <p>{formatTokenAmount(Number(fetchTokenBalance))}</p>
+                                            <p>{formatAmount(Number(fetchTokenBalance))}</p>
                                         </div>
                                     </div>
                                     <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
@@ -891,7 +864,7 @@ export default function Swap() {
                                                                 <Dialog open={fromTokenDialogOpen} onOpenChange={handleFromTokenDialogOpen}>
                                                                     <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
                                                                         <DialogHeader>
-                                                                            <DialogTitle>Select From Token</DialogTitle>
+                                                                            <DialogTitle>Select Token</DialogTitle>
                                                                         </DialogHeader>
                                                                         <motion.div initial='hidden' animate='show' exit='hidden' variants={listContainerVariants} className='flex flex-wrap gap-2'>
                                                                             {supportedChains.map((chain) => (
@@ -979,18 +952,18 @@ export default function Swap() {
                                             <Tooltip delayDuration={300}>
                                                 <TooltipTrigger asChild>
                                                     <div className='flex flex-row space-x-1'>
-                                                        $ {selectedFromTokenPrice ? formatTokenAmount((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) * 1.01) : '0'}
+                                                        $ {selectedFromTokenPrice ? formatAmount((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) * 1.01) : '0'}
                                                         <Info className='w-5 h-5 cursor-pointer ml-1' />
                                                     </div>
                                                 </TooltipTrigger>
                                                 <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                                     Price in {selectedFromToken?.label} + 1% Liquidity Provider fee <br />
-                                                    $ {formatTokenAmount(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))} + $ {formatTokenAmount(0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)))} = $ {formatTokenAmount((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) + (0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))))}
+                                                    $ {formatAmount(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))} + $ {formatAmount(0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)))} = $ {formatAmount((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) + (0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))))}
                                                 </TooltipContent>
                                             </Tooltip>
                                         </TooltipProvider>
                                         <div>
-                                            1 {selectedFromToken?.label} = $ {formatTokenAmount(Number(selectedFromTokenPrice))}
+                                            1 {selectedFromToken?.label} = $ {formatAmount(Number(selectedFromTokenPrice))}
                                         </div>
                                     </div>
                                 </div>
@@ -1054,7 +1027,7 @@ export default function Swap() {
                                                                 <Dialog open={toTokenDialogOpen} onOpenChange={handleToTokenDialogOpen}>
                                                                     <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
                                                                         <DialogHeader>
-                                                                            <DialogTitle>Select To Token</DialogTitle>
+                                                                            <DialogTitle>Select Token</DialogTitle>
                                                                         </DialogHeader>
 
                                                                         <motion.div initial='hidden' animate='show' exit='hidden' variants={listContainerVariants} className='flex flex-wrap gap-2'>
@@ -1146,9 +1119,9 @@ export default function Swap() {
                                     </div>
 
                                     <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                                        <div>$ {formatTokenAmount(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))}</div>
+                                        <div>$ {formatAmount(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))}</div>
                                         <div>
-                                            1 {selectedToToken?.label} = $ {formatTokenAmount(Number(selectedToTokenPrice))}
+                                            1 {selectedToToken?.label} = $ {formatAmount(Number(selectedToTokenPrice))}
                                         </div>
                                     </div>
                                 </div>
@@ -1199,7 +1172,7 @@ export default function Swap() {
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Minimum receive</div>
-                                            <div>{formatTokenAmount((form.watch('to_amount') || 0) * (1 - Number(form.watch('slippage') || 0) / 100))} {selectedToToken?.label}</div>
+                                            <div>{formatAmount((form.watch('to_amount') || 0) * (1 - Number(form.watch('slippage') || 0) / 100))} {selectedToToken?.label}</div>
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Liquidity Provider fee</div>
@@ -1221,7 +1194,7 @@ export default function Swap() {
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Exchange Rate</div>
-                                            <div>1 {selectedFromToken?.label} = {Number(selectedToTokenPrice) > 0 ? formatTokenAmount(Number(selectedFromTokenPrice) / Number(selectedToTokenPrice)) : '0'} {selectedToToken?.label}</div>
+                                            <div>1 {selectedFromToken?.label} = {Number(selectedToTokenPrice) > 0 ? formatAmount(Number(selectedFromTokenPrice) / Number(selectedToTokenPrice)) : '0'} {selectedToToken?.label}</div>
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Expected Time</div>
@@ -1229,7 +1202,7 @@ export default function Swap() {
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
                                             <div>Expected Output</div>
-                                            <div>{formatTokenAmount(Number(form.watch('to_amount')))} {selectedToToken?.label}</div>
+                                            <div>{formatAmount(Number(form.watch('to_amount')))} {selectedToToken?.label}</div>
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>

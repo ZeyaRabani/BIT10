@@ -595,7 +595,7 @@ export default function WalletBtn() {
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
                         <Button disabled={isConnecting} className='w-full'>
-                            {isConnecting && <Loader2 className='animate-spin mr-2' size={15} />}
+                            {isConnecting && <Loader2 className='animate-spin' size={15} />}
                             {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                         </Button>
                     </DialogTrigger>

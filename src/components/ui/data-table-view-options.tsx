@@ -25,6 +25,14 @@ const formatColumnName = (columnName: string): string => {
         return 'Staking Duration';
     } else if (columnName === 'liquidationId') {
         return 'Liquidation ID';
+    } else if (columnName === 'tokenAmount') {
+        return 'Amount Lend';
+    } else if (columnName === 'interestRate') {
+        return 'APY';
+    } else if (columnName === 'tokenBorrowed') {
+        return 'Amount Borrowed';
+    } else if (columnName === 'tokenCollateral') {
+        return 'Collateral Token';
     }
 
     return columnName

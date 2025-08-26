@@ -421,6 +421,61 @@ export const bit10TopRebalance = pgTable('bit10_top_rebalance', {
 		}
 	});
 
+export const teBorrow = pgTable('te_borrow', {
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity({ name: 'te_borrow_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
+	borrowerAddress: text('borrower_address').notNull(),
+	borrowTokenChain: text('borrow_token_chain').notNull(),
+	borrowTokenAddress: text('borrow_token_address').notNull(),
+	borrowTokenAmount: text('borrow_token_amount').notNull(),
+	borrowTrxHash: text('borrow_trx_hash').notNull(),
+	collateralAddress: text('collateral_address').notNull(),
+	collateralAmount: text('collateral_amount').notNull(),
+	collateralTrxHash: text('collateral_trx_hash').notNull(),
+	interestRate: text('interest_rate').notNull(),
+	status: text('status').notNull(),
+	repaymentAmount: text('repayment_amount'),
+	repaymentTrxHash: text('repayment_trx_hash'),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	repaymentTimestamp: bigint('repayment_timestamp', { mode: 'number' }),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	openedAt: bigint('opened_at', { mode: 'number' }).notNull(),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	closedAt: bigint('closed_at', { mode: 'number' }),
+	collateralChain: text('collateral_chain').notNull(),
+	borrowWalletAddress: text('borrow_wallet_address').notNull(),
+},
+	(table) => {
+		return {
+			idxTeBorrowBorrowerAddress: index('idx_te_borrow_borrower_address').using('btree', table.borrowerAddress.asc().nullsLast()),
+		}
+	});
+
+export const teLend = pgTable('te_lend', {
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity({ name: 'te_lend_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
+	lenderAddress: text('lender_address').notNull(),
+	tokenChain: text('token_chain').notNull(),
+	tokenAddress: text('token_address').notNull(),
+	tokenAmount: text('token_amount').notNull(),
+	tokenSentTrxHash: text('token_sent_trx_hash').notNull(),
+	interestRate: text('interest_rate').notNull(),
+	status: text('status').notNull(),
+	returnAmount: text('return_amount'),
+	returnTrxHash: text('return_trx_hash'),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	returnTimestamp: bigint('return_timestamp', { mode: 'number' }),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	openedAt: bigint('opened_at', { mode: 'number' }).notNull(),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	closedAt: bigint('closed_at', { mode: 'number' }),
+},
+	(table) => {
+		return {
+			idxTeLendLenderAddress: index('idx_te_lend_lender_address').using('btree', table.lenderAddress.asc().nullsLast()),
+		}
+	});
+
 export const teDexSwap = pgTable('te_dex_swap', {
 	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
 	id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity({ name: 'dex_swap_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
