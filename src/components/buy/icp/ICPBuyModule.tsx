@@ -214,9 +214,9 @@ export default function ICPSwapModule() {
     const bit10TokenPrice = (): number => {
         const bit10Token = form.watch('receive_token');
         if (bit10Token === 'Test BIT10.TOP') {
-            return bit10TOPPrice ?? 0;
+            return Number(bit10TOPPrice) || 0;
         } else if (bit10Token === 'Test BIT10.MEME') {
-            return bit10MEMEPrice ?? 0;
+            return Number(bit10MEMEPrice) || 0;
         }
         else {
             return 0;

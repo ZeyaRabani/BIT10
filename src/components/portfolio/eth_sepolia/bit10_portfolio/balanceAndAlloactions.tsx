@@ -58,8 +58,8 @@ export default function BalanceAndAlloactions() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10TOPTokens = bit10Queries[0].data as { id: number, name: string, symbol: string, market_cap: number, price: number }[] | undefined;
-    const bit10MEMETokens = bit10Queries[1].data as { id: number, name: string, symbol: string, market_cap: number, tokenAddress: string, chain: string; price: number }[] | undefined;
+    const bit10TOPTokens = bit10Queries[0].data as { id: number, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
+    const bit10MEMETokens = bit10Queries[1].data as { id: number, name: string, symbol: string, marketCap: number, tokenAddress: string, chain: string; price: number }[] | undefined;
     const bit10TOPTokenBalance = bit10Queries[2].data!;
 
     const totalBit10Tokens = (bit10TOPTokenBalance ?? 0);
@@ -75,7 +75,7 @@ export default function BalanceAndAlloactions() {
     };
 
     const rawTokens = selectedBit10Token();
-    const tokens = (Array.isArray(rawTokens) ? rawTokens : []) as { symbol: string; market_cap: number }[];
+    const tokens = (Array.isArray(rawTokens) ? rawTokens : []) as { symbol: string; marketCap: number }[];
 
     useEffect(() => {
         const handleResize = () => {
@@ -144,11 +144,11 @@ export default function BalanceAndAlloactions() {
         )
     };
 
-    const totalMarketCap = tokens.reduce((sum, token) => sum + token.market_cap, 0);
+    const totalMarketCap = tokens.reduce((sum, token) => sum + token.marketCap, 0);
 
     const bit10AllocationPieChartData = tokens.map((token, index) => ({
         name: token.symbol,
-        value: parseFloat(((token.market_cap / totalMarketCap) * 100).toFixed(4)),
+        value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(4)),
         fill: color[index % color.length],
     }));
 
@@ -335,7 +335,7 @@ export default function BalanceAndAlloactions() {
                             <div className='flex w-full flex-col space-y-3'>
                                 <h1 className='text-2xl'>{selectedAllocationToken} Allocations</h1>
                                 <div className='flex flex-col'>
-                                    {tokens?.sort((a, b) => b.market_cap - a.market_cap).map((token, index) => (
+                                    {tokens?.sort((a, b) => b.marketCap - a.marketCap).map((token, index) => (
                                         <div
                                             key={index}
                                             className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'
@@ -347,7 +347,7 @@ export default function BalanceAndAlloactions() {
                                                 ></div>
                                                 <div>{token.symbol}</div>
                                             </div>
-                                            <div>{formatAmount((token.market_cap / totalMarketCap) * 100)} %</div>
+                                            <div>{formatAmount((token.marketCap / totalMarketCap) * 100)} %</div>
                                         </div>
                                     ))}
                                 </div>

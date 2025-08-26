@@ -209,7 +209,7 @@ export default function PrivySwapModule() {
     const bit10TokenPrice = (): number => {
         const bit10Token = form.watch('receive_token');
         if (bit10Token === 'Test BIT10.DEFI') {
-            return bit10DEFIPrice ?? 0;
+            return Number(bit10DEFIPrice) || 0;
         }
         else {
             return 0;

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
+import { formatAmount } from '@/lib/utils'
 
 // ToDo: Remove Test BIT10.DEFI
 const bit10Tokens = ['Test BIT10.DEFI', 'Test BIT10.TOP', 'Test BIT10.MEME'];
@@ -85,16 +86,21 @@ export default function BalanceAndAlloactions() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10DEFITokens = bit10Queries[0].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const bit10TOPTokens = bit10Queries[1].data as { id: number, name: string, symbol: string, price: number }[] | undefined;
-    const bit10MEMETokens = bit10Queries[2].data as { id: number, name: string, symbol: string, tokenAddress: string, chain: string; price: number }[] | undefined;
+    // ToDo: Remove Test BIT10.DEFI
+    const bit10DEFITokens = bit10Queries[0].data as { id: number, name: string, symbol: string, marketCap?: number, price: number }[] | undefined;
+    const tokensWithFallback = bit10DEFITokens?.map(token => ({
+        ...token,
+        marketCap: token.marketCap ?? 10
+    })) ?? [];
+    const bit10TOPTokens = bit10Queries[1].data as { id: number, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
+    const bit10MEMETokens = bit10Queries[2].data as { id: number, name: string, symbol: string, marketCap: number, tokenAddress: string, chain: string; price: number }[] | undefined;
     const bit10DEFITokenBalance = bit10Queries[3].data as number | undefined;
 
     const totalBit10Tokens = (bit10DEFITokenBalance ?? 0);
 
     const selectedBit10Token = () => {
         if (selectedAllocationToken === 'Test BIT10.DEFI') {
-            return bit10DEFITokens;
+            return tokensWithFallback;
         } else if (selectedAllocationToken === 'Test BIT10.TOP') {
             return bit10TOPTokens;
         } else if (selectedAllocationToken === 'Test BIT10.MEME') {
@@ -104,7 +110,8 @@ export default function BalanceAndAlloactions() {
         }
     };
 
-    const tokens = selectedBit10Token();
+    const rawTokens = selectedBit10Token();
+    const tokens = (Array.isArray(rawTokens) ? rawTokens : []) as { symbol: string; marketCap: number }[];
 
     useEffect(() => {
         const handleResize = () => {
@@ -173,9 +180,11 @@ export default function BalanceAndAlloactions() {
         )
     };
 
-    const bit10AllocationPieChartData = tokens?.map((token, index) => ({
+    const totalMarketCap = tokens.reduce((sum, token) => sum + token.marketCap, 0);
+
+    const bit10AllocationPieChartData = tokens.map((token, index) => ({
         name: token.symbol,
-        value: 100 / tokens.length,
+        value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(4)),
         fill: color[index % color.length],
     }));
 
@@ -367,13 +376,19 @@ export default function BalanceAndAlloactions() {
                             <div className='flex w-full flex-col space-y-3'>
                                 <h1 className='text-2xl'>{selectedAllocationToken} Allocations</h1>
                                 <div className='flex flex-col'>
-                                    {tokens?.map((token, index) => (
-                                        <div key={index} className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'>
+                                    {tokens?.sort((a, b) => b.marketCap - a.marketCap).map((token, index) => (
+                                        <div
+                                            key={index}
+                                            className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'
+                                        >
                                             <div className='flex flex-row items-center space-x-1'>
-                                                <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }}></div>
+                                                <div
+                                                    className='w-3 h-3 rounded'
+                                                    style={{ backgroundColor: color[index % color.length] }}
+                                                ></div>
                                                 <div>{token.symbol}</div>
                                             </div>
-                                            <div>{(100 / tokens.length).toFixed(3)} %</div>
+                                            <div>{formatAmount((token.marketCap / totalMarketCap) * 100)} %</div>
                                         </div>
                                     ))}
                                 </div>

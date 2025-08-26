@@ -177,7 +177,7 @@ export default function ICPOverview() {
                                 </Card>
                             </TooltipTrigger>
                             <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center text-wrap'>
-                                Loans you$apos;ve given and are currently earning interest on.
+                                Loans you&apos;ve given and are currently earning interest on.
                             </TooltipContent>
                         </Tooltip>
 

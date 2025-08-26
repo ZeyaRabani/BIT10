@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
-import { formatAmount } from '@/lib/utils'
+import { formatAmount, getTokenName } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
@@ -98,35 +98,6 @@ export function DataTable<TData, TValue>({
         const period = hour < 12 ? 'AM' : 'PM';
 
         return `${formattedDay} ${month} ${year} at ${formattedHour}:${minute} ${period}`;
-    };
-
-    const getTokenName = (tokenAddress: string): string => {
-        if (!tokenAddress) {
-            return 'Unknown Token';
-        }
-
-        const normalizedAddress = tokenAddress.toLowerCase();
-
-        switch (normalizedAddress) {
-            case 'eegan-kqaaa-aaaap-qhmgq-cai'.toLocaleLowerCase():
-                return 'ckUSDC (on ICP)';
-            case 'wbckh-zqaaa-aaaap-qpuza-cai'.toLocaleLowerCase():
-                return 'Test BIT10.TOP (on ICP)';
-            case '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238'.toLocaleLowerCase():
-                return 'USDC (on Ethereum)';
-            case '0x0000000000000000000000000000000000000000e'.toLocaleLowerCase():
-                return 'ETH (on Ethereum)';
-            case '0x0000000000000000000000000000000000000000'.toLocaleLowerCase():
-                return 'ETH (on Ethereum)';
-            case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
-                return 'tBNB (on Binance Smart Chain)';
-            case '0x64544969ed7ebf5f083679233325356ebe738930'.toLocaleLowerCase():
-                return 'USDC (on Binance Smart Chain)';
-            case '0x6Ce8da28e2f864420840cf74474eff5fd80e65b8'.toLocaleLowerCase():
-                return 'BTCB (on Binance Smart Chain)';
-            default:
-                return tokenAddress;
-        }
     };
 
     const renderCellContent = (cell: CellContext<PortfolioTableDataType, unknown>, row: { original: PortfolioTableDataType }) => {

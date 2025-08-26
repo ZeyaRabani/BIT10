@@ -33,7 +33,7 @@ interface TokenPriceResponse {
 const supportedToken = [
     // ICP tokens (ICRC)
     {
-        label: 'BIT10.TOP',
+        label: 'Test BIT10.TOP',
         value: 'Test BIT10.TOP',
         img: BIT10Img as StaticImageData,
         address: 'wbckh-zqaaa-aaaap-qpuza-cai',

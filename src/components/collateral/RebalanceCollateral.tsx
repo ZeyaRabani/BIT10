@@ -38,7 +38,7 @@ type CoinSetData = {
     name: string;
     symbol: string;
     tokenAddress?: string;
-    market_cap: number;
+    marketCap: number;
     chain?: string;
     noOfTokens: number;
     price: number;
@@ -137,20 +137,20 @@ export default function RebalanceCollateral() {
         timestmpz: string,
         indexValue: number,
         priceOfTokenToBuy: number,
-        newTokens: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        added: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        removed: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        retained: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
+        newTokens: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        added: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        removed: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        retained: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
     };
     const bit10MEMEPrice = bit10Queries[2].data;
     const bit10MEMETokens = bit10Queries[3].data as {
         timestmpz: string,
         indexValue: number,
         priceOfTokenToBuy: number,
-        newTokens: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        added: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        removed: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        retained: { id: number, name: string, symbol: string, market_cap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
+        newTokens: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        added: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        removed: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        retained: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
     };
 
     useEffect(() => {
@@ -223,11 +223,11 @@ export default function RebalanceCollateral() {
     const generatePieChartData = (tokens: CoinSetData[]) => {
         if (!tokens || tokens.length === 0) return [];
 
-        const totalMarketCap = tokens.reduce((sum, token) => sum + token.market_cap, 0);
+        const totalMarketCap = tokens.reduce((sum, token) => sum + token.marketCap, 0);
 
         return tokens.map((token, index) => ({
             name: token.symbol,
-            value: parseFloat(((token.market_cap / totalMarketCap) * 100).toFixed(4)),
+            value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(4)),
             fill: color[index % color.length],
         }));
     };
