@@ -1,8 +1,11 @@
 import React from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, usePublicClient } from 'wagmi'
+import { formatUnits } from 'viem'
 import { useQueries } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { formatAmount } from '@/lib/utils'
+import { toast } from 'sonner'
+import { ERC20_ABI } from '@/lib/erc20Abi'
 import Link from 'next/link'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -11,6 +14,7 @@ import { BadgeDollarSign, Waves, HandCoins, Banknote } from 'lucide-react'
 
 export default function ETHSepoliaOverview() {
     const { address } = useAccount();
+    const publicClient = usePublicClient();
 
     const formatAddress = (id: string | undefined) => {
         if (!id) return '';
@@ -18,8 +22,40 @@ export default function ETHSepoliaOverview() {
         return `${id.slice(0, 4)}...${id.slice(-3)}`;
     };
 
-    const fetchBit10Balance = async () => {
-        return 0;
+    const fetchBIT10Balance = async (tokenAddress: string) => {
+        try {
+            if (!address || !publicClient) {
+                return '0';
+            }
+
+            if (tokenAddress === '0x0000000000000000000000000000000000000000e') {
+                const balance = await publicClient.getBalance({
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+                    address: address as `0x${string}`,
+                });
+                return formatUnits(balance, 18);
+            } else {
+                const decimals = await publicClient.readContract({
+                    address: tokenAddress as `0x${string}`,
+                    abi: ERC20_ABI,
+                    functionName: 'decimals',
+                });
+
+                const balance = await publicClient.readContract({
+                    address: tokenAddress as `0x${string}`,
+                    abi: ERC20_ABI,
+                    functionName: 'balanceOf',
+                    args: [address],
+                });
+
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+                return formatUnits(balance as bigint, decimals as number);
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            toast.error('Error fetching Sepolia balance');
+            return '0';
+        }
     };
 
     const fetchUserActiveLoansCount = async () => {
@@ -34,7 +70,7 @@ export default function ETHSepoliaOverview() {
         queries: [
             {
                 queryKey: ['bit10TOPBalance'],
-                queryFn: () => fetchBit10Balance()
+                queryFn: () => fetchBIT10Balance('0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D')
             },
             {
                 queryKey: ['userActiveLoansCount'],
@@ -52,7 +88,7 @@ export default function ETHSepoliaOverview() {
     const userActiveLoans = bit10Queries[1].data;
     const userActiveTokens = bit10Queries[2].data;
 
-    const totalBit10Tokens = (bit10TOPTokenBalance ?? 0);
+    const totalBIT10Tokens = bit10TOPTokenBalance ?? 0;
 
     return (
         <div className='flex flex-col space-y-4'>
@@ -89,7 +125,7 @@ export default function ETHSepoliaOverview() {
                                         <BadgeDollarSign />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        {formatAmount(Number(totalBit10Tokens))} BIT10
+                                        {formatAmount(Number(totalBIT10Tokens))} BIT10
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>

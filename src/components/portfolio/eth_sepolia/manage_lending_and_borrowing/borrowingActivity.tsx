@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-borrow-portfolio'
 import type { PortfolioTableDataType } from '@/components/ui/data-table-borrow-portfolio'
+import { formatAmount, getTokenName } from '@/lib/utils'
 
 const recentBorrowingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
@@ -17,6 +18,14 @@ const recentBorrowingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] =
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Amount Borrowed' />
         ),
+        filterFn: (row, columnId, value) => {
+            const formattedAmount = row.original.borrowTokenChain.toLowerCase() === 'icp'
+                ? formatAmount(Number(row.original.borrowTokenAmount) / 100000000)
+                : formatAmount(Number(row.original.borrowTokenAmount));
+            const tokenName = getTokenName(row.original.borrowTokenAddress);
+            const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
+            return searchableText.includes((value as string).toLowerCase());
+        },
     },
     {
         accessorKey: 'tokenCollateral',

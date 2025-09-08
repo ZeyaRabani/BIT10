@@ -1,9 +1,12 @@
 import React from 'react'
+import { useAccount } from 'wagmi'
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 import { Button } from '@/components/ui/button'
 import { ExternalLink } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
+import { userRecentBIT10BuyActivity } from '@/actions/dbActions'
+import { toast } from 'sonner'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
@@ -63,22 +66,31 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 ]
 
 export default function RecentActivity() {
+    const { address } = useAccount();
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const fetchRecentActivity = async (address: string) => {
-        return [];
+        const response = await userRecentBIT10BuyActivity({ paymentAddress: address.toLowerCase() });
+        if (response === 'Error fetching user recent activity') {
+            toast.error('An error occurred while fetching user recent activity. Please try again!');
+        } else {
+            return response as PortfolioTableDataType[];
+        }
     };
 
     const recentActivityQuery = useQueries({
         queries: [
             {
                 queryKey: ['bit10RecentActivity'],
-                queryFn: () => fetchRecentActivity('')
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                queryFn: () => fetchRecentActivity(address)
             },
         ]
     })
 
     const isLoading = recentActivityQuery.some(query => query.isLoading);
-    const recentActivityData = recentActivityQuery[0].data as PortfolioTableDataType[] | undefined;
+    const recentActivityData = recentActivityQuery[0].data;
 
     return (
         <div>

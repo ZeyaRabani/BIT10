@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { useAccount, usePublicClient } from 'wagmi'
+import { formatUnits } from 'viem'
+import { ERC20_ABI } from '@/lib/erc20Abi'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -17,9 +20,44 @@ export default function BalanceAndAlloactions() {
     const [selectedAllocationToken, setSelectedAllocationToken] = useState('Test BIT10.TOP');
     const [innerRadius, setInnerRadius] = useState<number>(80);
 
-    const fetchBit10Balance = async () => {
-        return 0;
-    }
+    const { address } = useAccount();
+    const publicClient = usePublicClient();
+
+    const fetchBIT10Balance = async (tokenAddress: string) => {
+        try {
+            if (!address || !publicClient) {
+                return '0';
+            }
+
+            if (tokenAddress === '0x0000000000000000000000000000000000000000e') {
+                const balance = await publicClient.getBalance({
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+                    address: address as `0x${string}`,
+                });
+                return formatUnits(balance, 18);
+            } else {
+                const decimals = await publicClient.readContract({
+                    address: tokenAddress as `0x${string}`,
+                    abi: ERC20_ABI,
+                    functionName: 'decimals',
+                });
+
+                const balance = await publicClient.readContract({
+                    address: tokenAddress as `0x${string}`,
+                    abi: ERC20_ABI,
+                    functionName: 'balanceOf',
+                    args: [address],
+                });
+
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+                return formatUnits(balance as bigint, decimals as number);
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            toast.error('Error fetching Sepolia balance');
+            return '0';
+        }
+    };
 
     const fetchBit10Tokens = async (tokenPriceAPI: string) => {
         const response = await fetch(tokenPriceAPI);
@@ -52,7 +90,7 @@ export default function BalanceAndAlloactions() {
             },
             {
                 queryKey: ['bit10TOPBalance'],
-                queryFn: () => fetchBit10Balance()
+                queryFn: () => fetchBIT10Balance('0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D')
             },
         ],
     });
@@ -62,7 +100,7 @@ export default function BalanceAndAlloactions() {
     const bit10MEMETokens = bit10Queries[1].data as { id: number, name: string, symbol: string, marketCap: number, tokenAddress: string, chain: string; price: number }[] | undefined;
     const bit10TOPTokenBalance = bit10Queries[2].data!;
 
-    const totalBit10Tokens = (bit10TOPTokenBalance ?? 0);
+    const totalBIT10Tokens = bit10TOPTokenBalance ?? 0;
 
     const selectedBit10Token = () => {
         if (selectedAllocationToken === 'Test BIT10.TOP') {
@@ -122,7 +160,7 @@ export default function BalanceAndAlloactions() {
     };
 
     const bit10BalancePieChartData =
-        Number(formatBit10(Number(totalBit10Tokens))) == 0
+        Number(formatBit10(Number(totalBIT10Tokens))) == 0
             ?
             [{ name: 'No Data', value: 1, fill: '#ebebe0' }]
             :
@@ -188,7 +226,7 @@ export default function BalanceAndAlloactions() {
                                     className='aspect-square max-h-[300px]'
                                 >
                                     <PieChart>
-                                        {Number(formatBit10(Number(totalBit10Tokens))) > 0 && (
+                                        {Number(formatBit10(Number(totalBIT10Tokens))) > 0 && (
                                             <ChartTooltip
                                                 cursor={false}
                                                 content={<ChartTooltipContent hideLabel />}
@@ -216,7 +254,7 @@ export default function BalanceAndAlloactions() {
                                                                     y={viewBox.cy}
                                                                     className='fill-foreground text-3xl font-bold'
                                                                 >
-                                                                    {formatBit10(Number(totalBit10Tokens))}
+                                                                    {formatBit10(Number(totalBIT10Tokens))}
                                                                 </tspan>
                                                                 <tspan
                                                                     x={viewBox.cx}
@@ -236,7 +274,7 @@ export default function BalanceAndAlloactions() {
                             </div>
                             <div className='flex w-full flex-col space-y-3'>
                                 <div className='flex flex-row items-center justify-start space-x-2'>
-                                    <p className='text-3xl font-semibold'>{Number(totalBit10Tokens)} Test BIT10</p>
+                                    <p className='text-3xl font-semibold'>{Number(totalBIT10Tokens)} Test BIT10</p>
                                 </div>
                                 <div className='flex w-full flex-col space-y-3'>
                                     <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
@@ -245,7 +283,7 @@ export default function BalanceAndAlloactions() {
                                             <div>Token Name</div>
                                             <div>No. of Tokens</div>
                                         </div>
-                                        {Number(formatBit10(Number(totalBit10Tokens))) == 0 ? (
+                                        {Number(formatBit10(Number(totalBIT10Tokens))) == 0 ? (
                                             <div className='text-center'>You currently own no Test BIT10 tokens</div>
                                         ) : (
                                             <>

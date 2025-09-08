@@ -85,6 +85,8 @@ export const getTokenName = (tokenAddress: string): string => {
       return 'ckUSDC (on ICP)';
     case 'wbckh-zqaaa-aaaap-qpuza-cai'.toLocaleLowerCase():
       return 'Test BIT10.TOP (on ICP)';
+    case '0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D'.toLocaleLowerCase():
+      return 'Test BIT10.TOP';
     case '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238'.toLocaleLowerCase():
       return 'USDC (on Ethereum)';
     case '0x0000000000000000000000000000000000000000e'.toLocaleLowerCase():
@@ -104,20 +106,21 @@ export const getTokenName = (tokenAddress: string): string => {
 
 export const getTokenExplorer = (tokenAddress: string): string => {
   const normalizedAddress = tokenAddress.toLowerCase();
+
   switch (normalizedAddress) {
-      case '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238'.toLocaleLowerCase():
-          return 'https://sepolia.etherscan.io/tx';
-      case '0x0000000000000000000000000000000000000000e'.toLocaleLowerCase():
-          return 'https://sepolia.etherscan.io/tx';
-      case '0x0000000000000000000000000000000000000000'.toLocaleLowerCase():
-          return 'https://sepolia.etherscan.io/tx';
-      case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
-          return 'https://testnet.bscscan.com/tx/'
-      case '0x64544969ed7ebf5f083679233325356ebe738930'.toLocaleLowerCase():
-          return 'https://testnet.bscscan.com/tx/'
-      case '0x6ce8da28e2f864420840cf74474eff5fd80e65b8'.toLocaleLowerCase():
-          return 'https://testnet.bscscan.com/tx/'
-      default:
-          return 'https://sepolia.etherscan.io/tx';
+    case '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238':
+    case '0x0000000000000000000000000000000000000000e':
+      return 'https://sepolia.etherscan.io/tx';
+
+    case '0x0000000000000000000000000000000000000000':
+      return 'https://sepolia.etherscan.io/tx';
+
+    case '0x0000000000000000000000000000000000000000b':
+    case '0x64544969ed7ebf5f083679233325356ebe738930':
+    case '0x6ce8da28e2f864420840cf74474eff5fd80e65b8':
+      return 'https://testnet.bscscan.com/tx';
+
+    default:
+      return 'https://sepolia.etherscan.io/tx';
   }
 };

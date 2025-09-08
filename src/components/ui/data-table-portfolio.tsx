@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
@@ -9,6 +9,7 @@ import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { useChain } from '@/context/ChainContext'
 import { Search, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { formatAmount, getTokenName } from '@/lib/utils'
 
 export type PortfolioTableDataType = {
     tokenSwapId: string;
@@ -102,9 +103,9 @@ export function DataTable<TData, TValue>({
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {chain === 'icp' ? (parseFloat(row.original.tickInAmount) / 100000000).toFixed(8) : parseFloat(row.original.tickInAmount).toFixed(8)}
+                            {chain === 'icp' ? formatAmount(parseFloat(row.original.tickInAmount) / 100000000) : formatAmount(Number(row.original.tickInAmount))}
                         </div>
-                        <div>{row.original.tickInName}</div>
+                        <div>{getTokenName(row.original.tickInName)}</div>
                     </div>
                 );
             case 'tickOutName':
@@ -113,9 +114,9 @@ export function DataTable<TData, TValue>({
                         <div>
                             {row.original.transactionType === 'Swap'
                                 ? row.original.tickOutAmount
-                                : (parseFloat(row.original.tickOutAmount) / 100000000).toFixed(8)}
+                                : formatAmount(parseFloat(row.original.tickOutAmount) / 100000000)}
                         </div>
-                        <div>{row.original.tickOutName}</div>
+                        <div>{getTokenName(row.original.tickOutName)}</div>
                     </div>
                 );
             case 'tokenBoughtAt':

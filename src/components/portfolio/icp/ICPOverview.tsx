@@ -97,7 +97,15 @@ export default function ICPOverview() {
     const userActiveLoans = bit10Queries[2].data;
     const userActiveTokens = bit10Queries[3].data;
 
-    const totalBit10Tokens = Number((BigInt(bit10TOPTokenBalance ?? 0n) + BigInt(bit10MEMETokenBalance ?? 0n))) / 100000000;
+    const toBigInt = (v: unknown) => {
+        if (typeof v === 'bigint') return v;
+        if (typeof v === 'number') return BigInt(Math.trunc(v));
+        if (typeof v === 'string') return BigInt((v.split?.('.')?.[0]) ?? '0');
+        return 0n;
+    };
+
+    const totalRaw = toBigInt(bit10TOPTokenBalance) + toBigInt(bit10MEMETokenBalance);
+    const totalBIT10Tokens = Number(totalRaw) / 100000000;
 
     return (
         <div className='flex flex-col space-y-4'>
@@ -134,7 +142,7 @@ export default function ICPOverview() {
                                         <BadgeDollarSign />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        {formatAmount(totalBit10Tokens)} BIT10
+                                        {formatAmount(totalBIT10Tokens)} BIT10
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>

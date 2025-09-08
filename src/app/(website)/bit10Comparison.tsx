@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatAmount } from '@/lib/utils'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Input } from '@/components/ui/input'
@@ -43,6 +43,7 @@ type AssetComparison = {
     currentValue: number;
     totalReturn: number;
     percentageReturn: number;
+    apy?: number; // Added APY field
 };
 
 type ComparisonResult = {
@@ -163,7 +164,7 @@ export default function BIT10Comparison() {
         }), []
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line react-hooks/exhaustive-deps, @typescript-eslint/no-explicit-any
     const safeParseFloat = (value: any): number => {
         const num = typeof value === 'string' ? parseFloat(value) : Number(value);
         return isNaN(num) ? 0 : num;
@@ -224,6 +225,60 @@ export default function BIT10Comparison() {
         );
     }, [bit10ComparisonCalculator]);
 
+    const calculateAPY = (initialValue: number, finalValue: number, years: number): number => {
+        if (years <= 0 || initialValue <= 0) return 0;
+        return (Math.pow(finalValue / initialValue, 1 / years) - 1) * 100;
+    };
+
+    const apyData = useMemo(() => {
+        const calculatePeriodAPY = (data: Bit10Entry[], periodLabel: string) => {
+            if (!data || data.length < 2) return null;
+
+            const firstEntry = data[0];
+            const lastEntry = data[data.length - 1];
+
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            const initialBit10Top = safeParseFloat(firstEntry.bit10Top);
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            const finalBit10Top = safeParseFloat(lastEntry.bit10Top);
+
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            const initialBtc = safeParseFloat(firstEntry.btc);
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            const finalBtc = safeParseFloat(lastEntry.btc);
+
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            const initialSp500 = safeParseFloat(firstEntry.sp500);
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            const finalSp500 = safeParseFloat(lastEntry.sp500);
+
+            const years = {
+                '1Y': 1,
+                '3Y': 3,
+                '5Y': 5
+            }[periodLabel] ?? 1;
+
+            return {
+                period: periodLabel,
+                bit10Top: calculateAPY(initialBit10Top, finalBit10Top, years),
+                btc: calculateAPY(initialBtc, finalBtc, years),
+                sp500: calculateAPY(initialSp500, finalSp500, years)
+            };
+        };
+
+        return {
+            '1Y': calculatePeriodAPY(bit10Comparison1Y, '1Y'),
+            '3Y': calculatePeriodAPY(bit10Comparison3Y, '3Y'),
+            '5Y': calculatePeriodAPY(bit10Comparison5Y, '5Y')
+        };
+    }, [bit10Comparison1Y, bit10Comparison3Y, bit10Comparison5Y, safeParseFloat]);
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -259,6 +314,10 @@ export default function BIT10Comparison() {
         const startEntry = findClosestEntry(startDate);
         const endEntry = findClosestEntry(endDate);
 
+        // Calculate time difference in years for APY
+        const timeDiffMs = endDate.getTime() - startDate.getTime();
+        const timeDiffYears = timeDiffMs / (1000 * 60 * 60 * 24 * 365.25);
+
         const tokens: { key: keyof Bit10Entry; name: string }[] = [
             { key: 'bit10Top', name: 'BIT10.TOP' },
             { key: 'btc', name: 'Bitcoin' },
@@ -276,6 +335,7 @@ export default function BIT10Comparison() {
                     currentValue: 0,
                     totalReturn: 0,
                     percentageReturn: 0,
+                    apy: 0
                 };
             }
 
@@ -284,12 +344,15 @@ export default function BIT10Comparison() {
             const percentageReturn =
                 ((currentValue - investmentAmount) / investmentAmount) * 100;
 
+            const apy = calculateAPY(investmentAmount, currentValue, timeDiffYears);
+
             return {
                 name,
                 initialInvestment: investmentAmount,
                 currentValue: parseFloat(currentValue.toFixed(2)),
                 totalReturn: parseFloat(totalReturn.toFixed(2)),
                 percentageReturn: parseFloat(percentageReturn.toFixed(2)),
+                apy: parseFloat(apy.toFixed(2))
             };
         });
 
@@ -326,235 +389,256 @@ export default function BIT10Comparison() {
     }
 
     return (
-        <div className='grid md:grid-cols-5 gap-3'>
-            <div className='md:col-span-3'>
-                <Card className='dark:border-white animate-fade-left-slow'>
-                    <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
-                        <div className='flex flex-1 flex-col justify-center gap-1 pb-3 sm:pb-0'>
-                            <CardTitle>$100 Investment Growth Comparison</CardTitle>
-                            <CardDescription>
-                                Performance of a $100 investment in each asset since tracking began
-                            </CardDescription>
+        <div className='flex flex-col space-y-4'>
+            <div className='mt-4 py-4'>
+                <div className='grid md:grid-cols-3 gap-8'>
+                    {['1Y', '3Y', '5Y'].map((period) => (
+                        <div key={period} className='border-2 rounded py-8 px-3'>
+                            <h4 className='font-medium text-2xl text-center mb-2'>BIT10.TOP {period} APY</h4>
+                            {apyData[period as keyof typeof apyData] ? (
+                                <div className='font-bold text-4xl text-center'>{apyData[period as keyof typeof apyData]?.bit10Top.toFixed(2)}%</div>
+                            ) : (
+                                <p className='text-center text-gray-500'>Loading...</p>
+                            )}
                         </div>
-                        <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0'>
-                            <div className='relative flex flex-row space-x-2 items-center justify-center border dark:border-white rounded-md px-2 py-1.5'>
-                                <AnimatedBackground defaultValue='10Y' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
-                                    {tabs.map((label, index) => (
-                                        <button key={index} data-id={label} type='button' className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}>
-                                            {label}
-                                        </button>
-                                    ))}
-                                </AnimatedBackground>
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent className='flex flex-col space-y-4'>
-                        {isLoading ? (
-                            <div className='flex flex-col h-full space-y-2'>
-                                <Skeleton className='h-[300px] md:h-[400px] w-full' />
-                            </div>
-                        ) : (
-                            <div className='select-none -ml-4'>
-                                <ChartContainer config={investmentChartConfig} className='max-h-[300px] md:max-h-[600px] w-full'>
-                                    <LineChart accessibilityLayer data={currentData}>
-                                        <CartesianGrid vertical={false} />
-                                        <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' />
-                                        <YAxis tickLine={true} axisLine={true} tickMargin={8} tickCount={5} stroke='#D5520E' tickFormatter={yAxisFormatter} />
-                                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                        <ChartLegend content={<ChartLegendContent />} />
-                                        <Line dataKey='bit10TopValue' type='linear' stroke='green' name={investmentChartConfig.bit10TopValue.label} strokeWidth={2} dot={false} />
-                                        <Line dataKey='btcValue' type='linear' stroke='orange' name={investmentChartConfig.btcValue.label} strokeWidth={2} dot={false} />
-                                        <Line dataKey='sp500Value' type='linear' stroke='blue' name={investmentChartConfig.sp500Value.label} strokeWidth={2} dot={false} />
-                                    </LineChart>
-                                </ChartContainer>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                    ))}
+                </div>
             </div>
-            <div className='md:col-span-2'>
-                <Card className='dark:border-white animate-fade-right-slow h-full flex flex-col'>
-                    <CardHeader>
-                        <CardTitle>
-                            BIT10 Investment Calculator
-                        </CardTitle>
-                        <CardDescription>
-                            Estimate your returns and see how your investment would have grown over time.
-                        </CardDescription>
-                    </CardHeader>
-                    <Form {...form}>
-                        <div onSubmit={form.handleSubmit(onSubmit)} className='flex-1 flex flex-col'>
-                            <CardContent className='flex-1'>
-                                <div className='flex flex-col space-y-2'>
-                                    <FormField
-                                        control={form.control}
-                                        name='initial_investment'
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Initial Investment</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} placeholder='Initial investment amount' type='number' className='dark:border-white' />
-                                                </FormControl>
-                                                <FormDescription>
-                                                    Enter the amount (in USD) you want to invest
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
 
-                                    <FormField
-                                        control={form.control}
-                                        name='initial_investment_start_date'
-                                        render={({ field }) => (
-                                            <FormItem className='flex flex-col'>
-                                                <FormLabel>Date of Initial Investment</FormLabel>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <FormControl>
-                                                            <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
-                                                                {field.value ? (
-                                                                    format(field.value, 'PPP')
-                                                                ) : (
-                                                                    <span>Select start date</span>
-                                                                )}
-                                                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                                            </Button>
-                                                        </FormControl>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className='w-auto p-0' align='start'>
-                                                        <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
-                                                    </PopoverContent>
-                                                </Popover>
-                                                <FormDescription>
-                                                    When your investment begins
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name='initial_investment_end_date'
-                                        render={({ field }) => (
-                                            <FormItem className='flex flex-col'>
-                                                <FormLabel>Date of Final Investment</FormLabel>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <FormControl>
-                                                            <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
-                                                                {field.value ? (
-                                                                    format(field.value, 'PPP')
-                                                                ) : (
-                                                                    <span>Select end date</span>
-                                                                )}
-                                                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                                            </Button>
-                                                        </FormControl>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className='w-auto p-0' align='start'>
-                                                        <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
-                                                    </PopoverContent>
-                                                </Popover>
-                                                <FormDescription>
-                                                    When your investment ends
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name='initial_investment_token'
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Token</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger className='dark:border-white'>
-                                                            <SelectValue placeholder='Select a investment token' />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value='BIT10.TOP'>BIT10.TOP</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormDescription>
-                                                    Select the token for your investment calculation
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+            <div className='grid md:grid-cols-5 gap-3'>
+                <div className='md:col-span-3'>
+                    <Card className='dark:border-white animate-fade-left-slow'>
+                        <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
+                            <div className='flex flex-1 flex-col justify-center gap-1 pb-3 sm:pb-0'>
+                                <CardTitle>$100 Investment Growth Comparison</CardTitle>
+                                <CardDescription>
+                                    Performance of a $100 investment in each asset since tracking began
+                                </CardDescription>
+                            </div>
+                            <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0'>
+                                <div className='relative flex flex-row space-x-2 items-center justify-center border dark:border-white rounded-md px-2 py-1.5'>
+                                    <AnimatedBackground defaultValue='10Y' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
+                                        {tabs.map((label, index) => (
+                                            <button key={index} data-id={label} type='button' className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}>
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </AnimatedBackground>
                                 </div>
-                            </CardContent>
-                            <CardFooter className='flex flex-col space-y-4'>
-                                <Button className='w-full' disabled={isLoading || processing} onClick={form.handleSubmit(onSubmit)}>
-                                    {processing && <Loader2 className='animate-spin mr-2' size={15} />}
-                                    {processing ? 'Calculating...' : 'Calculate'}
-                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent className='flex flex-col space-y-4'>
+                            {isLoading ? (
+                                <div className='flex flex-col h-full space-y-2'>
+                                    <Skeleton className='h-[300px] md:h-[400px] w-full' />
+                                </div>
+                            ) : (
+                                <div className='select-none -ml-4'>
+                                    <ChartContainer config={investmentChartConfig} className='max-h-[300px] md:max-h-[600px] w-full'>
+                                        <LineChart accessibilityLayer data={currentData}>
+                                            <CartesianGrid vertical={false} />
+                                            <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' />
+                                            <YAxis tickLine={true} axisLine={true} tickMargin={8} tickCount={5} stroke='#D5520E' tickFormatter={yAxisFormatter} />
+                                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                            <ChartLegend content={<ChartLegendContent />} />
+                                            <Line dataKey='bit10TopValue' type='linear' stroke='green' name={investmentChartConfig.bit10TopValue.label} strokeWidth={2} dot={false} />
+                                            <Line dataKey='btcValue' type='linear' stroke='orange' name={investmentChartConfig.btcValue.label} strokeWidth={2} dot={false} />
+                                            <Line dataKey='sp500Value' type='linear' stroke='blue' name={investmentChartConfig.sp500Value.label} strokeWidth={2} dot={false} />
+                                        </LineChart>
+                                    </ChartContainer>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className='md:col-span-2'>
+                    <Card className='dark:border-white animate-fade-right-slow h-full flex flex-col'>
+                        <CardHeader>
+                            <CardTitle>
+                                BIT10 Investment Calculator
+                            </CardTitle>
+                            <CardDescription>
+                                Estimate your returns and see how your investment would have grown over time.
+                            </CardDescription>
+                        </CardHeader>
+                        <Form {...form}>
+                            <div onSubmit={form.handleSubmit(onSubmit)} className='flex-1 flex flex-col'>
+                                <CardContent className='flex-1'>
+                                    <div className='flex flex-col space-y-2'>
+                                        <FormField
+                                            control={form.control}
+                                            name='initial_investment'
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Initial Investment</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='dark:border-white' />
+                                                    </FormControl>
+                                                    <FormDescription>
+                                                        Enter the amount (in USD) you want to invest
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                {calculationResult && (
-                                    <div className='w-full p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-900/20'>
-                                        <h3 className='font-semibold text-green-800 dark:text-green-200 mb-3'>
-                                            Investment Comparison
-                                        </h3>
-                                        <table className='w-full text-sm border-collapse'>
-                                            <thead>
-                                                <tr className='border-b border-green-200 dark:border-green-800'>
-                                                    <th className='text-left p-2'>Asset</th>
-                                                    <th className='text-center p-2'>Initial Investment</th>
-                                                    <th className='text-center p-2'>Current Value</th>
-                                                    <th className='text-center p-2'>Total Return</th>
-                                                    <th className='text-center p-2'>% Return</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {calculationResult.assets.map((asset) => (
-                                                    <tr
-                                                        key={asset.name}
-                                                        className='border-b border-green-200 dark:border-green-800 last:border-0'
-                                                    >
-                                                        <td className='p-2'>{asset.name}</td>
-                                                        <td className='p-2 text-right'>
-                                                            ${asset.initialInvestment.toLocaleString()}
-                                                        </td>
-                                                        <td className='p-2 text-right text-green-600 dark:text-green-400'>
-                                                            ${asset.currentValue.toLocaleString()}
-                                                        </td>
-                                                        <td
-                                                            className={`p-2 text-right ${asset.totalReturn >= 0
-                                                                ? 'text-green-600 dark:text-green-400'
-                                                                : 'text-red-600 dark:text-red-400'
-                                                                }`}
-                                                        >
-                                                            ${asset.totalReturn.toLocaleString()}
-                                                        </td>
-                                                        <td
-                                                            className={`p-2 text-right ${asset.percentageReturn >= 0
-                                                                ? 'text-green-600 dark:text-green-400'
-                                                                : 'text-red-600 dark:text-red-400'
-                                                                }`}
-                                                        >
-                                                            {asset.percentageReturn >= 0 ? '+' : ''}
-                                                            {asset.percentageReturn}%
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                        <div className='pt-2 text-xs text-gray-500 dark:text-gray-400'>
-                                            Period: From {new Date(calculationResult.startDate).toLocaleDateString()} to{' '}
-                                            {new Date(calculationResult.endDate).toLocaleDateString()}
-                                        </div>
+                                        <FormField
+                                            control={form.control}
+                                            name='initial_investment_start_date'
+                                            render={({ field }) => (
+                                                <FormItem className='flex flex-col'>
+                                                    <FormLabel>Date of Initial Investment</FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                    {field.value ? (
+                                                                        format(field.value, 'PPP')
+                                                                    ) : (
+                                                                        <span>Select start date</span>
+                                                                    )}
+                                                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className='w-auto p-0' align='start'>
+                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormDescription>
+                                                        When your investment begins
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name='initial_investment_end_date'
+                                            render={({ field }) => (
+                                                <FormItem className='flex flex-col'>
+                                                    <FormLabel>Date of Final Investment</FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                    {field.value ? (
+                                                                        format(field.value, 'PPP')
+                                                                    ) : (
+                                                                        <span>Select end date</span>
+                                                                    )}
+                                                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className='w-auto p-0' align='start'>
+                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormDescription>
+                                                        When your investment ends
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name='initial_investment_token'
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Token</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger className='dark:border-white'>
+                                                                <SelectValue placeholder='Select a investment token' />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value='BIT10.TOP'>BIT10.TOP</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormDescription>
+                                                        Select the token for your investment calculation
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     </div>
-                                )}
-                            </CardFooter>
-                        </div>
-                    </Form>
-                </Card>
+                                </CardContent>
+                                <CardFooter className='flex flex-col space-y-4'>
+                                    <Button className='w-full' disabled={isLoading || processing} onClick={form.handleSubmit(onSubmit)}>
+                                        {processing && <Loader2 className='animate-spin mr-2' size={15} />}
+                                        {processing ? 'Calculating...' : 'Calculate'}
+                                    </Button>
+
+                                    {calculationResult && (
+                                        <div className='w-full p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-900/20'>
+                                            <h3 className='font-semibold text-green-800 dark:text-green-200 mb-3'>
+                                                Investment Comparison
+                                            </h3>
+                                            <table className='w-full text-sm border-collapse'>
+                                                <thead>
+                                                    <tr className='border-b border-green-200 dark:border-green-800'>
+                                                        <th className='text-left p-2'>Asset</th>
+                                                        <th className='text-center p-2'>Initial Investment</th>
+                                                        <th className='text-center p-2'>Current Value</th>
+                                                        <th className='text-center p-2'>Total Return</th>
+                                                        <th className='text-center p-2'>% Return</th>
+                                                        <th className='text-center p-2'>APY</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {calculationResult.assets.map((asset) => (
+                                                        <tr
+                                                            key={asset.name}
+                                                            className='border-b border-green-200 dark:border-green-800 last:border-0'
+                                                        >
+                                                            <td className='p-2'>{asset.name}</td>
+                                                            <td className='p-2 text-right'>
+                                                                ${formatAmount(asset.initialInvestment)}
+                                                            </td>
+                                                            <td className='p-2 text-right text-green-600 dark:text-green-400'>
+                                                                ${formatAmount(asset.currentValue)}
+                                                            </td>
+                                                            <td
+                                                                className={`p-2 text-right ${asset.totalReturn >= 0
+                                                                    ? 'text-green-600 dark:text-green-400'
+                                                                    : 'text-red-600 dark:text-red-400'
+                                                                    }`}
+                                                            >
+                                                                ${formatAmount(asset.totalReturn)}
+                                                            </td>
+                                                            <td
+                                                                className={`p-2 text-right ${asset.percentageReturn >= 0
+                                                                    ? 'text-green-600 dark:text-green-400'
+                                                                    : 'text-red-600 dark:text-red-400'
+                                                                    }`}
+                                                            >
+                                                                {asset.percentageReturn >= 0 ? '+' : ''}
+                                                                {formatAmount(asset.percentageReturn)}%
+                                                            </td>
+                                                            <td className='p-2 text-right'>
+                                                                {asset.apy !== undefined ? `${asset.apy.toFixed(2)}%` : 'N/A'}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                            <div className='pt-2 text-xs text-gray-500 dark:text-gray-400'>
+                                                Period: From {new Date(calculationResult.startDate).toLocaleDateString()} to{' '}
+                                                {new Date(calculationResult.endDate).toLocaleDateString()}
+                                            </div>
+                                        </div>
+                                    )}
+                                </CardFooter>
+                            </div>
+                        </Form>
+                    </Card>
+                </div>
             </div>
         </div>
     )

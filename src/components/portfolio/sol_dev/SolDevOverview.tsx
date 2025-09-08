@@ -68,7 +68,7 @@ export default function SolDevOverview() {
     const userActiveLoans = bit10Queries[1].data;
     const userActiveTokens = bit10Queries[2].data;
 
-    const totalBit10Tokens = (bit10DEFITokenBalance ?? 0);
+    const totalBIT10Tokens = (bit10DEFITokenBalance ?? 0);
 
     return (
         <div className='flex flex-col space-y-4'>
@@ -105,7 +105,7 @@ export default function SolDevOverview() {
                                         <BadgeDollarSign />
                                     </CardHeader>
                                     <CardContent className='text-start text-2xl md:text-3xl font-bold'>
-                                        {formatAmount(Number(totalBit10Tokens))} BIT10
+                                        {formatAmount(Number(totalBIT10Tokens))} BIT10
                                     </CardContent>
                                 </Card>
                             </TooltipTrigger>

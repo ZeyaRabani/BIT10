@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-dex-portfolio'
 import type { PortfolioTableDataType } from '@/components/ui/data-table-dex-portfolio'
+import { formatAmount, getTokenName } from '@/lib/utils'
 
 const recentSwapTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
@@ -22,6 +23,12 @@ const recentSwapTableColumns: ColumnDef<PortfolioTableDataType>[] = [
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='To' />
         ),
+        filterFn: (row, columnId, value) => {
+            const formattedAmount = formatAmount(Number(row.original.amountOut));
+            const tokenName = getTokenName(row.original.tokenOutAddress);
+            const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
+            return searchableText.includes((value as string).toLowerCase());
+        },
     },
     {
         accessorKey: 'token_swap_on',

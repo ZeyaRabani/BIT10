@@ -86,7 +86,7 @@ const parterners = [
 export default function Page() {
   return (
     <div>
-      <AuroraBackground>
+      <AuroraBackground className='md:max-h-[60vh]'>
         <div className='relative flex flex-col gap-4 items-center justify-center md:px-4'>
           <div className='p-4 max-w-7xl mx-auto relative z-10 w-full pt-8 md:pt-0'>
             <motion.h1

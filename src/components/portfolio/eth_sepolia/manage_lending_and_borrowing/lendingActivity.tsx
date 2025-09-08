@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-lend-portfolio'
 import type { PortfolioTableDataType } from '@/components/ui/data-table-lend-portfolio'
+import { formatAmount, getTokenName } from '@/lib/utils'
 
 const recentLendingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
@@ -17,6 +18,14 @@ const recentLendingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] = [
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Amount Lend' />
         ),
+        filterFn: (row, columnId, value) => {
+            const formattedAmount = row.original.tokenChain.toLowerCase() === 'icp'
+                ? formatAmount(Number(row.original.tokenAmount) / 100000000)
+                : formatAmount(Number(row.original.tokenAmount));
+            const tokenName = getTokenName(row.original.tokenAddress);
+            const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
+            return searchableText.includes((value as string).toLowerCase());
+        },
     },
     {
         accessorKey: 'interestRate',

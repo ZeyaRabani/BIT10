@@ -96,7 +96,7 @@ export default function BalanceAndAlloactions() {
     const bit10MEMETokens = bit10Queries[2].data as { id: number, name: string, symbol: string, marketCap: number, tokenAddress: string, chain: string; price: number }[] | undefined;
     const bit10DEFITokenBalance = bit10Queries[3].data as number | undefined;
 
-    const totalBit10Tokens = (bit10DEFITokenBalance ?? 0);
+    const totalBIT10Tokens = (bit10DEFITokenBalance ?? 0);
 
     const selectedBit10Token = () => {
         if (selectedAllocationToken === 'Test BIT10.DEFI') {
@@ -158,7 +158,7 @@ export default function BalanceAndAlloactions() {
     };
 
     const bit10BalancePieChartData =
-        Number(formatBit10(Number(totalBit10Tokens))) == 0
+        Number(formatBit10(Number(totalBIT10Tokens))) == 0
             ?
             [{ name: 'No Data', value: 1, fill: '#ebebe0' }]
             :
@@ -224,7 +224,7 @@ export default function BalanceAndAlloactions() {
                                     className='aspect-square max-h-[300px]'
                                 >
                                     <PieChart>
-                                        {Number(formatBit10(Number(totalBit10Tokens))) > 0 && (
+                                        {Number(formatBit10(Number(totalBIT10Tokens))) > 0 && (
                                             <ChartTooltip
                                                 cursor={false}
                                                 content={<ChartTooltipContent hideLabel />}
@@ -252,7 +252,7 @@ export default function BalanceAndAlloactions() {
                                                                     y={viewBox.cy}
                                                                     className='fill-foreground text-3xl font-bold'
                                                                 >
-                                                                    {formatBit10(Number(totalBit10Tokens))}
+                                                                    {formatBit10(Number(totalBIT10Tokens))}
                                                                 </tspan>
                                                                 <tspan
                                                                     x={viewBox.cx}
@@ -272,7 +272,7 @@ export default function BalanceAndAlloactions() {
                             </div>
                             <div className='flex w-full flex-col space-y-3'>
                                 <div className='flex flex-row items-center justify-start space-x-2'>
-                                    <p className='text-3xl font-semibold'>{Number(totalBit10Tokens)} Test BIT10</p>
+                                    <p className='text-3xl font-semibold'>{Number(totalBIT10Tokens)} Test BIT10</p>
                                 </div>
                                 {/* {Number(formatBit10(bit10DEFI)) > 0 && (
                                 <div>
@@ -286,7 +286,7 @@ export default function BalanceAndAlloactions() {
                                             <div>Token Name</div>
                                             <div>No. of Tokens</div>
                                         </div>
-                                        {Number(formatBit10(Number(totalBit10Tokens))) == 0 ? (
+                                        {Number(formatBit10(Number(totalBIT10Tokens))) == 0 ? (
                                             <div className='text-center'>You currently own no Test BIT10 tokens</div>
                                         ) : (
                                             <>

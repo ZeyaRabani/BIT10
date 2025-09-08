@@ -55,7 +55,8 @@ const termsContent: TermSectionProps[] = [
             '- (A) not a "U.S. Person" as defined in Rule 902 of Regulation S promulgated under the Securities Act, (B) not offering, trading or holding BIT10 products for the account or benefit of any U.S. Person, (C) not intending to sell, grant any participation in, or otherwise distributing BIT10 products to any U.S. Person;',
             '- (A) not a "U.S. person" as defined in 17 C.F.R. § 23.23(a)(23) of the CFTC Cross-Border Swaps Rule, (B) not acquiring BIT10 assets for the account or benefit of any U.S. person, (C) not intending to sell, grant any participation in, or otherwise distributing BIT10 products to any U.S. Person; and',
             '- Not intending to offer, sell, or distribute BIT10 products or have a direct or indirect participation in any such undertaking or the underwriting of any such undertaking.',
-            'BIT10 shall not be liable for any person or entity\'s failure to understand, agree to and comply with each of the provisions above.'
+            'BIT10 shall not be liable for any person or entity\'s failure to understand, agree to and comply with each of the provisions above.',
+            'All statistics, charts, and performance metrics presented are derived from historical data and publicly available sources. While we strive for accuracy, we make no guarantees. Past performance does not guarantee future returns, and investments may fluctuate in value.'
         ]
     },
     {

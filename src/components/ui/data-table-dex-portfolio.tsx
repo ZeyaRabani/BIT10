@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
@@ -35,10 +35,23 @@ export function DataTable<TData, TValue>({
     userSearchColumn,
     inputPlaceHolder,
 }: DataTableProps<PortfolioTableDataType>) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
+
+    const customFilterFn = React.useCallback((row: { original: PortfolioTableDataType }, columnId: string, value: string) => {
+        if (columnId === 'to') {
+            const original = row.original;
+            const formattedAmount = formatAmount(Number(original.amountOut));
+            const tokenName = getTokenName(original.tokenOutAddress);
+            const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
+            return searchableText.includes(value.toLowerCase());
+        }
+
+        const cellValue = row.original[columnId as keyof PortfolioTableDataType];
+        return String(cellValue).toLowerCase().includes(value.toLowerCase());
+    }, []);
 
     const table = useReactTable({
         data,
@@ -51,13 +64,14 @@ export function DataTable<TData, TValue>({
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
+        globalFilterFn: customFilterFn,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
             rowSelection,
         },
-    })
+    });
 
     const clearSearch = () => {
         setColumnFilters([]);
@@ -75,7 +89,7 @@ export function DataTable<TData, TValue>({
             date = new Date(timestamp);
         } else {
             date = new Date(dateInput);
-        }
+        };
 
         const addOrdinalSuffix = (day: number): string => {
             if (day >= 11 && day <= 13) return day + 'th';
@@ -124,7 +138,7 @@ export function DataTable<TData, TValue>({
             case 'view_inbound_transaction':
                 return (
                     <a
-                        href={`${getTokenExplorer(row.original.tokenInAddress)}${getTokenExplorer(row.original.tokenInAddress).endsWith('/') ? '' : '/'}${row.original.txHashIn}`}
+                        href={`${getTokenExplorer(row.original.tokenInAddress)}/${getTokenExplorer(row.original.tokenInAddress).endsWith('/') ? '' : '/'}${row.original.txHashIn}`}
                         target='_blank'
                         rel='noopener noreferrer'
                     >
