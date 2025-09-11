@@ -44,7 +44,7 @@ if (!COINMARKETCAP_API_KEY) {
     process.exit(1);
 }
 
-export const fetchAndUpdateBit10TOPData = async () => {
+export const fetchAndUpdateBIT10TOPData = async () => {
     // limit is 15
     const API_URL = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=15`;
 
@@ -97,10 +97,9 @@ export const fetchAndUpdateBit10TOPData = async () => {
     }
 }
 
-// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10TOPData); // 30 sec
-cron.schedule('*/20 * * * *', fetchAndUpdateBit10TOPData); // 20 min
+// cron.schedule('*/30 * * * * *', fetchAndUpdateBIT10TOPData); // 30 sec
+cron.schedule('*/20 * * * *', fetchAndUpdateBIT10TOPData); // 20 min
 
-// ToDo: Update logic for Market Cap
 export const fetchAndUpdateBit10TOPRebalanceData = async () => {
     try {
         const priceOfTokenToBuyResult = await db.select({
@@ -141,32 +140,43 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
         const validTokenValues = tokenValues.filter(value => value > 0);
         const priceOfTokenToBuy = (validTokenValues.reduce((sum, value) => sum + value, 0) / validTokenValues.length) + priceOfTokenToBuyResult[0].priceoftokentobuy;
 
-        const newTokens = (latestData[0].data as Array<{ price: number }>).map((token) => ({
-            ...token,
-            noOfTokens: priceOfTokenToBuy / token.price
-        }));
+        const totalMarketCap = (latestData[0].data as Array<{ marketCap: number }>).reduce((sum, token) => sum + token.marketCap, 0);
+
+        const newTokens = (latestData[0].data as Array<{ price: number; marketCap: number }>).map((token) => {
+            const allocation = totalMarketCap > 0 ? priceOfTokenToBuy * (token.marketCap / totalMarketCap) : 0;
+            return {
+                ...token,
+                noOfTokens: allocation / token.price
+            };
+        });
 
         const latestRebalance = (existingData[0]?.newTokens as Array<{ id: string }>) || [];
 
-        const addedTokens = (latestData[0].data as Array<{ id: string; price: number }>)
+        const addedTokens = (latestData[0].data as Array<{ id: string; price: number; marketCap: number }>)
             .filter((historicalToken: { id: string }) =>
                 !latestRebalance.some((rebalanceToken: { id: string }) => rebalanceToken.id === historicalToken.id)
-            ).map((token: { id: string; price: number }) => ({
-                ...token,
-                noOfTokens: priceOfTokenToBuy / token.price
-            }));
+            ).map((token: { id: string; price: number; marketCap: number }) => {
+                const allocation = totalMarketCap > 0 ? priceOfTokenToBuy * (token.marketCap / totalMarketCap) : 0;
+                return {
+                    ...token,
+                    noOfTokens: allocation / token.price
+                };
+            });
 
         const removedTokens = latestRebalance.filter((rebalanceToken: { id: string }) =>
             !(latestData[0].data as Array<{ id: string }>).some((historicalToken: { id: string }) => historicalToken.id === rebalanceToken.id)
         );
 
-        const retainedTokens = (latestData[0].data as Array<{ id: string; price: number }>)
-            .filter((historicalToken: { id: string; price: number }) =>
+        const retainedTokens = (latestData[0].data as Array<{ id: string; price: number; marketCap: number }>)
+            .filter((historicalToken: { id: string; price: number; marketCap: number }) =>
                 latestRebalance.some((rebalanceToken: { id: string }) => rebalanceToken.id === historicalToken.id)
-            ).map((token: { id: string; price: number }) => ({
-                ...token,
-                noOfTokens: priceOfTokenToBuy / token.price
-            }));
+            ).map((token: { id: string; price: number; marketCap: number }) => {
+                const allocation = totalMarketCap > 0 ? priceOfTokenToBuy * (token.marketCap / totalMarketCap) : 0;
+                return {
+                    ...token,
+                    noOfTokens: allocation / token.price
+                };
+            });
 
         await db.transaction(async (tx) => {
             await tx.insert(bit10TopRebalance).values({

@@ -43,7 +43,7 @@ async function getCachedData(days: number) {
     return cachedData;
 }
 
-export const handleBit10TOPFilterData = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBIT10TOPFilterData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));

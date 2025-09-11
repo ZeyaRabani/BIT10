@@ -27,7 +27,7 @@ if (!COINMARKETCAP_API_KEY) {
     process.exit(1);
 }
 
-export const fetchAndUpdateBit10DEFIData = async () => {
+export const fetchAndUpdateBIT10DEFIData = async () => {
     try {
         const response = await axios.get(API_URL, {
             headers: { 'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEY },
@@ -71,5 +71,5 @@ export const fetchAndUpdateBit10DEFIData = async () => {
     }
 };
 
-// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10DEFIData); // 30 sec
-cron.schedule('*/20 * * * *', fetchAndUpdateBit10DEFIData); // 20 min
+// cron.schedule('*/30 * * * * *', fetchAndUpdateBIT10DEFIData); // 30 sec
+cron.schedule('*/20 * * * *', fetchAndUpdateBIT10DEFIData); // 20 min

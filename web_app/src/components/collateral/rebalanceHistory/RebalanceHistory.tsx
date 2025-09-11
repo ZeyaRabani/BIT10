@@ -232,6 +232,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
 
     const selectedBit10Token = bit10Token();
 
+    const calculateTotalCollateral = (tokens: CoinSetData[]) =>
+        tokens?.reduce((sum, t) => sum + t.price * t.noOfTokens, 0) ?? 0;
+
     return (
         <div className='py-4'>
             {isLoading ? (
@@ -257,7 +260,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                         <div key={entry.timestmpz} className='border p-4 rounded-lg'>
                                             <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                                             <p className='text-lg'>Index Value: {formatAmount(entry.indexValue)} USD</p>
-                                            <p className='text-lg'>Total Collateral: {formatAmount(entry.priceOfTokenToBuy * entry.newTokens.length)} USD</p>
+                                            <p className='text-lg'>Total Collateral: {formatAmount(calculateTotalCollateral(entry.newTokens))} USD</p>
                                             <h3 className='font-medium my-2'>
                                                 Allocation (Effective {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
                                             </h3>
@@ -289,8 +292,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                 return (
                                     <div key={entry.timestmpz} className='border p-4 rounded-lg'>
                                         <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                                        <p className='text-lg'>Index Value: {entry.indexValue.toFixed(4)} USD</p>
-                                        <p className='text-lg'>Total Collateral: {(entry.priceOfTokenToBuy * entry.newTokens.length).toFixed(4)} USD</p>
+                                        <p className='text-lg'>Index Value: {formatAmount(entry.indexValue)} USD</p>
+                                        <p className='text-lg'>Total Collateral: {formatAmount(calculateTotalCollateral(entry.newTokens))} USD</p>
                                         <div className='flex justify-between my-2'>
                                             <h3 className='font-medium'>
                                                 {/* @ts-ignore */}

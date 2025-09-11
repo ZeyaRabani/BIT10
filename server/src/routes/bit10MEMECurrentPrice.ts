@@ -44,7 +44,7 @@ cron.schedule('*/20 * * * *', () => { // 20 min
 
 fetchData();
 
-export const handleBit10MEMECurrentPrice = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBIT10MEMECurrentPrice = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));

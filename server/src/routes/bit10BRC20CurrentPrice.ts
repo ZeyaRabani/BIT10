@@ -43,7 +43,7 @@ cron.schedule('*/20 * * * *', () => { // 20 min
 
 fetchData().catch(error => console.error('Error in initial data fetch:', error));
 
-export const handleBit10BRC20CurrentPrice = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBIT10BRC20CurrentPrice = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));

@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/testnet_buy_bit10_backend"
+]
+resolver = "2"

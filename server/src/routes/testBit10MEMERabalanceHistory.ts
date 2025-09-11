@@ -26,7 +26,7 @@ async function fetchData() {
     }
 }
 
-export const handleTestBit10MEMERebalanceData = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleTestBIT10MEMERebalanceData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));

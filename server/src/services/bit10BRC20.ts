@@ -49,7 +49,7 @@ if (!COINMARKETCAP_API_KEY) {
     process.exit(1);
 }
 
-export const fetchAndUpdateBit10BRC20Data = async () => {
+export const fetchAndUpdateBIT10BRC20Data = async () => {
     // limit is 10
     const API_URL = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/category?id=654a0c87ba37f269c8016129&limit=10`;
 
@@ -104,8 +104,8 @@ export const fetchAndUpdateBit10BRC20Data = async () => {
     }
 }
 
-// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10BRC20Data); // 30 sec
-cron.schedule('*/20 * * * *', fetchAndUpdateBit10BRC20Data); // 20 min
+// cron.schedule('*/30 * * * * *', fetchAndUpdateBIT10BRC20Data); // 30 sec
+cron.schedule('*/20 * * * *', fetchAndUpdateBIT10BRC20Data); // 20 min
 
 export const fetchAndUpdateBit10BRC20RebalanceData = async () => {
     try {

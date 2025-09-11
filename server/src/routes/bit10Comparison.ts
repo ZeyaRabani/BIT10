@@ -70,7 +70,7 @@ cron.schedule('0 16 * * *', async () => { // 4 PM ET
 
 warmUpCache().catch(error => console.error('Error during initial cache warm-up:', error));
 
-export const handleBit10ComparisonData = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBIT10ComparisonData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));

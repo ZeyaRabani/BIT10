@@ -1,10 +1,10 @@
-# BIT10 Swap
+# Mainnet Buy BIT10
 
 Users can swap tokens from ICP, ckBTC, etc. to buy BIT10 tokens.
 
 ## 🌟 Overview
 
-BIT10 Swap is a decentralized exchange protocol built on the Internet Computer Protocol (ICP) that enables users to swap various tokens for BIT10 tokens. The system is designed to be secure, efficient, and user-friendly.
+Buy BIT10 is a decentralized exchange protocol built on the Internet Computer Protocol (ICP) that enables users to swap various tokens for BIT10 tokens. The system is designed to be secure, efficient, and user-friendly.
 
 Learn more about Swap in our [GitBook](https://gitbook.bit10.app/part_3/testnet/icp).
 
@@ -108,7 +108,7 @@ To start using BIT10 Liquidity Hub canister, follow these steps:
 
 2. **Go to ICP swap folder**:
     ```bash
-    cd icp_canister/buy_bit10
+    cd icp_canister/buy_bit10/mainnet_buy_bit10
     ```
 
 3. **Start the dfx locally and run the canister**:

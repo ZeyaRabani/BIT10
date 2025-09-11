@@ -40,7 +40,7 @@ async function fetchData(days: number) {
     }
 }
 
-export const handleBit10DEFIFilterData = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBIT10DEFIFilterData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));

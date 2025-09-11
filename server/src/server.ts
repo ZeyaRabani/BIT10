@@ -1,43 +1,43 @@
 import http from 'http'
 import dotenv from 'dotenv'
-import { fetchAndUpdateBit10DEFIData } from './services/bit10DEFI'
-import { fetchAndUpdateBit10BRC20Data } from './services/bit10BRC20'
-import { fetchAndUpdateBit10TOPData } from './services/bit10TOP'
-import { fetchAndUpdateBit10MEMEData } from './services/bit10MEME'
-import { handleBit10DEFICurrentPrice } from './routes/bit10DEFICurrentPrice'
-import { handleBit10DEFIFilterData } from './routes/bit10DEFIFilterData'
-import { handleBit10BRC20CurrentPrice } from './routes/bit10BRC20CurrentPrice'
-import { handleBit10BRC20FilterData } from './routes/bit10BRC20FilterData'
-import { handleBit10BRC20RebalanceData } from './routes/bit10BRC20RabalanceHistory'
-import { handleBit10TOPCurrentPrice } from './routes/bit10TOPCurrentPrice'
-import { handleBit10TOPFilterData } from './routes/bit10TOPFilterData'
-import { handleBit10TopRebalanceData } from './routes/bit10TOPRabalanceHistory'
-import { handleBit10MEMECurrentPrice } from './routes/bit10MEMECurrentPrice'
-import { handleBit10MEMEFilterData } from './routes/bit10MEMEFilterData'
-import { handleTestBit10MEMERebalanceData } from './routes/testBit10MEMERabalanceHistory'
+import { fetchAndUpdateBIT10DEFIData } from './services/bit10DEFI'
+import { fetchAndUpdateBIT10BRC20Data } from './services/bit10BRC20'
+import { fetchAndUpdateBIT10TOPData } from './services/bit10TOP'
+import { fetchAndUpdateBIT10MEMEData } from './services/bit10MEME'
+import { handleBIT10DEFICurrentPrice } from './routes/bit10DEFICurrentPrice'
+import { handleBIT10DEFIFilterData } from './routes/bit10DEFIFilterData'
+import { handleBIT10BRC20CurrentPrice } from './routes/bit10BRC20CurrentPrice'
+import { handleBIT10BRC20FilterData } from './routes/bit10BRC20FilterData'
+import { handleBIT10BRC20RebalanceData } from './routes/bit10BRC20RabalanceHistory'
+import { handleBIT10TOPCurrentPrice } from './routes/bit10TOPCurrentPrice'
+import { handleBIT10TOPFilterData } from './routes/bit10TOPFilterData'
+import { handleBIT10TopRebalanceData } from './routes/bit10TOPRabalanceHistory'
+import { handleBIT10MEMECurrentPrice } from './routes/bit10MEMECurrentPrice'
+import { handleBIT10MEMEFilterData } from './routes/bit10MEMEFilterData'
+import { handleTestBIT10MEMERebalanceData } from './routes/testBit10MEMERabalanceHistory'
 import { handleVerifyTransaction } from './routes/verifyTransaction'
 import { handelCreateTransaction } from './routes/createTransaction'
-import { handleBit10ComparisonData } from './routes/bit10Comparison'
+import { handleBIT10ComparisonData } from './routes/bit10Comparison'
 
 dotenv.config();
 
 const PORT = 8080;
 
 const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void>> = {
-    '/bit10-defi-current-price': handleBit10DEFICurrentPrice,
-    '/bit10-defi': handleBit10DEFIFilterData,
-    '/bit10-brc20-current-price': handleBit10BRC20CurrentPrice,
-    '/bit10-brc20': handleBit10BRC20FilterData,
-    '/bit10-brc20-rebalance': handleBit10BRC20RebalanceData,
-    '/bit10-top-current-price': handleBit10TOPCurrentPrice,
-    '/bit10-top': handleBit10TOPFilterData,
-    '/bit10-top-rebalance': handleBit10TopRebalanceData,
-    '/test-bit10-meme-current-price': handleBit10MEMECurrentPrice,
-    '/test-bit10-meme': handleBit10MEMEFilterData,
-    '/test-bit10-meme-rebalance': handleTestBit10MEMERebalanceData,
+    '/bit10-defi-current-price': handleBIT10DEFICurrentPrice,
+    '/bit10-defi': handleBIT10DEFIFilterData,
+    '/bit10-brc20-current-price': handleBIT10BRC20CurrentPrice,
+    '/bit10-brc20': handleBIT10BRC20FilterData,
+    '/bit10-brc20-rebalance': handleBIT10BRC20RebalanceData,
+    '/bit10-top-current-price': handleBIT10TOPCurrentPrice,
+    '/bit10-top': handleBIT10TOPFilterData,
+    '/bit10-top-rebalance': handleBIT10TopRebalanceData,
+    '/test-bit10-meme-current-price': handleBIT10MEMECurrentPrice,
+    '/test-bit10-meme': handleBIT10MEMEFilterData,
+    '/test-bit10-meme-rebalance': handleTestBIT10MEMERebalanceData,
     '/verify-transaction': handleVerifyTransaction,
     '/create-transaction': handelCreateTransaction,
-    '/bit10-comparison': handleBit10ComparisonData
+    '/bit10-comparison': handleBIT10ComparisonData
 };
 
 const requestHandler = async (req: http.IncomingMessage, res: http.ServerResponse) => {
@@ -64,10 +64,10 @@ server.listen(PORT, '::', async () => {
     console.log(`🚀 Server is running on port ${PORT} (IPv6 and IPv4)`);
     try {
         const results = await Promise.allSettled([
-            fetchAndUpdateBit10DEFIData(),
-            fetchAndUpdateBit10BRC20Data(),
-            fetchAndUpdateBit10TOPData(),
-            fetchAndUpdateBit10MEMEData()
+            fetchAndUpdateBIT10DEFIData(),
+            fetchAndUpdateBIT10BRC20Data(),
+            fetchAndUpdateBIT10TOPData(),
+            fetchAndUpdateBIT10MEMEData()
         ]);
 
         results.forEach((result, index) => {

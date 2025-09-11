@@ -43,27 +43,29 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 
 ⚠️ Steps to run the canister and the related architecture diagrams are present in their respective folders.
 
-- **`icp_canister/`** - Contains all the canisters on ICP.
+- **`icp_canisters/`** - Contains all the canisters on the ICP canister.
 
   - **`asset_storage/`** - Contains canister code for storing different token types:
     - `bsc_asset_storage/` - Stores BNB and BEP20 tokens.
-    - `erc20_asset_storage/` - Stores ETH and ERC-20 tokens.
+    - `eth_asset_storage/` - Stores ETH and ERC-20 tokens.
     - `icp_asset_storage/` - Stores ICP tokens.
     - `sui_asset_storage/` - Stores SUI tokens.
     - `trx_asset_storage/` - Stores TRX tokens.
 
-  - **`buy_bit10/`** - Swap logic for buying and selling BIT10 tokens on ICP.
+  - **`buy_bit10/`** - Swap logic for buying and selling BIT10 tokens on the ICP canister.
+    - `testnet_buy_bit10/` - Canister code for buying Test BIT10 across different chains on the ICP canister.
+    - `mainnet_buy_bit10/` - Canister code for buying BIT10 across different chains on the ICP canister.
   
-  - **`ai_portfolio_manager/`** - AI Portfolio Manager canister running on ICP.
+  - **`ai_portfolio_manager/`** - AI Portfolio Manager canister running on the ICP canister.
   
-  - **`dex/`** - DEX swap logic for same-chain and cross-chain token swaps on ICP.
+  - **`dex/`** - DEX swap logic for same-chain and cross-chain token swaps on the ICP canister.
     - `testnet_dex_router/` - Canister code for the DEX router.
     - `testnet_dex_eth_asset_storage/` - Canister code for swapping tokens on Ethereum.
     - `testnet_dex_bsc_asset_storage/` - Canister code for swapping token on BSC.
     - `testnet_dex_bsc_eth_asset_storage/` - Canister code for swapping token between BSC and Ethereum.
 
   - **`lending_and_borrowing/`**
-    - `testnet_lending_and_borrowing/` - Canister code for the Cross-Chain Lending and Borrowing on ICP testnet.
+    - `testnet_lending_and_borrowing/` - Canister code for the Cross-Chain Lending and Borrowing on the ICP canister.
 
   - **`liquidity_hub/`**
     - `testnet_liquidity_hub/` - Canister code for the Liquidity Hub on ICP testnet.
@@ -88,6 +90,7 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 - AI Portfolio Manager: [anic3-viaaa-aaaap-qqcaq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=anic3-viaaa-aaaap-qqcaq-cai)
 - BIT10.BTC Faucet: [5wxtf-uqaaa-aaaap-qpvha-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=5wxtf-uqaaa-aaaap-qpvha-cai)
 - BIT10 Exchange Canister: [6phs7-6yaaa-aaaap-qpvoq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=6phs7-6yaaa-aaaap-qpvoq-cai)
+- BIT10 Testnet Buy Canister: [feujt-7iaaa-aaaap-qqc4q-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=feujt-7iaaa-aaaap-qqc4q-cai)
 - BIT10 Testnet Liquidity Hub: [jskxc-iiaaa-aaaap-qpwrq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=jskxc-iiaaa-aaaap-qpwrq-cai)
 - BIT10 Testnet DEX: [t2vfi-5aaaa-aaaap-qqbfa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=t2vfi-5aaaa-aaaap-qqbfa-cai)
 - BIT10 Testnet Cross-Chain Lending and Borrowing: [dp57e-fyaaa-aaaap-qqclq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=dp57e-fyaaa-aaaap-qqclq-cai)
@@ -95,6 +98,7 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 - Test BIT10.DEFI: [hbs3g-xyaaa-aaaap-qhmna-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=hbs3g-xyaaa-aaaap-qhmna-cai)
 - Test BIT10.BRC20: [uv4pt-4qaaa-aaaap-qpuxa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=uv4pt-4qaaa-aaaap-qpuxa-cai)
 - Test BIT10.TOP: [wbckh-zqaaa-aaaap-qpuza-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=wbckh-zqaaa-aaaap-qpuza-cai)
+- Test BIT10.TOP(ERC20): [0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D](https://sepolia.etherscan.io/token/0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D)
 - Test BIT10.MEME: [yeoei-eiaaa-aaaap-qpvzq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=yeoei-eiaaa-aaaap-qpvzq-cai)
 - BIT10.DEFI: [bin4j-cyaaa-aaaap-qh7tq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=bin4j-cyaaa-aaaap-qh7tq-cai)
 - BIT10.TOP: [g37b3-lqaaa-aaaap-qp4hq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=g37b3-lqaaa-aaaap-qp4hq-cai)

@@ -184,10 +184,14 @@ export default function RebalanceCollateral() {
     }, []);
 
     const calculateTotalCollateral = (tokens: CoinSetData[], priceData: CoinData[]) => {
-        return tokens?.reduce((sum, token) => {
-            const foundCollateralPrice = priceData?.find(collateral => collateral.id === token.id);
-            return foundCollateralPrice ? sum + (token.noOfTokens * foundCollateralPrice.price) : sum;
-        }, 0) ?? 0;
+        if (!tokens?.length) return 0;
+        return tokens.reduce((sum, token) => {
+            const foundCollateralPrice = priceData?.find(
+                (collateral) => collateral.id.toString() === token.id.toString()
+            );
+            const value = foundCollateralPrice ? (token.noOfTokens ?? 0) * (foundCollateralPrice.price ?? 0) : 0;
+            return sum + value;
+        }, 0);
     };
 
     const calculateTargetValue = (priceOfTokenToBuy: number, numTokens: number) => {
