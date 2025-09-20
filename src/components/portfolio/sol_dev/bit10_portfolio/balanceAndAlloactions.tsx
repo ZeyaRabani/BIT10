@@ -24,7 +24,7 @@ export default function BalanceAndAlloactions() {
     const { publicKey } = useWallet();
     const { connection } = useConnection();
 
-    const fetchBit10Balance = async (splMint: string, decimalPlaces: number) => {
+    const fetchBIT10Balance = async (splMint: string, decimalPlaces: number) => {
         const tokenAddressPublicKey = new PublicKey(splMint);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
@@ -77,7 +77,7 @@ export default function BalanceAndAlloactions() {
             },
             {
                 queryKey: ['bit10DEFIBalance'],
-                queryFn: () => fetchBit10Balance('5bzHsBmXwX3U6yqKH8uoFgHrUNyoNJvMuAajsBbsHt5K', 9)
+                queryFn: () => fetchBIT10Balance('5bzHsBmXwX3U6yqKH8uoFgHrUNyoNJvMuAajsBbsHt5K', 9)
             },
         ],
     });

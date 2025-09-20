@@ -18,7 +18,7 @@ export default function BSCTestnetOverview() {
         return `${id.slice(0, 4)}...${id.slice(-3)}`;
     };
 
-    const fetchBit10Balance = async () => {
+    const fetchBIT10Balance = async () => {
         return 0;
     };
 
@@ -34,7 +34,7 @@ export default function BSCTestnetOverview() {
         queries: [
             {
                 queryKey: ['bit10TOPBalance'],
-                queryFn: () => fetchBit10Balance()
+                queryFn: () => fetchBIT10Balance()
             },
             {
                 queryKey: ['userActiveLoansCount'],

@@ -17,7 +17,7 @@ export default function BalanceAndAlloactions() {
     const [selectedAllocationToken, setSelectedAllocationToken] = useState('Test BIT10.TOP');
     const [innerRadius, setInnerRadius] = useState<number>(80);
 
-    const fetchBit10Balance = async () => {
+    const fetchBIT10Balance = async () => {
         return 0;
     }
 
@@ -52,7 +52,7 @@ export default function BalanceAndAlloactions() {
             },
             {
                 queryKey: ['bit10TOPBalance'],
-                queryFn: () => fetchBit10Balance()
+                queryFn: () => fetchBIT10Balance()
             },
         ],
     });

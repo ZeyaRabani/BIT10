@@ -22,7 +22,7 @@ export default function SolDevOverview() {
         return `${id.slice(0, 4)}...${id.slice(-3)}`;
     };
 
-    const fetchBit10Balance = async (splMint: string, decimalPlaces: number) => {
+    const fetchBIT10Balance = async (splMint: string, decimalPlaces: number) => {
         const tokenAddressPublicKey = new PublicKey(splMint);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
@@ -49,7 +49,7 @@ export default function SolDevOverview() {
         queries: [
             {
                 queryKey: ['bit10DEFIBalance'],
-                queryFn: () => fetchBit10Balance('5bzHsBmXwX3U6yqKH8uoFgHrUNyoNJvMuAajsBbsHt5K', 9)
+                queryFn: () => fetchBIT10Balance('5bzHsBmXwX3U6yqKH8uoFgHrUNyoNJvMuAajsBbsHt5K', 9)
             },
             {
                 queryKey: ['userActiveLoansCount'],

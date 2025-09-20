@@ -19,9 +19,7 @@ const recentLendingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] = [
             <DataTableColumnHeader column={column} title='Amount Lend' />
         ),
         filterFn: (row, columnId, value) => {
-            const formattedAmount = row.original.tokenChain.toLowerCase() === 'icp'
-                ? formatAmount(Number(row.original.tokenAmount) / 100000000)
-                : formatAmount(Number(row.original.tokenAmount));
+            const formattedAmount = formatAmount(Number(row.original.tokenAmount));
             const tokenName = getTokenName(row.original.tokenAddress);
             const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
             return searchableText.includes((value as string).toLowerCase());
@@ -53,7 +51,7 @@ const recentLendingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 
             return (
                 <Button>
-                    Withdraw / Claim Interest
+                    Withdraw
                 </Button>
             )
         },

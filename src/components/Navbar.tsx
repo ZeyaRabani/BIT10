@@ -21,8 +21,8 @@ const links = {
         { title: 'Whitepaper', link: '/whitepaper' }
     ],
     app: [
-        { title: 'DEX', link: '/swap' },
         { title: 'Buy BIT10.TOP', link: '/buy' },
+        { title: 'DEX', link: '/swap' },
         { title: 'Lend & Borrow', link: '/lend-and-borrow' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
@@ -139,7 +139,7 @@ export default function Navbar() {
                     {appMode ? (
                         <WalletBtn />
                     ) : (
-                        <Link href='/swap' passHref>
+                        <Link href='/buy' passHref>
                             <Button className='rounded-full'>Launch App</Button>
                         </Link>
                     )}

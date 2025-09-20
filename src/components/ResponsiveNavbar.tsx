@@ -16,8 +16,8 @@ const links = {
         { title: 'Whitepaper', link: '/whitepaper', icon: BookText }
     ],
     app: [
-        { title: 'DEX', link: '/swap', icon: ArrowRightLeft },
         { title: 'Buy BIT10.TOP', link: '/buy', icon: Coins },
+        { title: 'DEX', link: '/swap', icon: ArrowRightLeft },
         { title: 'Lend & Borrow', link: '/lend-and-borrow', icon: HandCoins },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
@@ -116,7 +116,7 @@ export default function ResponsiveNavbar() {
                                         </div>
                                     ) : (
                                         <div className='border-b-2 py-2 px-2 cursor-pointer w-full'>
-                                            <Link href='/swap' passHref>
+                                            <Link href='/buy' passHref>
                                                 <Button className='rounded-full w-full'>
                                                     Launch App
                                                 </Button>

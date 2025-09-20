@@ -31,6 +31,12 @@ const recentSwapTableColumns: ColumnDef<PortfolioTableDataType>[] = [
         },
     },
     {
+        accessorKey: 'status',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Status' />
+        ),
+    },
+    {
         accessorKey: 'token_swap_on',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Timestamp' />

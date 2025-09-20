@@ -43,7 +43,7 @@ type AssetComparison = {
     currentValue: number;
     totalReturn: number;
     percentageReturn: number;
-    apy?: number; // Added APY field
+    apy?: number;
 };
 
 type ComparisonResult = {
@@ -260,8 +260,8 @@ export default function BIT10Comparison() {
 
             const years = {
                 '1Y': 1,
-                '3Y': 3,
-                '5Y': 5
+                '5Y': 5,
+                '10Y': 10
             }[periodLabel] ?? 1;
 
             return {
@@ -274,10 +274,10 @@ export default function BIT10Comparison() {
 
         return {
             '1Y': calculatePeriodAPY(bit10Comparison1Y, '1Y'),
-            '3Y': calculatePeriodAPY(bit10Comparison3Y, '3Y'),
-            '5Y': calculatePeriodAPY(bit10Comparison5Y, '5Y')
+            '5Y': calculatePeriodAPY(bit10Comparison5Y, '5Y'),
+            '10Y': calculatePeriodAPY(bit10Comparison10Y, '10Y')
         };
-    }, [bit10Comparison1Y, bit10Comparison3Y, bit10Comparison5Y, safeParseFloat]);
+    }, [bit10Comparison1Y, bit10Comparison5Y, bit10Comparison10Y, safeParseFloat]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -392,7 +392,7 @@ export default function BIT10Comparison() {
         <div className='flex flex-col space-y-4'>
             <div className='mt-4 py-4'>
                 <div className='grid md:grid-cols-3 gap-8'>
-                    {['1Y', '3Y', '5Y'].map((period) => (
+                    {['1Y', '5Y', '10Y'].map((period) => (
                         <div key={period} className='border-2 rounded py-8 px-3'>
                             <h4 className='font-medium text-2xl text-center mb-2'>BIT10.TOP {period} APY</h4>
                             {apyData[period as keyof typeof apyData] ? (

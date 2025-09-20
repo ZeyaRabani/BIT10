@@ -230,13 +230,13 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
         if (!chain) return 0;
 
         // For ICP
-        if (item.token_chain === 'ICP' && chain === 'icp' && selectedCollateralToken?.address === 'wbckh-zqaaa-aaaap-qpuza-cai') {
+        if (chain === 'icp' && selectedCollateralToken?.address === 'wbckh-zqaaa-aaaap-qpuza-cai') {
             return collateralBalanceQueries[0].data ?? 0;
         }
         else {
             return 0;
         }
-    }, [chain, collateralBalanceQueries, item.token_chain, selectedCollateralToken?.address]);
+    }, [chain, collateralBalanceQueries, selectedCollateralToken?.address]);
 
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
@@ -248,7 +248,7 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
             if (chain === 'icp' && ICPAddress) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await createICPBorrowTransaction({ address: ICPAddress, values: values, collateralChain: selectedCollateralToken?.chain });
+                await createICPBorrowTransaction({ address: ICPAddress, values: values, borrowingTokenChain: borrowingTokenChain, borrowingTokenAddress: item.token_address });
             } else {
                 toast.error('Unsupported chain');
             }
@@ -264,6 +264,8 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
         const sourceChain = item.token_chain;
         if (sourceChain === 'ICP') {
             return 'icp';
+        } else if (sourceChain === 'Ethereum') {
+            return 'ethereum';
         }
         else {
             return undefined;
@@ -276,17 +278,16 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
         return chain !== borrowingTokenChain;
     }, [chain, borrowingTokenChain]);
 
-    const borrowDisabledConditions = !chain || chain !== borrowingTokenChain || borrowing || form.watch('collateral_amount') >= Number(collateralTokenBalance) * (parseFloat(item.ltv) / 100) || form.watch('collateral_amount') >= Number(collateralTokenBalance) || form.watch('collateral_amount') <= 0;
+    const borrowDisabledConditions = !chain || item.token_chain !== 'ICP' && item.token_chain !== 'Ethereum' || borrowing || form.watch('borrow_amount') >= (Number(collateralTokenBalance) * (parseFloat(item.ltv) / 100)) || form.watch('borrow_amount') >= Number(collateralTokenBalance) || Number(form.watch('borrow_amount')) <= 0;
 
     const getBorrowMessage = (): string => {
-        const borrowingAmount = Number(form.watch('collateral_amount'));
+        const borrowingAmount = Number(form.watch('borrow_amount'));
         const collateralbalance = Number(collateralTokenBalance);
 
         if (!chain) return 'Connect your wallet to continue';
         // ToDo: Temp, remove this when supported
-        if (item.token_chain !== 'ICP') return `Borrowing will be available on ${item.token_chain} soon`;
-        if (chain !== borrowingTokenChain) return `Connect wallet on ${item.token_chain} to continue`;
-        if (borrowingAmount >= collateralbalance * (parseFloat(item.ltv) / 100)) return `You cannot borrow an amount too close to your collateral's value`;
+        if (chain !== 'icp') return `Borrowing will be available for ${item.token_chain} token soon`;
+        if (borrowingAmount >= (collateralbalance * (parseFloat(item.ltv) / 100))) return `You cannot borrow an amount too close to your collateral's value ${borrowingAmount} ${collateralbalance}`;
         if (borrowingAmount >= collateralbalance) return 'Your collateral balance is too low for borrowing';
         if (borrowingAmount <= 0) return 'Amount too low';
         if (borrowing) return 'Borrowing...';
@@ -440,22 +441,20 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
                                     />
 
                                     {isCrossChain && (
-                                        <div className='overflow-hidden'>
-                                            <FormField
-                                                control={form.control}
-                                                name='borrow_wallet_address'
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Receiver Address</FormLabel>
-                                                        <FormControl>
-                                                            <Input className='dark:border-white' placeholder='Receiver wallet address' {...field} type='number' />
-                                                        </FormControl>
-                                                        <FormDescription>Enter the wallet address where you want to receive the borrowed tokens</FormDescription>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                                        <FormField
+                                            control={form.control}
+                                            name='borrow_wallet_address'
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Receiver Address</FormLabel>
+                                                    <FormControl>
+                                                        <Input className='dark:border-white' placeholder='Receiver wallet address' {...field} />
+                                                    </FormControl>
+                                                    <FormDescription>Enter the wallet address where you want to receive the borrowed tokens</FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     )}
 
                                     <div className='bg-blue-200 flex flex-col space-y-1 rounded border-2 border-blue-600 text-black p-2'>
@@ -484,6 +483,17 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
                                     <div>
                                         If you fail to repay the loan with interest on time, your collateral will be liquidated.
                                     </div>
+
+                                    {borrowing && (
+                                        <motion.div
+                                            className='text-center'
+                                            initial={{ y: 5, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ duration: 0.5, ease: 'easeOut' }}
+                                        >
+                                            Please keep this tab open until the borrowing is complete.
+                                        </motion.div>
+                                    )}
 
                                     <Button className='w-full rounded-lg' disabled={borrowDisabledConditions}>
                                         {borrowing && <Loader2 className='animate-spin mr-2' size={15} />}

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import type { LendAndBorrorTableDataType } from '@/components/ui/data-table-lend-and-borrow'
 import { useChain } from '@/context/ChainContext'
+import { useAccount, useWalletClient, usePublicClient } from 'wagmi'
 import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -10,10 +11,12 @@ import { Button } from '@/components/ui/button'
 import { useQueries } from '@tanstack/react-query'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { fetchICPTokenBalance, createICPLendTransaction } from './icp/ICPLendandBorrowModule'
+import { fetchSepoliaTokenBalance, createETHSepoliaLendTransaction } from './eth_sepolia/ETHSepoliaLendandBorrowModule'
 import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form'
 import { formatAmount } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const FormSchema = z.object({
     lend_amount: z
@@ -28,6 +31,9 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
 
     const { chain } = useChain();
     const { ICPAddress } = useICPWallet();
+    const { address } = useAccount();
+    const { data: walletClient } = useWalletClient();
+    const publicClient = usePublicClient();
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -47,7 +53,17 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
                 },
                 enabled: !!ICPAddress && chain === 'icp',
                 refetchInterval: 10000, // 10 seconds
-            }
+            },
+            // For USDC on Ethereum
+            {
+                queryKey: ['ethSepoliaUsdcBalance', address, '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'],
+                queryFn: () => {
+                    if (!address || chain !== 'eth_sepolia') return '0';
+                    return fetchSepoliaTokenBalance('0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', address, publicClient);
+                },
+                enabled: !!address && chain === 'eth_sepolia',
+                refetchInterval: 10000, // 10 seconds
+            },
         ],
     });
 
@@ -57,6 +73,10 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
         // For ICP
         if (item.token_chain === 'ICP' && chain === 'icp' && item.token_address === 'eegan-kqaaa-aaaap-qhmgq-cai') {
             return lendBalanceQueries[0].data ?? 0;
+        }
+        // For Ethereum
+        else if (item.token_chain === 'Ethereum' && chain === 'eth_sepolia' && item.token_address === '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238') {
+            return lendBalanceQueries[1].data ?? 0;
         }
         else {
             return 0;
@@ -68,7 +88,10 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
             setLending(true);
             if (chain === 'icp' && ICPAddress) {
                 await createICPLendTransaction({ values: values, tokenAddress: item.token_address, address: ICPAddress, chain: item.token_chain });
-            } else {
+            } else if (chain === 'eth_sepolia' && address) {
+                await createETHSepoliaLendTransaction({ values: values, tokenAddress: item.token_address, address: address, chain: item.token_chain, walletClient: walletClient })
+            }
+            else {
                 toast.error('Unsupported chain');
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -83,6 +106,8 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
         const sourceChain = item.token_chain;
         if (sourceChain === 'ICP') {
             return 'icp';
+        } else if (sourceChain === 'Ethereum') {
+            return 'eth_sepolia';
         }
         else {
             return undefined;
@@ -99,9 +124,9 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
 
         if (!chain) return 'Connect your wallet to continue';
         // ToDo: Temp, remove this when supported
-        if (item.token_chain !== 'ICP') return `Lending will be available on ${item.token_chain} soon`;
+        if (item.token_chain !== 'ICP' && item.token_chain !== 'Ethereum') return `Lending will be available on ${item.token_chain} soon`;
         if (chain !== lendTokenChain) return `Connect wallet on ${item.token_chain} to continue`;
-        if (lendingAmount >= balance || lendingAmount >= balance * 1.01 && !lending) return 'Your balance is too low for lending';
+        if ((lendingAmount >= balance || lendingAmount >= balance * 1.01) && !lending) return 'Your balance is too low for lending';
         if (lendingAmount <= 0) return 'Amount too low';
         if (lending) return 'Lending...';
         return 'Lend';
@@ -147,7 +172,7 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Estimated Earnings</div>
-                                            <div>{formatAmount(form.watch('lend_amount') * (parseFloat(item.apy) / 100) * (7 / 365))} (per 7 days)</div>
+                                            <div>{formatAmount(form.watch('lend_amount') * (parseFloat(item.apy) / 100) * (8 / 365))} (per 8 days)</div>
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Pool Liquidity</div>
@@ -155,10 +180,19 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Minimum lock-in</div>
-                                            <div>7 days</div>
+                                            <div>8 days</div>
                                         </div>
                                     </div>
-
+                                    {lending && (
+                                        <motion.div
+                                            className='text-center'
+                                            initial={{ y: 5, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ duration: 0.5, ease: 'easeOut' }}
+                                        >
+                                            Please keep this tab open until the lending is complete.
+                                        </motion.div>
+                                    )}
                                     <Button className='w-full rounded-lg' disabled={lendDisabledConditions}>
                                         {lending && <Loader2 className='animate-spin mr-2' size={15} />}
                                         {getLendMessage()}

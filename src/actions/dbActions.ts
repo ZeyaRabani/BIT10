@@ -53,6 +53,7 @@ interface NewDEXSwap {
 }
 
 interface NewTokenLend {
+    lendId: string;
     lenderAddress: string,
     tokenChain: string,
     tokenAddress: string,
@@ -64,6 +65,7 @@ interface NewTokenLend {
 }
 
 interface NewTokenBorrow {
+    borrowId: string;
     borrowerAddress: string,
     borrowTokenChain: string,
     borrowTokenAddress: string,
@@ -314,9 +316,10 @@ export const newDEXSwap = async ({ poolId, amountIn, amountOut, sourceChain, des
     }
 };
 
-export const newTokenLend = async ({ lenderAddress, tokenChain, tokenAddress, tokenAmount, tokenSentTrxHash, interestRate, status, openedAt }: NewTokenLend) => {
+export const newTokenLend = async ({ lendId, lenderAddress, tokenChain, tokenAddress, tokenAmount, tokenSentTrxHash, interestRate, status, openedAt }: NewTokenLend) => {
     try {
         await db.insert(teLend).values({
+            lendId: lendId,
             lenderAddress: lenderAddress,
             tokenChain: tokenChain,
             tokenAddress: tokenAddress,
@@ -333,9 +336,10 @@ export const newTokenLend = async ({ lenderAddress, tokenChain, tokenAddress, to
     }
 };
 
-export const newTokenBorrow = async ({ borrowerAddress, borrowTokenChain, borrowTokenAddress, borrowTokenAmount, borrowTrxHash, collateralAddress, collateralChain, collateralAmount, collateralTrxHash, borrowWalletAddress, interestRate, status, openedAt }: NewTokenBorrow) => {
+export const newTokenBorrow = async ({ borrowId, borrowerAddress, borrowTokenChain, borrowTokenAddress, borrowTokenAmount, borrowTrxHash, collateralAddress, collateralChain, collateralAmount, collateralTrxHash, borrowWalletAddress, interestRate, status, openedAt }: NewTokenBorrow) => {
     try {
         await db.insert(teBorrow).values({
+            borrowId: borrowId,
             borrowerAddress: borrowerAddress,
             borrowTokenChain: borrowTokenChain,
             borrowTokenAddress: borrowTokenAddress,
@@ -381,7 +385,7 @@ export const userRecentLendActivity = async ({ source_chain, address }: { source
     }
 }
 
-export const userRecentBorrowActivity = async ({ source_chain, address }: { source_chain: string, address: string }) => {
+export const userRecentBorrowActivity = async ({ address }: { address: string }) => {
     try {
         const data = await db.select({
             status: teBorrow.status,
@@ -397,8 +401,7 @@ export const userRecentBorrowActivity = async ({ source_chain, address }: { sour
         })
             .from(teBorrow)
             .where(and(
-                eq(teBorrow.borrowerAddress, address.toLowerCase()),
-                eq(teBorrow.borrowTokenChain, source_chain)
+                eq(teBorrow.borrowerAddress, address.toLowerCase())
             ))
             .orderBy(desc(teBorrow.openedAt));
         return data;

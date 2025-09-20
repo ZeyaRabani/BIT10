@@ -82,11 +82,11 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<LendA
         switch (cell.column.id) {
             case 'token_details':
                 return (
-                    <div className='flex flex-row space-x-1 items-center'>
-                        <div className='relative'>
-                            <Image src={getTokenImg(row.original.token_name)} alt={row.original.token_address} width={50} height={50} />
-                            <div className='absolute -bottom-2 right-0 border-[1px] border-[#B4B3B3] rounded-full bg-white'>
-                                <Image src={getTokenChainImg(row.original.token_chain)} alt={row.original.token_address} width={20} height={20} />
+                    <div className='flex flex-row items-center space-x-2'>
+                        <div className='relative w-10 h-10 min-w-[40px] min-h-[40px]'>
+                            <Image src={getTokenImg(row.original.token_name)} alt={row.original.token_address} fill className='object-contain rounded-full' />
+                            <div className='absolute -bottom-1 -right-1 w-5 h-5 border border-[#B4B3B3] rounded-full bg-white'>
+                                <Image src={getTokenChainImg(row.original.token_chain)} alt={`${row.original.token_chain} logo`} fill className='object-contain rounded-full' />
                             </div>
                         </div>
                         <div className='flex flex-col'>

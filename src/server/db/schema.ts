@@ -188,16 +188,7 @@ export const teSwap = pgTable('te_swap', {
 	transactionStatus: text('transaction_status').notNull(),
 	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
 	network: text('network').notNull(),
-},
-	(table) => {
-		return {
-			teSwapUserPrincipalIdFkey: foreignKey({
-				columns: [table.userPrincipalId],
-				foreignColumns: [teUsers.userPrincipalId],
-				name: 'te_swap_user_principal_id_fkey'
-			}),
-		}
-	});
+});
 
 export const testBit10MemeRebalance = pgTable('test_bit10_meme_rebalance', {
 	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
@@ -422,8 +413,6 @@ export const bit10TopRebalance = pgTable('bit10_top_rebalance', {
 	});
 
 export const teBorrow = pgTable('te_borrow', {
-	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
-	id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity({ name: 'te_borrow_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
 	borrowerAddress: text('borrower_address').notNull(),
 	borrowTokenChain: text('borrow_token_chain').notNull(),
 	borrowTokenAddress: text('borrow_token_address').notNull(),
@@ -444,16 +433,16 @@ export const teBorrow = pgTable('te_borrow', {
 	closedAt: bigint('closed_at', { mode: 'number' }),
 	collateralChain: text('collateral_chain').notNull(),
 	borrowWalletAddress: text('borrow_wallet_address').notNull(),
+	borrowId: text('borrow_id').primaryKey().notNull(),
 },
 	(table) => {
 		return {
 			idxTeBorrowBorrowerAddress: index('idx_te_borrow_borrower_address').using('btree', table.borrowerAddress.asc().nullsLast()),
+			teBorrowBorrowIdKey: unique('te_borrow_borrow_id_key').on(table.borrowId),
 		}
 	});
 
 export const teLend = pgTable('te_lend', {
-	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
-	id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity({ name: 'te_lend_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
 	lenderAddress: text('lender_address').notNull(),
 	tokenChain: text('token_chain').notNull(),
 	tokenAddress: text('token_address').notNull(),
@@ -469,10 +458,12 @@ export const teLend = pgTable('te_lend', {
 	openedAt: bigint('opened_at', { mode: 'number' }).notNull(),
 	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
 	closedAt: bigint('closed_at', { mode: 'number' }),
+	lendId: text('lend_id').primaryKey().notNull(),
 },
 	(table) => {
 		return {
 			idxTeLendLenderAddress: index('idx_te_lend_lender_address').using('btree', table.lenderAddress.asc().nullsLast()),
+			teLendLendIdKey: unique('te_lend_lend_id_key').on(table.lendId),
 		}
 	});
 

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { Search, X, ExternalLink } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 export type PortfolioTableDataType = {
     status: string,
@@ -133,6 +134,10 @@ export function DataTable<TData, TValue>({
                         <div>{getTokenName(row.original.tokenOutAddress)}</div>
                     </div>
                 );
+            case 'status':
+                return (
+                    <Badge className={`capitalize ${row.original.status === 'reverted' && 'bg-pink-800'}`}>{row.original.status}</Badge>
+                );
             case 'token_swap_on':
                 return formatDate(row.original.timestamp);
             case 'view_inbound_transaction':
@@ -149,18 +154,23 @@ export function DataTable<TData, TValue>({
                     </a>
                 )
             case 'view_outbound_transaction':
+                const isReverted = row.original.status === 'reverted';
+                const explorerUrl = isReverted
+                    ? `${getTokenExplorer(row.original.tokenInAddress)}${getTokenExplorer(row.original.tokenInAddress).endsWith('/') ? '' : '/'}${row.original.txHashOut}`
+                    : `${getTokenExplorer(row.original.tokenOutAddress.toLowerCase())}${getTokenExplorer(row.original.tokenOutAddress.toLowerCase()).endsWith('/') ? '' : '/'}${row.original.txHashOut}`;
+
                 return (
                     <a
-                        href={`${getTokenExplorer(row.original.tokenOutAddress.toLowerCase())}${getTokenExplorer(row.original.tokenOutAddress.toLowerCase()).endsWith('/') ? '' : '/'}${row.original.txHashOut}`}
-                        target='_blank'
-                        rel='noopener noreferrer'
+                        href={explorerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
                     >
                         <Button>
                             View Transaction
-                            <ExternalLink className='ml-1 w-4 h-4' />
+                            <ExternalLink className="ml-1 w-4 h-4" />
                         </Button>
                     </a>
-                )
+                );
             default:
                 return cell.column.columnDef.cell ? flexRender(cell.column.columnDef.cell, cell) : null;
         }

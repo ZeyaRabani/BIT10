@@ -23,7 +23,7 @@ export default function BalanceAndAlloactions() {
 
     const { ICPAddress } = useICPWallet();
 
-    const fetchBit10Balance = async (canisterId: string) => {
+    const fetchBIT10Balance = async (canisterId: string) => {
         const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
 
         const agent = new HttpAgent({ host });
@@ -83,11 +83,11 @@ export default function BalanceAndAlloactions() {
             },
             {
                 queryKey: ['bit10TOPBalance'],
-                queryFn: () => fetchBit10Balance('wbckh-zqaaa-aaaap-qpuza-cai')
+                queryFn: () => fetchBIT10Balance('wbckh-zqaaa-aaaap-qpuza-cai')
             },
             {
                 queryKey: ['bit10MEMEBalance'],
-                queryFn: () => fetchBit10Balance('yeoei-eiaaa-aaaap-qpvzq-cai')
+                queryFn: () => fetchBIT10Balance('yeoei-eiaaa-aaaap-qpvzq-cai')
             }
         ],
     });
@@ -106,7 +106,7 @@ export default function BalanceAndAlloactions() {
     };
 
     const totalRaw = toBigInt(bit10TOPTokenBalance) + toBigInt(bit10MEMETokenBalance);
-    const totalBIT10Tokens = Number(totalRaw) / 100000000;
+    const totalBIT10Tokens = Number(totalRaw);
 
     const selectedBit10Token = () => {
         if (selectedAllocationToken === 'Test BIT10.TOP') {

@@ -36,10 +36,12 @@ type Bit10RebalanceEntry = {
 const RebalanceSwapsTable = ({
     initialTokens,
     rebalanceTokens,
+    nextEntryTokens,
     formatAmount
 }: {
     initialTokens: CoinSetData[],
     rebalanceTokens: CoinSetData[],
+    nextEntryTokens?: CoinSetData[],
     formatAmount: (value: number) => string
 }) => {
     if (!initialTokens?.length || !rebalanceTokens?.length) return null;
@@ -212,7 +214,26 @@ const RebalanceSwapsTable = ({
                     </Table>
                 </div>
             );
-        } else if (buySwaps.length === 0 && sellSwaps.length > 0) {
+        } else if (buySwaps.length === 0 && sellSwaps.length > 0 && nextEntryTokens) {
+            const nextTokenMap = new Map(nextEntryTokens.map(t => [t.symbol, t]));
+
+            const reductions = rebalanceTokens
+                .map(token => {
+                    const prev = nextTokenMap.get(token.symbol);
+                    if (!prev) return null;
+
+                    const diffTokens = prev.noOfTokens - token.noOfTokens;
+                    if (diffTokens <= 0) return null;
+
+                    return {
+                        name: token.name,
+                        symbol: token.symbol,
+                        difference: diffTokens,
+                        value: diffTokens * prev.price,
+                    };
+                })
+                .filter(Boolean) as Array<{ name: string; symbol: string; difference: number; value: number }>;
+
             return (
                 <div className='my-4 w-full'>
                     <h2 className='text-xl font-semibold mb-4'>Rebalance Trades</h2>
@@ -226,16 +247,16 @@ const RebalanceSwapsTable = ({
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {sellSwaps.map((swap, index) => (
+                            {reductions.map((reduction, index) => (
                                 <TableRow key={index}>
                                     <TableCell className='text-red-600'>
-                                        {swap.name} ({swap.symbol})
+                                        {reduction.name} ({reduction.symbol})
                                     </TableCell>
                                     <TableCell className='text-right text-red-600'>
-                                        -{formatAmount(swap.difference)}
+                                        -{formatAmount(reduction.difference)}
                                     </TableCell>
                                     <TableCell className='text-right'>
-                                        ${formatAmount(swap.value)}
+                                        ${formatAmount(reduction.value)}
                                     </TableCell>
                                 </TableRow>
                             ))}

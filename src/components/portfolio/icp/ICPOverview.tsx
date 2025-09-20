@@ -23,7 +23,7 @@ export default function ICPOverview() {
         return `${id.slice(0, 4)}...${id.slice(-3)}`;
     };
 
-    const fetchBit10Balance = async (canisterId: string) => {
+    const fetchBIT10Balance = async (canisterId: string) => {
         const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
 
         const agent = new HttpAgent({ host });
@@ -53,7 +53,7 @@ export default function ICPOverview() {
     };
 
     const fetchUserActiveLoansCount = async (address: string) => {
-        const response = await userActiveLoansCount({ source_chain: 'ICP', address: address });
+        const response = await userActiveLoansCount({ source_chain: 'icp', address: address });
         if (response === 'Error fetching user borrow activity') {
             toast.error('An error occurred while fetching user borrow activity. Please try again!');
         } else {
@@ -62,7 +62,7 @@ export default function ICPOverview() {
     };
 
     const fetchUserActiveTokensCount = async (address: string) => {
-        const response = await userActiveTokensCount({ source_chain: 'ICP', address: address });
+        const response = await userActiveTokensCount({ source_chain: 'icp', address: address });
         if (response === 'Error fetching user borrow activity') {
             toast.error('An error occurred while fetching user borrow activity. Please try again!');
         } else {
@@ -74,11 +74,11 @@ export default function ICPOverview() {
         queries: [
             {
                 queryKey: ['bit10TOPBalance'],
-                queryFn: () => fetchBit10Balance('wbckh-zqaaa-aaaap-qpuza-cai')
+                queryFn: () => fetchBIT10Balance('wbckh-zqaaa-aaaap-qpuza-cai')
             },
             {
                 queryKey: ['bit10MEMEBalance'],
-                queryFn: () => fetchBit10Balance('yeoei-eiaaa-aaaap-qpvzq-cai')
+                queryFn: () => fetchBIT10Balance('yeoei-eiaaa-aaaap-qpvzq-cai')
             },
             {
                 queryKey: ['userActiveLoansCount'],

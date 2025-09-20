@@ -109,16 +109,18 @@ export const createICPLendTransaction = async ({ values, tokenAddress, address, 
                     lender_address: address,
                     token_chain: chain,
                     token_address: tokenAddress,
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    token_amount: Number(values.lend_amount) * 100000000,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    token_amount: (values.lend_amount).toString(),
                 }
 
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                const lending = await actor2.lend(args2);
+                const lending = await actor2.icp_lend(args2);
 
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 if (lending.Ok) {
                     const result = await newTokenLend({
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                        lendId: lending.Ok.lend_id,
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                         lenderAddress: lending.Ok.lender_address,
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -167,7 +169,7 @@ export const createICPLendTransaction = async ({ values, tokenAddress, address, 
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createICPBorrowTransaction = async ({ address, values, collateralChain }: { address: string, values: any, collateralChain: string }) => {
+export const createICPBorrowTransaction = async ({ address, values, borrowingTokenChain, borrowingTokenAddress }: { address: string, values: any, borrowingTokenChain: string, borrowingTokenAddress: string }) => {
     try {
         const lendingAndBorrowingCanister = 'dp57e-fyaaa-aaaap-qqclq-cai';
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -221,25 +223,37 @@ export const createICPBorrowTransaction = async ({ address, values, collateralCh
                     interfaceFactory: lendingAndBorrowingIDLFactory,
                 });
 
+                let borrow_wallet_address;
+                if (borrowingTokenChain === 'icp') {
+                    borrow_wallet_address = address;
+                } else {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                    borrow_wallet_address = values.borrow_wallet_address;
+                }
+
                 const args2 = {
                     borrower_address: address,
-                    borrow_token_chain: collateralChain,
-                    borrow_token_address: "eegan-kqaaa-aaaap-qhmgq-cai",
+                    borrow_token_chain: borrowingTokenChain,
+                    borrow_token_address: borrowingTokenAddress,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    borrow_token_amount: (values.borrow_amount).toString(),
+                    collateral_token_chain: 'icp',
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    borrow_token_amount: Number(values.borrow_amount) * 100000000,
-                    collateral_address: "wbckh-zqaaa-aaaap-qpuza-cai",
-                    collateral_chain: collateralChain,
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    collateral_amount: Number(values.collateral_amount) * 100000000,
-                    borrow_wallet_address: address,
+                    collateral_token_address: values.collateral_token,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    collateral_token_amount: (values.collateral_amount).toString(),
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    borrow_wallet_address: borrow_wallet_address,
                 };
 
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                const borrowing = await actor2.borrow(args2);
+                const borrowing = await actor2.icp_borrow(args2);
 
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 if (borrowing.Ok) {
                     const result = await newTokenBorrow({
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                        borrowId: borrowing.Ok.borrow_id,
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                         borrowerAddress: borrowing.Ok.borrower_address,
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -251,11 +265,11 @@ export const createICPBorrowTransaction = async ({ address, values, collateralCh
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                         borrowTrxHash: borrowing.Ok.borrow_trx_hash,
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                        collateralAddress: borrowing.Ok.collateral_address,
+                        collateralAddress: borrowing.Ok.collateral_token_address,
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                        collateralChain: borrowing.Ok.collateral_chain,
+                        collateralChain: borrowing.Ok.collateral_token_chain,
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                        collateralAmount: Number(borrowing.Ok.collateral_amount).toString(),
+                        collateralAmount: Number(borrowing.Ok.collateral_token_amount).toString(),
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                         collateralTrxHash: borrowing.Ok.collateral_trx_hash,
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -279,7 +293,9 @@ export const createICPBorrowTransaction = async ({ address, values, collateralCh
                     const errorMessage = String(borrowing.Err);
                     if (errorMessage.includes('Insufficient balance')) {
                         toast.error('Insufficient funds');
-                    } else {
+                    } else if (errorMessage.includes('Insufficient liquidity.'))
+                        toast.error('Insufficient liquidity in the pool. Please try again with a lower borrow amount.')
+                    else {
                         toast.error('An error occurred while processing your request. Please try again!');
                     }
                 } else {

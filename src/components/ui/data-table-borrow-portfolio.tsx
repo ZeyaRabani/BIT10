@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { Search, X } from 'lucide-react'
+import { Badge } from '@/components/ui//badge'
 
 export type PortfolioTableDataType = {
     status: string,
@@ -122,7 +123,7 @@ export function DataTable<TData, TValue>({
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {row.original.borrowTokenChain.toLocaleLowerCase() == 'icp' ? formatAmount(Number(row.original.borrowTokenAmount) / 100000000) : formatAmount(Number(row.original.borrowTokenAmount))}
+                            {formatAmount(Number(row.original.borrowTokenAmount))}
                         </div>
                         <div>{getTokenName(row.original.borrowTokenAddress)}</div>
                     </div>
@@ -131,10 +132,18 @@ export function DataTable<TData, TValue>({
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {row.original.collateralChain.toLocaleLowerCase() == 'icp' ? formatAmount(Number(row.original.collateralAmount) / 100000000) : formatAmount(Number(row.original.collateralAmount))}
+                            {formatAmount(Number(row.original.collateralAmount))}
                         </div>
                         <div>{getTokenName(row.original.collateralAddress)}</div>
                     </div>
+                );
+            case 'interestRate':
+                return (
+                    <div>{row.original.interestRate}%</div>
+                );
+            case 'status':
+                return (
+                    <Badge className={`capitalize ${row.original.status === 'closed' && 'bg-pink-800'}`}>{row.original.status}</Badge>
                 );
             case 'token_borrowed_on':
                 return formatDate(row.original.openedAt);

@@ -19,9 +19,7 @@ const recentLendingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] = [
             <DataTableColumnHeader column={column} title='Amount Lend' />
         ),
         filterFn: (row, columnId, value) => {
-            const formattedAmount = row.original.tokenChain.toLowerCase() === 'icp'
-                ? formatAmount(Number(row.original.tokenAmount) / 100000000)
-                : formatAmount(Number(row.original.tokenAmount));
+            const formattedAmount = formatAmount(Number(row.original.tokenAmount));
             const tokenName = getTokenName(row.original.tokenAddress);
             const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
             return searchableText.includes((value as string).toLowerCase());
@@ -53,7 +51,7 @@ const recentLendingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 
             return (
                 <Button>
-                    Withdraw / Claim Interest
+                    Withdraw
                 </Button>
             )
         },
@@ -64,7 +62,7 @@ export default function LendingActivity() {
     const { ICPAddress } = useICPWallet();
 
     const fetchRecentLendingActivity = async (address: string) => {
-        const response = await userRecentLendActivity({ source_chain: 'ICP', address: address });
+        const response = await userRecentLendActivity({ source_chain: 'icp', address: address });
         if (response === 'Error fetching user lending activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
         } else {

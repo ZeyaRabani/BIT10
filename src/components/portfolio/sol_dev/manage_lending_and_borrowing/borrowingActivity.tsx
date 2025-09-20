@@ -19,9 +19,7 @@ const recentBorrowingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] =
             <DataTableColumnHeader column={column} title='Amount Borrowed' />
         ),
         filterFn: (row, columnId, value) => {
-            const formattedAmount = row.original.borrowTokenChain.toLowerCase() === 'icp'
-                ? formatAmount(Number(row.original.borrowTokenAmount) / 100000000)
-                : formatAmount(Number(row.original.borrowTokenAmount));
+            const formattedAmount = formatAmount(Number(row.original.borrowTokenAmount));
             const tokenName = getTokenName(row.original.borrowTokenAddress);
             const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
             return searchableText.includes((value as string).toLowerCase());
@@ -70,7 +68,7 @@ export default function BorrowingActivity() {
     const wallet = useWallet();
 
     const fetchRecentBorrowingActivity = async (address: string) => {
-        const response = await userRecentBorrowActivity({ source_chain: 'Solana', address: address });
+        const response = await userRecentBorrowActivity({ address: address });
         if (response === 'Error fetching user borrowing activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
         } else {
