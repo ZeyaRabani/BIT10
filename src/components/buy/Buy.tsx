@@ -365,7 +365,7 @@ export default function Buy() {
             token.slug?.some((slug: string) => slug.toLowerCase().includes(query))
         );
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [paymentTokenSearch]);
+    }, [paymentTokenSearch, chain]);
 
     const filteredReceiveTokens = useMemo(() => {
         const query = receiveTokenSearch.toLowerCase();
@@ -375,7 +375,7 @@ export default function Buy() {
             token.address.toLowerCase().includes(query)
         );
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [receiveTokenSearch]);
+    }, [receiveTokenSearch, chain]);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const payingTokenImg = useMemo(() => {
