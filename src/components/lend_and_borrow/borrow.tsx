@@ -287,7 +287,7 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
         if (!chain) return 'Connect your wallet to continue';
         // ToDo: Temp, remove this when supported
         if (chain !== 'icp') return `Borrowing will be available for ${item.token_chain} token soon`;
-        if (borrowingAmount >= (collateralbalance * (parseFloat(item.ltv) / 100))) return `You cannot borrow an amount too close to your collateral's value ${borrowingAmount} ${collateralbalance}`;
+        if (borrowingAmount >= (collateralbalance * (parseFloat(item.ltv) / 100))) return `You cannot borrow an amount too close to your collateral's value`;
         if (borrowingAmount >= collateralbalance) return 'Your collateral balance is too low for borrowing';
         if (borrowingAmount <= 0) return 'Amount too low';
         if (borrowing) return 'Borrowing...';
