@@ -14,11 +14,11 @@ For the World Computer Hacker League (WCHL) 2025, we have created the following 
 - WCHL National Round Market Cap Rebalance: [youtube.com/watch?v=UQW2NAXfGts](https://www.youtube.com/watch?v=UQW2NAXfGts)
 - WCHL National Round AI Portfolio Manager: [youtube.com/watch?v=tVY_6PrMrU4](https://www.youtube.com/watch?v=tVY_6PrMrU4) -->
 
-- Pitch Video https://www.youtube.com/watch?v=SXsD1xcYf2A 
-- WCHL Regional Round BIT10 Code Structure Demo https://www.youtube.com/watch?v=64hIUoCsRNo 
-- WCHL Regional Round BIT10 Demo https://www.youtube.com/watch?v=_AT_RgoXSog
-- WCHL Regional Round Cross Chain Lending and Borrowing Demo https://www.youtube.com/watch?v=GnrcTsCXQco
-- WCHL Regional Buy BIT10 on Base Mainnet Demo
+- Pitch Video: [youtube.com/watch?v=SXsD1xcYf2A](https://www.youtube.com/watch?v=SXsD1xcYf2A) 
+- WCHL Regional Round BIT10 Code Structure Demo: [youtube.com/watch?v=64hIUoCsRNo](https://www.youtube.com/watch?v=64hIUoCsRNo) 
+- WCHL Regional Round BIT10 Demo: [youtube.com/watch?v=_AT_RgoXSog](https://www.youtube.com/watch?v=_AT_RgoXSog)
+- WCHL Regional Round Cross Chain Lending and Borrowing Demo: [youtube.com/watch?v=GnrcTsCXQco](https://www.youtube.com/watch?v=GnrcTsCXQco)
+- WCHL Regional Buy BIT10 on Base Mainnet Demo: []()
 
 ### Extra instructions on how to use the entire system and FAQ's are in the Part 3 of the Gitbook.
 
