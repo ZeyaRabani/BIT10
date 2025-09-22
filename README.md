@@ -18,7 +18,7 @@ For the World Computer Hacker League (WCHL) 2025, we have created the following 
 - WCHL Regional Round BIT10 Code Structure Demo: [youtube.com/watch?v=64hIUoCsRNo](https://www.youtube.com/watch?v=64hIUoCsRNo) 
 - WCHL Regional Round BIT10 Demo: [youtube.com/watch?v=_AT_RgoXSog](https://www.youtube.com/watch?v=_AT_RgoXSog)
 - WCHL Regional Round Cross Chain Lending and Borrowing Demo: [youtube.com/watch?v=GnrcTsCXQco](https://www.youtube.com/watch?v=GnrcTsCXQco)
-- WCHL Regional Buy BIT10 on Base Mainnet Demo: []()
+- WCHL Regional Buy BIT10 on Base Mainnet Demo: [youtube.com/watch?v=qfaFKKOQZVs](https://www.youtube.com/watch?v=qfaFKKOQZVs)
 
 ### Extra instructions on how to use the entire system and FAQ's are in the Part 3 of the Gitbook.
 
