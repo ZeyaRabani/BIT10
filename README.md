@@ -6,13 +6,19 @@ BIT10 pioneers the concept of an "S&P 500 for crypto assets." It provides users 
 
 For the World Computer Hacker League (WCHL) 2025, we have created the following demo videos to help you better understand BIT10. Please start by watching the Loom video presentation - it provides a smooth walkthrough of the platform.
 
-- Pitch Video: [youtu.be/Mceef9ahg_A](https://youtu.be/Mceef9ahg_A)
+<!-- - Pitch Video: [youtu.be/Mceef9ahg_A](https://youtu.be/Mceef9ahg_A)
 - Pitch Deck: [BIT10 WCHL Deck.pdf](https://github.com/user-attachments/files/21993258/BIT10.WCHL.Deck.pdf)
 - WCHL National Round BIT10 Demo: [youtube.com/watch?v=YQdF3uXAY4A](https://www.youtube.com/watch?v=YQdF3uXAY4A)
 - WCHL National Round Cross Chain Lending and Borrowing: [youtube.com/watch?v=DCkX21094Ng](https://www.youtube.com/watch?v=DCkX21094Ng)
 - WCHL National Round Cross Chain DEX: [youtube.com/watch?v=sEe__ZwVW8U](https://www.youtube.com/watch?v=sEe__ZwVW8U)
 - WCHL National Round Market Cap Rebalance: [youtube.com/watch?v=UQW2NAXfGts](https://www.youtube.com/watch?v=UQW2NAXfGts)
-- WCHL National Round AI Portfolio Manager: [youtube.com/watch?v=tVY_6PrMrU4](https://www.youtube.com/watch?v=tVY_6PrMrU4)
+- WCHL National Round AI Portfolio Manager: [youtube.com/watch?v=tVY_6PrMrU4](https://www.youtube.com/watch?v=tVY_6PrMrU4) -->
+
+- Pitch Video
+- Pitch Deck
+- WCHL Regional Round BIT10 Demo
+- WCHL Regional Round Cross Chain Lending and Borrowing Demo
+- WCHL Regional Buy BIT10 on Base Mainnet Demo
 
 ### Extra instructions on how to use the entire system and FAQ's are in the Part 3 of the Gitbook.
 
@@ -98,10 +104,11 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 - Test BIT10.DEFI: [hbs3g-xyaaa-aaaap-qhmna-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=hbs3g-xyaaa-aaaap-qhmna-cai)
 - Test BIT10.BRC20: [uv4pt-4qaaa-aaaap-qpuxa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=uv4pt-4qaaa-aaaap-qpuxa-cai)
 - Test BIT10.TOP: [wbckh-zqaaa-aaaap-qpuza-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=wbckh-zqaaa-aaaap-qpuza-cai)
-- Test BIT10.TOP(ERC20): [0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D](https://sepolia.etherscan.io/token/0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D)
+- Test BIT10.TOP (ERC20): [0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D](https://sepolia.etherscan.io/token/0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D)
 - Test BIT10.MEME: [yeoei-eiaaa-aaaap-qpvzq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=yeoei-eiaaa-aaaap-qpvzq-cai)
 - BIT10.DEFI: [bin4j-cyaaa-aaaap-qh7tq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=bin4j-cyaaa-aaaap-qh7tq-cai)
 - BIT10.TOP: [g37b3-lqaaa-aaaap-qp4hq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=g37b3-lqaaa-aaaap-qp4hq-cai)
+- BIT10.TOP (Base): [0x2d309c7c5fbbf74372edfc25b10842a7237b92de](https://basescan.org/token/0x2d309c7c5fbbf74372edfc25b10842a7237b92de)
 
 - BIT10.TOP Asset storage canister:
   - ETH Asset Storage: [g46hp-giaaa-aaaap-qp4ha-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=g46hp-giaaa-aaaap-qp4ha-cai)

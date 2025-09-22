@@ -21,7 +21,6 @@ import { Actor, HttpAgent } from '@dfinity/agent'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10.did'
 import { idlFactory as idlFactory2 } from '@/lib/swap.did'
-import crypto from 'crypto'
 import { newTokenSwap } from '@/actions/dbActions'
 
 interface BuyingTokenPriceResponse {
@@ -112,7 +111,6 @@ export default function Sell() {
                     return formatTokenAmount(value);
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error) {
-                    console.log(error);
                     toast.error('An error occurred while fetching user wallet balance. Please try again!');
                 }
             } else {
@@ -352,27 +350,28 @@ export default function Sell() {
                         interfaceFactory: idlFactory2,
                     });
 
-                    const tickInAmount = Math.round(parseFloat(values.from_bit10_amount.toString()) * 100000000).toString();
+                    let fromTokenAddress;
+                    if (values.from_bit10_token === 'BIT10.DEFI') {
+                        fromTokenAddress = 'bin4j-cyaaa-aaaap-qh7tq-cai';
+                    }
+                    else if (values.from_bit10_token === 'BIT10.TOP') {
+                        fromTokenAddress = 'g37b3-lqaaa-aaaap-qp4hq-cai';
+                    }
+                    else {
+                        throw new Error('Invalid payment method');
+                    }
 
                     const args2 = {
-                        tick_in_name: values.from_bit10_token,
-                        tick_in_amount: Number(tickInAmount),
-                        tick_out_name: values.to_token
+                        token_in_address: fromTokenAddress,
+                        token_in_amount: values.from_bit10_amount.toString(),
+                        token_out_address: 'ryjl3-tyaaa-aaaaa-aaaba-cai'
                     }
 
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                    const transfer = await actor2.mb_reverse_swap(args2);
+                    const transfer = await actor2.icp_sell(args2);
 
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     if (transfer.Ok) {
-                        const uuid = crypto.randomBytes(16).toString('hex');
-                        const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
-                        const newTokenSwapId = 'swap_' + generateNewTokenSwapId;
-
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-                        const principal = Principal.fromUint8Array(transfer.Ok.user_principal_id._arr);
-                        const textualRepresentation = principal.toText();
-
                         const formatTimestamp = (nanoseconds: string): string => {
                             const milliseconds = BigInt(nanoseconds) / BigInt(1_000_000);
                             const date = new Date(Number(milliseconds));
@@ -381,24 +380,26 @@ export default function Sell() {
                         };
 
                         const result = await newTokenSwap({
-                            newTokenSwapId: newTokenSwapId,
-                            principalId: textualRepresentation,
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                            tickInName: transfer.Ok.tick_in_name,
+                            newTokenSwapId: transfer.Ok.swap_id,
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                            principalId: transfer.Ok.user_wallet_address,
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                            tickInName: transfer.Ok.token_in_address,
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                            tickInAmount: transfer.Ok.tick_in_amount.toString(),
+                            tickInAmount: transfer.Ok.token_in_amount.toString(),
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                            tickInUSDAmount: transfer.Ok.tick_in_usd_amount.toString(),
+                            tickInUSDAmount: transfer.Ok.token_in_usd_amount.toString(),
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                            tickInTxBlock: transfer.Ok.tick_in_tx_block.toString(),
+                            tickInTxBlock: transfer.Ok.token_in_tx_hash.toString(),
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                            tickOutName: transfer.Ok.tick_out_name,
+                            tickOutName: transfer.Ok.token_out_address,
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                            tickOutAmount: transfer.Ok.tick_out_amount.toString(),
+                            tickOutAmount: transfer.Ok.token_out_amount.toString(),
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                            tickOutTxBlock: transfer.Ok.tick_out_tx_block.toString(),
+                            tickOutTxBlock: transfer.Ok.token_out_tx_hash.toString(),
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                            transactionType: transfer.Ok.transaction_type as 'Swap' | 'Reverse Swap',
+                            transactionType: transfer.Ok.transaction_type,
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                             network: transfer.Ok.network,
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
@@ -411,12 +412,13 @@ export default function Sell() {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                newTokenSwapId: newTokenSwapId,
+                                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                                newTokenSwapId: transfer.Ok.swap_id,
                                 principalId: principalId,
                                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                                tickOutName: transfer.Ok.tick_out_name,
+                                tickOutName: transfer.Ok.token_out_address,
                                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                                tickOutAmount: transfer.Ok.tick_out_amount.toString(),
+                                tickOutAmount: transfer.Ok.token_out_amount.toString(),
                                 transactionTimestamp: new Date().toISOString(),
                             }),
                         });

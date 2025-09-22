@@ -1,17 +1,109 @@
-type Account = record { owner : principal; subaccount : opt blob };
-type BalanceAndFeeResult = variant { Ok : record { balance: nat; fee: nat; total: nat }; Err : text };
-type TransferArgs = record { to_account : Account; amount : nat; ledger_canister_id: text };
-type Result = variant { Ok : nat; Err : text };
-type SwapArgs = record { tick_in_name: text; tick_out_name: text; tick_out_amount: nat };
-type MbSwapResponseData = record { user_principal_id: principal;  tick_in_name: text;  tick_in_amount: nat;  tick_in_usd_amount: text;  tick_in_tx_block: nat;  tick_out_name: text;  tick_out_amount: nat; tick_out_tx_block: nat; transaction_type: text; transaction_timestamp: text; network: text };
-type MbSwapResponse = variant { Ok : MbSwapResponseData; Err : text };
-type ReverseSwapArgs = record { tick_in_name: text; tick_in_amount: nat; tick_out_name: text };
+type Token = record {
+  token_id : opt text;
+  token_name : text;
+  token_symbol : text;
+  token_address : opt text;
+  token_chain : text;
+  token_decimals : nat8;
+  is_native : bool;
+  is_active : bool;
+  price_feed_id : opt text;
+  price_feed_link : opt text;
+};
 
-service : {
-    bit10_circulating_supply : () -> (vec record { token: text; supply: nat }) query;
-    bit10_reverse_swap_supply : () -> (vec record { token: text; supply: nat }) query;
-    bit10_defi_total_supply: () -> (variant { Ok: nat; Err: text });
-    te_swap : (SwapArgs) -> (MbSwapResponse);
-    mb_swap : (SwapArgs) -> (MbSwapResponse);
-    mb_reverse_swap : (ReverseSwapArgs) -> (MbSwapResponse);
-}
+type TokenAllocation = record {
+  chain : text;
+  token_address : text;
+  total_chain_supply : text;
+  total_tokens_bought : text;
+  total_tokens_sold : text;
+};
+
+type TokenDetails = record {
+  name : text;
+  symbol : text;
+  total_supply : text;
+  allocations : vec TokenAllocation;
+};
+
+type BIT10TokenResponse = record {
+  tokens : vec record { text; TokenDetails };
+};
+
+type BaseNetwork = variant {
+  Mainnet;
+  Sepolia;
+};
+
+type EcdsaKeyName = variant {
+  TestKeyLocalDevelopment;
+  TestKey1;
+  ProductionKey1;
+};
+
+type InitArg = record {
+  base_network : opt BaseNetwork;
+  ecdsa_key_name : opt EcdsaKeyName;
+};
+
+type ICPBuyArgs = record {
+  token_in_address : text;
+  token_out_address : text;
+  token_out_amount : text;
+};
+
+type SwapResponseData = record {
+  swap_id : text;
+  user_wallet_address : text;
+  token_in_address : text;
+  token_in_amount : text;
+  token_in_usd_amount : text;
+  token_in_tx_hash : text;
+  token_out_address : text;
+  token_out_amount : text;
+  token_out_tx_hash : text;
+  transaction_type : text;
+  transaction_timestamp : text;
+  network : text;
+};
+
+type SwapResponse = variant {
+  Ok : SwapResponseData;
+  Err : text;
+};
+
+type ICPSellArgs = record {
+  token_in_address : text;
+  token_in_amount : text;
+  token_out_address : text;
+};
+
+type SwapArgs = record {
+  user_wallet_address : text;
+  token_in_address : text;
+  token_in_amount : text;
+  token_out_address : text;
+  token_out_amount : text;
+};
+
+type TransactionResponse = record {
+  from : text;
+  to : text;
+  value : text;
+  data : text;
+};
+
+service : (opt InitArg) -> {
+  base_address : () -> (text);
+  
+  bit10_token : () -> (BIT10TokenResponse) query;
+  
+  get_buy_history : () -> (vec SwapResponseData) query;
+  get_sell_history : () -> (vec SwapResponseData) query;
+
+  icp_buy : (ICPBuyArgs) -> (SwapResponse);
+  icp_sell : (ICPSellArgs) -> (SwapResponse);
+  
+  base_create_transaction : (SwapArgs) -> (TransactionResponse);
+  base_buy : (text) -> (SwapResponse);
+};

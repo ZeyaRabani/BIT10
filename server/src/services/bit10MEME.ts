@@ -126,12 +126,6 @@ export const fetchAndUpdateBit10MEMERebalanceData = async () => {
             .limit(1)
             .execute();
 
-        const currentData = await db.select()
-            .from(testBit10MemeRebalance)
-            .orderBy(desc(testBit10MemeRebalance.timestmpz))
-            .limit(1)
-            .execute();
-
         const existingData = await db.select()
             .from(testBit10MemeRebalance)
             .orderBy(desc(testBit10MemeRebalance.timestmpz))
@@ -142,14 +136,11 @@ export const fetchAndUpdateBit10MEMERebalanceData = async () => {
             throw new Error('No token data found for Test BIT10.MEME');
         }
 
-        const tokenValues = (currentData[0].newTokens as Array<{ id: number; price: number }>).map((currentToken) => {
-            const existingToken = (existingData[0].newTokens as Array<{ id: number; noOfTokens: number }>).find((t) => t.id === currentToken.id);
-            if (!existingToken) return 0;
-            return currentToken.price * existingToken.noOfTokens;
-        });
+        const validTokenValues = existingData[0].newTokens as Array<{ id: number; symbol: string; price: number; noOfTokens: number }>;
 
-        const validTokenValues = tokenValues.filter(value => value > 0);
-        const priceOfTokenToBuy = (validTokenValues.reduce((sum, value) => sum + value, 0) / validTokenValues.length) + priceOfTokenToBuyResult[0].priceoftokentobuy;
+        const priceOfTokenToBuy: number = validTokenValues.reduce((acc, token) => {
+            return acc + token.price * token.noOfTokens;
+        }, 0) + (priceOfTokenToBuyResult[0]?.priceoftokentobuy || 0);
 
         const totalMarketCap = (latestData[0].data as Array<{ marketCap: number }>).reduce((sum, token) => sum + token.marketCap, 0);
 

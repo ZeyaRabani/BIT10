@@ -22,38 +22,60 @@ graph TD
         User[User Interface]
     end
 
-    User -- "1. Request Lend/Borrow" --> LBC_Canister[BIT10 Lending & Borrowing Canister]
+    User -- "1. Lend/Borrow Request (ICP or ETH)" --> LBC_Canister[BIT10 Lending & Borrowing Canister]
 
     subgraph "BIT10 Lending & Borrowing Canister"
         direction LR
 
-        subgraph "Core Logic"
-            LB_Functions[lend / borrow functions]
-            HTTP_Client[HTTP Client for External Data]
-            Controller_Manager[Canister Controller Management]
+        subgraph "Core Services"
+            LB_Logic[Lending & Borrowing Logic]
+            EVM_Signer["Ethereum Wallet (tECDSA)"]
+            HTTP_Client["HTTP Client (External API Outcalls)"]
         end
 
-        LB_Functions -- "2a. Validate Inputs" --> LBC_Canister
-        LB_Functions -- "2b. Check Controller Auth" --> Controller_Manager
+        LB_Logic -- "2a. Validate Inputs" --> LBC_Canister
+        LB_Logic -- "2b. Get Canister EVM Address" --> EVM_Signer
 
-        LB_Functions -- "3a. Fetch Interest Rate" --> HTTP_Client
-        HTTP_Client -- "External API Call (e.g., DeFi Oracle)" --> External_Interest_Rate_API[External Interest Rate API]
-        External_Interest_Rate_API -- "Interest Rate (e.g., 4.5%)" --> HTTP_Client
+        LB_Logic -- "3a. Fetch Borrow Token Price (ICP Price Feed)" --> ICP_Price_Feed["ICP Price Feed Canister"]
+        LB_Logic -- "3b. Fetch Collateral Token Price (External HTTP API)" --> External_Price_API["External Price API (e.g., BIT10 Backend)"]
+        ICP_Price_Feed -- "Price (e.g., USDC)" --> LB_Logic
+        External_Price_API -- "Price (e.g., BIT10.TOP)" --> HTTP_Client
+        HTTP_Client -- "Forward Price" --> LB_Logic
 
-        LB_Functions -- "4a. ICRC-2 transfer_from (Collateral)" --> Collateral_Ledger[Collateral Token Ledger - BIT10.TOP, BIT10.MEME]
-        LB_Functions -- "4b. ICRC-1 transfer (Borrowed Tokens)" --> Borrow_Token_Ledger[Borrowed Token Ledger - USDC, wBTC]
+        subgraph "ICP Interactions"
+            direction LR
+            Collateral_Ledger_ICP["Collateral Token Ledger (e.g., BIT10.TOP)"]
+            Borrowed_Ledger_ICP["Borrowed Token Ledger (e.g., ckUSDC)"]
+        end
 
-        Collateral_Ledger -- "Block Index / Error" --> LB_Functions
-        Borrow_Token_Ledger -- "Block Index / Error" --> LB_Functions
+        subgraph "Ethereum Interactions"
+            direction LR
+            ETH_RPC["Ethereum RPC (Tatum Gateway)"]
+            ETH_Chain["Ethereum Blockchain"]
+        end
 
-        LB_Functions -- "5. Respond with Transaction Details" --> LBC_Canister
+        LB_Logic -- "4a. (ICP) ICRC-2 transferFrom (Collateral to Canister)" --> Collateral_Ledger_ICP
+        LB_Logic -- "4b. (ICP) ICRC-1 transfer (Borrowed Tokens from Canister)" --> Borrowed_Ledger_ICP
+        Collateral_Ledger_ICP -- "Block Index / Error" --> LB_Logic
+        Borrowed_Ledger_ICP -- "Block Index / Error" --> LB_Logic
+
+        LB_Logic -- "5a. (ETH) Request unsigned Tx Data (Lend)" --> User
+        LB_Logic -- "5b. (ETH) Send Tx (Borrow)" --> EVM_Signer
+        EVM_Signer -- "Sign Tx" --> ETH_RPC
+        ETH_RPC -- "Send Raw Tx" --> ETH_Chain
+        ETH_Chain -- "Tx Hash / Error" --> LB_Logic
+
+        LB_Logic -- "6. Respond with Transaction Details" --> LBC_Canister
     end
 
-    LBC_Canister -- "6. Response (Tx Hashes, Status, Rates)" --> User
+    LBC_Canister -- "7. Response (Tx Hashes, Status, Rates)" --> User
 
-    style External_Interest_Rate_API fill:#f9f,stroke:#333,stroke-width:2px
-    style Collateral_Ledger fill:#ccf,stroke:#333,stroke-width:2px
-    style Borrow_Token_Ledger fill:#cfc,stroke:#333,stroke-width:2px
+    style ICP_Price_Feed stroke:#333,stroke-width:2px
+    style External_Price_API stroke:#333,stroke-width:2px
+    style Collateral_Ledger_ICP stroke:#333,stroke-width:2px
+    style Borrowed_Ledger_ICP stroke:#333,stroke-width:2px
+    style ETH_RPC stroke:#333,stroke-width:2px
+    style ETH_Chain stroke:#333,stroke-width:2px
 ```
 
 ## 🔗 ICP Canisters
