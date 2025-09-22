@@ -15,9 +15,9 @@ For the World Computer Hacker League (WCHL) 2025, we have created the following 
 - WCHL National Round AI Portfolio Manager: [youtube.com/watch?v=tVY_6PrMrU4](https://www.youtube.com/watch?v=tVY_6PrMrU4) -->
 
 - Pitch Video https://www.youtube.com/watch?v=SXsD1xcYf2A 
-- Pitch Deck
-- WCHL Regional Round BIT10 Demo
-- WCHL Regional Round Cross Chain Lending and Borrowing Demo
+- WCHL Regional Round BIT10 Code Structure Demo https://www.youtube.com/watch?v=64hIUoCsRNo 
+- WCHL Regional Round BIT10 Demo https://www.youtube.com/watch?v=_AT_RgoXSog
+- WCHL Regional Round Cross Chain Lending and Borrowing Demo https://www.youtube.com/watch?v=GnrcTsCXQco
 - WCHL Regional Buy BIT10 on Base Mainnet Demo
 
 ### Extra instructions on how to use the entire system and FAQ's are in the Part 3 of the Gitbook.
