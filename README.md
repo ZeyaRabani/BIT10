@@ -14,7 +14,7 @@ For the World Computer Hacker League (WCHL) 2025, we have created the following 
 - WCHL National Round Market Cap Rebalance: [youtube.com/watch?v=UQW2NAXfGts](https://www.youtube.com/watch?v=UQW2NAXfGts)
 - WCHL National Round AI Portfolio Manager: [youtube.com/watch?v=tVY_6PrMrU4](https://www.youtube.com/watch?v=tVY_6PrMrU4) -->
 
-- Pitch Video
+- Pitch Video https://www.youtube.com/watch?v=SXsD1xcYf2A 
 - Pitch Deck
 - WCHL Regional Round BIT10 Demo
 - WCHL Regional Round Cross Chain Lending and Borrowing Demo
