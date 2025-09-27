@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React, { useState } from 'react'
 import { transactionDetails } from '@/actions/dbActions'
@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { formatAmount, getTokenName } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 
 interface TransactionDetailsType {
@@ -104,7 +105,7 @@ export default function TransactionDetails({ transactionId }: { transactionId: s
                                         <div className='flex flex-col md:flex-row md:items-center md:justify-between hover:bg-accent hover:rounded py-1 px-2'>
                                             <div className='font-semibold tracking-wide'>Transaction Type</div>
                                             <div>
-                                                <Badge className={activity.transactionType === 'Swap' ? 'bg-primary' : 'bg-[#FF0066] hover:bg-[#f64189]'}>
+                                                <Badge className={activity.transactionType === 'Buy' ? 'bg-primary' : 'bg-[#FF0066] hover:bg-[#f64189]'}>
                                                     {activity.transactionType}
                                                 </Badge>
                                             </div>
@@ -122,17 +123,12 @@ export default function TransactionDetails({ transactionId }: { transactionId: s
 
                                         <div className='flex flex-col md:flex-row md:items-center md:justify-between hover:bg-accent hover:rounded py-1 px-2'>
                                             <div className='font-semibold tracking-wide'>Spent</div>
-                                            <div className='break-words'>{(parseFloat(activity.transactionTickInAmount) / 100000000).toFixed(8)} {activity.transactionTickInName}</div>
+                                            <div className='break-words'>{formatAmount(parseFloat(activity.transactionTickInAmount))} {getTokenName(activity.transactionTickInName)}</div>
                                         </div>
 
                                         <div className='flex flex-col md:flex-row md:items-center md:justify-between hover:bg-accent hover:rounded py-1 px-2'>
                                             <div className='font-semibold tracking-wide'>Recieved</div>
-                                            <div className='break-words'>
-                                                {activity.transactionType === "Swap"
-                                                    ? activity.transactionTickOutAmount
-                                                    : (parseFloat(activity.transactionTickOutAmount) / 100000000).toFixed(8)}
-
-                                                {activity.transactionTickOutName}</div>
+                                            <div className='break-words'>{formatAmount(parseFloat(activity.transactionTickOutAmount))} {getTokenName(activity.transactionTickOutName)}</div>
                                         </div>
                                     </div>
                                 ))}

@@ -3,11 +3,14 @@
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
+import { formatAmount, formatAddress, getTokenName, getTokenExplorer } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
-import { Search, X } from 'lucide-react'
+import { Search, X, Copy, ExternalLink } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
 
 export type PortfolioTableDataType = {
     tokenSwapId: string;
@@ -16,7 +19,9 @@ export type PortfolioTableDataType = {
     tickInName: string;
     tickOutAmount: string;
     tickOutName: string;
+    tickOutTxBlock: string;
     tokenBoughtAt: Date | string;
+    network: string;
 }
 
 interface DataTableProps<TData> {
@@ -33,10 +38,10 @@ export function DataTable<TData, TValue>({
     userSearchColumn,
     inputPlaceHolder,
 }: DataTableProps<PortfolioTableDataType>) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [rowSelection, setRowSelection] = React.useState({});
 
     const table = useReactTable({
         data,
@@ -62,22 +67,14 @@ export function DataTable<TData, TValue>({
         table.getColumn(userSearchColumn)?.setFilterValue('');
     };
 
-    const formatTokenAmount = (value: number | null | undefined): string => {
-        if (value === null || value === undefined || isNaN(value)) return '0';
-        if (value === 0) return '0';
-        const strValue = value.toFixed(10).replace(/\.?0+$/, '');
-        const [integerPart, decimalPart = ''] = strValue.split('.');
-        const formattedInteger = Number(integerPart).toLocaleString();
-
-        if (!decimalPart) return formattedInteger ?? '0';
-
-        const firstNonZeroIndex = decimalPart.search(/[1-9]/);
-
-        if (firstNonZeroIndex === -1) return formattedInteger ?? '0';
-
-        const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
-
-        return `${formattedInteger}.${trimmedDecimal}`;
+    const handleCopy = (text: string) => {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                toast.info('Copied to clipboard!');
+            })
+            .catch(() => {
+                toast.error('Failed to copy to clipboard');
+            });
     };
 
     const formatDate = (dateInput: Date | string): string => {
@@ -108,15 +105,27 @@ export function DataTable<TData, TValue>({
 
     const renderCellContent = (cell: CellContext<PortfolioTableDataType, unknown>, row: { original: PortfolioTableDataType }) => {
         switch (cell.column.id) {
+            case 'tokenSwapId':
+                return (
+                    <div className='flex flex-row space-x-2 items-center'>
+                        <div>{formatAddress(row.original.tokenSwapId)}</div>
+                        <div>
+                            <Copy
+                                className='size-4 cursor-pointer hover:text-primary transition-colors'
+                                onClick={() => handleCopy(row.original.tokenSwapId)}
+                            />
+                        </div>
+                    </div>
+                )
             case 'mode':
                 return (
-                    <Badge className={row.original.transactionType === 'Swap' ? 'bg-primary' : 'bg-[#FF0066] hover:bg-[#f64189]'}>{row.original.transactionType}</Badge>
+                    <Badge className={row.original.transactionType === 'Buy' ? 'bg-primary' : 'bg-[#FF0066] hover:bg-[#f64189]'}>{row.original.transactionType}</Badge>
                 );
             case 'tickIn':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{formatTokenAmount(parseFloat(row.original.tickInAmount) / 100000000)}</div>
-                        <div>{row.original.tickInName}</div>
+                        <div>{formatAmount(parseFloat(row.original.tickInAmount))}</div>
+                        <div>{getTokenName(row.original.tickInName)}</div>
                     </div>
                 );
             case 'tickOutName':
@@ -125,17 +134,31 @@ export function DataTable<TData, TValue>({
                         <div>
                             {row.original.transactionType === 'Swap'
                                 ? row.original.tickOutAmount
-                                : formatTokenAmount(parseFloat(row.original.tickOutAmount) / 100000000)}
+                                : formatAmount(parseFloat(row.original.tickOutAmount))}
                         </div>
-                        <div>{row.original.tickOutName}</div>
+                        <div>{getTokenName(row.original.tickOutName)}</div>
                     </div>
                 );
             case 'tokenBoughtAt':
                 return formatDate(row.original.tokenBoughtAt);
+            case 'viewTransaction':
+                return (
+                    <a
+                        href={`${getTokenExplorer(row.original.tickOutName)}${getTokenExplorer(row.original.tickOutName).endsWith('/') ? '' : '/'}${row.original.network == 'icp' ? row.original.tokenSwapId : row.original.tickOutTxBlock}`}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                    >
+                        <Button>
+                            View Transaction
+                            <ExternalLink className='ml-1 w-4 h-4' />
+                        </Button>
+                    </a>
+                )
             default:
                 return cell.column.columnDef.cell ? flexRender(cell.column.columnDef.cell, cell) : null;
         }
     };
+
 
     return (
         <div className='flex flex-col space-y-2'>

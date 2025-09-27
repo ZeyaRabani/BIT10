@@ -1,4 +1,4 @@
-import { pgTable, unique, text, timestamp, boolean, doublePrecision, index, json, foreignKey, date, numeric, bigint, serial, varchar, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, unique, text, timestamp, boolean, doublePrecision, index, json, date, numeric, bigint, serial, varchar, foreignKey, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -89,16 +89,7 @@ export const swap = pgTable('swap', {
 	transactionStatus: text('transaction_status').notNull(),
 	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
 	network: text('network').notNull(),
-},
-	(table) => {
-		return {
-			swapUserPrincipalIdFkey: foreignKey({
-				columns: [table.userPrincipalId],
-				foreignColumns: [mbUsers.userPrincipalId],
-				name: 'swap_user_principal_id_fkey'
-			}),
-		}
-	});
+});
 
 export const testBit10TopRebalance = pgTable('test_bit10_top_rebalance', {
 	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
@@ -188,16 +179,7 @@ export const teSwap = pgTable('te_swap', {
 	transactionStatus: text('transaction_status').notNull(),
 	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
 	network: text('network').notNull(),
-},
-	(table) => {
-		return {
-			teSwapUserPrincipalIdFkey: foreignKey({
-				columns: [table.userPrincipalId],
-				foreignColumns: [teUsers.userPrincipalId],
-				name: 'te_swap_user_principal_id_fkey'
-			}),
-		}
-	});
+});
 
 export const testBit10MemeRebalance = pgTable('test_bit10_meme_rebalance', {
 	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
@@ -418,6 +400,61 @@ export const bit10TopRebalance = pgTable('bit10_top_rebalance', {
 	(table) => {
 		return {
 			timestmpzIdx: index('bit10_top_rebalance_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst()),
+		}
+	});
+
+export const teBorrow = pgTable('te_borrow', {
+	borrowerAddress: text('borrower_address').notNull(),
+	borrowTokenChain: text('borrow_token_chain').notNull(),
+	borrowTokenAddress: text('borrow_token_address').notNull(),
+	borrowTokenAmount: text('borrow_token_amount').notNull(),
+	borrowTrxHash: text('borrow_trx_hash').notNull(),
+	collateralAddress: text('collateral_address').notNull(),
+	collateralAmount: text('collateral_amount').notNull(),
+	collateralTrxHash: text('collateral_trx_hash').notNull(),
+	interestRate: text('interest_rate').notNull(),
+	status: text('status').notNull(),
+	repaymentAmount: text('repayment_amount'),
+	repaymentTrxHash: text('repayment_trx_hash'),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	repaymentTimestamp: bigint('repayment_timestamp', { mode: 'number' }),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	openedAt: bigint('opened_at', { mode: 'number' }).notNull(),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	closedAt: bigint('closed_at', { mode: 'number' }),
+	collateralChain: text('collateral_chain').notNull(),
+	borrowWalletAddress: text('borrow_wallet_address').notNull(),
+	borrowId: text('borrow_id').primaryKey().notNull(),
+},
+	(table) => {
+		return {
+			idxTeBorrowBorrowerAddress: index('idx_te_borrow_borrower_address').using('btree', table.borrowerAddress.asc().nullsLast()),
+			teBorrowBorrowIdKey: unique('te_borrow_borrow_id_key').on(table.borrowId),
+		}
+	});
+
+export const teLend = pgTable('te_lend', {
+	lenderAddress: text('lender_address').notNull(),
+	tokenChain: text('token_chain').notNull(),
+	tokenAddress: text('token_address').notNull(),
+	tokenAmount: text('token_amount').notNull(),
+	tokenSentTrxHash: text('token_sent_trx_hash').notNull(),
+	interestRate: text('interest_rate').notNull(),
+	status: text('status').notNull(),
+	returnAmount: text('return_amount'),
+	returnTrxHash: text('return_trx_hash'),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	returnTimestamp: bigint('return_timestamp', { mode: 'number' }),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	openedAt: bigint('opened_at', { mode: 'number' }).notNull(),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	closedAt: bigint('closed_at', { mode: 'number' }),
+	lendId: text('lend_id').primaryKey().notNull(),
+},
+	(table) => {
+		return {
+			idxTeLendLenderAddress: index('idx_te_lend_lender_address').using('btree', table.lenderAddress.asc().nullsLast()),
+			teLendLendIdKey: unique('te_lend_lend_id_key').on(table.lendId),
 		}
 	});
 

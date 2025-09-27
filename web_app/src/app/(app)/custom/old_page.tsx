@@ -7,9 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Minus, Plus } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select'
 import Image from 'next/image'
-import CkBTCImg from '@/assets/swap/ckBTC.png'
-import CkETHImg from '@/assets/swap/ckETH.png'
-import ICPImg from '@/assets/swap/ICP.png'
+import CkBTCImg from '@/assets/tokens/ckBTC.png'
+import CkETHImg from '@/assets/tokens/ckETH.png'
+import ICPImg from '@/assets/tokens/ICP.png'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 

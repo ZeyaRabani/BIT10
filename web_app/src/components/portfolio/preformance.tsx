@@ -22,7 +22,7 @@ type Bit10Entry = {
 };
 
 export default function Bit10Preformance() {
-    const [selectedPreformanceToken, setSelectedPreformanceToken] = useState('Test BIT10.TOP');
+    const [selectedPreformanceToken, setSelectedPreformanceToken] = useState('BIT10.TOP');
     const [activeTab, setActiveTab] = useState('30D');
 
     const handleTabChange = (label: string | null) => {
@@ -102,7 +102,7 @@ export default function Bit10Preformance() {
     };
 
     const selectedBit10Token30D = () => {
-        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+        if (selectedPreformanceToken === 'BIT10.TOP') {
             return getBit10Performance(bit10TOPPreformance10Y, '30D');
         } else {
             return null;
@@ -112,7 +112,7 @@ export default function Bit10Preformance() {
     const tokens30D = selectedBit10Token30D();
 
     const selectedBit10Token60D = () => {
-        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+        if (selectedPreformanceToken === 'BIT10.TOP') {
             return getBit10Performance(bit10TOPPreformance10Y, '60D');
         } else {
             return null;
@@ -122,7 +122,7 @@ export default function Bit10Preformance() {
     const tokens60D = selectedBit10Token60D();
 
     const selectedBit10Token1Y = () => {
-        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+        if (selectedPreformanceToken === 'BIT10.TOP') {
             return getBit10Performance(bit10TOPPreformance10Y, '1Y');
         } else {
             return null;
@@ -132,7 +132,7 @@ export default function Bit10Preformance() {
     const tokens1Y = selectedBit10Token1Y();
 
     const selectedBit10Token3Y = () => {
-        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+        if (selectedPreformanceToken === 'BIT10.TOP') {
             return getBit10Performance(bit10TOPPreformance10Y, '3Y');
         } else {
             return null;
@@ -142,7 +142,7 @@ export default function Bit10Preformance() {
     const tokens3Y = selectedBit10Token3Y();
 
     const selectedBit10TokenChange = () => {
-        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+        if (selectedPreformanceToken === 'BIT10.TOP') {
             return bit10TOPPreformance10Y;
         } else {
             return null;
@@ -205,7 +205,7 @@ export default function Bit10Preformance() {
     const percentageChange3Year = getPercentageChange(tokensChange ?? [], '3Y');
 
     const bit10PreformanceTokenDataName = () => {
-        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+        if (selectedPreformanceToken === 'BIT10.TOP') {
             return 'bit10TOP';
         } else {
             return 'bit10';
@@ -214,13 +214,13 @@ export default function Bit10Preformance() {
 
     const tokenDataName = bit10PreformanceTokenDataName();
 
-    const bit10Tokens = ['Test BIT10.TOP'];
+    const bit10Tokens = ['BIT10.TOP'];
 
     const bit10PreformanceTokenName = () => {
-        if (selectedPreformanceToken === 'Test BIT10.TOP') {
+        if (selectedPreformanceToken === 'BIT10.TOP') {
             return {
                 name: 'bit10TOP',
-                indexFundName: 'Test BIT10.TOP'
+                indexFundName: 'BIT10.TOP'
             };
         } else {
             return {
@@ -317,7 +317,7 @@ export default function Bit10Preformance() {
             ) : (
                 <Card className='dark:border-white md:col-span-2 animate-fade-right-slow'>
                     <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
-                        <div className='text-2xl md:text-4xl text-center md:text-start'>Test BIT10 Performance</div>
+                        <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Performance</div>
                         <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0'>
                             <Select onValueChange={setSelectedPreformanceToken} defaultValue={selectedPreformanceToken}>
                                 <SelectTrigger className='w-[180px] dark:border-white'>

@@ -20,7 +20,7 @@ const links = {
         { title: 'Whitepaper', link: '/whitepaper' }
     ],
     app: [
-        { title: 'Swap', link: '/swap' },
+        { title: 'Buy BIT10', link: '/buy' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' }
     ]

@@ -23,7 +23,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-type Bit10Entry = {
+type BIT10Entry = {
     date: string;
     bit10Top: string;
     btc: string;
@@ -86,7 +86,7 @@ export default function Page() {
                 return null;
             }
 
-            const data = await response.json() as { bit10_top: Bit10Entry[] };
+            const data = await response.json() as { bit10_top: BIT10Entry[] };
             return { bit10_top: data.bit10_top.reverse() };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
@@ -139,7 +139,7 @@ export default function Page() {
     };
 
     const processInvestmentData = useMemo(() => {
-        return (data: Bit10Entry[]): ProcessedDataPoint[] => {
+        return (data: BIT10Entry[]): ProcessedDataPoint[] => {
             if (!data || data.length === 0) return [];
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -219,7 +219,7 @@ export default function Page() {
         const startEntry = findClosestEntry(startDate);
         const endEntry = findClosestEntry(endDate);
 
-        const tokens: { key: keyof Bit10Entry; name: string }[] = [
+        const tokens: { key: keyof BIT10Entry; name: string }[] = [
             { key: 'bit10Top', name: 'BIT10.TOP' },
             { key: 'btc', name: 'Bitcoin' },
             { key: 'sp500', name: 'S&P500' },

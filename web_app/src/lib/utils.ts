@@ -49,10 +49,25 @@ export function constructMetadata({
   }
 }
 
-export const formatAmount = (value: number | null | undefined): string => {
-  if (value === null || value === undefined || isNaN(value)) return '0';
-  if (value === 0) return '0';
-  const strValue = value.toFixed(10).replace(/\.?0+$/, '');
+export const formatAddress = (id: string) => {
+  if (!id) return '';
+  if (id.length <= 7) return id;
+  return `${id.slice(0, 9)}.....${id.slice(-9)}`;
+};
+
+export const formatAmount = (value: number | string | null | undefined): string => {
+  let numValue: number;
+  if (typeof value === 'string') {
+    numValue = parseFloat(value);
+  } else {
+    // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+    numValue = value as number;
+  }
+
+  if (numValue === null || numValue === undefined || isNaN(numValue)) return '0';
+  if (numValue === 0) return '0';
+
+  const strValue = numValue.toFixed(10).replace(/\.?0+$/, '');
   const [integerPart, decimalPart = ''] = strValue.split('.');
   const formattedInteger = Number(integerPart).toLocaleString();
 
@@ -65,4 +80,49 @@ export const formatAmount = (value: number | null | undefined): string => {
   const trimmedDecimal = decimalPart.slice(0, firstNonZeroIndex + 4);
 
   return `${formattedInteger}.${trimmedDecimal}`;
+};
+export const getTokenName = (tokenAddress: string): string => {
+  if (!tokenAddress) {
+    return 'Unknown Token';
+  }
+
+  const normalizedAddress = tokenAddress.toLowerCase();
+
+  switch (normalizedAddress) {
+    case 'bin4j-cyaaa-aaaap-qh7tq-cai'.toLocaleLowerCase():
+      return 'BIT10.DEFI';
+    case 'g37b3-lqaaa-aaaap-qp4hq-cai'.toLocaleLowerCase():
+    case '0x2d309c7c5fbbf74372edfc25b10842a7237b92de'.toLocaleLowerCase():
+      return 'BIT10.TOP';
+    case 'ryjl3-tyaaa-aaaaa-aaaba-cai'.toLocaleLowerCase():
+      return 'ICP';
+    case 'mxzaz-hqaaa-aaaar-qaada-cai'.toLocaleLowerCase():
+      return 'ckBTC';
+    case 'ss2fx-dyaaa-aaaar-qacoq-cai'.toLocaleLowerCase():
+      return 'ckETH';
+    case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
+      return 'ETH';
+    default:
+      return tokenAddress;
+  }
+};
+
+export const getTokenExplorer = (tokenAddress: string): string => {
+  const normalizedAddress = tokenAddress.toLowerCase();
+
+  switch (normalizedAddress) {
+    case 'ryjl3-tyaaa-aaaaa-aaaba-cai'.toLocaleLowerCase():
+    case 'mxzaz-hqaaa-aaaar-qaada-cai'.toLocaleLowerCase():
+    case 'ss2fx-dyaaa-aaaar-qacoq-cai'.toLocaleLowerCase():
+    case 'bin4j-cyaaa-aaaap-qh7tq-cai'.toLocaleLowerCase():
+    case 'g37b3-lqaaa-aaaap-qp4hq-cai'.toLocaleLowerCase():
+      return '/explorer/';
+
+    case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
+    case '0x2d309c7c5fbbf74372edfc25b10842a7237b92de'.toLocaleLowerCase():
+      return 'https://basescan.org/tx/';
+
+    default:
+      return '/explorer/';
+  }
 };

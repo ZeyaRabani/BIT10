@@ -1,14 +1,12 @@
-"use client"
-
 import React from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
-import { Button } from '@/components/ui/button'
-import { ExternalLink } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
-import { userRecentActivity } from '@/actions/dbActions'
+import { userRecentBIT10BuyActivity } from '@/actions/dbActions'
 import { toast } from 'sonner'
-import { useWallet } from '@/context/WalletContext'
+import { useChain } from '@/context/ChainContext'
+import { useICPWallet } from '@/context/ICPWalletContext'
+import { useBaseWallet } from '@/context/BaseWalletContext'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
@@ -46,32 +44,27 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
         ),
     },
     {
-        id: 'view_transaction',
-        header: 'View Transaction',
-        cell: ({ row }) => {
-            const order = row.original;
-
-            return (
-                <a
-                    href={`/explorer/${order.tokenSwapId}`}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    <Button>
-                        View Transaction
-                        <ExternalLink className='ml-1 w-4 h-4' />
-                    </Button>
-                </a>
-            )
-        },
+        accessorKey: 'viewTransaction',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='View Transaction' />
+        ),
     }
 ]
 
 export default function RecentActivity() {
-    const { principalId } = useWallet();
+    const { chain } = useChain();
+    const { isICPConnected, icpAddress } = useICPWallet();
+    const { account: baseAddress, isConnected: isBaseConnected } = useBaseWallet();
 
-    const fetchRecentActivity = async (principalId: string) => {
-        const response = await userRecentActivity({ paymentAddress: principalId });
+    const fetchRecentActivity = async () => {
+        let response;
+        if (chain === 'icp' && isICPConnected && icpAddress) {
+            response = await userRecentBIT10BuyActivity({ paymentAddress: icpAddress, chain: 'ICP' });
+        } else if (chain === 'base' && isBaseConnected && baseAddress) {
+            response = await userRecentBIT10BuyActivity({ paymentAddress: baseAddress, chain: 'Base' });
+        } else {
+            response = [];
+        }
         if (response === 'Error fetching user recent activity') {
             toast.error('An error occurred while fetching user recent activity. Please try again!');
         } else {
@@ -83,13 +76,13 @@ export default function RecentActivity() {
         queries: [
             {
                 queryKey: ['bit10RecentActivity'],
-                queryFn: () => principalId ? fetchRecentActivity(principalId) : toast.error('Principal ID is undefined')
+                queryFn: () => fetchRecentActivity()
             },
         ]
     })
 
     const isLoading = recentActivityQuery.some(query => query.isLoading);
-    const recentActivityData = recentActivityQuery[0].data as PortfolioTableDataType[] | undefined;
+    const recentActivityData = recentActivityQuery[0].data;
 
     return (
         <div>

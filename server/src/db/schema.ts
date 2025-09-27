@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, unique, timestamp, doublePrecision, index, json, foreignKey, date, numeric, bigint, serial, varchar, check, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, boolean, unique, timestamp, doublePrecision, index, json, date, numeric, bigint, serial, varchar, foreignKey, check, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
@@ -81,13 +81,7 @@ export const swap = pgTable('swap', {
 	transactionStatus: text('transaction_status').notNull(),
 	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
 	network: text().notNull(),
-}, (table) => [
-	foreignKey({
-		columns: [table.userPrincipalId],
-		foreignColumns: [mbUsers.userPrincipalId],
-		name: 'swap_user_principal_id_fkey'
-	}),
-]);
+});
 
 export const testBit10TopRebalance = pgTable('test_bit10_top_rebalance', {
 	timestmpz: timestamp({ withTimezone: true, mode: 'string' }).primaryKey().notNull(),
@@ -159,13 +153,7 @@ export const teSwap = pgTable('te_swap', {
 	transactionStatus: text('transaction_status').notNull(),
 	transactionTimestamp: timestamp('transaction_timestamp', { withTimezone: true, mode: 'string' }).notNull(),
 	network: text().notNull(),
-}, (table) => [
-	foreignKey({
-		columns: [table.userPrincipalId],
-		foreignColumns: [teUsers.userPrincipalId],
-		name: 'te_swap_user_principal_id_fkey'
-	}),
-]);
+});
 
 export const testBit10MemeRebalance = pgTable('test_bit10_meme_rebalance', {
 	timestmpz: timestamp({ withTimezone: true, mode: 'string' }).primaryKey().notNull(),
@@ -333,6 +321,57 @@ export const mbTokenSwap = pgTable('mb_token_swap', {
 		name: 'mb_token_swap_user_principal_id_mb_users_user_principal_id_fk'
 	}),
 	unique('mb_token_swap_transaction_index_key').on(table.transactionIndex),
+]);
+
+export const teLend = pgTable('te_lend', {
+	lenderAddress: text('lender_address').notNull(),
+	tokenChain: text('token_chain').notNull(),
+	tokenAddress: text('token_address').notNull(),
+	tokenAmount: text('token_amount').notNull(),
+	tokenSentTrxHash: text('token_sent_trx_hash').notNull(),
+	interestRate: text('interest_rate').notNull(),
+	status: text().notNull(),
+	returnAmount: text('return_amount'),
+	returnTrxHash: text('return_trx_hash'),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	returnTimestamp: bigint('return_timestamp', { mode: 'number' }),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	openedAt: bigint('opened_at', { mode: 'number' }).notNull(),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	closedAt: bigint('closed_at', { mode: 'number' }),
+	lendId: text('lend_id').primaryKey().notNull(),
+}, (table) => [
+	index('idx_te_lend_lender_address').using('btree', table.lenderAddress.asc().nullsLast().op('text_ops')),
+	unique('te_lend_lend_id_key').on(table.lendId),
+	check('te_lend_status_check', sql`status = ANY (ARRAY['Active'::text, 'Closed'::text])`),
+]);
+
+export const teBorrow = pgTable('te_borrow', {
+	borrowerAddress: text('borrower_address').notNull(),
+	borrowTokenChain: text('borrow_token_chain').notNull(),
+	borrowTokenAddress: text('borrow_token_address').notNull(),
+	borrowTokenAmount: text('borrow_token_amount').notNull(),
+	borrowTrxHash: text('borrow_trx_hash').notNull(),
+	collateralAddress: text('collateral_address').notNull(),
+	collateralAmount: text('collateral_amount').notNull(),
+	collateralTrxHash: text('collateral_trx_hash').notNull(),
+	interestRate: text('interest_rate').notNull(),
+	status: text().notNull(),
+	repaymentAmount: text('repayment_amount'),
+	repaymentTrxHash: text('repayment_trx_hash'),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	repaymentTimestamp: bigint('repayment_timestamp', { mode: 'number' }),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	openedAt: bigint('opened_at', { mode: 'number' }).notNull(),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	closedAt: bigint('closed_at', { mode: 'number' }),
+	collateralChain: text('collateral_chain').notNull(),
+	borrowWalletAddress: text('borrow_wallet_address').notNull(),
+	borrowId: text('borrow_id').primaryKey().notNull(),
+}, (table) => [
+	index('idx_te_borrow_borrower_address').using('btree', table.borrowerAddress.asc().nullsLast().op('text_ops')),
+	unique('te_borrow_borrow_id_key').on(table.borrowId),
+	check('te_borrow_status_check', sql`status = ANY (ARRAY['Active'::text, 'Closed'::text, 'Liquidated'::text])`),
 ]);
 
 export const bit10TopRebalance = pgTable('bit10_top_rebalance', {

@@ -1,6 +1,8 @@
 import { db } from '../db'
 import { bit10TopRebalance, bit10TopHistoricalData, bit10CollateralTokenPrices } from '../db/schema'
 import { desc, eq } from 'drizzle-orm'
+import { Actor, HttpAgent } from '@dfinity/agent'
+import { idlFactory } from '../lib/buy.did'
 import axios from 'axios'
 import fs from 'fs/promises'
 import path from 'path'
@@ -125,11 +127,25 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
             throw new Error('No token data found for BIT10.TOP');
         }
 
-        const validTokenValues = existingData[0].newTokens as Array<{ id: number; symbol: string; price: number; noOfTokens: number }>;
+        const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
+        const canisterId = '6phs7-6yaaa-aaaap-qpvoq-cai';
 
-        const priceOfTokenToBuy: number = validTokenValues.reduce((acc, token) => {
-            return acc + token.price * token.noOfTokens;
-        }, 0) + (priceOfTokenToBuyResult[0]?.priceoftokentobuy || 0);
+        const agent = new HttpAgent({ host });
+        const actor = Actor.createActor(idlFactory, {
+            agent,
+            canisterId,
+        });
+
+        const bit10_tokens = await actor.bit10_token();
+        if (!bit10_tokens || typeof bit10_tokens !== 'object' || !('tokens' in bit10_tokens)) {
+            throw new Error('Invalid bit10_tokens response');
+        }
+        const tokensArray = bit10_tokens.tokens as [string, { name: string }][];
+
+        const bit10TopEntry = tokensArray.find(([_, value]) => value.name === 'BIT10.TOP');
+
+        // @ts-expect-error
+        const priceOfTokenToBuy = latestData[0].tokenPrice * bit10TopEntry[1].total_supply;
 
         const totalMarketCap = (latestData[0].data as Array<{ marketCap: number }>).reduce((sum, token) => sum + token.marketCap, 0);
 

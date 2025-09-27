@@ -4,7 +4,7 @@
 import { db } from '@/server/db'
 import { mbUsers, userSignups, mbPrincipalIdWhitelist, swap, teSwap, referralJune2025, referralJune2025Tasks } from '@/server/db/schema'
 import crypto from 'crypto'
-import { eq, desc } from 'drizzle-orm'
+import { eq, desc, and } from 'drizzle-orm'
 
 interface NewTokenSwap {
     newTokenSwapId: string;
@@ -89,7 +89,7 @@ export const newTokenSwap = async ({ newTokenSwapId, principalId, tickInName, ti
     }
 };
 
-export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: string }) => {
+export const userRecentBIT10BuyActivity = async ({ paymentAddress, chain }: { paymentAddress: string, chain: string }) => {
     try {
         const data = await db.select({
             tokenSwapId: swap.tokenSwapId,
@@ -98,10 +98,15 @@ export const userRecentActivity = async ({ paymentAddress }: { paymentAddress: s
             tickInName: swap.tickInName,
             tickOutAmount: swap.tickOutAmount,
             tickOutName: swap.tickOutName,
-            tokenBoughtAt: swap.transactionTimestamp
+            tickOutTxBlock: swap.tickOutTxBlock,
+            tokenBoughtAt: swap.transactionTimestamp,
+            network: swap.network
         })
             .from(swap)
-            .where(eq(swap.userPrincipalId, paymentAddress))
+            .where(and(
+                eq(swap.userPrincipalId, paymentAddress.toLowerCase()),
+                eq(swap.network, chain)
+            ))
             .orderBy(desc(swap.transactionTimestamp));
         return data;
     } catch (error) {

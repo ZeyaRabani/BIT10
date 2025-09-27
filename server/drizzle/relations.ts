@@ -1,35 +1,15 @@
 import { relations } from 'drizzle-orm/relations'
-import { mbUsers, swap, teUsers, teSwap, teTokenSwap, users, tokenSwap, mbTokenSwap } from './schema'
-
-export const swapRelations = relations(swap, ({ one }) => ({
-	mbUser: one(mbUsers, {
-		fields: [swap.userPrincipalId],
-		references: [mbUsers.userPrincipalId]
-	}),
-}));
-
-export const mbUsersRelations = relations(mbUsers, ({ many }) => ({
-	swaps: many(swap),
-	mbTokenSwaps: many(mbTokenSwap),
-}));
-
-export const teSwapRelations = relations(teSwap, ({ one }) => ({
-	teUser: one(teUsers, {
-		fields: [teSwap.userPrincipalId],
-		references: [teUsers.userPrincipalId]
-	}),
-}));
-
-export const teUsersRelations = relations(teUsers, ({ many }) => ({
-	teSwaps: many(teSwap),
-	teTokenSwaps: many(teTokenSwap),
-}));
+import { teUsers, teTokenSwap, users, tokenSwap, mbUsers, mbTokenSwap } from './schema'
 
 export const teTokenSwapRelations = relations(teTokenSwap, ({ one }) => ({
 	teUser: one(teUsers, {
 		fields: [teTokenSwap.userPrincipalId],
 		references: [teUsers.userPrincipalId]
 	}),
+}));
+
+export const teUsersRelations = relations(teUsers, ({ many }) => ({
+	teTokenSwaps: many(teTokenSwap),
 }));
 
 export const tokenSwapRelations = relations(tokenSwap, ({ one }) => ({
@@ -67,4 +47,8 @@ export const mbTokenSwapRelations = relations(mbTokenSwap, ({ one }) => ({
 		fields: [mbTokenSwap.userPrincipalId],
 		references: [mbUsers.userPrincipalId]
 	}),
+}));
+
+export const mbUsersRelations = relations(mbUsers, ({ many }) => ({
+	mbTokenSwaps: many(mbTokenSwap),
 }));
