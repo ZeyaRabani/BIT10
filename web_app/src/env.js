@@ -28,7 +28,8 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_PRIVATE_PASS: z.string().min(8),
-    NEXT_PUBLIC_POSTHOG_KEY: z.string().min(8)
+    NEXT_PUBLIC_POSTHOG_KEY: z.string().min(8),
+    NEXT_PUBLIC_APP_ID: z.string().min(8)
   },
 
   /**
@@ -44,6 +45,7 @@ export const env = createEnv({
     UNISAT_SWAP_KEY: process.env.UNISAT_SWAP_KEY,
     NEXT_PUBLIC_PRIVATE_PASS: process.env.NEXT_PUBLIC_PRIVATE_PASS,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+    NEXT_PUBLIC_APP_ID: process.env.NEXT_PUBLIC_APP_ID,
     NODE_SERVER: process.env.NODE_SERVER
   },
   /**

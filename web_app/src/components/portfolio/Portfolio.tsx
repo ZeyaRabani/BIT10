@@ -4,7 +4,7 @@ import Preformance from './preformance'
 import RecentActivity from './recentActivity'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
-import { useBaseWallet } from '@/context/BaseWalletContext'
+import { useEVMWallet } from '@/context/EVMWalletContext'
 import { Button } from '@/components/ui/button'
 import { formatAddress } from '@/lib/utils'
 import Link from 'next/link'
@@ -12,13 +12,13 @@ import Link from 'next/link'
 export default function Portfolio() {
     const { chain } = useChain();
     const { isICPConnected, icpAddress } = useICPWallet();
-    const { account: baseAddress, isConnected: isBaseConnected } = useBaseWallet();
+    const { isEVMConnected, evmAddress } = useEVMWallet();
 
     const selectedAddress = () => {
         if (chain === 'icp' && isICPConnected) {
             return icpAddress;
-        } else if (chain === 'base' && isBaseConnected) {
-            return baseAddress;
+        } else if (chain === 'base' && isEVMConnected) {
+            return evmAddress;
         } else {
             return 'Guest'
         }

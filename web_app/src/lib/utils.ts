@@ -81,6 +81,7 @@ export const formatAmount = (value: number | string | null | undefined): string 
 
   return `${formattedInteger}.${trimmedDecimal}`;
 };
+
 export const getTokenName = (tokenAddress: string): string => {
   if (!tokenAddress) {
     return 'Unknown Token';

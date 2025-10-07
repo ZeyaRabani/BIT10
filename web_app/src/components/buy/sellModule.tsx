@@ -172,6 +172,7 @@ export default function SellModule() {
     const fromAmount = Number(form.watch('from_bit10_amount'));
     const balance = Number(payingTokenBalance);
 
+    // ToDo: temp.
     const sellDisabledConditions = chain === 'base' || !chain || selling || fromAmount > balance || fromAmount <= 0;
 
     const getSellMessage = (): string => {
@@ -413,11 +414,6 @@ export default function SellModule() {
                                                 <Info className='w-5 h-5 cursor-pointer ml-1' />
                                             </div>
                                         </TooltipTrigger>
-                                        {/* <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                            The Management Fee (1%) is deducted from your output amount <br />
-                                            You sell {formatAmount(form.watch('from_bit10_amount'))} {form.watch('from_bit10_token')} worth ${formatAmount(form.watch('from_bit10_amount') * selectedBIT10TokenPrice)},
-                                            receive {formatAmount((form.watch('from_bit10_amount') * selectedBIT10TokenPrice * 0.99) / Number(receiveingTokenPrice))} {form.watch('to_token')}
-                                        </TooltipContent> */}
                                         <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                             The Management Fee (1%) is deducted from your output amount <br />
                                             You sell {formatAmount(Number(form.watch('from_bit10_amount')))} {form.watch('from_bit10_token')} worth ${formatAmount(Number(form.watch('from_bit10_amount')) * selectedBIT10TokenPrice)},
@@ -435,7 +431,6 @@ export default function SellModule() {
                             <p>Receive</p>
                             <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                 <div className='text-4xl text-center md:text-start'>
-                                    {/* {formatAmount(selectedBIT10TokenPrice > 0 && Number(receiveingTokenPrice) > 0 ? (form.watch('from_bit10_amount') * selectedBIT10TokenPrice * 0.99) / Number(receiveingTokenPrice) : 0)} */}
                                     {formatAmount(receiveAmount)}
                                 </div>
 
@@ -510,13 +505,12 @@ export default function SellModule() {
                                     />
 
                                     <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                        <Image src={recivingTokenImg} alt='BIT10' width={75} height={75} className='z-20 border-[3px] dark:border-[#B0B0B0] bg-white rounded-full p-0.5' />
+                                        <Image src={recivingTokenImg} alt='BIT10' width={75} height={75} className='z-20' />
                                     </div>
                                 </div>
                             </div>
 
                             <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                                {/* <div>$ {formatAmount(form.watch('from_bit10_amount') * Number(receiveingTokenPrice))}</div> */}
                                 <div>$ {formatAmount(Number(form.watch('from_bit10_amount')) * Number(receiveingTokenPrice ?? 0))}</div>
                                 <div>
                                     1 {form.watch('to_token')} = $ {formatAmount(Number(receiveingTokenPrice))}
@@ -548,7 +542,6 @@ export default function SellModule() {
                                 </div>
                                 <div className='flex flex-row items-center justify-between space-x-2'>
                                     <div>Exchange Rate</div>
-                                    {/* 1 {form.watch('from_bit10_token')} = {selectedBIT10TokenPrice > 0 && Number(receiveingTokenPrice) > 0 ? formatAmount((selectedBIT10TokenPrice * 0.99) / Number(receiveingTokenPrice)) : '0'} {form.watch('to_token')} */}
                                     1 {form.watch('from_bit10_token')} = {formatAmount(exchangeRate)} {form.watch('to_token')}
                                 </div>
                                 <div className='flex flex-row items-center justify-between space-x-2'>
@@ -557,7 +550,6 @@ export default function SellModule() {
                                 </div>
                                 <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
                                     <div>Expected Output</div>
-                                    {/* <div>{formatAmount(selectedBIT10TokenPrice > 0 && Number(receiveingTokenPrice) > 0 ? (form.watch('from_bit10_amount') * selectedBIT10TokenPrice * 0.99) / Number(receiveingTokenPrice) : 0)} {form.watch('to_token')}</div> */}
                                     <div>{formatAmount(receiveAmount)} {form.watch('to_token')}</div>
                                 </div>
                             </AccordionContent>

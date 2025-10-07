@@ -5,7 +5,7 @@
 "use client"
 
 import React from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import InformationCard from '@/components/InformationCard'
 import { useQueries } from '@tanstack/react-query'
 import { formatAmount } from '@/lib/utils'
@@ -43,8 +43,11 @@ type RebalanceTrade = {
 
 export default function RebalanceHistory({ index_fund }: { index_fund: string }) {
     const pathname = usePathname();
+    const searchParams = useSearchParams();
 
-    const fetchBit10RebalanceHistory = async (tokenRebalanceAPI: string) => {
+    const isDebugMode = searchParams.get('debug') === 'true';
+
+    const fetchBIT10RebalanceHistory = async (tokenRebalanceAPI: string) => {
         const response = await fetch(`/bit10-rebalance-history-${tokenRebalanceAPI}`);
 
         if (!response.ok) {
@@ -59,7 +62,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         queries: [
             {
                 queryKey: ['bit10TOPRebalance'],
-                queryFn: () => fetchBit10RebalanceHistory('top')
+                queryFn: () => fetchBIT10RebalanceHistory('top')
             }
         ],
     });
@@ -80,34 +83,57 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
     const calculateTotalCollateral = (tokens: CoinSetData[]) =>
         tokens?.reduce((sum, t) => sum + t.price * t.noOfTokens, 0) ?? 0;
 
-    const calculateRebalanceTrades = (prevTokens: CoinSetData[], newTokens: CoinSetData[]): RebalanceTrade[] => {
-        const trades: RebalanceTrade[] = [];
-
+    const calculateRebalanceTrades = (prevTokens: CoinSetData[], newTokens: CoinSetData[]): {
+        trades: RebalanceTrade[];
+        needsExternalLiquidity: boolean;
+        externalLiquidityAmount: number;
+        internalSwaps: RebalanceTrade[];
+        externalTokens: Array<{
+            symbol: string;
+            tokensNeeded: number;
+            valueNeeded: number;
+            price: number;
+        }>;
+        collateralChange: 'increase' | 'decrease' | 'same';
+        collateralChangeAmount: number;
+    } => {
         const prevMap = new Map(prevTokens.map(t => [t.symbol, t]));
         const newMap = new Map(newTokens.map(t => [t.symbol, t]));
 
         const prevTotalValue = calculateTotalCollateral(prevTokens);
         const newTotalValue = calculateTotalCollateral(newTokens);
+        const collatteralValueChange = newTotalValue - prevTotalValue;
+        const absCollateralChange = Math.abs(collatteralValueChange);
 
-        const VALUE_TOLERANCE = 0.05; // 5% tolerance
-        const isRebalanceOnly = Math.abs(newTotalValue - prevTotalValue) / prevTotalValue < VALUE_TOLERANCE;
-
-        if (!isRebalanceOnly) {
-            return [];
+        const MIN_CHANGE_THRESHOLD = 0.01; // $0.01 minimum to consider a change
+        let collateralChange: 'increase' | 'decrease' | 'same' = 'same';
+        if (collatteralValueChange > MIN_CHANGE_THRESHOLD) {
+            collateralChange = 'increase';
+        } else if (collatteralValueChange < -MIN_CHANGE_THRESHOLD) {
+            collateralChange = 'decrease';
         }
 
-        const tokenValueChanges = new Map<string, { valueChange: number; newPrice: number; prevPrice: number }>();
+        const tokenValueChanges = new Map<string, {
+            valueChange: number;
+            newPrice: number;
+            prevPrice: number;
+            symbol: string;
+            tokensChange: number;
+        }>();
 
         newTokens.forEach(newToken => {
             const prevToken = prevMap.get(newToken.symbol);
-            const prevValue = prevToken ? prevToken.noOfTokens * prevToken.price : 0;
+            const prevValue = prevToken ? prevToken.noOfTokens * newToken.price : 0;
             const newValue = newToken.noOfTokens * newToken.price;
             const valueChange = newValue - prevValue;
+            const tokensChange = newToken.noOfTokens - (prevToken?.noOfTokens ?? 0);
 
             tokenValueChanges.set(newToken.symbol, {
                 valueChange,
                 newPrice: newToken.price,
-                prevPrice: prevToken?.price ?? newToken.price
+                prevPrice: prevToken?.price ?? newToken.price,
+                symbol: newToken.symbol,
+                tokensChange
             });
         });
 
@@ -117,52 +143,77 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                 tokenValueChanges.set(prevToken.symbol, {
                     valueChange,
                     newPrice: prevToken.price,
-                    prevPrice: prevToken.price
+                    prevPrice: prevToken.price,
+                    symbol: prevToken.symbol,
+                    tokensChange: -prevToken.noOfTokens
                 });
             }
         });
 
-        const MIN_TRADE_VALUE = 0.00000000001; // Minimum $0.00000000001 USD trade value
-        const tokensToBuy: Array<{ symbol: string; valueNeeded: number; price: number }> = [];
-        const tokensToSell: Array<{ symbol: string; valueToSell: number; price: number }> = [];
+        const MIN_TRADE_VALUE = 0.0000001; // $0.0000001 USD minimum
+        const tokensToBuy: Array<{ symbol: string; valueNeeded: number; price: number; tokensNeeded: number }> = [];
+        const tokensToSell: Array<{ symbol: string; valueToSell: number; price: number; tokensToSell: number }> = [];
 
-        tokenValueChanges.forEach((data, symbol) => {
+        tokenValueChanges.forEach((data) => {
             const absValueChange = Math.abs(data.valueChange);
             if (absValueChange < MIN_TRADE_VALUE) return;
 
             if (data.valueChange > 0) {
                 tokensToBuy.push({
-                    symbol,
+                    symbol: data.symbol,
                     valueNeeded: data.valueChange,
-                    price: data.newPrice
+                    price: data.newPrice,
+                    tokensNeeded: Math.abs(data.tokensChange)
                 });
             } else if (data.valueChange < 0) {
                 tokensToSell.push({
-                    symbol,
+                    symbol: data.symbol,
                     valueToSell: absValueChange,
-                    price: data.prevPrice
+                    price: data.newPrice,
+                    tokensToSell: Math.abs(data.tokensChange)
                 });
             }
         });
 
+        const totalValueToBuy = tokensToBuy.reduce((sum, t) => sum + t.valueNeeded, 0);
+        const totalValueToSell = tokensToSell.reduce((sum, t) => sum + t.valueToSell, 0);
+
+        const netValueDifference = totalValueToBuy - totalValueToSell;
+
+        const needsExternalLiquidity = netValueDifference > MIN_TRADE_VALUE && collateralChange !== 'decrease';
+        const externalLiquidityAmount = needsExternalLiquidity ? netValueDifference : 0;
+
+        const internalSwaps: RebalanceTrade[] = [];
+        const externalTokensDetails: Array<{
+            symbol: string;
+            tokensNeeded: number;
+            valueNeeded: number;
+            price: number;
+        }> = [];
+
+        const buyList = [...tokensToBuy];
+        const sellList = [...tokensToSell];
+
         let sellIndex = 0;
         let buyIndex = 0;
-        let remainingSellValue = tokensToSell[sellIndex]?.valueToSell ?? 0;
-        let remainingBuyValue = tokensToBuy[buyIndex]?.valueNeeded ?? 0;
+        let remainingSellValue = sellList[sellIndex]?.valueToSell ?? 0;
+        let remainingBuyValue = buyList[buyIndex]?.valueNeeded ?? 0;
+        let remainingBuyTokens = buyList[buyIndex]?.tokensNeeded ?? 0;
 
-        while (sellIndex < tokensToSell.length && buyIndex < tokensToBuy.length) {
-            const sellToken = tokensToSell[sellIndex];
-            const buyToken = tokensToBuy[buyIndex];
+        while (sellIndex < sellList.length && buyIndex < buyList.length) {
+            const sellToken = sellList[sellIndex];
+            const buyToken = buyList[buyIndex];
 
-            if (remainingSellValue <= 0 || remainingSellValue < MIN_TRADE_VALUE) {
+            if (remainingSellValue <= MIN_TRADE_VALUE) {
                 sellIndex++;
-                remainingSellValue = tokensToSell[sellIndex]?.valueToSell ?? 0;
+                remainingSellValue = sellList[sellIndex]?.valueToSell ?? 0;
                 continue;
             }
 
-            if (remainingBuyValue <= 0 || remainingBuyValue < MIN_TRADE_VALUE) {
+            if (remainingBuyValue <= MIN_TRADE_VALUE) {
                 buyIndex++;
-                remainingBuyValue = tokensToBuy[buyIndex]?.valueNeeded ?? 0;
+                remainingBuyValue = buyList[buyIndex]?.valueNeeded ?? 0;
+                remainingBuyTokens = buyList[buyIndex]?.tokensNeeded ?? 0;
                 continue;
             }
 
@@ -171,10 +222,11 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             if (tradeValueUSD < MIN_TRADE_VALUE) {
                 if (remainingSellValue < remainingBuyValue) {
                     sellIndex++;
-                    remainingSellValue = tokensToSell[sellIndex]?.valueToSell ?? 0;
+                    remainingSellValue = sellList[sellIndex]?.valueToSell ?? 0;
                 } else {
                     buyIndex++;
-                    remainingBuyValue = tokensToBuy[buyIndex]?.valueNeeded ?? 0;
+                    remainingBuyValue = buyList[buyIndex]?.valueNeeded ?? 0;
+                    remainingBuyTokens = buyList[buyIndex]?.tokensNeeded ?? 0;
                 }
                 continue;
             }
@@ -184,27 +236,56 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             // @ts-ignore
             const buyAmount = tradeValueUSD / buyToken.price;
 
-            const normalizedSellAmount = Math.abs(sellAmount) < 1e-10 ? 0 : Number(sellAmount.toFixed(10));
-            const normalizedBuyAmount = Math.abs(buyAmount) < 1e-10 ? 0 : Number(buyAmount.toFixed(10));
-            const normalizedValueUSD = Math.abs(tradeValueUSD) < 0.01 ? 0 : Number(tradeValueUSD.toFixed(2));
-
-            if (normalizedSellAmount > 0 && normalizedBuyAmount > 0 && normalizedValueUSD > 0) {
-                trades.push({
-                    // @ts-ignore
-                    sellToken: sellToken.symbol,
-                    sellAmount: normalizedSellAmount,
-                    // @ts-ignore
-                    buyToken: buyToken.symbol,
-                    buyAmount: normalizedBuyAmount,
-                    valueUSD: normalizedValueUSD
-                });
-            }
+            internalSwaps.push({
+                // @ts-ignore
+                sellToken: sellToken.symbol,
+                sellAmount: Number(sellAmount.toFixed(12)),
+                // @ts-ignore
+                buyToken: buyToken.symbol,
+                buyAmount: Number(buyAmount.toFixed(12)),
+                valueUSD: Number(tradeValueUSD.toFixed(8))
+            });
 
             remainingSellValue = Math.max(0, remainingSellValue - tradeValueUSD);
             remainingBuyValue = Math.max(0, remainingBuyValue - tradeValueUSD);
+            remainingBuyTokens = Math.max(0, remainingBuyTokens - buyAmount);
         }
 
-        return trades;
+        if (needsExternalLiquidity) {
+            if (buyIndex < buyList.length && remainingBuyValue > MIN_TRADE_VALUE) {
+                externalTokensDetails.push({
+                    // @ts-ignore
+                    symbol: buyList[buyIndex].symbol,
+                    tokensNeeded: remainingBuyTokens,
+                    valueNeeded: remainingBuyValue,
+                    // @ts-ignore
+                    price: buyList[buyIndex].price
+                });
+            }
+
+            for (let i = buyIndex + 1; i < buyList.length; i++) {
+                externalTokensDetails.push({
+                    // @ts-ignore
+                    symbol: buyList[i].symbol,
+                    // @ts-ignore
+                    tokensNeeded: buyList[i].tokensNeeded,
+                    // @ts-ignore
+                    valueNeeded: buyList[i].valueNeeded,
+                    // @ts-ignore
+                    price: buyList[i].price
+                });
+            }
+        }
+
+        return {
+            trades: internalSwaps,
+            needsExternalLiquidity,
+            externalLiquidityAmount,
+            internalSwaps,
+            externalTokens: externalTokensDetails,
+            collateralChange,
+            collateralChangeAmount: absCollateralChange
+        };
     };
 
     const analyzeRebalanceReason = (prevTokens: CoinSetData[], newTokens: CoinSetData[]): {
@@ -215,7 +296,6 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         const prevTotal = calculateTotalCollateral(prevTokens);
         const newTotal = calculateTotalCollateral(newTokens);
         const prevMap = new Map(prevTokens.map(t => [t.symbol, t]));
-        // const newMap = new Map(newTokens.map(t => [t.symbol, t]));
 
         const prevSymbols = new Set(prevTokens.map(t => t.symbol));
         const newSymbols = new Set(newTokens.map(t => t.symbol));
@@ -267,7 +347,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             }
         }
 
-        const MIN_MEANINGFUL_TRADE = 0.00000001;
+        const MIN_MEANINGFUL_TRADE = 0.01;
         let totalTradeValue = 0;
 
         newTokens.forEach(newToken => {
@@ -286,7 +366,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             };
         }
 
-        const ALLOCATION_TOLERANCE = 0.0000001; // 0.00001% tolerance
+        const ALLOCATION_TOLERANCE = 0.001; // 0.1% tolerance
         const sameAllocations = newTokens.every(newToken => {
             const prevToken = prevMap.get(newToken.symbol);
             if (!prevToken) return false;
@@ -306,7 +386,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
 
         return {
             hasChanges: true,
-            reason: 'Portfolio rebalancing required',
+            reason: 'Collateral rebalancing required',
             type: 'rebalance'
         };
     };
@@ -366,7 +446,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
 
                                 const nextEntry = selectedBIT10Token[index + 1];
                                 // @ts-ignore
-                                const rebalanceTrades = calculateRebalanceTrades(nextEntry.newTokens, entry.newTokens);
+                                const rebalanceResult = calculateRebalanceTrades(nextEntry.newTokens, entry.newTokens);
                                 // @ts-ignore
                                 const rebalanceAnalysis = analyzeRebalanceReason(nextEntry.newTokens, entry.newTokens);
 
@@ -376,25 +456,56 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                         <p className='text-lg'>Index Value: {formatAmount(entry.indexValue)} USD</p>
                                         <p className='text-lg'>Total Collateral: {formatAmount(calculateTotalCollateral(entry.newTokens))} USD</p>
 
-                                        {/* <div className={`rounded-lg p-3 my-3 ${rebalanceAnalysis.type === 'growth'
-                                            ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
-                                            : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal'
-                                                ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
-                                                : 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800'
-                                            }`}>
-                                            <p className={`font-medium ${rebalanceAnalysis.type === 'growth'
-                                                ? 'text-green-700 dark:text-green-300'
-                                                : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal'
-                                                    ? 'text-blue-700 dark:text-blue-300'
-                                                    : 'text-orange-700 dark:text-orange-300'
-                                                }`}>
-                                                {rebalanceAnalysis.type === 'growth' && '📈 '}
-                                                {rebalanceAnalysis.type === 'identical' && '🔄 '}
-                                                {rebalanceAnalysis.type === 'minimal' && '📊 '}
-                                                {rebalanceAnalysis.type === 'rebalance' && '⚖️ '}
-                                                {rebalanceAnalysis.reason}
-                                            </p>
-                                        </div> */}
+                                        {isDebugMode &&
+                                            <>
+                                                {rebalanceResult.collateralChange !== 'same' && (
+                                                    <div className={`rounded-lg p-3 my-3 ${rebalanceResult.collateralChange === 'increase'
+                                                        ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                                                        : 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
+                                                        }`}>
+                                                        <p className={`font-medium ${rebalanceResult.collateralChange === 'increase'
+                                                            ? 'text-green-700 dark:text-green-300'
+                                                            : 'text-blue-700 dark:text-blue-300'
+                                                            }`}>
+                                                            {rebalanceResult.collateralChange === 'increase' ? '📈 ' : '📉 '}
+                                                            Collateral Value {rebalanceResult.collateralChange === 'increase' ? 'Increased' : 'Decreased'} by ${formatAmount(rebalanceResult.collateralChangeAmount)}
+                                                            {rebalanceResult.collateralChange === 'decrease'}
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {rebalanceResult.needsExternalLiquidity && (
+                                                    <div className='bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3 my-3'>
+                                                        <p className='text-purple-700 dark:text-purple-300 font-medium'>
+                                                            💰 External Liquidity Required: ${formatAmount(rebalanceResult.externalLiquidityAmount)}
+                                                        </p>
+                                                        <p className='text-purple-600 dark:text-purple-400 text-sm mt-1'>
+                                                            Tokens requiring external funds: {rebalanceResult.externalTokens.map(t => t.symbol).join(', ')}
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                <div className={`rounded-lg p-3 my-3 ${rebalanceAnalysis.type === 'growth'
+                                                    ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                                                    : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal'
+                                                        ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
+                                                        : 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800'
+                                                    }`}>
+                                                    <p className={`font-medium ${rebalanceAnalysis.type === 'growth'
+                                                        ? 'text-green-700 dark:text-green-300'
+                                                        : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal'
+                                                            ? 'text-blue-700 dark:text-blue-300'
+                                                            : 'text-orange-700 dark:text-orange-300'
+                                                        }`}>
+                                                        {rebalanceAnalysis.type === 'growth' && '📈 '}
+                                                        {rebalanceAnalysis.type === 'identical' && '🔄 '}
+                                                        {rebalanceAnalysis.type === 'minimal' && '📊 '}
+                                                        {rebalanceAnalysis.type === 'rebalance' && '⚖️ '}
+                                                        {rebalanceAnalysis.reason}
+                                                    </p>
+                                                </div>
+                                            </>
+                                        }
 
                                         <div className='flex justify-between my-2'>
                                             <h3 className='font-medium'>
@@ -445,10 +556,11 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                             </Table>
                                         </div>
 
-                                        {/* Rebalance Trades Table or No Trades Message */}
                                         <div className='mt-6'>
-                                            <h3 className='font-medium mb-3'>Rebalance Trades</h3>
-                                            {rebalanceTrades.length > 0 ? (
+                                            <h3 className='font-medium mb-3'>
+                                                {rebalanceResult.needsExternalLiquidity ? 'Internal Swaps' : 'Rebalance Trades'}
+                                            </h3>
+                                            {rebalanceResult.internalSwaps.length > 0 ? (
                                                 <Table className='border-collapse border'>
                                                     <TableHeader>
                                                         <TableRow>
@@ -461,7 +573,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>
-                                                        {rebalanceTrades.map((trade, tradeIndex) => (
+                                                        {rebalanceResult.internalSwaps.map((trade, tradeIndex) => (
                                                             <TableRow key={tradeIndex}>
                                                                 <TableCell className='font-medium text-red-600 dark:text-red-400'>{trade.sellToken}</TableCell>
                                                                 <TableCell>{formatAmount(trade.sellAmount)}</TableCell>
@@ -490,6 +602,49 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                 </div>
                                             )}
                                         </div>
+
+                                        {isDebugMode && <>
+                                            {rebalanceResult.needsExternalLiquidity && rebalanceResult.externalTokens.length > 0 && (
+                                                <div className='mt-4'>
+                                                    <h3 className='font-medium mb-3'>External Liquidity Breakdown</h3>
+                                                    <div className='bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4'>
+                                                        <p className='text-purple-700 dark:text-purple-300 mb-3'>
+                                                            Total additional funds needed: <span className='font-semibold'>${formatAmount(rebalanceResult.externalLiquidityAmount)}</span>
+                                                        </p>
+
+                                                        <div className='space-y-3'>
+                                                            {rebalanceResult.externalTokens.map((tokenDetail) => (
+                                                                <div key={tokenDetail.symbol} className='bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-700'>
+                                                                    <div className='flex justify-between items-center'>
+                                                                        <span className='font-semibold text-purple-800 dark:text-purple-200'>
+                                                                            {tokenDetail.symbol}
+                                                                        </span>
+                                                                        <span className='text-purple-700 dark:text-purple-300 font-medium'>
+                                                                            ${formatAmount(tokenDetail.valueNeeded)}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className='mt-2 text-sm text-purple-600 dark:text-purple-400'>
+                                                                        <div className='flex justify-between'>
+                                                                            <span>Tokens needed:</span>
+                                                                            <span className='font-mono'>{formatAmount(tokenDetail.tokensNeeded)}</span>
+                                                                        </div>
+                                                                        <div className='flex justify-between'>
+                                                                            <span>Price per token:</span>
+                                                                            <span className='font-mono'>${formatAmount(tokenDetail.price)}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+
+                                                        <p className='text-purple-600 dark:text-purple-400 text-xs mt-3 italic'>
+                                                            * These tokens require external funding as internal swaps cannot cover the full target allocation.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                        }
                                     </div>
                                 );
                             })}

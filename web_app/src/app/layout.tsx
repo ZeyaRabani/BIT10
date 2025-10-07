@@ -3,7 +3,6 @@ import { cn, constructMetadata } from '@/lib/utils'
 import { CSPostHogProvider } from '@/app/_analytics/provider'
 import { TRPCReactProvider } from '@/trpc/react'
 import Providers from '@/app/_provider/Providers'
-import { ThemeProvider } from '@/components/theme-provider'
 import ScrollToTopBtn from '@/components/ScrollToTopBtn'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -16,13 +15,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <CSPostHogProvider>
           <TRPCReactProvider>
             <Providers>
-              <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-                <main>
-                  {children}
-                </main>
-                <ScrollToTopBtn />
-                <Toaster richColors closeButton />
-              </ThemeProvider>
+              <main>
+                {children}
+              </main>
+              <ScrollToTopBtn />
+              <Toaster richColors closeButton />
             </Providers>
           </TRPCReactProvider>
         </CSPostHogProvider>

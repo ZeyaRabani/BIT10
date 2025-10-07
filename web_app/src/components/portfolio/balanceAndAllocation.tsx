@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
-import { useBaseWallet } from '@/context/BaseWalletContext'
+import { useEVMWallet } from '@/context/EVMWalletContext'
 import { fetchICPBIT10Balance } from './icp/ICPPortfolioModule'
 import { fetchBaseBIT10Balance } from './base/BasePortfolioModule'
 import { useQueries } from '@tanstack/react-query'
@@ -24,7 +24,7 @@ export default function BalanceAndAllocation() {
 
     const { chain } = useChain();
     const { isICPConnected, icpAddress } = useICPWallet();
-    const { isConnected: isBaseConnected, account: baseAddress } = useBaseWallet();
+    const { isEVMConnected, evmAddress } = useEVMWallet();
 
     const fetchBIT10Tokens = async (tokenPriceAPI: string) => {
         const response = await fetch(tokenPriceAPI);
@@ -64,7 +64,7 @@ export default function BalanceAndAllocation() {
                 queryKey: ['bit10TOPBalanceBase'],
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                queryFn: () => fetchBaseBIT10Balance({ tokenAddress: '0x2d309c7c5fbbf74372edfc25b10842a7237b92de', address: baseAddress })
+                queryFn: () => fetchBaseBIT10Balance({ tokenAddress: '0x2d309c7c5fbbf74372edfc25b10842a7237b92de', address: evmAddress })
             },
         ],
     });
@@ -80,7 +80,7 @@ export default function BalanceAndAllocation() {
         if (chain === 'icp' && isICPConnected) {
             const total = Number(icpBIT10DEFIokenBalance) + Number(icpBIT10TOPTokenBalance);
             return (total / 100000000);
-        } else if (chain === 'base' && isBaseConnected) {
+        } else if (chain === 'base' && isEVMConnected) {
             const total = Number(baseBIT10TOPTokenBalance);
             return total;
         } else {
@@ -135,7 +135,7 @@ export default function BalanceAndAllocation() {
         if (chain === 'icp' && isICPConnected) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return (Number(icpBIT10TOPTokenBalance) / 100000000);
-        } else if (chain === 'base' && isBaseConnected) {
+        } else if (chain === 'base' && isEVMConnected) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return Number(baseBIT10TOPTokenBalance);
         } else {

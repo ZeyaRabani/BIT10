@@ -4,14 +4,21 @@
 import React, { useState, useEffect } from 'react'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
+import { useEVMWallet } from '@/context/EVMWalletContext'
+import { useConnect, useAccount, useDisconnect, useSwitchChain } from 'wagmi'
+import { base } from 'wagmi/chains'
 import { addNewUser } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import ICPLogo from '@/assets/wallet/icp-logo.svg'
 import BaseLogo from '@/assets/wallet/base-logo.svg'
-import { useBaseWallet } from '@/context/BaseWalletContext'
 import MetamaskLogo from '@/assets/wallet/metamsak.svg'
+import CoinbaseLogo from '@/assets/wallet/coinbase.svg'
+import LedgerLogo from '@/assets/wallet/ledger.svg'
+import PhantomLogo from '@/assets/wallet/phantom.svg'
+import TrustWalletLogo from '@/assets/wallet/trust-wallet.svg'
+import TalismanLogo from '@/assets/wallet/talisman.svg'
 import PlugImg from '@/assets/wallet/plug.svg'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { motion } from 'framer-motion'
@@ -39,6 +46,15 @@ const icpWallets = [
     { name: 'Plug', img: PlugImg }
 ];
 
+const evmWalletConfig = [
+    { name: 'MetaMask', icon: MetamaskLogo, id: 'metaMask' },
+    { name: 'Coinbase Wallet', icon: CoinbaseLogo, id: 'coinbaseWallet' },
+    { name: 'Ledger', icon: LedgerLogo, id: 'ledger' },
+    { name: 'Phantom', icon: PhantomLogo, id: 'phantom' },
+    { name: 'Trust Wallet', icon: TrustWalletLogo, id: 'trust' },
+    { name: 'Talisman', icon: TalismanLogo, id: 'talisman' }
+];
+
 export default function WalletBtn() {
     const [open, setOpen] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
@@ -46,10 +62,12 @@ export default function WalletBtn() {
 
     const { isICPConnected, icpAddress, connectICPWallet, disconnectICPWallet } = useICPWallet();
 
+    const { isEVMConnected, evmAddress } = useEVMWallet();
     const { chain, setChain } = useChain();
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const { account: baseAddress, isConnected: isBaseConnected, isConnecting: isBaseConnecting, connectWallet: connectBaseWallet, disconnectWallet: disconnectBaseWallet } = useBaseWallet();
+    const { connectors, connect } = useConnect();
+    const { isConnected: wagmiConnected, chain: wagmiChain } = useAccount();
+    const { disconnect: wagmiDisconnect } = useDisconnect();
+    const { switchChain } = useSwitchChain();
 
     useEffect(() => {
         const addUserToDB = async () => {
@@ -68,10 +86,10 @@ export default function WalletBtn() {
                     }
                 }
             } else if (chain === 'base') {
-                if (baseAddress && isBaseConnected) {
+                if (isEVMConnected && evmAddress) {
                     try {
                         const result = await addNewUser({
-                            principalId: baseAddress,
+                            principalId: evmAddress,
                         });
                         if (result === 'Error adding new user') {
                             toast.error('An error occurred while setting up your account. Please try again!');
@@ -87,70 +105,37 @@ export default function WalletBtn() {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         addUserToDB();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [icpAddress, isICPConnected, baseAddress, isBaseConnected]);
+    }, [isICPConnected, icpAddress, isEVMConnected, evmAddress]);
 
-    // Add this useEffect to properly detect EVM chains
-    useEffect(() => {
-        const checkBaseConnection = async () => {
-            if (isBaseConnected && baseAddress) {
-                // Check if we're actually on Base
-                const baseChainId = localStorage.getItem('baseChainId');
-                const walletChain = localStorage.getItem('walletChain');
-
-                if (walletChain === 'base' || baseChainId === '0x2105' || isBaseConnected) {
-                    setChain('base');
-                }
-                // else {
-                //     setChain('eth');
-                // }
-            }
-        };
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        checkBaseConnection();
-    }, [isBaseConnected, baseAddress, setChain]);
 
     useEffect(() => {
         if (isICPConnected && icpAddress) {
             setChain('icp');
-        } else if (isBaseConnected && baseAddress) {
-            const walletChain = localStorage.getItem('walletChain');
-            const bscChainId = localStorage.getItem('bscChainId');
-
-            if (walletChain === 'base' || bscChainId === '0x2105') {
+        } else if (wagmiConnected && wagmiChain) {
+            if (wagmiChain.id === base.id) {
                 setChain('base');
             }
-            // else {
+            // else if (wagmiChain.id === mainnet.id) {
             //     setChain('eth');
             // }
         } else {
             setChain(undefined);
         }
-    }, [isICPConnected, icpAddress, isBaseConnected, baseAddress, setChain]);
+    }, [isICPConnected, icpAddress, wagmiConnected, wagmiChain, isEVMConnected, evmAddress, setChain]);
 
-    // Add this useEffect to clean up chain state when all connections are lost
     useEffect(() => {
-        // If no wallet is connected, ensure chain is undefined
-        if (!isICPConnected && !isBaseConnected) {
+        if (!isICPConnected && !wagmiConnected) {
             setChain(undefined);
         }
-
-        // if (!isBaseConnected && ethIsConnected) {
-        //     const walletChain = localStorage.getItem('walletChain');
-        //     if (walletChain === 'base') {
-        //         localStorage.removeItem('walletChain');
-        //         localStorage.removeItem('bscChainId');
-        //     }
-        // }
-    }, [isICPConnected, isBaseConnected, setChain]);
+    }, [isICPConnected, wagmiConnected, setChain]);
 
     useEffect(() => {
         if (chain === 'icp' && !isICPConnected) {
             setChain(undefined);
-        } else if (chain === 'base' && !baseAddress) {
+        } else if (chain === 'base' && !evmAddress) {
             setChain(undefined);
         }
-    }, [chain, isICPConnected, baseAddress, setChain]);
+    }, [chain, isICPConnected, evmAddress, setChain]);
 
     const handleDisconnect = async () => {
         switch (chain) {
@@ -158,9 +143,9 @@ export default function WalletBtn() {
                 disconnectICPWallet();
                 break;
             case 'base':
-                disconnectBaseWallet();
-                localStorage.removeItem('walletChain');
-                localStorage.removeItem('bscChainId');
+            // case 'eth':
+                wagmiDisconnect();
+                toast.success('Wallet disconnected successfully!');
                 break;
         }
 
@@ -174,6 +159,42 @@ export default function WalletBtn() {
 
     const handleBack = () => {
         setSelectedChain(null);
+    };
+
+    const handleEVMWalletConnect = async (walletId: string, targetChainId: number) => {
+        setIsConnecting(true);
+        try {
+            const connector = connectors.find(c =>
+                c.id.toLowerCase().includes(walletId.toLowerCase()) ||
+                c.name.toLowerCase().includes(walletId.toLowerCase())
+            );
+
+            if (connector) {
+                // eslint-disable-next-line @typescript-eslint/await-thenable
+                await connect({ connector, chainId: targetChainId });
+
+                if (wagmiChain?.id !== targetChainId) {
+                    // eslint-disable-next-line @typescript-eslint/await-thenable
+                    await switchChain({ chainId: targetChainId });
+                }
+
+                setOpen(false);
+                handleBack();
+            } else {
+                toast.error(`${walletId} wallet not found. Please install the extension.`);
+            }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            if (error?.message?.includes('User rejected')) {
+                toast.error('Connection request cancelled!');
+            } else {
+                toast.error('Failed to connect wallet. Please try again.');
+            }
+            toast.error('Wallet connection error',);
+        } finally {
+            setIsConnecting(false);
+        }
     };
 
     const renderChainContent = () => {
@@ -204,33 +225,24 @@ export default function WalletBtn() {
                 );
 
             case 'base':
-                const handleBaseWalletSelect = async () => {
-                    setIsConnecting(true);
-                    setOpen(false);
-                    try {
-                        await connectBaseWallet();
-                        setChain('base');
-                        localStorage.setItem('walletChain', 'base');
-                        handleBack();
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    } catch (error) {
-                        toast.error('Failed to connect BSC wallet');
-                    } finally {
-                        setIsConnecting(false);
-                    }
-                };
-
                 return (
                     <div className='flex flex-col justify-between space-y-2 h-[22rem] md:h-72'>
                         <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='grid md:grid-cols-2 gap-2 items-center overflow-x-hidden'>
-                            <motion.div variants={cardVariantsRight}>
-                                <Button variant='outline' className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white' onClick={handleBaseWalletSelect} disabled={isBaseConnecting}>
-                                    <Image height={30} width={30} src={MetamaskLogo} alt='Metamask' className='rounded' />
-                                    <div className='text-lg md:text-xl overflow-hidden'>Metamask</div>
-                                </Button>
-                            </motion.div>
+                            {evmWalletConfig.map(({ name, icon, id }) => (
+                                <motion.div variants={cardVariantsRight} key={id}>
+                                    <Button
+                                        variant='outline'
+                                        className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white'
+                                        onClick={() => handleEVMWalletConnect(id, base.id)}
+                                        disabled={isConnecting}
+                                    >
+                                        <Image height={30} width={30} src={icon} alt={name} className='rounded' />
+                                        <div className='text-lg md:text-xl overflow-hidden'>{name}</div>
+                                    </Button>
+                                </motion.div>
+                            ))}
                         </motion.div>
-                        <p className='text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                        <p className='text-center text-xs md:text-sm'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
                     </div>
                 );
 
@@ -259,7 +271,7 @@ export default function WalletBtn() {
 
     return (
         <div>
-            {isICPConnected || isBaseConnected ? (
+            {isICPConnected || isEVMConnected ? (
                 <Button variant='destructive' onClick={handleDisconnect} className='w-full'>Disconnect wallet</Button>
             ) : (
                 <Dialog open={open} onOpenChange={setOpen}>

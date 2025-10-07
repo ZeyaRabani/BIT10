@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import * as z from 'zod'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
-import { useBaseWallet } from '@/context/BaseWalletContext'
+import { useEVMWallet } from '@/context/EVMWalletContext'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { formatAddress, formatAmount } from '@/lib/utils'
@@ -55,7 +55,7 @@ export default function BuyModule() {
 
     const { chain } = useChain();
     const { icpAddress } = useICPWallet();
-    const { account: baseAddress } = useBaseWallet();
+    const { evmAddress } = useEVMWallet();
 
     const fetchBIT10Price = useCallback(async (tokenPriceAPI: string) => {
         const response = await fetch(tokenPriceAPI);
@@ -185,12 +185,12 @@ export default function BuyModule() {
             },
             // For Base
             {
-                queryKey: ['paymentTokenBalanceBaseETH', baseAddress, payingTokenAddress, chain],
+                queryKey: ['paymentTokenBalanceBaseETH', evmAddress, payingTokenAddress, chain],
                 queryFn: () => {
-                    if (!baseAddress || chain !== 'base' || !payingTokenAddress) return '1';
-                    return fetchBaseBIT10Balance({ tokenAddress: '0x0000000000000000000000000000000000000000b', address: baseAddress });
+                    if (!evmAddress || chain !== 'base' || !payingTokenAddress) return '1';
+                    return fetchBaseBIT10Balance({ tokenAddress: '0x0000000000000000000000000000000000000000b', address: evmAddress });
                 },
-                enabled: !!baseAddress && chain === 'base' && !!payingTokenAddress,
+                enabled: !!evmAddress && chain === 'base' && !!payingTokenAddress,
                 refetchInterval: 30000, // 30 seconds
             },
         ],
@@ -274,7 +274,7 @@ export default function BuyModule() {
             } else if (chain === 'base') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await buyBaseBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount, tokenInAmount: tokenInAmount.toString(), baseAddress: baseAddress! });
+                await buyBaseBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount, tokenInAmount: tokenInAmount.toString(), evmAddress: evmAddress! });
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {

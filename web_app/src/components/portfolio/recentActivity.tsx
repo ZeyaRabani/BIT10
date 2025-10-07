@@ -6,7 +6,7 @@ import { userRecentBIT10BuyActivity } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
-import { useBaseWallet } from '@/context/BaseWalletContext'
+import { useEVMWallet } from '@/context/EVMWalletContext'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
@@ -54,14 +54,14 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 export default function RecentActivity() {
     const { chain } = useChain();
     const { isICPConnected, icpAddress } = useICPWallet();
-    const { account: baseAddress, isConnected: isBaseConnected } = useBaseWallet();
+    const { isEVMConnected, evmAddress } = useEVMWallet();
 
     const fetchRecentActivity = async () => {
         let response;
         if (chain === 'icp' && isICPConnected && icpAddress) {
             response = await userRecentBIT10BuyActivity({ paymentAddress: icpAddress, chain: 'ICP' });
-        } else if (chain === 'base' && isBaseConnected && baseAddress) {
-            response = await userRecentBIT10BuyActivity({ paymentAddress: baseAddress, chain: 'Base' });
+        } else if (chain === 'base' && isEVMConnected && evmAddress) {
+            response = await userRecentBIT10BuyActivity({ paymentAddress: evmAddress, chain: 'Base' });
         } else {
             response = [];
         }
