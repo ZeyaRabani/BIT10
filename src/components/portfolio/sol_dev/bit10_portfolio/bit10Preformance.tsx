@@ -305,7 +305,7 @@ export default function Bit10Preformance() {
     return (
         <div>
             {isLoading ? (
-                <Card className='dark:border-white w-full animate-fade-right-slow'>
+                <Card className='dark:border-white w-full animate-fade-right-slow bg-transparent'>
                     <CardContent>
                         <div className='flex flex-col h-full space-y-2 pt-8'>
                             {['h-10 w-36', 'h-36', 'h-52'].map((classes, index) => (
@@ -315,7 +315,7 @@ export default function Bit10Preformance() {
                     </CardContent>
                 </Card>
             ) : (
-                <Card className='dark:border-white md:col-span-2 animate-fade-right-slow'>
+                <Card className='dark:border-white md:col-span-2 animate-fade-right-slow bg-transparent'>
                     <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
                         <div className='text-2xl md:text-4xl text-center md:text-start'>Test BIT10 Performance</div>
                         <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0'>

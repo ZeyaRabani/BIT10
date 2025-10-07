@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Minus, Plus } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select'
-import Image from 'next/image'
-import CkBTCImg from '@/assets/swap/ckBTC.png'
-import CkETHImg from '@/assets/swap/ckETH.png'
-import ICPImg from '@/assets/swap/ICP.png'
+import Image, { type StaticImageData } from 'next/image'
+import CkBTCImg from '@/assets/tokens/ckbtc.svg'
+import CkETHImg from '@/assets/tokens/cketh.svg'
+import ICPImg from '@/assets/tokens/icp.svg'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 
@@ -49,19 +49,19 @@ function SelectToken() {
                         <SelectLabel>Available Tokens</SelectLabel>
                         <SelectItem value='btc'>
                             <div className='inline-flex items-center justify-center'>
-                                <Image src={CkBTCImg} alt='ckBTC' width={25} height={25} className='z-20 rounded-full' />
+                                <Image src={CkBTCImg as StaticImageData} alt='ckBTC' width={25} height={25} className='z-20 rounded-full' />
                                 <div className='ml-2'>ckBTC</div>
                             </div>
                         </SelectItem>
                         <SelectItem value='eth'>
                             <div className='inline-flex items-center justify-center'>
-                                <Image src={CkETHImg} alt='ckETH' width={25} height={25} className='z-20 rounded-full' />
+                                <Image src={CkETHImg as StaticImageData} alt='ckETH' width={25} height={25} className='z-20 rounded-full' />
                                 <div className='ml-2'>ckETH</div>
                             </div>
                         </SelectItem>
                         <SelectItem value='usdc'>
                             <div className='inline-flex items-center justify-center'>
-                                <Image src={ICPImg} alt='ICP' width={25} height={25} className='z-20 rounded-full' />
+                                <Image src={ICPImg as StaticImageData} alt='ICP' width={25} height={25} className='z-20 rounded-full' />
                                 <div className='ml-2'>ICP</div>
                             </div>
                         </SelectItem>

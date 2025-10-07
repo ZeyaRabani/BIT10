@@ -29,7 +29,7 @@ export default function Chatbot() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const toggleChat = () => setIsOpen(!isOpen);
-    const { ICPAddress } = useICPWallet();
+    const { icpAddress } = useICPWallet();
     const { chain } = useChain();
 
     useEffect(() => {
@@ -84,7 +84,7 @@ export default function Chatbot() {
         if (chain === 'icp') {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
-            walletAddress = ICPAddress;
+            walletAddress = icpAddress;
         } else {
             walletAddress = 'none';
         }

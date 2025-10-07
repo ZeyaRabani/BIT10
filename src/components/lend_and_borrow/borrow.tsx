@@ -8,8 +8,8 @@ import { cn } from '@/lib/utils'
 import * as z from 'zod'
 import { useQueries } from '@tanstack/react-query'
 import Image, { type StaticImageData } from 'next/image'
-import BIT10Img from '@/assets/swap/bit10.svg'
-import ICPImg from '@/assets/swap/icp.svg'
+import BIT10Img from '@/assets/tokens/bit10.svg'
+import ICPImg from '@/assets/tokens/icp.svg'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useICPWallet } from '@/context/ICPWalletContext'
@@ -68,7 +68,7 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
     const [collateralTokenSearch, setCollateralTokenSearch] = useState('');
 
     const { chain } = useChain();
-    const { ICPAddress } = useICPWallet();
+    const { icpAddress } = useICPWallet();
 
     const FormSchema = z.object({
         collateral_token: z.string({ required_error: 'Please select a collateral token' }),
@@ -215,12 +215,12 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
         queries: [
             // For ICP
             {
-                queryKey: ['bit10TOPBalance', ICPAddress, 'wbckh-zqaaa-aaaap-qpuza-cai'],
+                queryKey: ['bit10TOPBalance', icpAddress, 'wbckh-zqaaa-aaaap-qpuza-cai'],
                 queryFn: () => {
-                    if (!ICPAddress || chain !== 'icp') return '0';
-                    return fetchICPTokenBalance('wbckh-zqaaa-aaaap-qpuza-cai', ICPAddress);
+                    if (!icpAddress || chain !== 'icp') return '0';
+                    return fetchICPTokenBalance('wbckh-zqaaa-aaaap-qpuza-cai', icpAddress);
                 },
-                enabled: !!ICPAddress && chain === 'icp',
+                enabled: !!icpAddress && chain === 'icp',
                 refetchInterval: 10000, // 10 seconds
             }
         ],
@@ -245,10 +245,10 @@ export default function Borrow({ item }: { item: LendAndBorrorTableDataType }) {
 
             setBorrowing(true);
 
-            if (chain === 'icp' && ICPAddress) {
+            if (chain === 'icp' && icpAddress) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await createICPBorrowTransaction({ address: ICPAddress, values: values, borrowingTokenChain: borrowingTokenChain, borrowingTokenAddress: item.token_address });
+                await createICPBorrowTransaction({ address: icpAddress, values: values, borrowingTokenChain: borrowingTokenChain, borrowingTokenAddress: item.token_address });
             } else {
                 toast.error('Unsupported chain');
             }

@@ -1,6 +1,6 @@
-import ETHImg from '@/assets/swap/eth.svg'
-import USDCImg from '@/assets/swap/usdc.svg'
-import BIT10Img from '@/assets/swap/bit10.svg'
+import ETHImg from '@/assets/tokens/eth.svg'
+import USDCImg from '@/assets/tokens/usdc.svg'
+import BIT10Img from '@/assets/tokens/bit10.svg'
 import { type StaticImageData } from 'next/image'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/buy.did'
@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { type usePublicClient } from 'wagmi'
 import crypto from 'crypto'
 import { newTokenBuy } from '@/actions/dbActions'
+import { getTokenName } from '@/lib/utils'
 
 export const paymentTokenETHSepolia = [
     { label: 'ETH', value: 'Ethereum', img: ETHImg as StaticImageData, tokenType: 'ERC20', address: '0x0000000000000000000000000000000000000000e', slug: ['ethereum'] },
@@ -200,8 +201,8 @@ export const buySepoliaBIT10Token = async (tickInName: string, selectedTickInAmo
                     principalId: address,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                    tickOutName: transfer.Ok.token_out_address,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+                    tickOutName: getTokenName(transfer.Ok.token_out_address),
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

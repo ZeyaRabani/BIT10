@@ -21,7 +21,7 @@ export default function BalanceAndAlloactions() {
     const [selectedAllocationToken, setSelectedAllocationToken] = useState('Test BIT10.TOP');
     const [innerRadius, setInnerRadius] = useState<number>(80);
 
-    const { ICPAddress } = useICPWallet();
+    const { icpAddress } = useICPWallet();
 
     const fetchBIT10Balance = async (canisterId: string) => {
         const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
@@ -32,9 +32,9 @@ export default function BalanceAndAlloactions() {
             canisterId,
         });
 
-        if (ICPAddress) {
+        if (icpAddress) {
             const account = {
-                owner: Principal.fromText(ICPAddress),
+                owner: Principal.fromText(icpAddress),
                 subaccount: [],
             };
             if (actor && actor.icrc1_balance_of) {
@@ -204,7 +204,7 @@ export default function BalanceAndAlloactions() {
         <div>
             {isLoading ? (
                 <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
-                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow'>
+                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow bg-transparent'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -213,7 +213,7 @@ export default function BalanceAndAlloactions() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-right-slow'>
+                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-right-slow bg-transparent'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -225,7 +225,7 @@ export default function BalanceAndAlloactions() {
                 </div>
             ) : (
                 <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
-                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow'>
+                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow bg-transparent'>
                         <CardHeader>
                             <div className='text-2xl md:text-4xl text-center md:text-start'>Your Current Balance</div>
                         </CardHeader>
@@ -313,7 +313,7 @@ export default function BalanceAndAlloactions() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-right-slow'>
+                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-right-slow bg-transparent'>
                         <CardHeader className='flex flex-col md:flex-row items-center md:justify-between'>
                             <div className='text-2xl md:text-4xl text-center md:text-start'>Test BIT10 Allocations</div>
                             <Select onValueChange={setSelectedAllocationToken} defaultValue={selectedAllocationToken}>

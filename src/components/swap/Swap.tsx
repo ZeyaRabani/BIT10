@@ -9,10 +9,10 @@ import { cn } from '@/lib/utils'
 import * as z from 'zod'
 import { useQueries } from '@tanstack/react-query'
 import Image, { type StaticImageData } from 'next/image'
-import ETHImg from '@/assets/swap/eth.svg'
-import USDCImg from '@/assets/swap/usdc.svg'
-import BTCImg from '@/assets/swap/bitcoin.svg'
-import BNBImg from '@/assets/swap/bnb.svg'
+import ETHImg from '@/assets/tokens/eth.svg'
+import USDCImg from '@/assets/tokens/usdc.svg'
+import BTCImg from '@/assets/tokens/bitcoin.svg'
+import BNBImg from '@/assets/tokens/bnb.svg'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog'
@@ -710,7 +710,7 @@ export default function Swap() {
 
     return (
         <div className='flex flex-col items-center justify-center py-4'>
-            <Card className='w-[300px] md:w-[580px] animate-fade-bottom-up rounded-lg'>
+            <Card className='w-[300px] md:w-[580px] animate-fade-bottom-up rounded-lg bg-transparent'>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
                         <CardHeader>
@@ -805,7 +805,7 @@ export default function Swap() {
                         </CardHeader>
                         <CardContent className='flex flex-col space-y-2'>
                             <div className='rounded-lg border-2'>
-                                <div className='py-2 px-6 bg-muted rounded-lg'>
+                                <div className='py-2 px-6 rounded-lg'>
                                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
                                         <div>From</div>
                                         <div className='flex flex-row space-x-1 items-center'>

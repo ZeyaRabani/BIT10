@@ -4,7 +4,7 @@ import { Actor, HttpAgent } from '@dfinity/agent'
 import { Principal } from '@dfinity/principal'
 import { idlFactory } from '@/lib/bit10.did'
 import { toast } from 'sonner'
-import { formatAmount } from '@/lib/utils'
+import { formatAddress, formatAmount } from '@/lib/utils'
 import { userActiveLoansCount, userActiveTokensCount } from '@/actions/dbActions'
 import { useQueries } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -15,13 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BadgeDollarSign, Waves, HandCoins, Banknote } from 'lucide-react'
 
 export default function ICPOverview() {
-    const { ICPAddress } = useICPWallet();
-
-    const formatAddress = (id: string | undefined) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 4)}...${id.slice(-3)}`;
-    };
+    const { icpAddress } = useICPWallet();
 
     const fetchBIT10Balance = async (canisterId: string) => {
         const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
@@ -32,9 +26,9 @@ export default function ICPOverview() {
             canisterId,
         });
 
-        if (ICPAddress) {
+        if (icpAddress) {
             const account = {
-                owner: Principal.fromText(ICPAddress),
+                owner: Principal.fromText(icpAddress),
                 subaccount: [],
             };
             if (actor && actor.icrc1_balance_of) {
@@ -82,11 +76,11 @@ export default function ICPOverview() {
             },
             {
                 queryKey: ['userActiveLoansCount'],
-                queryFn: () => ICPAddress ? fetchUserActiveLoansCount(ICPAddress) : fetchUserActiveLoansCount('')
+                queryFn: () => icpAddress ? fetchUserActiveLoansCount(icpAddress) : fetchUserActiveLoansCount('')
             },
             {
                 queryKey: ['userActiveTokensCount'],
-                queryFn: () => ICPAddress ? fetchUserActiveTokensCount(ICPAddress) : fetchUserActiveTokensCount('')
+                queryFn: () => icpAddress ? fetchUserActiveTokensCount(icpAddress) : fetchUserActiveTokensCount('')
             }
         ],
     });
@@ -111,7 +105,7 @@ export default function ICPOverview() {
         <div className='flex flex-col space-y-4'>
             <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:justify-between items-center'>
                 <h1 className='text-center md:text-start text-3xl font-bold animate-fade-left-slow'>
-                    Welcome back {ICPAddress ? formatAddress(ICPAddress) : 'Guest'}
+                    Welcome back {icpAddress ? formatAddress(icpAddress) : 'Guest'}
                 </h1>
                 <Button className='animate-fade-right-slow' asChild>
                     <Link href='/buy'>Buy BIT10 Token</Link>
@@ -121,7 +115,7 @@ export default function ICPOverview() {
                 {isLoading ? (
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
                         {Array.from({ length: 4 }).map((_, index) => (
-                            <Card className='flex flex-col h-full' key={index}>
+                            <Card className='flex flex-col h-full bg-transparent' key={index}>
                                 <div className='p-2 space-y-2'>
                                     {['h-8 w-3/4', 'h-16'].map((classes, subIndex) => (
                                         <Skeleton key={subIndex} className={classes} />
@@ -134,7 +128,7 @@ export default function ICPOverview() {
                     <div className='grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4 lg:grid-flow-row lg:grid-rows-auto lg:align-content-start w-full'>
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger>
-                                <Card className='flex flex-col h-full'>
+                                <Card className='flex flex-col h-full bg-transparent'>
                                     <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                         <CardTitle className='text-lg font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                             <p>BIT10 Tokens Owned</p>
@@ -153,7 +147,7 @@ export default function ICPOverview() {
 
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger>
-                                <Card className='flex flex-col h-full'>
+                                <Card className='flex flex-col h-full bg-transparent'>
                                     <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                         <CardTitle className='text-lg font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                             <p>Liquidity Provided</p>
@@ -172,7 +166,7 @@ export default function ICPOverview() {
 
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger>
-                                <Card className='flex flex-col h-full'>
+                                <Card className='flex flex-col h-full bg-transparent'>
                                     <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                         <CardTitle className='text-lg font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                             <p>Active Loans</p>
@@ -191,7 +185,7 @@ export default function ICPOverview() {
 
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger>
-                                <Card className='flex flex-col h-full'>
+                                <Card className='flex flex-col h-full bg-transparent'>
                                     <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                         <CardTitle className='text-lg font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                             <p>Borrowed Amount</p>

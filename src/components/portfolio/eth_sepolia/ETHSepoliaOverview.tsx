@@ -3,7 +3,7 @@ import { useAccount, usePublicClient } from 'wagmi'
 import { formatUnits } from 'viem'
 import { useQueries } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { formatAmount } from '@/lib/utils'
+import { formatAddress, formatAmount } from '@/lib/utils'
 import { toast } from 'sonner'
 import { ERC20_ABI } from '@/lib/erc20Abi'
 import Link from 'next/link'
@@ -15,12 +15,6 @@ import { BadgeDollarSign, Waves, HandCoins, Banknote } from 'lucide-react'
 export default function ETHSepoliaOverview() {
     const { address } = useAccount();
     const publicClient = usePublicClient();
-
-    const formatAddress = (id: string | undefined) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 4)}...${id.slice(-3)}`;
-    };
 
     const fetchBIT10Balance = async (tokenAddress: string) => {
         try {
@@ -104,7 +98,7 @@ export default function ETHSepoliaOverview() {
                 {isLoading ? (
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
                         {Array.from({ length: 4 }).map((_, index) => (
-                            <Card className='flex flex-col h-full' key={index}>
+                            <Card className='flex flex-col h-full bg-transparent' key={index}>
                                 <div className='p-2 space-y-2'>
                                     {['h-8 w-3/4', 'h-16'].map((classes, subIndex) => (
                                         <Skeleton key={subIndex} className={classes} />
@@ -117,7 +111,7 @@ export default function ETHSepoliaOverview() {
                     <div className='grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4 lg:grid-flow-row lg:grid-rows-auto lg:align-content-start w-full'>
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger>
-                                <Card className='flex flex-col h-full'>
+                                <Card className='flex flex-col h-full bg-transparent'>
                                     <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                         <CardTitle className='text-lg font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                             <p>BIT10 Tokens Owned</p>
@@ -136,7 +130,7 @@ export default function ETHSepoliaOverview() {
 
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger>
-                                <Card className='flex flex-col h-full'>
+                                <Card className='flex flex-col h-full bg-transparent'>
                                     <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                         <CardTitle className='text-lg font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                             <p>Liquidity Provided</p>
@@ -155,7 +149,7 @@ export default function ETHSepoliaOverview() {
 
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger>
-                                <Card className='flex flex-col h-full'>
+                                <Card className='flex flex-col h-full bg-transparent'>
                                     <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                         <CardTitle className='text-lg font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                             <p>Active Loans</p>
@@ -174,7 +168,7 @@ export default function ETHSepoliaOverview() {
 
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger>
-                                <Card className='flex flex-col h-full'>
+                                <Card className='flex flex-col h-full bg-transparent'>
                                     <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                         <CardTitle className='text-lg font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                             <p>Borrowed Amount</p>

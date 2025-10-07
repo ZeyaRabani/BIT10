@@ -1,6 +1,6 @@
 import { type StaticImageData } from 'next/image'
-import SOLImg from '@/assets/swap/sol.svg'
-import BIT10Img from '@/assets/swap/bit10.svg'
+import SOLImg from '@/assets/tokens/sol.svg'
+import BIT10Img from '@/assets/tokens/bit10.svg'
 import { toast } from 'sonner'
 import { formatAmount } from '@/lib/utils'
 import { PublicKey, Keypair, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
@@ -218,7 +218,7 @@ export const buySOLDevnetBIT10Token = async (tickInName: string, tickOutName: st
             toast.error('Transction approval failed.');
         }
     } catch (error) {
-        toast.error('Error creating Sepolia transaction');
+        toast.error('An error occurred while processing your request. Please try again!');
         throw error;
     }
 };

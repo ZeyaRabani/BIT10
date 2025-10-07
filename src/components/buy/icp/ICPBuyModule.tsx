@@ -1,7 +1,7 @@
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/bit10.did'
 import { idlFactory as buyidlFactory2 } from '@/lib/buy.did'
-import BIT10Img from '@/assets/swap/bit10.svg'
+import BIT10Img from '@/assets/tokens/bit10.svg'
 import { type StaticImageData } from 'next/image'
 import { toast } from 'sonner'
 import { formatAmount } from '@/lib/utils'
@@ -91,7 +91,7 @@ export const buyICPBIT10Token = async (tickInName: string, tickOutName: string, 
             const selectedAmount = selectedTickInAmount * 2; // More in case of sudden price change
 
             const price = selectedAmount;
-            const amount = Math.round(price * 100000000).toFixed(0);
+            const amount = Math.round((price * 100000000) + 1000).toFixed(0); // For transfer fee
             const time = BigInt(Date.now()) * BigInt(1_000_000) + BigInt(300_000_000_000)
 
             const args = {
@@ -207,7 +207,7 @@ export const buyICPBIT10Token = async (tickInName: string, tickOutName: string, 
             toast.error('Transfer failed.');
         }
     } catch (error) {
-        toast.error('Error creating Sepolia transaction');
+        toast.error('An error occurred while processing your request. Please try again!');
         throw error;
     }
 };

@@ -93,7 +93,7 @@ const lendAndBorrowTableColumns: ColumnDef<LendAndBorrorTableDataType>[] = [
 
 export default function LendAndBorrow() {
     return (
-        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-bottom-up-slow'>
+        <Card className='dark:border-white w-full lg:col-span-1 animate-fade-bottom-up-slow bg-transparent'>
             <CardHeader>
                 <div className='text-2xl md:text-4xl text-center md:text-start'>Lend & Borrow</div>
             </CardHeader>

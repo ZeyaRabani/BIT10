@@ -26,7 +26,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image, { type StaticImageData } from 'next/image'
-import BIT10Img from '@/assets/swap/bit10.svg'
+import BIT10Img from '@/assets/tokens/bit10.svg'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 
@@ -76,7 +76,7 @@ export default function Buy() {
     const [receiveTokenSearch, setReceiveTokenSearch] = useState('');
 
     const { chain } = useChain();
-    const { ICPAddress } = useICPWallet();
+    const { icpAddress } = useICPWallet();
     const { address } = useAccount();
     const { data: walletClient } = useWalletClient();
     const publicClient = usePublicClient();
@@ -204,6 +204,15 @@ export default function Buy() {
             }
         }
 
+        // BSC Testnet
+        if (chain === 'bsc_testnet') {
+            if (payingTokenAddress === '0x0000000000000000000000000000000000000000e') {
+                return ethAmount ?? '0';
+            } else if (payingTokenAddress === '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238') {
+                return usdcAmount ?? '0';
+            }
+        }
+
         // Solana Devent
         if (chain === 'sol_dev' || chain === 'privy') {
             if (payingTokenAddress === 'So11111111111111111111111111111111111111111') {
@@ -218,12 +227,12 @@ export default function Buy() {
         queries: [
             // For ICP
             {
-                queryKey: ['paymentTokenBalanceBIT10BTC', ICPAddress, payingTokenAddress, chain],
+                queryKey: ['paymentTokenBalanceBIT10BTC', icpAddress, payingTokenAddress, chain],
                 queryFn: () => {
-                    if (!ICPAddress || chain !== 'icp' || !payingTokenAddress) return '0';
-                    return fetchICPTokenBalance(payingTokenAddress, ICPAddress);
+                    if (!icpAddress || chain !== 'icp' || !payingTokenAddress) return '0';
+                    return fetchICPTokenBalance(payingTokenAddress, icpAddress);
                 },
-                enabled: !!ICPAddress && chain === 'icp' && !!payingTokenAddress,
+                enabled: !!icpAddress && chain === 'icp' && !!payingTokenAddress,
                 refetchInterval: 10000, // 10 seconds
             },
             // For Solana Devent
@@ -307,7 +316,7 @@ export default function Buy() {
             if (chain == 'icp') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await buyICPBIT10Token(values.payment_token, values.receive_token, Number(values.receive_amount), Number((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice)), ICPAddress);
+                await buyICPBIT10Token(values.payment_token, values.receive_token, Number(values.receive_amount), Number((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice)), icpAddress);
             } else if (chain == 'sol_dev') {
                 await buySOLDevnetBIT10Token(values.payment_token, values.receive_token, Number(values.receive_amount), program, tokenMint, wallet);
             }
@@ -335,6 +344,8 @@ export default function Buy() {
             return paymentTokenSOLDevnet;
         } else if (chain === 'eth_sepolia') {
             return paymentTokenETHSepolia;
+        } else if (chain === 'bsc_testnet') {
+            return paymentTokenETHSepolia;
         } else if (chain === 'privy') {
             return paymentTokenPrivy;
         } else {
@@ -348,6 +359,8 @@ export default function Buy() {
         } else if (chain === 'sol_dev') {
             return bit10TokenbuySOLDevnet;
         } else if (chain === 'eth_sepolia') {
+            return bit10TokenbuyETHSepolia;
+        } else if (chain === 'bsc_testnet') {
             return bit10TokenbuyETHSepolia;
         } else if (chain === 'privy') {
             return bit10TokenbuyPrivy;
@@ -405,7 +418,7 @@ export default function Buy() {
 
     return (
         <div className='flex flex-col items-center justify-center py-4'>
-            <Card className='w-[300px] md:w-[580px] animate-fade-bottom-up rounded-lg'>
+            <Card className='w-[300px] md:w-[580px] animate-fade-bottom-up rounded-lg bg-transparent'>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
                         <CardHeader>
@@ -500,7 +513,7 @@ export default function Buy() {
                         </CardHeader>
                         <CardContent className='flex flex-col space-y-2'>
                             <div className='rounded-lg border-2'>
-                                <div className='py-2 px-6 bg-muted rounded-lg'>
+                                <div className='py-2 px-6 rounded-lg'>
                                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
                                         <div>Pay with</div>
                                         <div className='flex flex-row space-x-1 items-center'>
@@ -713,7 +726,7 @@ export default function Buy() {
                                                 )}
                                             />
 
-                                            <div className='col-span-1 -ml-6 z-20'>
+                                            <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-white'>
                                                 {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
                                                 <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
                                             </div>

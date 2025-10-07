@@ -55,10 +55,19 @@ export const formatAddress = (id: string) => {
   return `${id.slice(0, 9)}.....${id.slice(-9)}`;
 };
 
-export const formatAmount = (value: number | null | undefined): string => {
-  if (value === null || value === undefined || isNaN(value)) return '0';
-  if (value === 0) return '0';
-  const strValue = value.toFixed(10).replace(/\.?0+$/, '');
+export const formatAmount = (value: number | string | null | undefined): string => {
+  let numValue: number;
+  if (typeof value === 'string') {
+    numValue = parseFloat(value);
+  } else {
+    // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+    numValue = value as number;
+  }
+
+  if (numValue === null || numValue === undefined || isNaN(numValue)) return '0';
+  if (numValue === 0) return '0';
+
+  const strValue = numValue.toFixed(10).replace(/\.?0+$/, '');
   const [integerPart, decimalPart = ''] = strValue.split('.');
   const formattedInteger = Number(integerPart).toLocaleString();
 
@@ -81,23 +90,23 @@ export const getTokenName = (tokenAddress: string): string => {
   const normalizedAddress = tokenAddress.toLowerCase();
 
   switch (normalizedAddress) {
-    case 'eegan-kqaaa-aaaap-qhmgq-cai'.toLocaleLowerCase():
+    case 'eegan-kqaaa-aaaap-qhmgq-cai'.toLowerCase():
       return 'ckUSDC (on ICP)';
-    case 'wbckh-zqaaa-aaaap-qpuza-cai'.toLocaleLowerCase():
+    case 'wbckh-zqaaa-aaaap-qpuza-cai'.toLowerCase():
       return 'Test BIT10.TOP (on ICP)';
-    case '0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D'.toLocaleLowerCase():
+    case '0x00Cb097146a5D2b1C0dFeff3A5E3b2c21Fb2864D'.toLowerCase():
       return 'Test BIT10.TOP';
-    case '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238'.toLocaleLowerCase():
+    case '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238'.toLowerCase():
       return 'USDC (on Ethereum)';
-    case '0x0000000000000000000000000000000000000000e'.toLocaleLowerCase():
+    case '0x0000000000000000000000000000000000000000e'.toLowerCase():
       return 'ETH (on Ethereum)';
-    case '0x0000000000000000000000000000000000000000'.toLocaleLowerCase():
+    case '0x0000000000000000000000000000000000000000'.toLowerCase():
       return 'ETH (on Ethereum)';
-    case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
+    case '0x0000000000000000000000000000000000000000b'.toLowerCase():
       return 'tBNB (on Binance Smart Chain)';
-    case '0x64544969ed7ebf5f083679233325356ebe738930'.toLocaleLowerCase():
+    case '0x64544969ed7ebf5f083679233325356ebe738930'.toLowerCase():
       return 'USDC (on Binance Smart Chain)';
-    case '0x6Ce8da28e2f864420840cf74474eff5fd80e65b8'.toLocaleLowerCase():
+    case '0x6Ce8da28e2f864420840cf74474eff5fd80e65b8'.toLowerCase():
       return 'BTCB (on Binance Smart Chain)';
     default:
       return tokenAddress;

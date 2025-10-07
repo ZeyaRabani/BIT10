@@ -59,7 +59,7 @@ const recentLendingActivityTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 ]
 
 export default function LendingActivity() {
-    const { ICPAddress } = useICPWallet();
+    const { icpAddress } = useICPWallet();
 
     const fetchRecentLendingActivity = async (address: string) => {
         const response = await userRecentLendActivity({ source_chain: 'icp', address: address });
@@ -74,7 +74,7 @@ export default function LendingActivity() {
         queries: [
             {
                 queryKey: ['bit10RecentLendingActivity'],
-                queryFn: () => ICPAddress ? fetchRecentLendingActivity(ICPAddress) : toast.error('User address is undefined')
+                queryFn: () => icpAddress ? fetchRecentLendingActivity(icpAddress) : toast.error('User address is undefined')
             }
         ]
     });
@@ -86,7 +86,7 @@ export default function LendingActivity() {
         <div>
             {isLoading ? (
                 <div className='flex flex-col space-y-4'>
-                    <Card className='dark:border-white animate-fade-bottom-up-slow'>
+                    <Card className='dark:border-white animate-fade-bottom-up-slow bg-transparent'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
@@ -97,7 +97,7 @@ export default function LendingActivity() {
                     </Card>
                 </div>
             ) : (
-                <Card className='dark:border-white animate-fade-bottom-up-slow'>
+                <Card className='dark:border-white animate-fade-bottom-up-slow bg-transparent'>
                     <CardHeader>
                         <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent Lending activity</div>
                     </CardHeader>

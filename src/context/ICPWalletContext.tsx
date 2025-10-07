@@ -7,7 +7,7 @@ import { useChain } from '@/context/ChainContext'
 
 interface ICPWalletContextType {
     isICPConnected: boolean;
-    ICPAddress?: string;
+    icpAddress?: string;
     connectICPWallet: () => Promise<void>;
     disconnectICPWallet: () => void;
 }
@@ -15,10 +15,10 @@ interface ICPWalletContextType {
 const ICPWalletContext = createContext<ICPWalletContextType | undefined>(undefined);
 
 export const ICPWalletProvider: React.FC<React.PropsWithChildren<object>> = ({ children }) => {
-    const [ICPAddress, setICPAddress] = useLocalStorage<string>('ICPAddress');
+    const [icpAddress, seticpAddress] = useLocalStorage<string>('icpAddress');
 
     const { setChain } = useChain();
-    const isICPConnected = !!ICPAddress;
+    const isICPConnected = !!icpAddress;
 
     const connectICPWallet = async () => {
         try {
@@ -34,8 +34,8 @@ export const ICPWalletProvider: React.FC<React.PropsWithChildren<object>> = ({ c
                 whitelist,
             });
 
-            const getICPAddress = await window.ic.plug.agent.getPrincipal();
-            setICPAddress(getICPAddress.toString());
+            const geticpAddress = await window.ic.plug.agent.getPrincipal();
+            seticpAddress(geticpAddress.toString());
             setChain('icp');
             toast.success('Wallet connected successfully!');
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -45,13 +45,13 @@ export const ICPWalletProvider: React.FC<React.PropsWithChildren<object>> = ({ c
     };
 
     const disconnectICPWallet = () => {
-        setICPAddress(undefined);
+        seticpAddress(undefined);
         setChain(undefined);
         toast.success('Wallet disconnected successfully!');
     };
 
     return (
-        <ICPWalletContext.Provider value={{ isICPConnected, ICPAddress, connectICPWallet, disconnectICPWallet }}>
+        <ICPWalletContext.Provider value={{ isICPConnected, icpAddress, connectICPWallet, disconnectICPWallet }}>
             {children}
         </ICPWalletContext.Provider>
     );

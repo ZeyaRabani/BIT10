@@ -92,7 +92,7 @@ export default function BorrowingActivity() {
         <div>
             {isLoading ? (
                 <div className='flex flex-col space-y-4'>
-                    <Card className='dark:border-white animate-fade-bottom-up-slow'>
+                    <Card className='dark:border-white animate-fade-bottom-up-slow bg-transparent'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
@@ -103,7 +103,7 @@ export default function BorrowingActivity() {
                     </Card>
                 </div>
             ) : (
-                <Card className='dark:border-white animate-fade-bottom-up-slow'>
+                <Card className='dark:border-white animate-fade-bottom-up-slow bg-transparent'>
                     <CardHeader>
                         <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent Borrowing activity</div>
                     </CardHeader>

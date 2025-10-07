@@ -44,7 +44,7 @@ export default function Portfolio() {
             {chain === 'privy' && <PrivyOverview />}
 
             <div className='grid place-items-center'>
-                <div className='relative flex flex-row space-x-2 items-center justify-around lg:w-[50vw] bg-background border dark:border-white rounded-md px-2 py-1.5'>
+                <div className='relative flex flex-row space-x-2 items-center justify-around lg:w-[50vw] bg-transparent border dark:border-white rounded-md px-2 py-1.5'>
                     <AnimatedBackground
                         defaultValue='BIT10 Portfolio'
                         className='rounded bg-primary'

@@ -4,30 +4,28 @@
 import React, { useState, useEffect } from 'react'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
+import { useEVMWallet } from '@/context/EVMWalletContext'
+import { useConnect, useAccount, useDisconnect, useSwitchChain } from 'wagmi'
+import { sepolia, bscTestnet } from 'wagmi/chains'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useLoginWithEmail, usePrivy, useSolanaWallets } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 import { addNewUser } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import Image, { type StaticImageData } from 'next/image'
+import Image from 'next/image'
 import ICPLogo from '@/assets/wallet/icp-logo.svg'
 import SOLLogo from '@/assets/wallet/solana-logo.svg'
-import PlugImg from '@/assets/wallet/plug.svg'
 import ETHLogo from '@/assets/wallet/ethereum-logo.svg'
-import EmailImg from '@/assets/wallet/email.svg'
-import { useConnect, useAccount, useDisconnect, useSwitchChain } from 'wagmi'
-import MetamaskLogo from '@/assets/wallet/metamsak.svg'
-import PhantomLogo from '@/assets/wallet/phantom.svg'
-import CoinbaseLogo from '@/assets/wallet/coinbase.svg'
-import WalletConnectLogo from '@/assets/wallet/walletconnect.png'
-import TrustLogo from '@/assets/wallet/trust-wallet.svg'
-import RainbowLogo from '@/assets/wallet/rainbow.png'
-import ExodusLogo from '@/assets/wallet/exodus.svg'
-import TalismanLogo from '@/assets/wallet/talisman.jpg'
-import DefaultWallet from '@/assets/wallet/wallet.svg'
-import { useBSCWallet } from '@/context/BSCWalletContext'
 import BSCLogo from '@/assets/wallet/bsc-logo.svg'
+import EmailImg from '@/assets/wallet/email.svg'
+import PlugImg from '@/assets/wallet/plug.svg'
+import MetamaskLogo from '@/assets/wallet/metamsak.svg'
+import CoinbaseLogo from '@/assets/wallet/coinbase.svg'
+import LedgerLogo from '@/assets/wallet/ledger.svg'
+import PhantomLogo from '@/assets/wallet/phantom.svg'
+import TrustWalletLogo from '@/assets/wallet/trust-wallet.svg'
+import TalismanLogo from '@/assets/wallet/talisman.svg'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { motion } from 'framer-motion'
 import { ArrowLeft, WalletMinimal, Loader2, Mail } from 'lucide-react'
@@ -56,33 +54,18 @@ const fadeInLeftSlow = {
     visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: 'easeOut' } },
 };
 
-
 const icpWallets = [
     { name: 'Plug', img: PlugImg }
 ];
 
-export function ETHWalletIcon({ walletName, size = 24 }: { walletName: string; size?: number }) {
-    const getETHWalletIconPath = (name: string) => {
-        const lowerName = name.toLowerCase();
-
-        if (lowerName.includes('metamask')) return MetamaskLogo as StaticImageData;
-        if (lowerName.includes('coinbase')) return CoinbaseLogo as StaticImageData;
-        if (lowerName.includes('walletconnect')) return WalletConnectLogo;
-        if (lowerName.includes('trust')) return TrustLogo as StaticImageData;
-        if (lowerName.includes('rainbow')) return RainbowLogo;
-        if (lowerName.includes('exodus')) return ExodusLogo as StaticImageData;
-        if (lowerName.includes('phantom')) return PhantomLogo as StaticImageData;
-        if (lowerName.includes('talisman')) return TalismanLogo;
-
-        return DefaultWallet as StaticImageData;
-    };
-
-    const iconPath = getETHWalletIconPath(walletName);
-
-    return (
-        <Image src={iconPath} alt={`${walletName} logo`} width={size} height={size} className='rounded-sm' />
-    );
-}
+const evmWalletConfig = [
+    { name: 'MetaMask', icon: MetamaskLogo, id: 'metaMask' },
+    { name: 'Coinbase Wallet', icon: CoinbaseLogo, id: 'coinbaseWallet' },
+    { name: 'Ledger', icon: LedgerLogo, id: 'ledger' },
+    { name: 'Phantom', icon: PhantomLogo, id: 'phantom' },
+    { name: 'Trust Wallet', icon: TrustWalletLogo, id: 'trust' },
+    { name: 'Talisman', icon: TalismanLogo, id: 'talisman' }
+];
 
 export default function WalletBtn() {
     const [open, setOpen] = useState<boolean>(false);
@@ -93,24 +76,19 @@ export default function WalletBtn() {
     const [showCodeInput, setShowCodeInput] = useState(false);
 
 
-    const { isICPConnected, ICPAddress, connectICPWallet, disconnectICPWallet } = useICPWallet();
+    const { isICPConnected, icpAddress, connectICPWallet, disconnectICPWallet } = useICPWallet();
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { select: SOLSelect, wallets: SOLWallets, publicKey, disconnect: disconnectSOLWallet, connected: isSOLConnected } = useWallet();
-    const SOLWallet = useWallet();
+    const { select: SOLSelect, wallets: solWallets, publicKey, disconnect: disconnectsolWallet, connected: isSOLConnected } = useWallet();
+    const solWallet = useWallet();
+
+    const { authenticated: isPrivyConnected, user: privyUser, logout: privyLogout } = usePrivy();
+
+    const { isEVMConnected, evmAddress } = useEVMWallet();
     const { chain, setChain } = useChain();
-
-    const { authenticated, user: privyUser, logout: privyLogout } = usePrivy();
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { connectors: ethConnectors, connect: ethConnect, error: ethError, isPending: ethIsPending } = useConnect();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { address: ethAddress, isConnected: ethIsConnected, chain: ethChain } = useAccount();
-    const { disconnect: ethDisconnect } = useDisconnect();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { switchChain: ethSwitchChain, isPending: isSwitching } = useSwitchChain();
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const { account: bscAddress, isConnected: bscIsConnected, isConnecting: bscIsConnecting, connectWallet: bscConnectWallet, disconnectWallet: bscDisconnectWallet } = useBSCWallet();
+    const { connectors, connect } = useConnect();
+    const { isConnected: wagmiConnected, chain: wagmiChain } = useAccount();
+    const { disconnect: wagmiDisconnect } = useDisconnect();
+    const { switchChain } = useSwitchChain();
 
     const router = useRouter();
 
@@ -143,10 +121,10 @@ export default function WalletBtn() {
     useEffect(() => {
         const addUserToDB = async () => {
             if (chain === 'icp') {
-                if (isICPConnected && ICPAddress) {
+                if (isICPConnected && icpAddress) {
                     try {
                         const result = await addNewUser({
-                            principalId: ICPAddress.toString(),
+                            principalId: icpAddress,
                         });
                         if (result === 'Error adding new user') {
                             toast.error('An error occurred while setting up your account. Please try again!');
@@ -157,10 +135,10 @@ export default function WalletBtn() {
                     }
                 }
             } else if (chain === 'sol_dev') {
-                if (isSOLConnected && SOLWallet.publicKey) {
+                if (isSOLConnected && solWallet.publicKey) {
                     try {
                         const result = await addNewUser({
-                            principalId: SOLWallet.publicKey.toString(),
+                            principalId: solWallet.publicKey.toString(),
                         });
                         if (result === 'Error adding new user') {
                             toast.error('An error occurred while setting up your account. Please try again!');
@@ -171,10 +149,10 @@ export default function WalletBtn() {
                     }
                 }
             } else if (chain === 'eth_sepolia') {
-                if (ethAddress && ethIsConnected) {
+                if (isEVMConnected && evmAddress) {
                     try {
                         const result = await addNewUser({
-                            principalId: ethAddress,
+                            principalId: evmAddress,
                         });
                         if (result === 'Error adding new user') {
                             toast.error('An error occurred while setting up your account. Please try again!');
@@ -185,10 +163,10 @@ export default function WalletBtn() {
                     }
                 }
             } else if (chain === 'bsc_testnet') {
-                if (bscAddress && bscIsConnected) {
+                if (isEVMConnected && evmAddress) {
                     try {
                         const result = await addNewUser({
-                            principalId: bscAddress,
+                            principalId: evmAddress,
                         });
                         if (result === 'Error adding new user') {
                             toast.error('An error occurred while setting up your account. Please try again!');
@@ -199,7 +177,7 @@ export default function WalletBtn() {
                     }
                 }
             } else if (chain === 'privy') {
-                if (authenticated && privyUser?.wallet?.address) {
+                if (isPrivyConnected && privyUser?.wallet?.address) {
                     try {
                         const result = await addNewUser({
                             principalId: privyUser?.wallet?.address,
@@ -218,80 +196,46 @@ export default function WalletBtn() {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         addUserToDB();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [authenticated, privyUser?.wallet?.address, ICPAddress, SOLWallet.publicKey, publicKey, isICPConnected, isSOLConnected, ethAddress, bscAddress, bscIsConnected]);
-
-    // Add this useEffect to properly detect BSC vs ETH
-    useEffect(() => {
-        const checkBSCConnection = async () => {
-            if (ethIsConnected && ethAddress) {
-                // Check if we're actually on BSC Testnet
-                const bscChainId = localStorage.getItem('bscChainId');
-                const walletChain = localStorage.getItem('walletChain');
-
-                if (walletChain === 'bsc_testnet' || bscChainId === '0x61' || bscIsConnected) {
-                    setChain('bsc_testnet');
-                } else {
-                    setChain('eth_sepolia');
-                }
-            }
-        };
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        checkBSCConnection();
-    }, [ethIsConnected, ethAddress, bscIsConnected, setChain]);
+    }, [isPrivyConnected, privyUser?.wallet?.address, icpAddress, solWallet.publicKey, publicKey, isICPConnected, isSOLConnected, evmAddress, evmAddress, isEVMConnected]);
 
     useEffect(() => {
-        if (isSOLConnected && SOLWallet.publicKey) {
-            setChain('sol_dev');
-        } else if (isICPConnected && ICPAddress) {
+        if (isICPConnected && icpAddress) {
             setChain('icp');
-        } else if (bscIsConnected && bscAddress) {
-            setChain('bsc_testnet');
-        } else if (ethIsConnected && ethAddress) {
-            const walletChain = localStorage.getItem('walletChain');
-            const bscChainId = localStorage.getItem('bscChainId');
-
-            if (walletChain === 'bsc_testnet' || bscChainId === '0x61') {
-            } else {
+        } else if (isSOLConnected && solWallet.publicKey) {
+            setChain('sol_dev');
+        } else if (wagmiConnected && wagmiChain) {
+            if (wagmiChain.id === sepolia.id) {
                 setChain('eth_sepolia');
             }
-        } else if (authenticated && privyUser?.wallet?.address) {
+            else if (wagmiChain.id === bscTestnet.id) {
+                setChain('bsc_testnet');
+            }
+        } else if (isPrivyConnected && privyUser?.wallet?.address) {
             setChain('privy');
         } else {
             setChain(undefined);
         }
-    }, [isICPConnected, isSOLConnected, authenticated, ethIsConnected, bscIsConnected,
-        ICPAddress, SOLWallet.publicKey, ethAddress, bscAddress, privyUser?.wallet?.address, setChain]);
+    }, [isICPConnected, icpAddress, isSOLConnected, solWallet.publicKey, wagmiConnected, wagmiChain, isPrivyConnected, isEVMConnected, evmAddress, privyUser?.wallet?.address, setChain]);
 
-    // Add this useEffect to clean up chain state when all connections are lost
     useEffect(() => {
-        // If no wallet is connected, ensure chain is undefined
-        if (!isICPConnected && !isSOLConnected && !ethIsConnected && !bscIsConnected && !authenticated) {
+        if (!isICPConnected && !isSOLConnected && !wagmiConnected && !isPrivyConnected) {
             setChain(undefined);
         }
-
-        if (!bscIsConnected && ethIsConnected) {
-            const walletChain = localStorage.getItem('walletChain');
-            if (walletChain === 'bsc_testnet') {
-                localStorage.removeItem('walletChain');
-                localStorage.removeItem('bscChainId');
-            }
-        }
-    }, [isICPConnected, isSOLConnected, ethIsConnected, bscIsConnected, authenticated, setChain]);
+    }, [isICPConnected, isSOLConnected, wagmiConnected, isPrivyConnected, setChain]);
 
     useEffect(() => {
         if (chain === 'icp' && !isICPConnected) {
             setChain(undefined);
         } else if (chain === 'sol_dev' && !isSOLConnected) {
             setChain(undefined);
-        } else if (chain === 'eth_sepolia' && !ethIsConnected) {
+        } else if (chain === 'eth_sepolia' && !isEVMConnected) {
             setChain(undefined);
-        } else if (chain === 'bsc_testnet' && !bscIsConnected) {
+        } else if (chain === 'bsc_testnet' && !isEVMConnected) {
             setChain(undefined);
-        } else if (chain === 'privy' && !authenticated) {
+        } else if (chain === 'privy' && !isPrivyConnected) {
             setChain(undefined);
         }
-    }, [chain, isICPConnected, isSOLConnected, ethIsConnected, bscIsConnected, authenticated, setChain]);
+    }, [chain, isICPConnected, isSOLConnected, isEVMConnected, isPrivyConnected, setChain]);
 
     const handleDisconnect = async () => {
         switch (chain) {
@@ -299,18 +243,12 @@ export default function WalletBtn() {
                 disconnectICPWallet();
                 break;
             case 'sol_dev':
-                await disconnectSOLWallet();
+                await disconnectsolWallet();
                 break;
             case 'eth_sepolia':
-                ethDisconnect();
-                localStorage.removeItem('walletChain');
-                localStorage.removeItem('bscChainId');
-                break;
             case 'bsc_testnet':
-                bscDisconnectWallet();
-                ethDisconnect();
-                localStorage.removeItem('walletChain');
-                localStorage.removeItem('bscChainId');
+                wagmiDisconnect();
+                toast.success('Wallet disconnected successfully!');
                 break;
             case 'privy':
                 await privyLogout();
@@ -330,6 +268,41 @@ export default function WalletBtn() {
         setShowCodeInput(false);
         setEmail('');
         setCode('');
+    };
+
+    const handleEVMWalletConnect = async (walletId: string, targetChainId: number) => {
+        setIsConnecting(true);
+        try {
+            const connector = connectors.find(c =>
+                c.id.toLowerCase().includes(walletId.toLowerCase()) ||
+                c.name.toLowerCase().includes(walletId.toLowerCase())
+            );
+
+            if (connector) {
+                // eslint-disable-next-line @typescript-eslint/await-thenable
+                await connect({ connector, chainId: targetChainId });
+
+                if (wagmiChain?.id !== targetChainId) {
+                    // eslint-disable-next-line @typescript-eslint/await-thenable
+                    await switchChain({ chainId: targetChainId });
+                }
+
+                setOpen(false);
+                handleBack();
+            } else {
+                toast.error(`${walletId} wallet not found. Please install the extension.`);
+            }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            if (error?.message?.includes('User rejected')) {
+                toast.error('Connection request cancelled!');
+            } else {
+                toast.error('Failed to connect wallet. Please try again.');
+            }
+        } finally {
+            setIsConnecting(false);
+        }
     };
 
     const renderChainContent = () => {
@@ -360,7 +333,7 @@ export default function WalletBtn() {
                 );
             case 'sol_dev':
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const handleSOLWalletSelect = async (walletName: any) => {
+                const handlesolWalletSelect = async (walletName: any) => {
                     if (walletName) {
                         try {
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -384,7 +357,7 @@ export default function WalletBtn() {
                 return (
                     <div className='flex flex-col justify-between space-y-2 h-[22rem] md:h-72'>
                         {/* eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison */}
-                        {!SOLWallets.some((wallet) => wallet.readyState === 'Installed') ? (
+                        {!solWallets.some((wallet) => wallet.readyState === 'Installed') ? (
                             <motion.div initial='hidden' whileInView='visible' variants={containerVariants}>
                                 <div className='flex flex-col space-y-2 items-center justify-center'>
                                     <motion.h1 variants={cardVariantsRight} className='text-xl md:text-2xl tracking-wide text-center'>You&apos;ll need a wallet on Solana to continue</motion.h1>
@@ -400,9 +373,9 @@ export default function WalletBtn() {
                             </motion.div>
                         ) : (
                             <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='grid md:grid-cols-2 gap-2 items-center overflow-x-hidden'>
-                                {SOLWallets.map((wallet) => (
+                                {solWallets.map((wallet) => (
                                     <motion.div variants={cardVariantsRight} key={wallet.adapter.name}>
-                                        <Button variant='outline' className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white' onClick={() => handleSOLWalletSelect(wallet.adapter.name)}>
+                                        <Button variant='outline' className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white' onClick={() => handlesolWalletSelect(wallet.adapter.name)}>
                                             <Image height={30} width={30} src={wallet.adapter.icon} alt={wallet.adapter.name} className='rounded' />
                                             <div className='text-lg md:text-xl overflow-hidden'>{wallet.adapter.name}</div>
                                         </Button>
@@ -415,93 +388,47 @@ export default function WalletBtn() {
                     </div>
                 );
             case 'eth_sepolia':
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                const filteredConnectors = ethConnectors.filter(connector =>
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    connector.id !== 'injected'
-                );
-
-                return (
-                    <div className='flex flex-col justify-between space-y-2 h-[22rem] md:h-72'>
-                        {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
-                        {filteredConnectors.length === 0 ? (
-                            <motion.div initial='hidden' whileInView='visible' variants={containerVariants}>
-                                <div className='flex flex-col space-y-2 items-center justify-center'>
-                                    <motion.h1 variants={cardVariantsRight} className='text-xl md:text-2xl tracking-wide text-center'>You&apos;ll need a wallet on Ethereum to continue</motion.h1>
-                                    <motion.div variants={cardVariantsRight} className='p-4 rounded-full border-2'>
-                                        <WalletMinimal strokeWidth={1} className='h-16 w-16 font-light' />
-                                    </motion.div>
-                                    <motion.div variants={cardVariantsRight} className='flex flex-row justify-center py-2'>
-                                        <a href='https://metamask.io' target='_blank'>
-                                            <Button className='w-full px-20'>Get a Wallet</Button>
-                                        </a>
-                                    </motion.div>
-                                </div>
-                            </motion.div>
-                        ) : (
-                            <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='grid md:grid-cols-2 gap-2 items-center overflow-x-hidden'>
-                                {/* eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */}
-                                {filteredConnectors.map((connector) => {
-                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                                    let displayName = connector.name;
-                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                                    if (connector.id === 'metaMask') {
-                                        displayName = 'MetaMask';
-                                    }
-
-                                    return (
-                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                                        <motion.div variants={cardVariantsRight} key={connector.id}>
-                                            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call */}
-                                            <Button variant='outline' className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white' onClick={() => ethConnect({ connector })}>
-                                                <ETHWalletIcon walletName={displayName} />
-                                                <div className='text-lg md:text-xl overflow-hidden'>{displayName}</div>
-                                            </Button>
-                                        </motion.div>
-                                    );
-                                })}
-                            </motion.div>
-                        )}
-
-                        <p className='text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
-                    </div>
-                );
-
-            case 'bsc_testnet':
-                const handleBSCWalletSelect = async () => {
-                    setIsConnecting(true);
-                    setOpen(false);
-                    try {
-                        if (ethIsConnected) {
-                            ethDisconnect();
-                        }
-
-                        await bscConnectWallet();
-                        setChain('bsc_testnet');
-                        localStorage.setItem('walletChain', 'bsc_testnet');
-                        handleBack();
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    } catch (error) {
-                        toast.error('Failed to connect BSC wallet');
-                    } finally {
-                        setIsConnecting(false);
-                    }
-                };
-
                 return (
                     <div className='flex flex-col justify-between space-y-2 h-[22rem] md:h-72'>
                         <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='grid md:grid-cols-2 gap-2 items-center overflow-x-hidden'>
-                            <motion.div variants={cardVariantsRight}>
-                                <Button variant='outline' className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white' onClick={handleBSCWalletSelect} disabled={bscIsConnecting}>
-                                    <Image height={30} width={30} src={MetamaskLogo} alt='Metamask' className='rounded' />
-                                    <div className='text-lg md:text-xl overflow-hidden'>Metamask</div>
-                                </Button>
-                            </motion.div>
+                            {evmWalletConfig.map(({ name, icon, id }) => (
+                                <motion.div variants={cardVariantsRight} key={id}>
+                                    <Button
+                                        variant='outline'
+                                        className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white'
+                                        onClick={() => handleEVMWalletConnect(id, sepolia.id)}
+                                        disabled={isConnecting}
+                                    >
+                                        <Image height={30} width={30} src={icon} alt={name} className='rounded' />
+                                        <div className='text-lg md:text-xl overflow-hidden'>{name}</div>
+                                    </Button>
+                                </motion.div>
+                            ))}
                         </motion.div>
-                        <p className='text-center'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                        <p className='text-center text-xs md:text-sm'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
                     </div>
                 );
-
+            case 'bsc_testnet':
+                return (
+                    <div className='flex flex-col justify-between space-y-2 h-[22rem] md:h-72'>
+                        <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='grid md:grid-cols-2 gap-2 items-center overflow-x-hidden'>
+                            {evmWalletConfig.map(({ name, icon, id }) => (
+                                <motion.div variants={cardVariantsRight} key={id}>
+                                    <Button
+                                        variant='outline'
+                                        className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white'
+                                        onClick={() => handleEVMWalletConnect(id, bscTestnet.id)}
+                                        disabled={isConnecting}
+                                    >
+                                        <Image height={30} width={30} src={icon} alt={name} className='rounded' />
+                                        <div className='text-lg md:text-xl overflow-hidden'>{name}</div>
+                                    </Button>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                        <p className='text-center text-xs md:text-sm'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                    </div>
+                );
             case 'privy':
                 return (
                     <div>
@@ -589,7 +516,7 @@ export default function WalletBtn() {
 
     return (
         <div>
-            {isICPConnected || isSOLConnected || authenticated || ethIsConnected || bscIsConnected ? (
+            {isICPConnected || isSOLConnected || isEVMConnected || isPrivyConnected ? (
                 <Button variant='destructive' onClick={handleDisconnect} className='w-full'>Disconnect wallet</Button>
             ) : (
                 <Dialog open={open} onOpenChange={setOpen}>

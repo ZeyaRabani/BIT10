@@ -8,7 +8,7 @@ import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Badge } from '@/components/ui/badge'
 import { History, ExternalLink } from 'lucide-react'
-import { formatAmount } from '@/lib/utils'
+import { formatAmount, formatAddress } from '@/lib/utils'
 
 // temp
 interface WalletDataType {
@@ -27,7 +27,7 @@ type CoinData = {
     price: number;
 };
 
-type Bit10Entry = {
+type BIT10Entry = {
     timestmpz: string;
     tokenPrice: number;
     data: CoinData[];
@@ -44,7 +44,7 @@ type CoinSetData = {
     price: number;
 };
 
-type Bit10RebalanceEntry = {
+type BIT10RebalanceEntry = {
     timestmpz: string;
     indexValue: number;
     priceOfTokenToBuy: number;
@@ -80,7 +80,6 @@ const bit10Allocation: WalletDataType[] = [
 
     { walletAddress: 'EVcodbVbJT9hk4iu9GHy3mzCCPEYewgv4CMJtki9mLtB', explorerAddress: 'https://explorer.solana.com/address/EVcodbVbJT9hk4iu9GHy3mzCCPEYewgv4CMJtki9mLtB?cluster=devnet', bit10: ['Test BIT10.MEME'] },
     { walletAddress: '0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', explorerAddress: 'https://sepolia.etherscan.io/address/0x9685777eb64579f14DC8a418Ae2f7f93C25f162c', bit10: ['Test BIT10.MEME'], tokenId: ['5994', '24478', '23095', '10804', '28081'] },
-
 ];
 
 const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
@@ -88,25 +87,25 @@ const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366',
 export default function RebalanceCollateral() {
     const [innerRadius, setInnerRadius] = useState<number>(80);
 
-    const fetchBit10Price = async (tokenPriceAPI: string) => {
+    const fetchBIT10Price = async (tokenPriceAPI: string) => {
         const response = await fetch(tokenPriceAPI);
 
         if (!response.ok) {
             toast.error('Error fetching BIT10 price. Please try again!');
         }
 
-        const data = await response.json() as Bit10Entry;
+        const data = await response.json() as BIT10Entry;
         return data;
     };
 
-    const fetchBit10Tokens = async (tokenLatestRebalanceAPI: string) => {
+    const fetchBIT10Tokens = async (tokenLatestRebalanceAPI: string) => {
         const response = await fetch(tokenLatestRebalanceAPI);
 
         if (!response.ok) {
             toast.error('Error fetching BIT10 Tokens. Please try again!');
         }
 
-        const data = await response.json() as Bit10RebalanceEntry;
+        const data = await response.json() as BIT10RebalanceEntry;
         return data;
     };
 
@@ -114,19 +113,19 @@ export default function RebalanceCollateral() {
         queries: [
             {
                 queryKey: ['bit10TOPTokenPrice'],
-                queryFn: () => fetchBit10Price('bit10-latest-price-top')
+                queryFn: () => fetchBIT10Price('bit10-latest-price-top')
             },
             {
                 queryKey: ['bit10TOPTokenList'],
-                queryFn: () => fetchBit10Tokens('bit10-latest-rebalance-top')
+                queryFn: () => fetchBIT10Tokens('bit10-latest-rebalance-top')
             },
             {
                 queryKey: ['bit10MEMETokenPrice'],
-                queryFn: () => fetchBit10Price('test-bit10-latest-price-meme')
+                queryFn: () => fetchBIT10Price('test-bit10-latest-price-meme')
             },
             {
                 queryKey: ['bit10MEMETokenList'],
-                queryFn: () => fetchBit10Tokens('test-bit10-latest-rebalance-meme')
+                queryFn: () => fetchBIT10Tokens('test-bit10-latest-rebalance-meme')
             }
         ],
     });
@@ -183,11 +182,7 @@ export default function RebalanceCollateral() {
         }, 0);
     };
 
-    const calculateTargetValue = (priceOfTokenToBuy: number, numTokens: number) => {
-        return (priceOfTokenToBuy ?? 0) * (numTokens ?? 0);
-    };
-
-    const initialBit10RebalanceData: RebalanceData[] = [
+    const initialBIT10RebalanceData: RebalanceData[] = [
         {
             bit10Name: 'Test BIT10.TOP',
             bit10RebalanceHistory: 'top',
@@ -236,9 +231,9 @@ export default function RebalanceCollateral() {
         }));
     };
 
-    const bit10RebalanceData = initialBit10RebalanceData.map(data => {
+    const bit10RebalanceData = initialBIT10RebalanceData.map(data => {
         const totalCollateral = calculateTotalCollateral(data.bit10Token.newTokens, data.bit10Data ?? []);
-        const targetValue = calculateTargetValue(data.bit10Token.priceOfTokenToBuy, data.bit10Token.newTokens.length);
+        const targetValue = data.bit10Token.priceOfTokenToBuy;
         const percentChange = targetValue !== 0
             ? ((totalCollateral - targetValue) / targetValue) * 100
             : 0;
@@ -255,14 +250,8 @@ export default function RebalanceCollateral() {
         };
     });
 
-    const formatWallet = (id: string | undefined) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 7)}.........${id.slice(-8)}`;
-    };
-
     return (
-        <div>
+        <div className='bg-transparent'>
             {isLoading ? (
                 <div className='w-full animate-fade-left-slow'>
                     <div className='flex flex-col h-full space-y-2 pt-8'>
@@ -340,7 +329,7 @@ export default function RebalanceCollateral() {
                                         <h1 className='text-2xl'>{data.bit10Name}</h1>
                                         <div className='text-lg flex flex-1 flex-row items-center justify-start'>
                                             Total Collateral: {''}
-                                            {data.totalCollateral.toFixed(4)} USD
+                                            {formatAmount(data.targetValue)} USD
                                             <Badge className='ml-1 text-white' style={{
                                                 backgroundColor: data.percentChange > 0 ? 'green' : 'red'
                                             }}>
@@ -391,7 +380,7 @@ export default function RebalanceCollateral() {
                                                                     style={{ backgroundColor: color[index % color.length] }}
                                                                 ></div>
                                                                 <span>{token.symbol}</span>
-                                                                <span>({formatWallet(foundAllocation?.walletAddress)})</span>
+                                                                <span>({formatAddress(foundAllocation?.walletAddress ?? '')})</span>
                                                                 <a
                                                                     href={foundAllocation?.explorerAddress}
                                                                     target='_blank'

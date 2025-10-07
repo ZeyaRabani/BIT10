@@ -30,7 +30,7 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
     const [lending, setLending] = useState<boolean>(false);
 
     const { chain } = useChain();
-    const { ICPAddress } = useICPWallet();
+    const { icpAddress } = useICPWallet();
     const { address } = useAccount();
     const { data: walletClient } = useWalletClient();
     const publicClient = usePublicClient();
@@ -46,12 +46,12 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
         queries: [
             // For ckUSDC
             {
-                queryKey: ['icpBalance', ICPAddress, 'eegan-kqaaa-aaaap-qhmgq-cai'],
+                queryKey: ['icpBalance', icpAddress, 'eegan-kqaaa-aaaap-qhmgq-cai'],
                 queryFn: () => {
-                    if (!ICPAddress || chain !== 'icp') return '0';
-                    return fetchICPTokenBalance('eegan-kqaaa-aaaap-qhmgq-cai', ICPAddress);
+                    if (!icpAddress || chain !== 'icp') return '0';
+                    return fetchICPTokenBalance('eegan-kqaaa-aaaap-qhmgq-cai', icpAddress);
                 },
-                enabled: !!ICPAddress && chain === 'icp',
+                enabled: !!icpAddress && chain === 'icp',
                 refetchInterval: 10000, // 10 seconds
             },
             // For USDC on Ethereum
@@ -86,8 +86,8 @@ export default function Lend({ item }: { item: LendAndBorrorTableDataType }) {
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
             setLending(true);
-            if (chain === 'icp' && ICPAddress) {
-                await createICPLendTransaction({ values: values, tokenAddress: item.token_address, address: ICPAddress, chain: item.token_chain });
+            if (chain === 'icp' && icpAddress) {
+                await createICPLendTransaction({ values: values, tokenAddress: item.token_address, address: icpAddress, chain: item.token_chain });
             } else if (chain === 'eth_sepolia' && address) {
                 await createETHSepoliaLendTransaction({ values: values, tokenAddress: item.token_address, address: address, chain: item.token_chain, walletClient: walletClient })
             }
