@@ -1,11 +1,12 @@
 import React from 'react'
+import Provider from '@/app/_provider/PrivyProvider'
 import Navbar from '@/components/Navbar'
 import Header from '@/components/Header'
 import Chatbot from '@/components/chatbot/Chatbot'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
-        <div>
+        <Provider>
             <Navbar />
             <div className='pt-[5rem]'>
                 <Header message='You are on testnet. Tokens have no value.' />
@@ -14,6 +15,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {children}
             </main>
             <Chatbot />
-        </div>
+        </Provider>
     )
 }

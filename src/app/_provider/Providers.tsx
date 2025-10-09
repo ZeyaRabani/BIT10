@@ -6,7 +6,6 @@ import { ChainProvider } from '@/context/ChainContext'
 import { ICPWalletProvider } from '@/context/ICPWalletContext'
 import { SOLWalletProvider } from '@/context/SOLWalletContext'
 import { EVMWalletProvider } from '@/context/EVMWalletContext'
-import PrivyProviderWrapper from './PrivyProvider'
 import { ThemeProvider } from '@/components/theme-provider'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -18,11 +17,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 <ICPWalletProvider>
                     <SOLWalletProvider>
                         <EVMWalletProvider>
-                            <PrivyProviderWrapper>
-                                <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-                                    {children}
-                                </ThemeProvider>
-                            </PrivyProviderWrapper>
+                            <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+                                {children}
+                            </ThemeProvider>
                         </EVMWalletProvider>
                     </SOLWalletProvider>
                 </ICPWalletProvider>
