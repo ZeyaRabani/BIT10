@@ -20,12 +20,7 @@ export default function PrivyProviderWrapper({ children }: { children: React.Rea
                         name: 'devnet',
                         rpcUrl: 'https://api.devnet.solana.com'
                     }
-                ],
-                appearance: {
-                    walletList: ['detected_wallets'],
-                    showWalletLoginFirst: false
-                },
-                walletConnectCloudProjectId: undefined
+                ]
             }}
         >
             {children}
