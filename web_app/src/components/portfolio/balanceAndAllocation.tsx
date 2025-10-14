@@ -4,6 +4,7 @@ import { useICPWallet } from '@/context/ICPWalletContext'
 import { useEVMWallet } from '@/context/EVMWalletContext'
 import { fetchICPBIT10Balance } from './icp/ICPPortfolioModule'
 import { fetchBaseBIT10Balance } from './base/BasePortfolioModule'
+import { fetchBSCBIT10Balance } from './bsc/BSCPortfolioModule'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -66,6 +67,12 @@ export default function BalanceAndAllocation() {
                 // @ts-expect-error
                 queryFn: () => fetchBaseBIT10Balance({ tokenAddress: '0x2d309c7c5fbbf74372edfc25b10842a7237b92de', address: evmAddress })
             },
+            {
+                queryKey: ['bit10TOPBalanceBSC'],
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                queryFn: () => fetchBSCBIT10Balance({ tokenAddress: '0x2ab6998575EFcDe422D0A7dbc63e0105BbcAA7c9', address: evmAddress })
+            },
         ],
     });
 
@@ -73,15 +80,19 @@ export default function BalanceAndAllocation() {
     const bit10TOPTokens = bit10Queries[0].data as { id: number, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
     const bit10TOPPrice = Array.isArray(bit10TOPTokens) ? (bit10TOPTokens.reduce((sum, token) => sum + token.marketCap, 0) / 25_000_000_000_000) * 100 : 0;
     const icpBIT10DEFIokenBalance = bit10Queries[1].data as bigint | undefined;
-    const icpBIT10TOPTokenBalance = bit10Queries[2].data as bigint | undefined;
-    const baseBIT10TOPTokenBalance = bit10Queries[3].data as number | undefined;
+    const icpBIT10TOPTokenBalance = bit10Queries[2].data!;
+    const baseBIT10TOPTokenBalance = bit10Queries[3].data!;
+    const bscBIT10TOPTokenBalance = bit10Queries[4].data!;
 
     const totalTokens = () => {
         if (chain === 'icp' && isICPConnected) {
-            const total = Number(icpBIT10DEFIokenBalance) + Number(icpBIT10TOPTokenBalance);
+            const total = Number(icpBIT10DEFIokenBalance!) + Number(icpBIT10TOPTokenBalance);
             return (total / 100000000);
         } else if (chain === 'base' && isEVMConnected) {
             const total = Number(baseBIT10TOPTokenBalance);
+            return total;
+        } else if (chain === 'bsc' && isEVMConnected) {
+            const total = Number(bscBIT10TOPTokenBalance);
             return total;
         } else {
             return 0;
@@ -138,6 +149,9 @@ export default function BalanceAndAllocation() {
         } else if (chain === 'base' && isEVMConnected) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return Number(baseBIT10TOPTokenBalance);
+        } else if (chain === 'bsc' && isEVMConnected) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return Number(bscBIT10TOPTokenBalance);
         } else {
             return 0;
         }

@@ -1,9 +1,10 @@
 import { type StaticImageData } from 'next/image'
-import ETHImg from '@/assets/tokens/eth.svg'
+import BNBImg from '@/assets/tokens/bnb.svg'
+import USDCImg from '@/assets/tokens/usdc.svg'
 import BIT10Img from '@/assets/tokens/bit10.svg'
 import { ERC20_ABI } from '@/lib/erc20Abi'
 import { createPublicClient, http } from 'viem'
-import { base } from 'viem/chains'
+import { bsc } from 'viem/chains'
 import { toast } from 'sonner'
 import { formatUnits } from 'viem'
 import { ethers } from 'ethers'
@@ -12,37 +13,39 @@ import { idlFactory as buyidlFactory2 } from '@/lib/buy.did'
 import { newTokenSwap } from '@/actions/dbActions'
 import { getTokenName } from '@/lib/utils'
 
-const baseClient = createPublicClient({
-    chain: base,
+const bscClient = createPublicClient({
+    chain: bsc,
     transport: http(),
 });
 
-export const buyPayTokensBase = [
-    { label: 'ETH', value: 'Ethereum', img: ETHImg as StaticImageData, address: '0x0000000000000000000000000000000000000000b', tokenType: 'ERC20', slug: ['ethereum'] },
+export const buyPayTokensBSC = [
+    { label: 'BNB', value: 'BNB', img: BNBImg as StaticImageData, address: '0x0000000000000000000000000000000000000000bnb', tokenType: 'BEP20', slug: ['bnb'] },
+    { label: 'USDC', value: 'USD Coin', img: USDCImg as StaticImageData, address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d', tokenType: 'BEP20', slug: ['usdc', 'stable coin'] },
 ]
 
-export const buyReceiveTokensBase = [
-    { label: 'BIT10.TOP', value: 'BIT10.TOP', img: BIT10Img as StaticImageData, address: '0x2d309c7c5FbBf74372EdfC25B10842a7237b92dE', tokenType: 'ERC20', slug: ['top crypto'] },
+export const buyReceiveTokensBSC = [
+    { label: 'BIT10.TOP', value: 'BIT10.TOP', img: BIT10Img as StaticImageData, address: '0x2ab6998575EFcDe422D0A7dbc63e0105BbcAA7c9', tokenType: 'BEP20', slug: ['top crypto'] },
 ]
 
-export const fetchBaseTokenBalance = async ({ tokenAddress, address }: { tokenAddress: string, address: string }): Promise<number> => {
+export const fetchBSCTokenBalance = async ({ tokenAddress, address }: { tokenAddress: string, address: string }): Promise<number> => {
     try {
         if (!address) {
             return 0;
         }
-        if (tokenAddress === '0x0000000000000000000000000000000000000000b') {
-            const balance = await baseClient.getBalance({
+
+        if (tokenAddress === '0x0000000000000000000000000000000000000000bnb') {
+            const balance = await bscClient.getBalance({
                 address: address as `0x${string}`,
             });
             return Number(formatUnits(balance, 18));
         } else {
-            const decimals = await baseClient.readContract({
+            const decimals = await bscClient.readContract({
                 address: tokenAddress as `0x${string}`,
                 abi: ERC20_ABI,
                 functionName: 'decimals',
             });
 
-            const balance = await baseClient.readContract({
+            const balance = await bscClient.readContract({
                 address: tokenAddress as `0x${string}`,
                 abi: ERC20_ABI,
                 functionName: 'balanceOf',
@@ -54,12 +57,12 @@ export const fetchBaseTokenBalance = async ({ tokenAddress, address }: { tokenAd
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-        toast.error('Error fetching wallet balance');
+        toast.error('Error fetching BNB wallet balance');
         return 0;
     }
 }
 
-export const buyBaseBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenOutAmount, tokenInAmount, baseAddress }: { tokenInAddress: string, tokenOutAddress: string, tokenOutAmount: string, tokenInAmount: string, baseAddress: string }) => {
+export const buyBSCBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenOutAmount, tokenInAmount, bscAddress }: { tokenInAddress: string, tokenOutAddress: string, tokenOutAmount: string, tokenInAmount: string, bscAddress: string }) => {
     try {
         const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
         const canisterId = '6phs7-6yaaa-aaaap-qpvoq-cai';
@@ -72,8 +75,8 @@ export const buyBaseBIT10Token = async ({ tokenInAddress, tokenOutAddress, token
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //  @ts-expect-error
-        const create_transaction = await actor.base_create_transaction({
-            user_wallet_address: baseAddress,
+        const create_transaction = await actor.bsc_create_transaction({
+            user_wallet_address: bscAddress,
             token_in_address: tokenInAddress,
             token_in_amount: tokenInAmount,
             token_out_address: tokenOutAddress,
@@ -112,7 +115,7 @@ export const buyBaseBIT10Token = async ({ tokenInAddress, tokenOutAddress, token
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //  @ts-expect-error
-        const transfer = await actor.base_buy(txResponse.hash);
+        const transfer = await actor.bsc_buy(txResponse.hash);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/ban-ts-comment
         // @ts-expect-error
@@ -185,7 +188,7 @@ export const buyBaseBIT10Token = async ({ tokenInAddress, tokenOutAddress, token
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                     newTokenSwapId: transfer.Ok.swap_id,
-                    principalId: baseAddress,
+                    principalId: bscAddress,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument

@@ -19,6 +19,8 @@ export default function Portfolio() {
             return icpAddress;
         } else if (chain === 'base' && isEVMConnected) {
             return evmAddress;
+        } else if (chain === 'bsc' && isEVMConnected) {
+            return evmAddress;
         } else {
             return 'Guest'
         }

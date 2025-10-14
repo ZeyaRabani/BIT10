@@ -6,13 +6,14 @@ import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { useEVMWallet } from '@/context/EVMWalletContext'
 import { useConnect, useAccount, useDisconnect, useSwitchChain } from 'wagmi'
-import { base } from 'wagmi/chains'
+import { base, bsc } from 'wagmi/chains'
 import { addNewUser } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import ICPLogo from '@/assets/wallet/icp-logo.svg'
 import BaseLogo from '@/assets/wallet/base-logo.svg'
+import BSCLogo from '@/assets/wallet/bsc-logo.svg'
 import MetamaskLogo from '@/assets/wallet/metamsak.svg'
 import CoinbaseLogo from '@/assets/wallet/coinbase.svg'
 import LedgerLogo from '@/assets/wallet/ledger.svg'
@@ -58,7 +59,7 @@ const evmWalletConfig = [
 export default function WalletBtn() {
     const [open, setOpen] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [selectedChain, setSelectedChain] = useState<'icp' | 'base' | null>(null);
+    const [selectedChain, setSelectedChain] = useState<'icp' | 'base' | 'bsc' | null>(null);
 
     const { isICPConnected, icpAddress, connectICPWallet, disconnectICPWallet } = useICPWallet();
 
@@ -99,14 +100,26 @@ export default function WalletBtn() {
                         toast.error('An error occurred while setting up your account. Please try again!');
                     }
                 }
+            } else if (chain === 'bsc') {
+                if (isEVMConnected && evmAddress) {
+                    try {
+                        const result = await addNewUser({
+                            principalId: evmAddress,
+                        });
+                        if (result === 'Error adding new user') {
+                            toast.error('An error occurred while setting up your account. Please try again!');
+                        }
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    } catch (error) {
+                        toast.error('An error occurred while setting up your account. Please try again!');
+                    }
+                }
             }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         addUserToDB();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isICPConnected, icpAddress, isEVMConnected, evmAddress]);
-
+    }, [isICPConnected, icpAddress, isEVMConnected, evmAddress, chain]);
 
     useEffect(() => {
         if (isICPConnected && icpAddress) {
@@ -115,9 +128,9 @@ export default function WalletBtn() {
             if (wagmiChain.id === base.id) {
                 setChain('base');
             }
-            // else if (wagmiChain.id === mainnet.id) {
-            //     setChain('eth');
-            // }
+            else if (wagmiChain.id === bsc.id) {
+                setChain('bsc');
+            }
         } else {
             setChain(undefined);
         }
@@ -134,6 +147,8 @@ export default function WalletBtn() {
             setChain(undefined);
         } else if (chain === 'base' && !evmAddress) {
             setChain(undefined);
+        } else if (chain === 'bsc' && !evmAddress) {
+            setChain(undefined);
         }
     }, [chain, isICPConnected, evmAddress, setChain]);
 
@@ -143,7 +158,7 @@ export default function WalletBtn() {
                 disconnectICPWallet();
                 break;
             case 'base':
-            // case 'eth':
+            case 'bsc':
                 wagmiDisconnect();
                 toast.success('Wallet disconnected successfully!');
                 break;
@@ -153,7 +168,7 @@ export default function WalletBtn() {
         setSelectedChain(null);
     };
 
-    const handleChainSelect = (chain: 'icp' | 'base') => {
+    const handleChainSelect = (chain: 'icp' | 'base' | 'bsc') => {
         setSelectedChain(chain);
     };
 
@@ -246,6 +261,28 @@ export default function WalletBtn() {
                     </div>
                 );
 
+            case 'bsc':
+                return (
+                    <div className='flex flex-col justify-between space-y-2 h-[22rem] md:h-72'>
+                        <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='grid md:grid-cols-2 gap-2 items-center overflow-x-hidden'>
+                            {evmWalletConfig.map(({ name, icon, id }) => (
+                                <motion.div variants={cardVariantsRight} key={id}>
+                                    <Button
+                                        variant='outline'
+                                        className='flex flex-row w-full md:py-6 justify-center items-center dark:border-white'
+                                        onClick={() => handleEVMWalletConnect(id, bsc.id)}
+                                        disabled={isConnecting}
+                                    >
+                                        <Image height={30} width={30} src={icon} alt={name} className='rounded' />
+                                        <div className='text-lg md:text-xl overflow-hidden'>{name}</div>
+                                    </Button>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                        <p className='text-center text-xs md:text-sm'>By connecting a wallet, you agree to BIT10&apos;s <a href='/tos' target='_blank'><span className='underline'>Terms of Service</span></a>, and consent to its <a href='/privacy' target='_blank'><span className='underline'>Privacy Policy</span></a>.</p>
+                    </div>
+                );
+
             default:
                 return (
                     <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='flex flex-col space-y-2'>
@@ -263,6 +300,14 @@ export default function WalletBtn() {
                         >
                             <Image src={BaseLogo} alt='Base' className='rounded' height='30' width='30' />
                             <div className='text-lg'>Base</div>
+                        </motion.div>
+
+                        <motion.div variants={cardVariantsLeft}
+                            className='rounded-md border hover:border-primary hover:text-primary p-4 flex flex-row items-center space-x-2 cursor-pointer'
+                            onClick={() => handleChainSelect('bsc')}
+                        >
+                            <Image src={BSCLogo} alt='BSC' className='rounded' height='30' width='30' />
+                            <div className='text-lg'>Binance Smart Chain</div>
                         </motion.div>
                     </motion.div>
                 );

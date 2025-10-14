@@ -109,6 +109,8 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 - BIT10.DEFI: [bin4j-cyaaa-aaaap-qh7tq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=bin4j-cyaaa-aaaap-qh7tq-cai)
 - BIT10.TOP: [g37b3-lqaaa-aaaap-qp4hq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=g37b3-lqaaa-aaaap-qp4hq-cai)
 - BIT10.TOP (Base): [0x2d309c7c5fbbf74372edfc25b10842a7237b92de](https://basescan.org/token/0x2d309c7c5fbbf74372edfc25b10842a7237b92de)
+- BIT10.TOP (Solana): [bity2aNuHSbQiKLYB7PziepJw2aYwiiZM287XQxuXE1](https://solscan.io/token/bity2aNuHSbQiKLYB7PziepJw2aYwiiZM287XQxuXE1)
+- BIT10.TOP (Binance Smart Chain): [0x2ab6998575EFcDe422D0A7dbc63e0105BbcAA7c9](https://bscscan.com/token/0x2ab6998575EFcDe422D0A7dbc63e0105BbcAA7c9)
 
 - BIT10.TOP Asset storage canister:
   - ETH Asset Storage: [g46hp-giaaa-aaaap-qp4ha-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=g46hp-giaaa-aaaap-qp4ha-cai)

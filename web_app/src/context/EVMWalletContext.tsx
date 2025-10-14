@@ -1,16 +1,26 @@
 "use client"
 
 import React, { createContext, useContext, useEffect } from 'react'
-import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit'
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { env } from '@/env'
-import { WagmiProvider, useAccount, useDisconnect } from 'wagmi'
-import { base } from 'wagmi/chains'
+import { WagmiProvider, useAccount, useDisconnect, createConfig, http } from 'wagmi'
+import { base, bsc } from 'wagmi/chains'
 import { useChain } from '@/context/ChainContext'
+import { injected, walletConnect } from 'wagmi/connectors'
 
-const config = getDefaultConfig({
-    appName: 'BIT10',
-    projectId: env.NEXT_PUBLIC_APP_ID,
-    chains: [base],
+const config = createConfig({
+    chains: [base, bsc],
+    connectors: [
+        injected(),
+        walletConnect({
+            projectId: env.NEXT_PUBLIC_APP_ID,
+            showQrModal: false,
+        })
+    ],
+    transports: {
+        [base.id]: http(),
+        [bsc.id]: http(),
+    },
     ssr: true,
 })
 
@@ -33,9 +43,9 @@ function EVMWalletProviderInner({ children }: { children: React.ReactNode }) {
             if (chain.id === base.id) {
                 setChain('base');
             }
-            // else if (chain.id === mainnet.id) {
-            //     setChain('eth');
-            // }
+            else if (chain.id === bsc.id) {
+                setChain('bsc');
+            }
         }
     }, [isConnected, address, chain, setChain]);
 
@@ -68,7 +78,7 @@ function EVMWalletProviderInner({ children }: { children: React.ReactNode }) {
 
 export function EVMWalletProvider({ children }: { children: React.ReactNode }) {
     return (
-        <WagmiProvider config={config}>
+        <WagmiProvider reconnectOnMount={false} config={config}>
             <EVMWalletProviderInner>
                 {children}
             </EVMWalletProviderInner>

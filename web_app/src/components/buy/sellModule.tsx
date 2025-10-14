@@ -5,7 +5,7 @@ import { useICPWallet } from '@/context/ICPWalletContext'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { formatAddress, formatAmount } from '@/lib/utils'
-import { ChevronsUpDown, Loader2, Info, Wallet } from 'lucide-react'
+import { ChevronsUpDown, Loader2, Info, Wallet, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { sellPayTokensICP, sellReceiveTokensICP, fetchICPTokenBalance, sellICPBIT10Token } from './icp/ICPBuyModule'
@@ -19,6 +19,10 @@ import { Input } from '@/components/ui/input'
 import Image, { type StaticImageData } from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+
+interface SellModuleProps {
+    onSwitchToBuy: () => void
+}
 
 interface SellingTokenPriceResponse {
     data: {
@@ -43,7 +47,7 @@ const FormSchema = z.object({
     })
 });
 
-export default function SellModule() {
+export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const [selling, setSelling] = useState<boolean>(false);
     const [paymentTokenDialogOpen, setPaymentTokenDialogOpen] = useState(false);
     const [paymentTokenSearch, setPaymentTokenSearch] = useState('');
@@ -173,12 +177,12 @@ export default function SellModule() {
     const balance = Number(payingTokenBalance);
 
     // ToDo: temp.
-    const sellDisabledConditions = chain === 'base' || !chain || selling || fromAmount > balance || fromAmount <= 0;
+    const sellDisabledConditions = chain === 'base' || chain === 'bsc' || !chain || selling || fromAmount > balance || fromAmount <= 0;
 
     const getSellMessage = (): string => {
         if (!chain) return 'Connect your wallet to continue';
         // ToDo: temp.
-        if (chain === 'base') return 'Selling coming soon on Base';
+        if (chain === 'base' || chain === 'bsc') return `Selling coming soon on ${chain === 'base' ? 'Base' : 'Binance Smart Chain'}`;
         if (selling) return 'Selling...';
         if (fromAmount >= balance || fromAmount >= balance * 1.01 && !selling) return 'Your balance is too low for this transaction';
         if (fromAmount <= 0) return 'Amount too low';
@@ -304,258 +308,264 @@ export default function SellModule() {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
                 <div className='flex flex-col space-y-2'>
-                    <div className='rounded-lg border-2'>
-                        <div className='py-2 px-6 rounded-lg'>
-                            <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
-                                <div>Sell</div>
-                                <div className='flex flex-row space-x-1 items-center'>
-                                    <Wallet size={16} />
-                                    <p>{formatAmount(Number(payingTokenBalance ?? 0))}</p>
-                                </div>
+                    <div className='bg-muted rounded-lg p-4'>
+                        <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
+                            <div>You Sell</div>
+                            <div className='flex flex-row space-x-1 items-center'>
+                                <Wallet size={16} />
+                                <p>{formatAmount(Number(payingTokenBalance ?? 0))}</p>
                             </div>
-                            <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
-                                <div className='w-full'>
-                                    <FormField
-                                        control={form.control}
-                                        name='from_bit10_amount'
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Input {...field} placeholder='BIT10 Tokens to sell' className='dark:border-white' />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <div className='grid grid-cols-5 items-center'>
-                                    <FormField
-                                        control={form.control}
-                                        name='from_bit10_token'
-                                        render={({ field }) => (
-                                            <FormItem className='w-full px-2 col-span-4'>
-                                                <FormControl>
-                                                    <div>
-                                                        <Button
-                                                            type='button'
-                                                            variant='outline'
-                                                            className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
-                                                            onClick={() => setPaymentTokenDialogOpen(true)}
-                                                        >
-                                                            {field.value
-                                                                ? currentPaymentTokens.find((t) => t.value === field.value)?.label
-                                                                : 'Select token'}
-                                                            <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
-                                                        </Button>
-                                                        <Dialog open={paymentTokenDialogOpen} onOpenChange={setPaymentTokenDialogOpen}>
-                                                            <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
-                                                                <DialogHeader>
-                                                                    <DialogTitle>Select Payment Token</DialogTitle>
-                                                                </DialogHeader>
-                                                                <Input
-                                                                    placeholder='Search tokens'
-                                                                    value={paymentTokenSearch}
-                                                                    onChange={(e) => setPaymentTokenSearch(e.target.value)}
-                                                                    className='dark:border-white'
-                                                                />
-                                                                <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
-                                                                    {filteredPaymentTokens.length === 0 ? (
-                                                                        <div className='text-center text-gray-500 py-4'>No token found.</div>
-                                                                    ) : (
-                                                                        filteredPaymentTokens.map((token) => (
-                                                                            <Button
-                                                                                key={token.value}
-                                                                                variant='ghost'
-                                                                                className='flex flex-row items-center justify-between py-6'
-                                                                                onClick={() => {
-                                                                                    field.onChange(token.value);
-                                                                                    setPaymentTokenDialogOpen(false);
-                                                                                    setPaymentTokenSearch('');
-                                                                                }}
-                                                                            >
-                                                                                <div className='flex flex-row items-center justify-start space-x-1'>
-                                                                                    <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                                                                        <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
-                                                                                    </div>
-                                                                                    <div className='flex flex-col items-start tracking-wide'>
-                                                                                        <div>{token.label}</div>
-                                                                                        <div>{formatAddress(token.address)}</div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <Badge variant='outline'>{token.tokenType}</Badge>
-                                                                                </div>
-                                                                            </Button>
-                                                                        ))
-                                                                    )}
-                                                                </div>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                        <Image src={BIT10Img as StaticImageData} alt={form.watch('from_bit10_token')} width={75} height={75} className='z-20' />
-                                    </div>
-                                </div>
+                        </div>
+                        <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
+                            <div className='w-full'>
+                                <FormField
+                                    control={form.control}
+                                    name='from_bit10_amount'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Input {...field} placeholder='BIT10 Tokens to sell' className='dark:border-white' />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
 
-                            <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                                <TooltipProvider>
-                                    <Tooltip delayDuration={300}>
-                                        <TooltipTrigger asChild>
-                                            <div className='flex flex-row space-x-1'>
-                                                $ {formatAmount(form.watch('from_bit10_amount') * selectedBIT10TokenPrice)} {form.watch('from_bit10_token')}
-                                                <Info className='w-5 h-5 cursor-pointer ml-1' />
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                            The Management Fee (1%) is deducted from your output amount <br />
-                                            You sell {formatAmount(Number(form.watch('from_bit10_amount')))} {form.watch('from_bit10_token')} worth ${formatAmount(Number(form.watch('from_bit10_amount')) * selectedBIT10TokenPrice)},
-                                            receive {formatAmount(receiveAmount)} {form.watch('to_token')}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                                <div>
-                                    1 {form.watch('from_bit10_token')} = $ {formatAmount(Number(receiveingTokenPrice))}
+                            <div className='grid grid-cols-5 items-center'>
+                                <FormField
+                                    control={form.control}
+                                    name='from_bit10_token'
+                                    render={({ field }) => (
+                                        <FormItem className='w-full px-2 col-span-4'>
+                                            <FormControl>
+                                                <div>
+                                                    <Button
+                                                        type='button'
+                                                        variant='outline'
+                                                        className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
+                                                        onClick={() => setPaymentTokenDialogOpen(true)}
+                                                    >
+                                                        {field.value
+                                                            ? currentPaymentTokens.find((t) => t.value === field.value)?.label
+                                                            : 'Select token'}
+                                                        <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                    </Button>
+                                                    <Dialog open={paymentTokenDialogOpen} onOpenChange={setPaymentTokenDialogOpen}>
+                                                        <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
+                                                            <DialogHeader>
+                                                                <DialogTitle>Select Payment Token</DialogTitle>
+                                                            </DialogHeader>
+                                                            <Input
+                                                                placeholder='Search tokens'
+                                                                value={paymentTokenSearch}
+                                                                onChange={(e) => setPaymentTokenSearch(e.target.value)}
+                                                                className='dark:border-white'
+                                                            />
+                                                            <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
+                                                                {filteredPaymentTokens.length === 0 ? (
+                                                                    <div className='text-center text-gray-500 py-4'>No token found.</div>
+                                                                ) : (
+                                                                    filteredPaymentTokens.map((token) => (
+                                                                        <Button
+                                                                            key={token.value}
+                                                                            variant='ghost'
+                                                                            className='flex flex-row items-center justify-between py-6 px-2'
+                                                                            onClick={() => {
+                                                                                field.onChange(token.value);
+                                                                                setPaymentTokenDialogOpen(false);
+                                                                                setPaymentTokenSearch('');
+                                                                            }}
+                                                                        >
+                                                                            <div className='flex flex-row items-center justify-start space-x-1'>
+                                                                                <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-white'>
+                                                                                    <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
+                                                                                </div>
+                                                                                <div className='flex flex-col items-start tracking-wide'>
+                                                                                    <div>{token.label}</div>
+                                                                                    <div>{formatAddress(token.address)}</div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <Badge variant='outline'>{token.tokenType}</Badge>
+                                                                            </div>
+                                                                        </Button>
+                                                                    ))
+                                                                )}
+                                                            </div>
+                                                        </DialogContent>
+                                                    </Dialog>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-white'>
+                                    <Image src={BIT10Img as StaticImageData} alt={form.watch('from_bit10_token')} width={75} height={75} className='z-20' />
                                 </div>
                             </div>
                         </div>
 
-                        <div className='py-2 px-6'>
-                            <p>Receive</p>
-                            <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
-                                <div className='text-4xl text-center md:text-start'>
-                                    {formatAmount(receiveAmount)}
-                                </div>
-
-                                <div className='grid grid-cols-5 items-center'>
-                                    <FormField
-                                        control={form.control}
-                                        name='to_token'
-                                        render={({ field }) => (
-                                            <FormItem className='w-full px-2 col-span-4'>
-                                                <FormControl>
-                                                    <div>
-                                                        <Button
-                                                            type='button'
-                                                            variant='outline'
-                                                            className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
-                                                            onClick={() => setReceiveTokenDialogOpen(true)}
-                                                        >
-                                                            {field.value
-                                                                ? currentReceiveTokens.find((t) => t.value === field.value)?.label
-                                                                : 'Select token'}
-                                                            <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
-                                                        </Button>
-                                                        <Dialog open={receiveTokenDialogOpen} onOpenChange={setReceiveTokenDialogOpen}>
-                                                            <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
-                                                                <DialogHeader>
-                                                                    <DialogTitle>Select Receive Token</DialogTitle>
-                                                                </DialogHeader>
-                                                                <Input
-                                                                    placeholder='Search tokens'
-                                                                    value={receiveTokenSearch}
-                                                                    onChange={(e) => setReceiveTokenSearch(e.target.value)}
-                                                                    className='dark:border-white'
-                                                                />
-                                                                <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
-                                                                    {filteredReceiveTokens.length === 0 ? (
-                                                                        <div className='text-center text-gray-500 py-4'>No token found.</div>
-                                                                    ) : (
-                                                                        filteredReceiveTokens.map((token) => (
-                                                                            <Button
-                                                                                key={token.value}
-                                                                                variant='ghost'
-                                                                                className='flex flex-row items-center justify-between py-6'
-                                                                                onClick={() => {
-                                                                                    field.onChange(token.value);
-                                                                                    setReceiveTokenDialogOpen(false);
-                                                                                    setReceiveTokenSearch('');
-                                                                                }}
-                                                                            >
-                                                                                <div className='flex flex-row items-center justify-start space-x-1'>
-                                                                                    <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                                                                        <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
-                                                                                    </div>
-                                                                                    <div className='flex flex-col items-start tracking-wide'>
-                                                                                        <div>{token.label}</div>
-                                                                                        <div>{formatAddress(token.address)}</div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <Badge variant='outline'>{token.tokenType}</Badge>
-                                                                                </div>
-                                                                            </Button>
-                                                                        ))
-                                                                    )}
-                                                                </div>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                        <Image src={recivingTokenImg} alt='BIT10' width={75} height={75} className='z-20' />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                                <div>$ {formatAmount(Number(form.watch('from_bit10_amount')) * Number(receiveingTokenPrice ?? 0))}</div>
-                                <div>
-                                    1 {form.watch('to_token')} = $ {formatAmount(Number(receiveingTokenPrice))}
-                                </div>
+                        <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
+                            <TooltipProvider>
+                                <Tooltip delayDuration={300}>
+                                    <TooltipTrigger asChild>
+                                        <div className='flex flex-row space-x-1'>
+                                            $ {formatAmount(form.watch('from_bit10_amount') * selectedBIT10TokenPrice)} {form.watch('from_bit10_token')}
+                                            <Info className='w-5 h-5 cursor-pointer ml-1' />
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                        The Management Fee (1%) is deducted from your output amount <br />
+                                        You sell {formatAmount(Number(form.watch('from_bit10_amount')))} {form.watch('from_bit10_token')} worth ${formatAmount(Number(form.watch('from_bit10_amount')) * selectedBIT10TokenPrice)},
+                                        receive {formatAmount(receiveAmount)} {form.watch('to_token')}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            <div>
+                                1 {form.watch('from_bit10_token')} = $ {formatAmount(Number(receiveingTokenPrice))}
                             </div>
                         </div>
                     </div>
-                    <Accordion type='single' collapsible>
-                        <AccordionItem value='item-1' className='rounded-lg border-2 px-6'>
-                            <AccordionTrigger className='hover:no-underline'><p>Summary</p></AccordionTrigger>
-                            <AccordionContent className='flex flex-col space-y-1 border-t-2 pt-4 tracking-wide'>
-                                <div className='flex flex-row items-center justify-between space-x-2'>
-                                    <div>Management Fee</div>
-                                    <TooltipProvider>
-                                        <Tooltip delayDuration={300}>
-                                            <TooltipTrigger asChild>
-                                                <div className='flex flex-row space-x-1 items-center'>
-                                                    <div>1%</div>
-                                                    <div>
-                                                        <Info className='size-3 align-middle relative bottom-[1px]' />
-                                                    </div>
+
+                    <div className='grid place-items-center z-[2] my-6'>
+                        <Button type='button' variant='ghost' size='sm' className='rounded-full p-2 h-8 w-8 border-2 border-gray-300 hover:border-gray-400 group bg-background' onClick={onSwitchToBuy}>
+                            <ArrowUpDown className='h-4 w-4 transition-transform duration-700 group-hover:rotate-[180deg]' />
+                        </Button>
+                    </div>
+
+                    <div className='bg-muted rounded-lg p-4'>
+                        <p>You Receive</p>
+                        <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
+                            <div className='text-4xl text-center md:text-start'>
+                                {formatAmount(receiveAmount)}
+                            </div>
+
+                            <div className='grid grid-cols-5 items-center'>
+                                <FormField
+                                    control={form.control}
+                                    name='to_token'
+                                    render={({ field }) => (
+                                        <FormItem className='w-full px-2 col-span-4'>
+                                            <FormControl>
+                                                <div>
+                                                    <Button
+                                                        type='button'
+                                                        variant='outline'
+                                                        className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
+                                                        onClick={() => setReceiveTokenDialogOpen(true)}
+                                                    >
+                                                        {field.value
+                                                            ? currentReceiveTokens.find((t) => t.value === field.value)?.label
+                                                            : 'Select token'}
+                                                        <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                    </Button>
+                                                    <Dialog open={receiveTokenDialogOpen} onOpenChange={setReceiveTokenDialogOpen}>
+                                                        <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
+                                                            <DialogHeader>
+                                                                <DialogTitle>Select Receive Token</DialogTitle>
+                                                            </DialogHeader>
+                                                            <Input
+                                                                placeholder='Search tokens'
+                                                                value={receiveTokenSearch}
+                                                                onChange={(e) => setReceiveTokenSearch(e.target.value)}
+                                                                className='dark:border-white'
+                                                            />
+                                                            <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
+                                                                {filteredReceiveTokens.length === 0 ? (
+                                                                    <div className='text-center text-gray-500 py-4'>No token found.</div>
+                                                                ) : (
+                                                                    filteredReceiveTokens.map((token) => (
+                                                                        <Button
+                                                                            key={token.value}
+                                                                            variant='ghost'
+                                                                            className='flex flex-row items-center justify-between py-6 px-2'
+                                                                            onClick={() => {
+                                                                                field.onChange(token.value);
+                                                                                setReceiveTokenDialogOpen(false);
+                                                                                setReceiveTokenSearch('');
+                                                                            }}
+                                                                        >
+                                                                            <div className='flex flex-row items-center justify-start space-x-1'>
+                                                                                <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-white'>
+                                                                                    <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
+                                                                                </div>
+                                                                                <div className='flex flex-col items-start tracking-wide'>
+                                                                                    <div>{token.label}</div>
+                                                                                    <div>{formatAddress(token.address)}</div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <Badge variant='outline'>{token.tokenType}</Badge>
+                                                                            </div>
+                                                                        </Button>
+                                                                    ))
+                                                                )}
+                                                            </div>
+                                                        </DialogContent>
+                                                    </Dialog>
                                                 </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                The Management Fee covers the cost of managing and rebalancing the token
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-white'>
+                                    <Image src={recivingTokenImg} alt='BIT10' width={75} height={75} className='z-20' />
                                 </div>
-                                <div className='flex flex-row items-center justify-between space-x-2'>
-                                    <div>Exchange Rate</div>
-                                    1 {form.watch('from_bit10_token')} = {formatAmount(exchangeRate)} {form.watch('to_token')}
-                                </div>
-                                <div className='flex flex-row items-center justify-between space-x-2'>
-                                    <div>Expected Time</div>
-                                    <div>1-2 min.</div>
-                                </div>
-                                <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
-                                    <div>Expected Output</div>
-                                    <div>{formatAmount(receiveAmount)} {form.watch('to_token')}</div>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
+                            </div>
+                        </div>
+
+                        <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
+                            <div>$ {formatAmount(Number(form.watch('from_bit10_amount')) * Number(receiveingTokenPrice ?? 0))}</div>
+                            <div>
+                                1 {form.watch('to_token')} = $ {formatAmount(Number(receiveingTokenPrice))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <Accordion type='single' collapsible>
+                    <AccordionItem value='item-1' className='rounded-lg border-2 px-6 my-2'>
+                        <AccordionTrigger className='hover:no-underline'><p>Summary</p></AccordionTrigger>
+                        <AccordionContent className='flex flex-col space-y-1 border-t-2 pt-4 tracking-wide'>
+                            <div className='flex flex-row items-center justify-between space-x-2'>
+                                <div>Management Fee</div>
+                                <TooltipProvider>
+                                    <Tooltip delayDuration={300}>
+                                        <TooltipTrigger asChild>
+                                            <div className='flex flex-row space-x-1 items-center'>
+                                                <div>1%</div>
+                                                <div>
+                                                    <Info className='size-3 align-middle relative bottom-[1px]' />
+                                                </div>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                            The Management Fee covers the cost of managing and rebalancing the token
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                            <div className='flex flex-row items-center justify-between space-x-2'>
+                                <div>Exchange Rate</div>
+                                1 {form.watch('from_bit10_token')} = {formatAmount(exchangeRate)} {form.watch('to_token')}
+                            </div>
+                            <div className='flex flex-row items-center justify-between space-x-2'>
+                                <div>Expected Time</div>
+                                <div>1-2 min.</div>
+                            </div>
+                            <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
+                                <div>Expected Output</div>
+                                <div>{formatAmount(receiveAmount)} {form.watch('to_token')}</div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+
                 <div className='flex flex-row space-x-2 w-full items-center pt-3'>
                     <Button className='w-full rounded-lg' disabled={sellDisabledConditions}>
                         {selling && <Loader2 className='animate-spin mr-2' size={15} />}

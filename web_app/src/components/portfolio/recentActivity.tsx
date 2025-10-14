@@ -62,6 +62,8 @@ export default function RecentActivity() {
             response = await userRecentBIT10BuyActivity({ paymentAddress: icpAddress, chain: 'ICP' });
         } else if (chain === 'base' && isEVMConnected && evmAddress) {
             response = await userRecentBIT10BuyActivity({ paymentAddress: evmAddress, chain: 'Base' });
+        } else if (chain === 'bsc' && isEVMConnected && evmAddress) {
+            response = await userRecentBIT10BuyActivity({ paymentAddress: evmAddress, chain: 'Binance Smart Chain' });
         } else {
             response = [];
         }
