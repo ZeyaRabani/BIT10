@@ -79,7 +79,7 @@ export const InfiniteMovingCards = ({
         <div
             ref={containerRef}
             className={cn(
-                'scroller relative z-20  max-w-7xl overflow-hidden  [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]',
+                'scroller relative z-20 max-w-7xl overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]',
                 className
             )}
         >
@@ -95,7 +95,7 @@ export const InfiniteMovingCards = ({
                     <a href={item.x_link} target='_blank' rel='noreferrer noopener' key={idx}>
                         <li
                             // className='w-[350px] max-w-full relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 px-8 py-6 md:w-[450px]'
-                            className='w-[350px] max-w-full relative rounded-2xl flex-shrink-0 border dark:border-white px-8 py-6 md:w-[450px] bg-card'
+                            className='w-[350px] max-w-full relative rounded-2xl flex-shrink-0 border border-muted px-8 py-6 md:w-[450px] bg-card'
                         // style={{
                         //     background:
                         //         'linear-gradient(180deg, var(--slate-800), var(--slate-900)',
@@ -111,7 +111,7 @@ export const InfiniteMovingCards = ({
                                 </div>
                                 <div className='flex flex-row items-center space-x-1 pt-4'>
                                     <div>
-                                        <Image src={item.profile_pic} alt='parterner' height='50' width='50' className='rounded-full border dark:border-white' />
+                                        <Image src={item.profile_pic} alt='parterner' height='50' width='50' className='rounded-full border border-muted' />
                                     </div>
                                     <div className='flex flex-col'>
                                         <h1 className='text-sm leading-[1.6] text-gray-400 font-normal'>{item.name}</h1>

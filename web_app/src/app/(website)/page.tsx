@@ -108,7 +108,7 @@ export default function Page() {
                 </Link>
               </Button>
               <a href='https://gitbook.bit10.app' target='_blank' rel='noreferrer noopener'>
-                <Button variant='outline' className='tracking-wider dark:border-white dark:text-white'>
+                <Button variant='outline' className='tracking-wider border-muted dark:text-white'>
                   Read GitBook <ExternalLink className='h-4 w-4' />
                 </Button>
               </a>

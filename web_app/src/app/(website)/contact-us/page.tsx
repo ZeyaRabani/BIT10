@@ -71,7 +71,7 @@ export default function Page() {
     return (
         <Suspense fallback={<Preloader />}>
             <MaxWidthWrapper className='md:px-36 pt-4'>
-                <Card className='animate-fade-in-down grid md:grid-cols-2 p-4 md:p-10 shadow-2xl gap-6'>
+                <Card className='border-muted animate-fade-in-down grid md:grid-cols-2 p-4 md:p-10 shadow-2xl gap-6'>
                     <div className='flex flex-col justify-between'>
                         <div>
                             <CardTitle className='text-2xl font-semibold leading-tight tracking-wider lg:text-3xl'>Let&apos;s talk about everything!</CardTitle>
@@ -96,7 +96,7 @@ export default function Page() {
                                         <FormControl>
                                             <div className='flex'>
                                                 <div className='w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center'><User height={20} width={20} /></div>
-                                                <Input className='w-full -ml-10 pl-10 pr-3 py-2 dark:border-white' placeholder='Your Name' {...field} />
+                                                <Input className='w-full -ml-10 pl-10 pr-3 py-2 border-muted' placeholder='Your Name' {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -113,7 +113,7 @@ export default function Page() {
                                         <FormControl>
                                             <div className='flex'>
                                                 <div className='w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center'><Mail height={20} width={20} /></div>
-                                                <Input className='w-full -ml-10 pl-10 pr-3 py-2 dark:border-white' placeholder='Your Email' {...field} />
+                                                <Input className='w-full -ml-10 pl-10 pr-3 py-2 border-muted' placeholder='Your Email' {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -129,7 +129,7 @@ export default function Page() {
                                         <FormLabel>Your message</FormLabel>
                                         <FormControl>
                                             <div className='flex'>
-                                                <Textarea className='w-full min-h-[14rem] dark:border-white' placeholder='Your message'  {...field} />
+                                                <Textarea className='w-full min-h-[14rem] border-muted' placeholder='Your message'  {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />

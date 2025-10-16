@@ -220,7 +220,7 @@ export default function Page() {
                         <Search height={20} width={20} />
                     </div>
                     <Input
-                        className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 dark:border-white'
+                        className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 border-muted'
                         placeholder='Search by title or description...'
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}

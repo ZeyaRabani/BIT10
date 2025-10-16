@@ -52,12 +52,21 @@ export const addUserSignUps = async ({ email }: { email: string }) => {
     }
 };
 
-export const whitelistedPrincipalIds = async () => {
+export const whitelistedAddress = async () => {
     try {
         const data = await db.select().from(mbPrincipalIdWhitelist)
         return data;
     } catch (error) {
         return 'Error fetching whitelisted users';
+    }
+}
+
+export const addWhitelistedAddress = async ({ address }: { address: string }) => {
+    try {
+        await db.insert(mbPrincipalIdWhitelist).values({ userPrincipalId: address });
+        return 'Wallet address added successfully';
+    } catch (error) {
+        return 'Error adding whitelisted users';
     }
 }
 

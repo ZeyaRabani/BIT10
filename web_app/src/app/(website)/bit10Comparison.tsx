@@ -393,7 +393,7 @@ export default function BIT10Comparison() {
             <div className='mt-4 py-4'>
                 <div className='grid md:grid-cols-3 gap-8'>
                     {['1Y', '5Y', '10Y'].map((period) => (
-                        <div key={period} className='border-2 rounded py-8 px-3'>
+                        <div key={period} className='border-2 border-muted rounded py-8 px-3'>
                             <h4 className='font-medium text-2xl text-center mb-2'>BIT10.TOP {period} APY</h4>
                             {apyData[period as keyof typeof apyData] ? (
                                 <div className='font-bold text-4xl text-center'>{apyData[period as keyof typeof apyData]?.bit10Top.toFixed(2)}%</div>
@@ -407,7 +407,7 @@ export default function BIT10Comparison() {
 
             <div className='grid md:grid-cols-5 gap-3'>
                 <div className='md:col-span-3'>
-                    <Card className='dark:border-white animate-fade-left-slow'>
+                    <Card className='border-muted animate-fade-left-slow'>
                         <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
                             <div className='flex flex-1 flex-col justify-center gap-1 pb-3 sm:pb-0'>
                                 <CardTitle>$100 Investment Growth Comparison</CardTitle>
@@ -416,7 +416,7 @@ export default function BIT10Comparison() {
                                 </CardDescription>
                             </div>
                             <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0'>
-                                <div className='relative flex flex-row space-x-2 items-center justify-center border dark:border-white rounded-md px-2 py-1.5'>
+                                <div className='relative flex flex-row space-x-2 items-center justify-center border border-muted rounded-md px-2 py-1.5'>
                                     <AnimatedBackground defaultValue='10Y' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
                                         {tabs.map((label, index) => (
                                             <button key={index} data-id={label} type='button' className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}>
@@ -452,7 +452,7 @@ export default function BIT10Comparison() {
                     </Card>
                 </div>
                 <div className='md:col-span-2'>
-                    <Card className='dark:border-white animate-fade-right-slow h-full flex flex-col'>
+                    <Card className='border-muted animate-fade-right-slow h-full flex flex-col'>
                         <CardHeader>
                             <CardTitle>
                                 BIT10 Investment Calculator
@@ -472,7 +472,7 @@ export default function BIT10Comparison() {
                                                 <FormItem>
                                                     <FormLabel>Initial Investment</FormLabel>
                                                     <FormControl>
-                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='dark:border-white' />
+                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='border-muted' />
                                                     </FormControl>
                                                     <FormDescription>
                                                         Enter the amount (in USD) you want to invest
@@ -491,7 +491,7 @@ export default function BIT10Comparison() {
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <FormControl>
-                                                                <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
                                                                     {field.value ? (
                                                                         format(field.value, 'PPP')
                                                                     ) : (
@@ -501,8 +501,8 @@ export default function BIT10Comparison() {
                                                                 </Button>
                                                             </FormControl>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className='w-auto p-0' align='start'>
-                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                        <PopoverContent className='w-auto p-0 border-muted' align='start'>
+                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' className='rounded-md' />
                                                         </PopoverContent>
                                                     </Popover>
                                                     <FormDescription>
@@ -522,7 +522,7 @@ export default function BIT10Comparison() {
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <FormControl>
-                                                                <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
                                                                     {field.value ? (
                                                                         format(field.value, 'PPP')
                                                                     ) : (
@@ -532,8 +532,8 @@ export default function BIT10Comparison() {
                                                                 </Button>
                                                             </FormControl>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className='w-auto p-0' align='start'>
-                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                        <PopoverContent className='w-auto p-0 border-muted' align='start'>
+                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' className='rounded-md' />
                                                         </PopoverContent>
                                                     </Popover>
                                                     <FormDescription>
@@ -552,7 +552,7 @@ export default function BIT10Comparison() {
                                                     <FormLabel>Token</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger className='dark:border-white'>
+                                                            <SelectTrigger className='border-muted'>
                                                                 <SelectValue placeholder='Select a investment token' />
                                                             </SelectTrigger>
                                                         </FormControl>

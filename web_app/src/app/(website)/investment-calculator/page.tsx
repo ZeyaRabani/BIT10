@@ -289,7 +289,7 @@ export default function Page() {
         <MaxWidthWrapper className='py-4'>
             <div className='grid md:grid-cols-5 gap-3'>
                 <div className='md:col-span-3'>
-                    <Card className='dark:border-white animate-fade-left-slow'>
+                    <Card className='border-muted animate-fade-left-slow'>
                         <CardHeader>
                             <CardTitle>Investment Growth Over Selected Period</CardTitle>
                             <CardDescription>
@@ -369,7 +369,7 @@ export default function Page() {
                     </Card>
                 </div>
                 <div className='md:col-span-2'>
-                    <Card className='dark:border-white animate-fade-right-slow h-full flex flex-col'>
+                    <Card className='border-muted animate-fade-right-slow h-full flex flex-col'>
                         <CardHeader>
                             <CardTitle>
                                 BIT10 Investment Calculator
@@ -389,7 +389,7 @@ export default function Page() {
                                                 <FormItem>
                                                     <FormLabel>Initial Investment</FormLabel>
                                                     <FormControl>
-                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='dark:border-white' />
+                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='border-muted' />
                                                     </FormControl>
                                                     <FormDescription>
                                                         Enter the amount (in USD) you want to invest
@@ -408,7 +408,7 @@ export default function Page() {
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <FormControl>
-                                                                <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
                                                                     {field.value ? (
                                                                         format(field.value, 'PPP')
                                                                     ) : (
@@ -418,8 +418,8 @@ export default function Page() {
                                                                 </Button>
                                                             </FormControl>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className='w-auto p-0' align='start'>
-                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                        <PopoverContent className='w-auto p-0 border-muted' align='start'>
+                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' className='rounded-md' />
                                                         </PopoverContent>
                                                     </Popover>
                                                     <FormDescription>
@@ -439,7 +439,7 @@ export default function Page() {
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <FormControl>
-                                                                <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
                                                                     {field.value ? (
                                                                         format(field.value, 'PPP')
                                                                     ) : (
@@ -449,8 +449,8 @@ export default function Page() {
                                                                 </Button>
                                                             </FormControl>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className='w-auto p-0' align='start'>
-                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                        <PopoverContent className='border-muted w-auto p-0' align='start'>
+                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' className='rounded-md' />
                                                         </PopoverContent>
                                                     </Popover>
                                                     <FormDescription>
@@ -469,7 +469,7 @@ export default function Page() {
                                                     <FormLabel>Token</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger className='dark:border-white'>
+                                                            <SelectTrigger className='border-muted'>
                                                                 <SelectValue placeholder='Select a investment token' />
                                                             </SelectTrigger>
                                                         </FormControl>
