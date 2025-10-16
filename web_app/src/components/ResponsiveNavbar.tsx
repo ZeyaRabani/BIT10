@@ -14,7 +14,7 @@ const links = {
         { title: 'About', link: '/', icon: Home },
         { title: 'Resources', link: '/resources', icon: BookCopy },
         { title: 'Investment Calculator', link: '/investment-calculator', icon: Calculator },
-        { title: 'Whitepaper', link: '/whitepaper', icon: BookText }
+        { title: 'GitBook', link: '/gitbook', icon: BookText }
     ],
     app: [
         { title: 'Buy BIT10', link: '/buy', icon: Coins },
@@ -79,11 +79,11 @@ export default function ResponsiveNavbar() {
                                         </Link>
                                     ))}
                                     {appMode ? (
-                                        <div className='border-b-2 pb-2 px-2 w-full'>
+                                        <div className='border-b-2 pb-2 w-full'>
                                             <WalletBtn />
                                         </div>
                                     ) : (
-                                        <div className='border-b-2 pb-2 px-2 cursor-pointer w-full'>
+                                        <div className='border-b-2 pb-2 cursor-pointer w-full'>
                                             <Link href='/launch' passHref>
                                                 <Button className='rounded-full w-full'>Launch App</Button>
                                             </Link>

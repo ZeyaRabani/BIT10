@@ -8,7 +8,7 @@ export default function Page() {
     return (
         <MaxWidthWrapper>
             <div className='animate-fade-bottom-up flex items-center justify-center w-full min-h-[60vh]'>
-                <Card className='w-full md:max-w-96 py-8'>
+                <Card className='border-muted w-full md:max-w-96 py-8'>
                     <CardHeader>
                         <CardTitle className='text-center tracking-wide'>Access Restricted</CardTitle>
                     </CardHeader>

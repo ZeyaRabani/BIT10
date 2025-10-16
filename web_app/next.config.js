@@ -17,11 +17,6 @@ const config = {
                 permanent: true,
             },
             {
-                source: '/whitepaper',
-                destination: 'https://gitbook.bit10.app',
-                permanent: true,
-            },
-            {
                 source: '/twitter',
                 destination: 'https://twitter.com/bit10startup',
                 permanent: true,

@@ -38,13 +38,13 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                 <Button
                     variant='outline'
                     size='sm'
-                    className='ml-auto hidden h-8 lg:flex dark:border-white'
+                    className='ml-auto hidden h-8 lg:flex border-muted'
                 >
                     <Settings2 className='mr-2 h-4 w-4' />
                     View
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-[200px]'>
+            <DropdownMenuContent align='end' className='w-[200px] border-muted'>
                 <DropdownMenuLabel>View columns</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {table

@@ -95,7 +95,7 @@ export const getTokenName = (tokenAddress: string): string => {
     case 'g37b3-lqaaa-aaaap-qp4hq-cai'.toLocaleLowerCase():
     case '0x2d309c7c5fbbf74372edfc25b10842a7237b92de'.toLocaleLowerCase():
     case 'bity2anuhsbqiklyb7pziepjw2aywiizm287xqxuxe1'.toLocaleLowerCase():
-    case '0x77b1C7EA014767518ce9333CE4d7809E9f9e360a'.toLocaleLowerCase():
+    case '0x2ab6998575efcde422d0a7dbc63e0105bbcaa7c9'.toLocaleLowerCase():
       return 'BIT10.TOP';
     case 'ryjl3-tyaaa-aaaaa-aaaba-cai'.toLocaleLowerCase():
       return 'ICP';
@@ -137,8 +137,9 @@ export const getTokenExplorer = (tokenAddress: string): string => {
     case 'bity2anuhsbqiklyb7pziepjw2aywiizm287xqxuxe1'.toLocaleLowerCase():
       return 'https://explorer.solana.com/tx/';
 
-    case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
-    case '0x77b1C7EA014767518ce9333CE4d7809E9f9e360a'.toLocaleLowerCase():
+    case '0x0000000000000000000000000000000000000000bnb'.toLocaleLowerCase():
+    case '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d'.toLocaleLowerCase():
+    case '0x2ab6998575efcde422d0a7dbc63e0105bbcaa7c9'.toLocaleLowerCase():
       return 'https://bscscan.com/tx/';
 
     default:

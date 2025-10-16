@@ -394,7 +394,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
     return (
         <div className='py-4 bg-transparent'>
             {isLoading ? (
-                <Card className='dark:border-white w-full'>
+                <Card className='border-muted w-full'>
                     <CardContent className='w-full animate-fade-left-slow'>
                         <div className='flex flex-col h-full space-y-2 pt-8'>
                             {['h-12 w-28', 'h-72'].map((classes, index) => (
@@ -406,14 +406,14 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             ) : selectedBIT10Token?.length === 0 ? (
                 <InformationCard message='No rebalance information available for this BIT10 token' />
             ) : (
-                <Card className='dark:border-white w-full bg-transparent'>
+                <Card className='border-muted w-full bg-transparent'>
                     <CardContent className='flex flex-col space-y-4 py-4'>
                         <h1 className='text-xl md:text-2xl font-semibold uppercase'>BIT10.{index_fund}</h1>
                         <div className='space-y-8'>
                             {selectedBIT10Token.map((entry, index) => {
                                 if (index === selectedBIT10Token.length - 1) {
                                     return (
-                                        <div key={entry.timestmpz} className='border p-4 rounded-lg'>
+                                        <div key={entry.timestmpz} className='border p-4 rounded-lg border-muted'>
                                             <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                                             <p className='text-lg'>Index Value: {formatAmount(entry.indexValue)} USD</p>
                                             <p className='text-lg'>Total Collateral: {formatAmount(calculateTotalCollateral(entry.newTokens))} USD</p>
@@ -421,7 +421,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                 Allocation (Effective {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
                                             </h3>
                                             <div className='grid grid-cols-1 gap-4'>
-                                                <Table className='border-collapse border'>
+                                                <Table className='border-collapse border border-muted'>
                                                     <TableHeader>
                                                         <TableRow>
                                                             <TableHead>Symbol</TableHead>
@@ -451,7 +451,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                 const rebalanceAnalysis = analyzeRebalanceReason(nextEntry.newTokens, entry.newTokens);
 
                                 return (
-                                    <div key={entry.timestmpz} className='border p-4 rounded-lg'>
+                                    <div key={entry.timestmpz} className='border border-muted p-4 rounded-lg'>
                                         <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                                         <p className='text-lg'>Index Value: {formatAmount(entry.indexValue)} USD</p>
                                         <p className='text-lg'>Total Collateral: {formatAmount(calculateTotalCollateral(entry.newTokens))} USD</p>
@@ -517,7 +517,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                             </h3>
                                         </div>
                                         <div className='grid md:grid-cols-2 gap-4'>
-                                            <Table className='border-collapse border'>
+                                            <Table className='border-collapse border border-muted'>
                                                 <TableHeader>
                                                     <TableRow>
                                                         <TableHead>Symbol</TableHead>
@@ -536,7 +536,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     ))}
                                                 </TableBody>
                                             </Table>
-                                            <Table className='border-collapse border'>
+                                            <Table className='border-collapse border border-muted'>
                                                 <TableHeader>
                                                     <TableRow>
                                                         <TableHead>Symbol</TableHead>
@@ -561,7 +561,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                 {rebalanceResult.needsExternalLiquidity ? 'Internal Swaps' : 'Rebalance Trades'}
                                             </h3>
                                             {rebalanceResult.internalSwaps.length > 0 ? (
-                                                <Table className='border-collapse border'>
+                                                <Table className='border-collapse border border-muted'>
                                                     <TableHeader>
                                                         <TableRow>
                                                             <TableHead>Sell Token</TableHead>

@@ -144,7 +144,7 @@ export function DataTable<TData, TValue>({
             case 'viewTransaction':
                 return (
                     <a
-                        href={`${getTokenExplorer(row.original.tickOutName)}${getTokenExplorer(row.original.tickOutName).endsWith('/') ? '' : '/'}${row.original.network == 'icp' ? row.original.tokenSwapId : row.original.tickOutTxBlock}`}
+                        href={`${getTokenExplorer(row.original.tickOutName)}${getTokenExplorer(row.original.tickOutName).endsWith('/') ? '' : '/'}${row.original.network == 'ICP' ? row.original.tokenSwapId : row.original.tickOutTxBlock}`}
                         target='_blank'
                         rel='noopener noreferrer'
                     >
@@ -165,7 +165,7 @@ export function DataTable<TData, TValue>({
             <div className='flex items-center'>
                 <div className='flex w-full items-center'>
                     <div className='w-10 z-20 pl-1 text-center pointer-events-none flex items-center justify-center'><Search height={20} width={20} /></div>
-                    <Input className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 dark:border-white' placeholder={inputPlaceHolder}
+                    <Input className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 border-muted' placeholder={inputPlaceHolder}
                         value={(table.getColumn(userSearchColumn)?.getFilterValue() as string) ?? ''}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                             table.getColumn(userSearchColumn)?.setFilterValue(event.target.value)
@@ -179,7 +179,7 @@ export function DataTable<TData, TValue>({
                 </div>
                 <DataTableViewOptions table={table} />
             </div>
-            <div className='rounded-md border dark:border-white'>
+            <div className='rounded-md border border-muted'>
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

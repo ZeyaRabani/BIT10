@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { useEVMWallet } from '@/context/EVMWalletContext'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { formatAddress, formatAmount } from '@/lib/utils'
@@ -11,6 +12,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { buyPayTokensICP, buyReceiveTokensICP, fetchICPTokenBalance, buyICPBIT10Token } from './icp/ICPBuyModule'
 import { buyPayTokensBase, buyReceiveTokensBase, fetchBaseTokenBalance, buyBaseBIT10Token } from './base/BaseBuyModule'
+import { buyPayTokensSolana, buyReceiveTokensSolana, fetchSolanaTokenBalance, buySolanaBIT10Token } from './solana/SolanaBuyModule'
 import { buyPayTokensBSC, buyReceiveTokensBSC, fetchBSCTokenBalance, buyBSCBIT10Token } from './bsc/BSCBuyModule'
 import BIT10Img from '@/assets/tokens/bit10.svg'
 import { cn } from '@/lib/utils'
@@ -62,6 +64,9 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const { icpAddress } = useICPWallet();
     const { evmAddress } = useEVMWallet();
 
+    const { publicKey } = useWallet();
+    const wallet = useWallet();
+
     const fetchBIT10Price = useCallback(async (tokenPriceAPI: string) => {
         const response = await fetch(tokenPriceAPI);
 
@@ -112,6 +117,11 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                 refetchInterval: 30000, // 30 sec.
             },
             {
+                queryKey: ['solPrice'],
+                queryFn: () => fetchPayWithPrice('SOL'),
+                refetchInterval: 30000, // 30 sec.
+            },
+            {
                 queryKey: ['bnbPrice'],
                 queryFn: () => fetchPayWithPrice('BNB'),
                 refetchInterval: 30000, // 30 sec.
@@ -127,8 +137,9 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const icpAmount = useMemo(() => payWithPriceQueries[0].data, [payWithPriceQueries]);
     const btcAmount = useMemo(() => payWithPriceQueries[1].data, [payWithPriceQueries]);
     const ethAmount = useMemo(() => payWithPriceQueries[2].data, [payWithPriceQueries]);
-    const bnbAmount = useMemo(() => payWithPriceQueries[3].data, [payWithPriceQueries]);
-    const usdcAmount = useMemo(() => payWithPriceQueries[4].data, [payWithPriceQueries]);
+    const solAmount = useMemo(() => payWithPriceQueries[3].data, [payWithPriceQueries]);
+    const bnbAmount = useMemo(() => payWithPriceQueries[4].data, [payWithPriceQueries]);
+    const usdcAmount = useMemo(() => payWithPriceQueries[5].data, [payWithPriceQueries]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -167,6 +178,13 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
             }
         }
 
+        // Solana
+        if (chain === 'solana' || chain === undefined) {
+            if (payingTokenAddress === 'So11111111111111111111111111111111111111111') {
+                return solAmount ?? 0;
+            }
+        }
+
         // BSC
         if (chain === 'bsc') {
             if (payingTokenAddress === '0x0000000000000000000000000000000000000000bnb') {
@@ -177,7 +195,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         }
 
         return 0;
-    }, [chain, payingTokenAddress, icpAmount, btcAmount, ethAmount, bnbAmount, usdcAmount]);
+    }, [chain, payingTokenAddress, icpAmount, btcAmount, ethAmount, solAmount, bnbAmount, usdcAmount]);
 
     const fromBalanceQueries = useQueries({
         queries: [
@@ -209,6 +227,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                 enabled: !!icpAddress && chain === 'icp' && !!payingTokenAddress,
                 refetchInterval: 30000, // 30 seconds
             },
+
             // For Base
             {
                 queryKey: ['paymentTokenBalanceBaseETH', evmAddress, payingTokenAddress, chain],
@@ -217,6 +236,17 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                     return fetchBaseTokenBalance({ tokenAddress: '0x0000000000000000000000000000000000000000b', address: evmAddress });
                 },
                 enabled: !!evmAddress && chain === 'base' && !!payingTokenAddress,
+                refetchInterval: 30000, // 30 seconds
+            },
+
+            // For Solana
+            {
+                queryKey: ['paymentTokenBalanceSolanaSOL', publicKey, payingTokenAddress, chain],
+                queryFn: () => {
+                    if (!publicKey || chain !== 'solana' || !payingTokenAddress) return '0';
+                    return fetchSolanaTokenBalance({ tokenAddress: 'So11111111111111111111111111111111111111111', publicKey: publicKey });
+                },
+                enabled: !!publicKey && chain === 'solana' && !!payingTokenAddress,
                 refetchInterval: 30000, // 30 seconds
             },
 
@@ -251,10 +281,12 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
             return fromBalanceQueries[2].data;
         } else if (payingTokenAddress == '0x0000000000000000000000000000000000000000b') {
             return fromBalanceQueries[3].data;
-        } else if (payingTokenAddress == '0x0000000000000000000000000000000000000000bnb') {
+        } else if (payingTokenAddress == 'So11111111111111111111111111111111111111111') {
             return fromBalanceQueries[4].data;
-        } else if (payingTokenAddress == '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d') {
+        } else if (payingTokenAddress == '0x0000000000000000000000000000000000000000bnb') {
             return fromBalanceQueries[5].data;
+        } else if (payingTokenAddress == '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d') {
+            return fromBalanceQueries[6].data;
         }
         return '0';
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -280,6 +312,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
             return buyPayTokensICP;
         } else if (chain === 'base') {
             return buyPayTokensBase;
+        } else if (chain === 'solana') {
+            return buyPayTokensSolana;
         } else if (chain === 'bsc') {
             return buyPayTokensBSC;
         } else {
@@ -292,6 +326,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
             return buyReceiveTokensICP;
         } else if (chain === 'base') {
             return buyReceiveTokensBase;
+        } else if (chain === 'solana') {
+            return buyReceiveTokensSolana;
         } else if (chain === 'bsc') {
             return buyReceiveTokensBSC;
         } else {
@@ -329,6 +365,11 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
                 await buyBaseBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount, tokenInAmount: tokenInAmount.toString(), baseAddress: evmAddress! });
+            } else if (chain === 'solana') {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                await buySolanaBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount, tokenInAmount: tokenInAmount.toString(), solanaAddress: wallet.publicKey?.toBase58(), wallet: wallet });
             } else if (chain === 'bsc') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
@@ -629,7 +670,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                 </div>
 
                 <Accordion type='single' collapsible>
-                    <AccordionItem value='item-1' className='rounded-lg border-2 px-6 my-2'>
+                    <AccordionItem value='item-1' className='rounded-lg border-2 my-2 border-none'>
                         <AccordionTrigger className='hover:no-underline'><p>Summary</p></AccordionTrigger>
                         <AccordionContent className='flex flex-col space-y-1 border-t-2 pt-4 tracking-wide'>
                             <div className='flex flex-row items-center justify-between space-x-2'>

@@ -305,7 +305,7 @@ export default function Bit10Preformance() {
     return (
         <div>
             {isLoading ? (
-                <Card className='dark:border-white w-full animate-fade-right-slow'>
+                <Card className='border-muted w-full animate-fade-right-slow'>
                     <CardContent>
                         <div className='flex flex-col h-full space-y-2 pt-8'>
                             {['h-10 w-36', 'h-36', 'h-52'].map((classes, index) => (
@@ -315,15 +315,17 @@ export default function Bit10Preformance() {
                     </CardContent>
                 </Card>
             ) : (
-                <Card className='dark:border-white md:col-span-2 animate-fade-right-slow'>
+                <Card className='border-muted md:col-span-2 animate-fade-right-slow'>
                     <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
-                        <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Performance</div>
-                        <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0'>
+                        <div className='text-2xl md:text-4xl w-full text-center'>BIT10 Performance</div>
+                    </CardHeader>
+                    <CardContent className='flex flex-col space-y-4'>
+                        <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0 justify-end'>
                             <Select onValueChange={setSelectedPreformanceToken} defaultValue={selectedPreformanceToken}>
-                                <SelectTrigger className='w-[180px] dark:border-white'>
+                                <SelectTrigger className='w-[180px] border-muted'>
                                     <SelectValue placeholder='Select Token' />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className='border-muted'>
                                     {bit10Tokens.map((token) => (
                                         <SelectItem key={token} value={token}>
                                             {token}
@@ -331,7 +333,7 @@ export default function Bit10Preformance() {
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <div className='relative flex flex-row space-x-2 items-center justify-center border dark:border-white rounded-md px-2 py-1.5'>
+                            <div className='relative flex flex-row space-x-2 items-center justify-center border border-muted rounded-md px-2 py-1.5'>
                                 <AnimatedBackground
                                     defaultValue='30D'
                                     className='rounded bg-primary'
@@ -354,10 +356,8 @@ export default function Bit10Preformance() {
                                 </AnimatedBackground>
                             </div>
                         </div>
-                    </CardHeader>
-                    <CardContent className='flex flex-col space-y-4'>
                         <div className='flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-x-4 md:space-y-0'>
-                            <Card className='flex flex-col h-full w-full'>
+                            <Card className='border-muted flex flex-col h-full w-full'>
                                 <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                     <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                         30D %
@@ -371,7 +371,7 @@ export default function Bit10Preformance() {
                                 </CardContent>
                             </Card>
 
-                            <Card className='flex flex-col h-full w-full'>
+                            <Card className='border-muted flex flex-col h-full w-full'>
                                 <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                     <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                         60D %
@@ -385,7 +385,7 @@ export default function Bit10Preformance() {
                                 </CardContent>
                             </Card>
 
-                            <Card className='flex flex-col h-full w-full'>
+                            <Card className='border-muted flex flex-col h-full w-full'>
                                 <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                     <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                         1Y %
@@ -399,7 +399,7 @@ export default function Bit10Preformance() {
                                 </CardContent>
                             </Card>
 
-                            <Card className='flex flex-col h-full w-full'>
+                            <Card className='border-muted flex flex-col h-full w-full'>
                                 <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                     <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
                                         3Y %

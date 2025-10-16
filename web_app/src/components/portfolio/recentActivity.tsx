@@ -7,10 +7,12 @@ import { toast } from 'sonner'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { useEVMWallet } from '@/context/EVMWalletContext'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
 import type { PortfolioTableDataType } from '@/components/ui/data-table-portfolio'
+import { formatAmount, getTokenName } from '@/lib/utils'
 
 const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
@@ -36,6 +38,12 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Received' />
         ),
+        filterFn: (row, columnId, value) => {
+            const formattedAmount = formatAmount(Number(row.original.tickOutAmount));
+            const tokenName = getTokenName(row.original.tickOutName);
+            const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
+            return searchableText.includes((value as string).toLowerCase());
+        },
     },
     {
         accessorKey: 'tokenBoughtAt',
@@ -55,15 +63,19 @@ export default function RecentActivity() {
     const { chain } = useChain();
     const { isICPConnected, icpAddress } = useICPWallet();
     const { isEVMConnected, evmAddress } = useEVMWallet();
+    const { connected: isSolanaConnected } = useWallet();
+    const wallet = useWallet();
 
     const fetchRecentActivity = async () => {
         let response;
         if (chain === 'icp' && isICPConnected && icpAddress) {
-            response = await userRecentBIT10BuyActivity({ paymentAddress: icpAddress, chain: 'ICP' });
+            response = await userRecentBIT10BuyActivity({ paymentAddress: icpAddress.toLowerCase(), chain: 'ICP' });
         } else if (chain === 'base' && isEVMConnected && evmAddress) {
-            response = await userRecentBIT10BuyActivity({ paymentAddress: evmAddress, chain: 'Base' });
+            response = await userRecentBIT10BuyActivity({ paymentAddress: evmAddress.toLowerCase(), chain: 'Base' });
+        } else if (chain === 'solana' && isSolanaConnected && wallet.publicKey) {
+            response = await userRecentBIT10BuyActivity({ paymentAddress: wallet.publicKey?.toBase58(), chain: 'Solana' });
         } else if (chain === 'bsc' && isEVMConnected && evmAddress) {
-            response = await userRecentBIT10BuyActivity({ paymentAddress: evmAddress, chain: 'Binance Smart Chain' });
+            response = await userRecentBIT10BuyActivity({ paymentAddress: evmAddress.toLowerCase(), chain: 'Binance Smart Chain' });
         } else {
             response = [];
         }
@@ -89,7 +101,7 @@ export default function RecentActivity() {
     return (
         <div>
             {isLoading ? (
-                <Card className='dark:border-white animate-fade-bottom-up-slow'>
+                <Card className='border-muted animate-fade-bottom-up-slow'>
                     <CardContent>
                         <div className='flex flex-col h-full space-y-2 pt-8'>
                             {['h-9 md:w-1/3', 'h-10', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12', 'h-12'].map((classes, index) => (
@@ -99,7 +111,7 @@ export default function RecentActivity() {
                     </CardContent>
                 </Card>
             ) : (
-                <Card className='dark:border-white animate-fade-bottom-up-slow'>
+                <Card className='border-muted animate-fade-bottom-up-slow'>
                     <CardHeader>
                         <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent activity</div>
                     </CardHeader>

@@ -34,7 +34,7 @@ export default function Page() {
 
     return (
         <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10'>
-            <Card className='w-[90vw] md:w-[550px]'>
+            <Card className='w-[90vw] md:w-[550px] border-muted'>
                 <CardHeader>
                     <CardTitle className='text-4xl text-center'>BIT10 Explorer</CardTitle>
                     <CardDescription className='text-center'>
@@ -51,7 +51,7 @@ export default function Page() {
                                     <FormItem>
                                         <FormLabel>Transaction ID</FormLabel>
                                         <FormControl>
-                                            <Input {...field} className='dark:border-white' placeholder='Transaction ID' />
+                                            <Input {...field} className='border-muted' placeholder='Transaction ID' />
                                         </FormControl>
                                         <FormDescription>Please enter the Transaction ID associated with your transaction.</FormDescription>
                                         <FormMessage />

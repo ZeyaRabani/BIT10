@@ -98,7 +98,7 @@ export default function Page() {
     return (
         <MaxWidthWrapper>
             <div className='flex flex-col py-4 md:py-8 h-full items-center justify-center'>
-                <Card className='w-[300px] md:w-[550px] animate-fade-bottom-up'>
+                <Card className='border-muted w-[300px] md:w-[550px] animate-fade-bottom-up'>
                     <CardHeader>
                         <CardTitle className='flex flex-row items-center justify-between'>
                             <div>Send BIT10.DEFI</div>
@@ -117,7 +117,7 @@ export default function Page() {
                                             <FormControl>
                                                 <div className='flex'>
                                                     <div className='w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center'><WalletMinimal height={20} width={20} /></div>
-                                                    <Input className='w-full -ml-10 pl-10 pr-3 py-2 dark:border-white' placeholder='Your Principal ID' {...field} />
+                                                    <Input className='w-full -ml-10 pl-10 pr-3 py-2 border-muted' placeholder='Your Principal ID' {...field} />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -134,7 +134,7 @@ export default function Page() {
                                             <FormControl>
                                                 <div className='flex'>
                                                     <div className='w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center'><WalletMinimal height={20} width={20} /></div>
-                                                    <Input className='w-full -ml-10 pl-10 pr-3 py-2 dark:border-white' placeholder='Receiver Principal ID' {...field} />
+                                                    <Input className='w-full -ml-10 pl-10 pr-3 py-2 border-muted' placeholder='Receiver Principal ID' {...field} />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -151,7 +151,7 @@ export default function Page() {
                                             <FormControl>
                                                 <div className='flex'>
                                                     <div className='w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center'><CircleDollarSign height={20} width={20} /></div>
-                                                    <Input className='w-full -ml-10 pl-10 pr-3 py-2 dark:border-white' type='number' placeholder='BIT10.DEFI amount to send' {...field} />
+                                                    <Input className='w-full -ml-10 pl-10 pr-3 py-2 border-muted' type='number' placeholder='BIT10.DEFI amount to send' {...field} />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />

@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from 'react'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 
-type ChainType = 'icp' | 'base' | 'bsc' | undefined;
+type ChainType = 'icp' | 'base' | 'solana' | 'bsc' | undefined;
 
 interface ChainContextType {
     chain: ChainType;

@@ -6,7 +6,7 @@ import RebalanceCollateral from './RebalanceCollateral'
 
 export default function Collateral() {
     return (
-        <Card className='dark:border-white w-full lg:col-span-1 bg-transparent'>
+        <Card className='border-muted w-full lg:col-span-1 bg-transparent'>
             <CardHeader>
                 <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Collateral</div>
             </CardHeader>

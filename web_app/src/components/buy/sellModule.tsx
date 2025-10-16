@@ -177,12 +177,12 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const balance = Number(payingTokenBalance);
 
     // ToDo: temp.
-    const sellDisabledConditions = chain === 'base' || chain === 'bsc' || !chain || selling || fromAmount > balance || fromAmount <= 0;
+    const sellDisabledConditions = chain === 'base' || chain === 'solana' || chain === 'bsc' || !chain || selling || fromAmount > balance || fromAmount <= 0;
 
     const getSellMessage = (): string => {
         if (!chain) return 'Connect your wallet to continue';
         // ToDo: temp.
-        if (chain === 'base' || chain === 'bsc') return `Selling coming soon on ${chain === 'base' ? 'Base' : 'Binance Smart Chain'}`;
+        if (chain === 'base' || chain === 'solana' || chain === 'bsc') return `Selling coming soon on ${chain === 'base' ? 'Base' : chain === 'solana' ? 'Solana' : 'Binance Smart Chain'}`;
         if (selling) return 'Selling...';
         if (fromAmount >= balance || fromAmount >= balance * 1.01 && !selling) return 'Your balance is too low for this transaction';
         if (fromAmount <= 0) return 'Amount too low';
@@ -529,7 +529,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                 </div>
 
                 <Accordion type='single' collapsible>
-                    <AccordionItem value='item-1' className='rounded-lg border-2 px-6 my-2'>
+                    <AccordionItem value='item-1' className='rounded-lg border-2 my-2 border-none'>
                         <AccordionTrigger className='hover:no-underline'><p>Summary</p></AccordionTrigger>
                         <AccordionContent className='flex flex-col space-y-1 border-t-2 pt-4 tracking-wide'>
                             <div className='flex flex-row items-center justify-between space-x-2'>

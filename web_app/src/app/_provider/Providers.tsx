@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ChainProvider } from '@/context/ChainContext'
 import { ICPWalletProvider } from '@/context/ICPWalletContext'
 import { EVMWalletProvider } from '@/context/EVMWalletContext'
+import { SolanaWalletProvider } from '@/context/SolanaWalletContext'
 import { ThemeProvider } from '@/components/theme-provider'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -15,9 +16,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <ChainProvider>
                 <ICPWalletProvider>
                     <EVMWalletProvider>
-                        <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-                            {children}
-                        </ThemeProvider>
+                        <SolanaWalletProvider>
+                            <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+                                {children}
+                            </ThemeProvider>
+                        </SolanaWalletProvider>
                     </EVMWalletProvider>
                 </ICPWalletProvider>
             </ChainProvider>

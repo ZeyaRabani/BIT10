@@ -75,7 +75,7 @@ export default function TransactionDetails({ transactionId }: { transactionId: s
     return (
         <MaxWidthWrapper className='py-4 flex justify-center'>
             {isLoading ? (
-                <Card className='w-full md:w-3/4 dark:border-white'>
+                <Card className='w-full md:w-3/4 border-muted'>
                     <CardContent>
                         <div className='flex flex-col h-full space-y-2 pt-8'>
                             {['h-10 w-64', 'h-10', 'h-10', 'h-10', 'h-10', 'h-10', 'h-10'].map((classes, index) => (
@@ -85,7 +85,7 @@ export default function TransactionDetails({ transactionId }: { transactionId: s
                     </CardContent>
                 </Card>
             ) : (
-                <Card className='w-full md:w-3/4 dark:border-white'>
+                <Card className='w-full md:w-3/4 border-muted'>
                     <CardHeader className='text-center md:text-start text-3xl font-semibold'>
                         Transaction Details
                     </CardHeader>

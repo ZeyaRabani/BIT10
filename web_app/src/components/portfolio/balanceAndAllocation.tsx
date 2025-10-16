@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { useEVMWallet } from '@/context/EVMWalletContext'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { fetchICPBIT10Balance } from './icp/ICPPortfolioModule'
 import { fetchBaseBIT10Balance } from './base/BasePortfolioModule'
+import { fetchSolanaBIT10Balance } from './solana/SolanaPortfolioModule'
 import { fetchBSCBIT10Balance } from './bsc/BSCPortfolioModule'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -26,6 +28,7 @@ export default function BalanceAndAllocation() {
     const { chain } = useChain();
     const { isICPConnected, icpAddress } = useICPWallet();
     const { isEVMConnected, evmAddress } = useEVMWallet();
+    const { connected: isSolanaConnected, publicKey } = useWallet();
 
     const fetchBIT10Tokens = async (tokenPriceAPI: string) => {
         const response = await fetch(tokenPriceAPI);
@@ -68,6 +71,13 @@ export default function BalanceAndAllocation() {
                 queryFn: () => fetchBaseBIT10Balance({ tokenAddress: '0x2d309c7c5fbbf74372edfc25b10842a7237b92de', address: evmAddress })
             },
             {
+                queryKey: ['bit10TOPBalanceSolana'],
+                queryFn: () => {
+                    if (!publicKey || chain !== 'solana') return '0';
+                    return fetchSolanaBIT10Balance({ tokenAddress: 'bity2aNuHSbQiKLYB7PziepJw2aYwiiZM287XQxuXE1', publicKey: publicKey, decimals: 9 })
+                }
+            },
+            {
                 queryKey: ['bit10TOPBalanceBSC'],
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
@@ -82,7 +92,8 @@ export default function BalanceAndAllocation() {
     const icpBIT10DEFIokenBalance = bit10Queries[1].data as bigint | undefined;
     const icpBIT10TOPTokenBalance = bit10Queries[2].data!;
     const baseBIT10TOPTokenBalance = bit10Queries[3].data!;
-    const bscBIT10TOPTokenBalance = bit10Queries[4].data!;
+    const solanaBIT10TOPTokenBalance = bit10Queries[4].data!;
+    const bscBIT10TOPTokenBalance = bit10Queries[5].data!;
 
     const totalTokens = () => {
         if (chain === 'icp' && isICPConnected) {
@@ -90,6 +101,9 @@ export default function BalanceAndAllocation() {
             return (total / 100000000);
         } else if (chain === 'base' && isEVMConnected) {
             const total = Number(baseBIT10TOPTokenBalance);
+            return total;
+        } else if (chain === 'solana' && isSolanaConnected) {
+            const total = Number(solanaBIT10TOPTokenBalance);
             return total;
         } else if (chain === 'bsc' && isEVMConnected) {
             const total = Number(bscBIT10TOPTokenBalance);
@@ -149,6 +163,9 @@ export default function BalanceAndAllocation() {
         } else if (chain === 'base' && isEVMConnected) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return Number(baseBIT10TOPTokenBalance);
+        } else if (chain === 'solana' && isSolanaConnected) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return Number(solanaBIT10TOPTokenBalance);
         } else if (chain === 'bsc' && isEVMConnected) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return Number(bscBIT10TOPTokenBalance);
@@ -217,7 +234,7 @@ export default function BalanceAndAllocation() {
         <div>
             {isLoading ? (
                 <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
-                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow bg-transparent'>
+                    <Card className='border-muted w-full lg:col-span-1 animate-fade-left-slow bg-transparent'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -226,7 +243,7 @@ export default function BalanceAndAllocation() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-right-slow bg-transparent'>
+                    <Card className='border-muted w-full lg:col-span-1 animate-fade-right-slow bg-transparent'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -238,7 +255,7 @@ export default function BalanceAndAllocation() {
                 </div>
             ) : (
                 <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
-                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-left-slow bg-transparent'>
+                    <Card className='border-muted w-full lg:col-span-1 animate-fade-left-slow bg-transparent'>
                         <CardHeader>
                             <div className='text-2xl md:text-4xl text-center md:text-start'>Your Current Balance</div>
                         </CardHeader>
@@ -341,14 +358,15 @@ export default function BalanceAndAllocation() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className='dark:border-white w-full lg:col-span-1 animate-fade-right-slow bg-transparent'>
+
+                    <Card className='border-muted w-full lg:col-span-1 animate-fade-right-slow bg-transparent'>
                         <CardHeader className='flex flex-col md:flex-row items-center md:justify-between'>
                             <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Allocations</div>
                             <Select onValueChange={setSelectedAllocationToken} defaultValue={selectedAllocationToken}>
-                                <SelectTrigger className='w-[180px] dark:border-white'>
+                                <SelectTrigger className='w-[180px] dark:border-muted'>
                                     <SelectValue placeholder='Select Token' />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className='dark:border-muted'>
                                     {bit10Tokens.map((token) => (
                                         <SelectItem key={token} value={token}>
                                             {token}

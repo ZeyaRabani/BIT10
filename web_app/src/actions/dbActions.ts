@@ -104,7 +104,7 @@ export const userRecentBIT10BuyActivity = async ({ paymentAddress, chain }: { pa
         })
             .from(swap)
             .where(and(
-                eq(swap.userPrincipalId, paymentAddress.toLowerCase()),
+                eq(swap.userPrincipalId, paymentAddress),
                 eq(swap.network, chain)
             ))
             .orderBy(desc(swap.transactionTimestamp));

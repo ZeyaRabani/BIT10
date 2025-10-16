@@ -83,7 +83,7 @@ export default function Swap() {
         <div>
             {isLoading ? (
                 <div className='animate-fade-bottom-up flex items-center justify-center w-full min-h-[60vh]'>
-                    <Card className='w-96 px-2 pt-6 animate-fade-bottom-up bg-transparent'>
+                    <Card className='border-muted w-96 px-2 pt-6 animate-fade-bottom-up bg-transparent'>
                         <CardContent className='flex flex-col space-y-2'>
                             <Skeleton className='h-56' />
                         </CardContent>
@@ -97,7 +97,7 @@ export default function Swap() {
                         <ExchangeCard activeTab={activeTab} onTabChange={handleTabChange} />
                     ) : (
                         <div className='animate-fade-bottom-up flex items-center justify-center w-full min-h-[60vh]'>
-                            <Card className='w-full md:max-w-96 py-8 bg-transparent'>
+                            <Card className='border-muted w-full md:max-w-96 py-8 bg-transparent'>
                                 <CardHeader>
                                     <CardTitle className='text-center tracking-wide'>
                                         Access Restricted

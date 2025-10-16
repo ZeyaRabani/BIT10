@@ -17,7 +17,7 @@ const links = {
         { title: 'About', link: '/' },
         { title: 'Resources', link: '/resources' },
         { title: 'Investment Calculator', link: '/investment-calculator' },
-        { title: 'Whitepaper', link: '/whitepaper' }
+        { title: 'GitBook', link: '/gitbook' }
     ],
     app: [
         { title: 'Buy BIT10', link: '/buy' },
