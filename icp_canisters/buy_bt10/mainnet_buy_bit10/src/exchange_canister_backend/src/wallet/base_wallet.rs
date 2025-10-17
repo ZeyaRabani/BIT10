@@ -1,8 +1,8 @@
-use crate::ecdsa::EcdsaPublicKey;
-use crate::state::{lazy_call_ecdsa_public_key, read_state};
+use crate::state::state::{lazy_call_ecdsa_public_key, read_state};
+use crate::wallet::ecdsa::EcdsaPublicKey;
 use candid::Principal;
-use ic_secp256k1::{PublicKey, RecoveryId};
 use ic_ethereum_types::Address;
+use ic_secp256k1::{DerivationIndex, DerivationPath, PublicKey, RecoveryId};
 use serde_bytes::ByteBuf;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -47,7 +47,7 @@ impl BaseWallet {
         } else {
             derivation_path(&self.owner)
         };
-
+        
         let key_id = read_state(|s| s.ecdsa_key_id());
         let (result,) =
             ic_cdk::api::management_canister::ecdsa::sign_with_ecdsa(SignWithEcdsaArgument {
@@ -57,48 +57,26 @@ impl BaseWallet {
             })
             .await
             .expect("failed to sign with ecdsa");
-
-        let signature_length = result.signature.len();
+            
         let signature = <[u8; 64]>::try_from(result.signature).unwrap_or_else(|_| {
-            panic!(
-                "BUG: invalid signature from management canister. Expected 64 bytes but got {} bytes",
-                signature_length
-            )
+            panic!("BUG: invalid signature from management canister")
         });
-
+        
         let recovery_id = self.compute_recovery_id(&message_hash, &signature);
         if recovery_id.is_x_reduced() {
-            ic_cdk::trap(
-                "BUG: affine x-coordinate of r is reduced which is so unlikely to happen that it's probably a bug",
-            );
+            ic_cdk::trap("BUG: affine x-coordinate of r is reduced");
         }
         (signature, recovery_id)
     }
 
     fn compute_recovery_id(&self, message_hash: &[u8], signature: &[u8]) -> RecoveryId {
-        use alloy_primitives::hex;
-
         if !self.as_ref().verify_signature_prehashed(message_hash, signature) {
-            ic_cdk::println!(
-                "Signature verification failed - digest: {}, signature: {}, public_key: {}",
-                hex::encode(message_hash),
-                hex::encode(signature),
-                hex::encode(self.as_ref().serialize_sec1(true)),
-            );
             ic_cdk::trap("Signature verification failed");
         }
 
         self.as_ref()
             .try_recovery_from_digest(message_hash, signature)
-            .unwrap_or_else(|e| {
-                panic!(
-                    "BUG: failed to recover public key {:?} from digest {:?} and signature {:?}: {:?}",
-                    hex::encode(self.as_ref().serialize_sec1(true)),
-                    hex::encode(message_hash),
-                    hex::encode(signature),
-                    e
-                )
-            })
+            .unwrap_or_else(|e| panic!("BUG: failed to recover public key: {:?}", e))
     }
 }
 
@@ -106,7 +84,6 @@ fn derive_public_key(owner: &Principal, public_key: &EcdsaPublicKey) -> EcdsaPub
     if *owner == ic_cdk::id() {
         public_key.clone()
     } else {
-        use ic_secp256k1::{DerivationIndex, DerivationPath};
         let derivation_path = DerivationPath::new(
             derivation_path(owner)
                 .into_iter()

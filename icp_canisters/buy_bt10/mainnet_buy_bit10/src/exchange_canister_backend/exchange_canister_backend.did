@@ -35,15 +35,34 @@ type BaseNetwork = variant {
   Sepolia;
 };
 
+type BscNetwork = variant {
+  Mainnet;
+  Testnet;
+};
+
+type SolanaNetwork = variant {
+  Mainnet;
+  Devnet;
+};
+
 type EcdsaKeyName = variant {
   TestKeyLocalDevelopment;
   TestKey1;
   ProductionKey1;
 };
 
+type Ed25519KeyName = variant {
+  LocalDevelopment;
+  MainnetTestKey1;
+  MainnetProdKey1;
+};
+
 type InitArg = record {
   base_network : opt BaseNetwork;
+  bsc_network : opt BscNetwork;
+  solana_network : opt SolanaNetwork;
   ecdsa_key_name : opt EcdsaKeyName;
+  ed25519_key_name : opt Ed25519KeyName;
 };
 
 type ICPBuyArgs = record {
@@ -95,6 +114,10 @@ type TransactionResponse = record {
 
 service : (opt InitArg) -> {
   base_address : () -> (text);
+  bsc_address : () -> (text);
+  solana_address : () -> (text);
+  
+  nonce_account : () -> (text);
   
   bit10_token : () -> (BIT10TokenResponse) query;
   
@@ -106,4 +129,13 @@ service : (opt InitArg) -> {
   
   base_create_transaction : (SwapArgs) -> (TransactionResponse);
   base_buy : (text) -> (SwapResponse);
+
+  bsc_create_transaction : (SwapArgs) -> (TransactionResponse);
+  bsc_buy : (text) -> (SwapResponse);
+  
+  create_associated_token_account : (text) -> (variant { Ok : text; Err : text });
+  associated_token_account : (text) -> (variant { Ok : text; Err : text });
+  create_nonce_account : () -> (variant { Ok : text; Err : text });
+  solana_create_transaction : (SwapArgs) -> (TransactionResponse);
+  solana_buy : (text) -> (SwapResponse);
 };

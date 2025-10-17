@@ -1,7 +1,6 @@
 use ic_cdk::api::management_canister::ecdsa::EcdsaPublicKeyResponse;
-use ic_secp256k1::{PublicKey, DerivationPath};
 use ic_ethereum_types::Address;
-use alloy_primitives::hex;
+use ic_secp256k1::{DerivationPath, PublicKey};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct EcdsaPublicKey {
@@ -10,10 +9,7 @@ pub struct EcdsaPublicKey {
 }
 
 impl EcdsaPublicKey {
-    pub fn derive_new_public_key(
-        &self,
-        derivation_path: &DerivationPath,
-    ) -> Self {
+    pub fn derive_new_public_key(&self, derivation_path: &DerivationPath) -> Self {
         let (dk, cc) = self.public_key.derive_subkey(derivation_path);
 
         Self {
@@ -22,8 +18,12 @@ impl EcdsaPublicKey {
         }
     }
 
-    pub fn to_hex_string(&self) -> String {
-        hex::encode(self.public_key.serialize_sec1(/*compressed=*/ true))
+    pub fn public_key_bytes(&self) -> Vec<u8> {
+        self.public_key.serialize_sec1(false)
+    }
+    
+    pub fn public_key_compressed(&self) -> Vec<u8> {
+        self.public_key.serialize_sec1(true)
     }
 }
 
@@ -37,7 +37,7 @@ impl From<EcdsaPublicKeyResponse> for EcdsaPublicKey {
     fn from(value: EcdsaPublicKeyResponse) -> Self {
         EcdsaPublicKey {
             public_key: PublicKey::deserialize_sec1(&value.public_key)
-                .expect("BUG: invalid public key deserialization from management canister response"),
+                .expect("BUG: invalid public key"),
             chain_code: value.chain_code,
         }
     }
@@ -45,11 +45,9 @@ impl From<EcdsaPublicKeyResponse> for EcdsaPublicKey {
 
 impl From<&EcdsaPublicKey> for Address {
     fn from(value: &EcdsaPublicKey) -> Self {
-        let key_bytes = value.as_ref().serialize_sec1(/*compressed=*/ false);
-        debug_assert_eq!(key_bytes[0], 0x04, "Public key must be uncompressed for Ethereum address derivation");
-        
+        let key_bytes = value.as_ref().serialize_sec1(false);
+        debug_assert_eq!(key_bytes[0], 0x04);
         let hash = ic_sha3::Keccak256::hash(&key_bytes[1..]);
-        
         let mut addr = [0u8; 20];
         addr[..].copy_from_slice(&hash[12..32]);
         Address::new(addr)

@@ -477,17 +477,17 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     return (
         <>
             {isLoading ? (
-                <div className='flex flex-col space-y-4'>
-                    <div className='bg-muted rounded-md w-full h-44'></div>
-                    <div className='bg-muted rounded-md w-full h-44'></div>
-                    <div className='bg-muted rounded-md w-full h-12'></div>
+                <div className='flex flex-col space-y-2'>
+                    <div className='bg-muted rounded-md w-full h-32'></div>
+                    <div className='bg-muted rounded-md w-full h-32'></div>
+                    <div className='bg-muted rounded-md w-full h-14'></div>
                     <div className='bg-muted rounded-md w-full h-12'></div>
                 </div>
             ) : (
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
-                        <div className='flex flex-col space-y-2'>
-                            <div className='bg-muted rounded-lg p-4'>
+                    <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off' className='flex flex-col space-y-2'>
+                        <div className='relative flex flex-col items-center'>
+                            <div className='bg-muted rounded-t-lg w-full px-4 py-2'>
                                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
                                     <div>You Pay</div>
                                     <div className='flex flex-row space-x-1 items-center'>
@@ -495,11 +495,26 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                         <p>{formatAmount(Number(payingTokenBalance))}</p>
                                     </div>
                                 </div>
-                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
-                                    <div className='text-4xl text-center md:text-start'>
+                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center w-full'>
+                                    <div className='text-4xl md:pt-[26px] text-center md:text-start flex flex-col space-y-1'>
                                         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                                         {/* @ts-expect-error */}
                                         {selectedBIT10TokenPrice ? formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01) : '0'}
+
+                                        <TooltipProvider>
+                                            <Tooltip delayDuration={300}>
+                                                <TooltipTrigger asChild>
+                                                    <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-1'>
+                                                        &asymp; ${selectedBIT10TokenPrice ? formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 1.01) : '0'}
+                                                        <Info className='w-4 h-4 cursor-pointer ml-1' />
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                    Price in {form.watch('payment_token')} + 1% Management fee <br />
+                                                    $ {formatAmount(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatAmount(0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatAmount((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0'))))}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     </div>
 
                                     <div className='grid grid-cols-5 items-center'>
@@ -577,40 +592,16 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                                    <TooltipProvider>
-                                        <Tooltip delayDuration={300}>
-                                            <TooltipTrigger asChild>
-                                                <div className='flex flex-row space-x-1'>
-                                                    $ {selectedBIT10TokenPrice ? formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 1.01) : '0'}
-                                                    <Info className='w-5 h-5 cursor-pointer ml-1' />
-                                                </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                Price in {form.watch('payment_token')} + 1% Management fee <br />
-                                                $ {formatAmount(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatAmount(0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatAmount((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0'))))}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                    <div>
-                                        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                                        {/* @ts-expect-error */}
-                                        1 {form.watch('payment_token')} = $ {formatAmount(parseFloat(payingTokenPrice))}
-                                    </div>
-                                </div>
                             </div>
 
-                            <div className='grid place-items-center z-[2] my-6'>
-                                <Button type='button' variant='ghost' size='sm' className='rounded-full p-2 h-8 w-8 border-2 border-gray-300 hover:border-gray-400 group bg-background' onClick={onSwitchToSell}>
-                                    <ArrowUpDown className='h-4 w-4 transition-transform duration-700 group-hover:rotate-[180deg]' />
-                                </Button>
-                            </div>
+                            <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 rounded-full p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' onClick={onSwitchToSell}>
+                                <ArrowUpDown className='h-8 w-8 transition-transform duration-700 group-hover:rotate-[180deg]' />
+                            </Button>
 
-                            <div className='bg-muted rounded-lg p-4'>
+                            <div className='bg-muted rounded-b-lg w-full px-4 py-2 -mt-6 md:mt-2'>
                                 <p>You Receive</p>
-                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
-                                    <div className='w-full md:w-3/4'>
+                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center w-full'>
+                                    <div className='w-full md:w-3/4 flex flex-col space-y-1 pt-2 md:pt-[27px]'>
                                         <FormField
                                             control={form.control}
                                             name='receive_amount'
@@ -634,6 +625,10 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                 </FormItem>
                                             )}
                                         />
+
+                                        <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
+                                            <div> &asymp; ${formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))))}</div>
+                                        </div>
                                     </div>
 
                                     <div className='grid grid-cols-5 items-center'>
@@ -682,8 +677,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                                     }}
                                                                                 >
                                                                                     <div className='flex flex-row items-center justify-start space-x-1'>
-                                                                                        <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                                                                            <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
+                                                                                        <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-black p-0.5'>
+                                                                                            <Image src={token.img} alt={token.label} width={35} height={35} />
                                                                                         </div>
                                                                                         <div className='flex flex-col items-start tracking-wide'>
                                                                                             <div>{token.label}</div>
@@ -706,24 +701,16 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                             )}
                                         />
 
-                                        <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
-                                            <Image src={BIT10Img} alt='BIT10' width={75} height={75} className='z-20' />
+                                        <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-black p-1.5'>
+                                            <Image src={BIT10Img as StaticImageData} alt='BIT10' width={75} height={75} className='z-20' />
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
-                                    <div>$ {formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))))}</div>
-                                    <div>
-                                        1 {form.watch('receive_token')} = $ {formatAmount(selectedBIT10TokenPrice)}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <Accordion type='single' collapsible>
-                            <AccordionItem value='item-1' className='rounded-lg border-2 my-2 border-none'>
+                            <AccordionItem value='item-1' className='rounded-lg border-2 my-2 border-none bg-muted/50 px-4'>
                                 <AccordionTrigger className='hover:no-underline'><p>Summary</p></AccordionTrigger>
                                 <AccordionContent className='flex flex-col space-y-1 border-t-2 pt-4 tracking-wide'>
                                     <div className='flex flex-row items-center justify-between space-x-2'>
@@ -762,14 +749,14 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                             </AccordionItem>
                         </Accordion>
 
-                        {chain && !isApproved &&
-                            <div className='border-muted border flex flex-col items-center space-y-2 px-2 py-4 my-2 text-center'>
+                        {chain && !isApproved && (
+                            <div className='border-muted border rounded-lg flex flex-col items-center space-y-2 px-2 py-4 text-center'>
                                 <div>The Buy BIT10 page is gated for mainnet access. Your Wallet Address needs to be approved first to use the Buy BIT10 feature.</div>
                                 <div>For access, please contact <a href='https://x.com/bit10startup' className='text-primary underline'>@bit10startup</a> on Twitter/X.</div>
                             </div>
-                        }
+                        )}
 
-                        <div className='flex flex-row space-x-2 w-full items-center pt-3'>
+                        <div className='flex flex-row space-x-2 w-full items-center'>
                             <Button className='w-full rounded-lg' disabled={buyDisabledConditions}>
                                 {buying && <Loader2 className='animate-spin mr-2' size={15} />}
                                 {getBuyMessage()}

@@ -1,6 +1,6 @@
 # Mainnet Buy BIT10
 
-Users can swap tokens from ICP, ckBTC, etc. to buy BIT10 tokens.
+Users can swap tokens from ICP, ckBTC, etc. to buy BIT10 tokens on different chains.
 
 ## 🌟 Overview
 
@@ -136,8 +136,6 @@ The system uses several configuration parameters:
 
 - Management Fee: 1% on swaps
 - Minting Fee: 1% on reverse swaps
-- Maximum Retries: 5 for HTTP requests
-- HTTP Request Cycles: 25,000,000,000
 
 ## 🏁 Getting Started
 
@@ -157,5 +155,5 @@ To start using BIT10 Liquidity Hub canister, follow these steps:
     ```bash
     dfx start --background
     
-    dfx deploy exchange_canister_backend
+    dfx deploy mainnet_buy_bit10_backend
     ```

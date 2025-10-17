@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import MaxWidthWrapper from '@/components/MaxWidthWrapper'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import BuyModule from './buyModule'
 import SellModule from './sellModule'
 
@@ -30,11 +30,16 @@ export default function Buy() {
     };
 
     return (
-        <MaxWidthWrapper className='flex flex-col py-4 md:py-12 h-full items-center justify-center'>
-            <div className='w-[300px] md:w-[500px] animate-fade-bottom-up bg-transparent'>
-                {activeTab === 'buy' && <BuyModule onSwitchToSell={() => handleTabChange('sell')} />}
-                {activeTab === 'sell' && <SellModule onSwitchToBuy={() => handleTabChange('buy')} />}
-            </div>
-        </MaxWidthWrapper>
+        <div className='flex flex-col py-4 h-full items-center justify-center'>
+            <Card className='border-none w-[300px] md:w-[560px] animate-fade-bottom-up bg-gray-200 dark:bg-[#1c1717]'>
+                <CardHeader>
+                    <CardTitle>Buy BIT10</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {activeTab === 'buy' && <BuyModule onSwitchToSell={() => handleTabChange('sell')} />}
+                    {activeTab === 'sell' && <SellModule onSwitchToBuy={() => handleTabChange('buy')} />}
+                </CardContent>
+            </Card>
+        </div>
     )
 }

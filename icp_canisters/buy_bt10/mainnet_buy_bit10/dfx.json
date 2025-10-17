@@ -1,8 +1,8 @@
 {
   "canisters": {
-    "exchange_canister_backend": {
-      "candid": "src/exchange_canister_backend/exchange_canister_backend.did",
-      "package": "exchange_canister_backend",
+    "mainnet_buy_bit10_backend": {
+      "candid": "src/mainnet_buy_bit10_backend/mainnet_buy_bit10_backend.did",
+      "package": "mainnet_buy_bit10_backend",
       "type": "rust"
     }
   },
