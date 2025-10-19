@@ -23,7 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const tabs = ['10Y', '5Y', '3Y', '1Y'];
 
-type Bit10Entry = {
+type BIT10Entry = {
     date: string;
     bit10Top: string;
     btc: string;
@@ -94,7 +94,7 @@ export default function BIT10Comparison() {
                 return null;
             }
 
-            const data = await response.json() as { bit10_top: Bit10Entry[] };
+            const data = await response.json() as { bit10_top: BIT10Entry[] };
             return { bit10_top: data.bit10_top.reverse() };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
@@ -171,12 +171,12 @@ export default function BIT10Comparison() {
     };
 
     const processInvestmentData = useMemo(() => {
-        return (data: Bit10Entry[]): ProcessedDataPoint[] => {
+        return (data: BIT10Entry[]): ProcessedDataPoint[] => {
             if (!data || data.length === 0) return [];
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
-            const initialBit10Top = safeParseFloat(data[0].bit10Top);
+            const initialBIT10Top = safeParseFloat(data[0].bit10Top);
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
             const initialBtc = safeParseFloat(data[0].btc);
@@ -192,7 +192,7 @@ export default function BIT10Comparison() {
 
                 return {
                     day: dateFormatter.format(date),
-                    bit10TopValue: parseFloat((100 * (currentBit10Top / initialBit10Top)).toFixed(2)),
+                    bit10TopValue: parseFloat((100 * (currentBit10Top / initialBIT10Top)).toFixed(2)),
                     btcValue: parseFloat((100 * (currentBtc / initialBtc)).toFixed(2)),
                     sp500Value: parseFloat((100 * (currentSp500 / initialSp500)).toFixed(2)),
                 };
@@ -231,7 +231,7 @@ export default function BIT10Comparison() {
     };
 
     const apyData = useMemo(() => {
-        const calculatePeriodAPY = (data: Bit10Entry[], periodLabel: string) => {
+        const calculatePeriodAPY = (data: BIT10Entry[], periodLabel: string) => {
             if (!data || data.length < 2) return null;
 
             const firstEntry = data[0];
@@ -239,10 +239,10 @@ export default function BIT10Comparison() {
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
-            const initialBit10Top = safeParseFloat(firstEntry.bit10Top);
+            const initialBIT10Top = safeParseFloat(firstEntry.bit10Top);
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
-            const finalBit10Top = safeParseFloat(lastEntry.bit10Top);
+            const finalBIT10Top = safeParseFloat(lastEntry.bit10Top);
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
@@ -266,7 +266,7 @@ export default function BIT10Comparison() {
 
             return {
                 period: periodLabel,
-                bit10Top: calculateAPY(initialBit10Top, finalBit10Top, years),
+                bit10Top: calculateAPY(initialBIT10Top, finalBIT10Top, years),
                 btc: calculateAPY(initialBtc, finalBtc, years),
                 sp500: calculateAPY(initialSp500, finalSp500, years)
             };
@@ -318,7 +318,7 @@ export default function BIT10Comparison() {
         const timeDiffMs = endDate.getTime() - startDate.getTime();
         const timeDiffYears = timeDiffMs / (1000 * 60 * 60 * 24 * 365.25);
 
-        const tokens: { key: keyof Bit10Entry; name: string }[] = [
+        const tokens: { key: keyof BIT10Entry; name: string }[] = [
             { key: 'bit10Top', name: 'BIT10.TOP' },
             { key: 'btc', name: 'Bitcoin' },
             { key: 'sp500', name: 'S&P500' },
@@ -391,9 +391,9 @@ export default function BIT10Comparison() {
     return (
         <div className='flex flex-col space-y-4'>
             <div className='mt-4 py-4'>
-                <div className='grid md:grid-cols-3 gap-8'>
+                <div className='grid lg:grid-cols-3 gap-8'>
                     {['1Y', '5Y', '10Y'].map((period) => (
-                        <div key={period} className='border-2 rounded py-8 px-3'>
+                        <div key={period} className='border-2 border-muted rounded py-8 px-3'>
                             <h4 className='font-medium text-2xl text-center mb-2'>BIT10.TOP {period} APY</h4>
                             {apyData[period as keyof typeof apyData] ? (
                                 <div className='font-bold text-4xl text-center'>{apyData[period as keyof typeof apyData]?.bit10Top.toFixed(2)}%</div>
@@ -405,18 +405,18 @@ export default function BIT10Comparison() {
                 </div>
             </div>
 
-            <div className='grid md:grid-cols-5 gap-3'>
-                <div className='md:col-span-3'>
-                    <Card className='dark:border-white animate-fade-left-slow'>
-                        <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
+            <div className='grid lg:grid-cols-5 gap-3'>
+                <div className='lg:col-span-3'>
+                    <Card className='border-muted animate-fade-left-slow'>
+                        <CardHeader className='flex flex-col lg:flex-row items-center justify-between'>
                             <div className='flex flex-1 flex-col justify-center gap-1 pb-3 sm:pb-0'>
                                 <CardTitle>$100 Investment Growth Comparison</CardTitle>
                                 <CardDescription>
                                     Performance of a $100 investment in each asset since tracking began
                                 </CardDescription>
                             </div>
-                            <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0'>
-                                <div className='relative flex flex-row space-x-2 items-center justify-center border dark:border-white rounded-md px-2 py-1.5'>
+                            <div className='flex flex-col lg:flex-row items-center space-y-2 lg:space-x-4 lg:space-y-0'>
+                                <div className='relative flex flex-row space-x-2 items-center justify-center border border-muted rounded-md px-2 py-1.5'>
                                     <AnimatedBackground defaultValue='10Y' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
                                         {tabs.map((label, index) => (
                                             <button key={index} data-id={label} type='button' className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}>
@@ -430,11 +430,11 @@ export default function BIT10Comparison() {
                         <CardContent className='flex flex-col space-y-4'>
                             {isLoading ? (
                                 <div className='flex flex-col h-full space-y-2'>
-                                    <Skeleton className='h-[300px] md:h-[400px] w-full' />
+                                    <Skeleton className='h-[300px] lg:h-[400px] w-full' />
                                 </div>
                             ) : (
                                 <div className='select-none -ml-4'>
-                                    <ChartContainer config={investmentChartConfig} className='max-h-[300px] md:max-h-[600px] w-full'>
+                                    <ChartContainer config={investmentChartConfig} className='max-h-[300px] lg:max-h-[600px] w-full'>
                                         <LineChart accessibilityLayer data={currentData}>
                                             <CartesianGrid vertical={false} />
                                             <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' />
@@ -451,8 +451,8 @@ export default function BIT10Comparison() {
                         </CardContent>
                     </Card>
                 </div>
-                <div className='md:col-span-2'>
-                    <Card className='dark:border-white animate-fade-right-slow h-full flex flex-col'>
+                <div className='lg:col-span-2'>
+                    <Card className='border-muted animate-fade-right-slow h-full flex flex-col'>
                         <CardHeader>
                             <CardTitle>
                                 BIT10 Investment Calculator
@@ -472,7 +472,7 @@ export default function BIT10Comparison() {
                                                 <FormItem>
                                                     <FormLabel>Initial Investment</FormLabel>
                                                     <FormControl>
-                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='dark:border-white' />
+                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='border-muted' />
                                                     </FormControl>
                                                     <FormDescription>
                                                         Enter the amount (in USD) you want to invest
@@ -491,7 +491,7 @@ export default function BIT10Comparison() {
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <FormControl>
-                                                                <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
                                                                     {field.value ? (
                                                                         format(field.value, 'PPP')
                                                                     ) : (
@@ -501,8 +501,8 @@ export default function BIT10Comparison() {
                                                                 </Button>
                                                             </FormControl>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className='w-auto p-0' align='start'>
-                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                        <PopoverContent className='w-auto p-0 border-muted' align='start'>
+                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' className='rounded-md' />
                                                         </PopoverContent>
                                                     </Popover>
                                                     <FormDescription>
@@ -522,7 +522,7 @@ export default function BIT10Comparison() {
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <FormControl>
-                                                                <Button variant='outline' className={cn('w-full dark:border-white pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
                                                                     {field.value ? (
                                                                         format(field.value, 'PPP')
                                                                     ) : (
@@ -532,8 +532,8 @@ export default function BIT10Comparison() {
                                                                 </Button>
                                                             </FormControl>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className='w-auto p-0' align='start'>
-                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' />
+                                                        <PopoverContent className='w-auto p-0 border-muted' align='start'>
+                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' className='rounded-md' />
                                                         </PopoverContent>
                                                     </Popover>
                                                     <FormDescription>
@@ -552,7 +552,7 @@ export default function BIT10Comparison() {
                                                     <FormLabel>Token</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger className='dark:border-white'>
+                                                            <SelectTrigger className='border-muted'>
                                                                 <SelectValue placeholder='Select a investment token' />
                                                             </SelectTrigger>
                                                         </FormControl>
@@ -580,54 +580,56 @@ export default function BIT10Comparison() {
                                             <h3 className='font-semibold text-green-800 dark:text-green-200 mb-3'>
                                                 Investment Comparison
                                             </h3>
-                                            <table className='w-full text-sm border-collapse'>
-                                                <thead>
-                                                    <tr className='border-b border-green-200 dark:border-green-800'>
-                                                        <th className='text-left p-2'>Asset</th>
-                                                        <th className='text-center p-2'>Initial Investment</th>
-                                                        <th className='text-center p-2'>Current Value</th>
-                                                        <th className='text-center p-2'>Total Return</th>
-                                                        <th className='text-center p-2'>% Return</th>
-                                                        <th className='text-center p-2'>APY</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {calculationResult.assets.map((asset) => (
-                                                        <tr
-                                                            key={asset.name}
-                                                            className='border-b border-green-200 dark:border-green-800 last:border-0'
-                                                        >
-                                                            <td className='p-2'>{asset.name}</td>
-                                                            <td className='p-2 text-right'>
-                                                                ${formatAmount(asset.initialInvestment)}
-                                                            </td>
-                                                            <td className='p-2 text-right text-green-600 dark:text-green-400'>
-                                                                ${formatAmount(asset.currentValue)}
-                                                            </td>
-                                                            <td
-                                                                className={`p-2 text-right ${asset.totalReturn >= 0
-                                                                    ? 'text-green-600 dark:text-green-400'
-                                                                    : 'text-red-600 dark:text-red-400'
-                                                                    }`}
-                                                            >
-                                                                ${formatAmount(asset.totalReturn)}
-                                                            </td>
-                                                            <td
-                                                                className={`p-2 text-right ${asset.percentageReturn >= 0
-                                                                    ? 'text-green-600 dark:text-green-400'
-                                                                    : 'text-red-600 dark:text-red-400'
-                                                                    }`}
-                                                            >
-                                                                {asset.percentageReturn >= 0 ? '+' : ''}
-                                                                {formatAmount(asset.percentageReturn)}%
-                                                            </td>
-                                                            <td className='p-2 text-right'>
-                                                                {asset.apy !== undefined ? `${asset.apy.toFixed(2)}%` : 'N/A'}
-                                                            </td>
+                                            <div className='overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 max-w-[80vw]'>
+                                                <table className='w-full text-sm border-collapse '>
+                                                    <thead>
+                                                        <tr className='border-b border-green-200 dark:border-green-800'>
+                                                            <th className='text-left p-2'>Asset</th>
+                                                            <th className='text-center p-2'>Initial Capital</th>
+                                                            <th className='text-center p-2'>Current Value</th>
+                                                            <th className='text-center p-2'>Total Return</th>
+                                                            <th className='text-center p-2'>% Return</th>
+                                                            <th className='text-center p-2'>APY</th>
                                                         </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        {calculationResult.assets.map((asset) => (
+                                                            <tr
+                                                                key={asset.name}
+                                                                className='border-b border-green-200 dark:border-green-800 last:border-0'
+                                                            >
+                                                                <td className='p-2'>{asset.name}</td>
+                                                                <td className='p-2 text-right'>
+                                                                    ${formatAmount(asset.initialInvestment)}
+                                                                </td>
+                                                                <td className='p-2 text-right text-green-600 dark:text-green-400'>
+                                                                    ${formatAmount(asset.currentValue)}
+                                                                </td>
+                                                                <td
+                                                                    className={`p-2 text-right ${asset.totalReturn >= 0
+                                                                        ? 'text-green-600 dark:text-green-400'
+                                                                        : 'text-red-600 dark:text-red-400'
+                                                                        }`}
+                                                                >
+                                                                    ${formatAmount(asset.totalReturn)}
+                                                                </td>
+                                                                <td
+                                                                    className={`p-2 text-right ${asset.percentageReturn >= 0
+                                                                        ? 'text-green-600 dark:text-green-400'
+                                                                        : 'text-red-600 dark:text-red-400'
+                                                                        }`}
+                                                                >
+                                                                    {asset.percentageReturn >= 0 ? '+' : ''}
+                                                                    {formatAmount(asset.percentageReturn)}%
+                                                                </td>
+                                                                <td className='p-2 text-right'>
+                                                                    {asset.apy !== undefined ? `${asset.apy.toFixed(2)}%` : 'N/A'}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                             <div className='pt-2 text-xs text-gray-500 dark:text-gray-400'>
                                                 Period: From {new Date(calculationResult.startDate).toLocaleDateString()} to{' '}
                                                 {new Date(calculationResult.endDate).toLocaleDateString()}

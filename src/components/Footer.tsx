@@ -15,7 +15,6 @@ import Link from 'next/link'
 import Image, { type StaticImageData } from 'next/image'
 import XImg from '@/assets/footer/x.svg'
 import TelegramImg from '@/assets/footer/telegram.svg'
-import GitHubImg from '@/assets/footer/github.svg'
 
 interface FooterLinkType {
     title: string;
@@ -78,10 +77,10 @@ const companySocial: SocialLinkType[] = [
     //     link: '#',
     //     imageName: 'linkedin.svg',
     // },
-    {
-        link: 'https://github.com/ZeyaRabani/BIT10',
-        imageName: GitHubImg as StaticImageData,
-    },
+    // {
+    //     link: 'https://github.com/ZeyaRabani/BIT10',
+    //     imageName: GitHubImg as StaticImageData,
+    // },
     // {
     //     link: '#',
     //     imageName: 'reddit.svg',
