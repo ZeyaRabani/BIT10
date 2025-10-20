@@ -1,0 +1,133 @@
+type BaseNetwork = variant {
+  Mainnet;
+  Sepolia;
+};
+
+type BscNetwork = variant {
+  Mainnet;
+  Testnet;
+};
+
+type SolanaNetwork = variant {
+  Mainnet;
+  Devnet;
+};
+
+type EcdsaKeyName = variant {
+  TestKeyLocalDevelopment;
+  TestKey1;
+  ProductionKey1;
+};
+
+type Ed25519KeyName = variant {
+  LocalDevelopment;
+  MainnetTestKey1;
+  MainnetProdKey1;
+};
+
+type InitArg = record {
+  base_network : opt BaseNetwork;
+  bsc_network : opt BscNetwork;
+  solana_network : opt SolanaNetwork;
+  ecdsa_key_name : opt EcdsaKeyName;
+  ed25519_key_name : opt Ed25519KeyName;
+};
+
+type Token = record {
+  token_id : text;
+  token_name : text;
+  token_symbol : text;
+  token_address : opt text;
+  token_chain : text;
+  token_decimals : nat8;
+  is_native : bool;
+  is_active : bool;
+  price_feed_id : text;
+};
+
+type PoolInfo = record {
+  pool_id : text;
+  token_a : text;
+  token_a_address : text;
+  token_a_chain : text;
+  token_a_balance : text;
+  token_b : text;
+  token_b_address : text;
+  token_b_chain : text;
+  token_b_balance : text;
+};
+
+type PoolsResponse = record {
+  pools : vec PoolInfo;
+};
+
+type SwapArgs = record {
+  pool_id : text;
+  tick_in_wallet_address : text;
+  tick_out_wallet_address : text;
+  swap_type : text;
+  source_chain : text;
+  destination_chain : text;
+  token_in_address : text;
+  token_out_address : text;
+  amount_in : text;
+  expected_amount_out : text;
+  slippage : text;
+};
+
+type SwapResponse = record {
+  swap_id: text;
+  pool_id : text;
+  tick_in_wallet_address : text;
+  tick_out_wallet_address : text;
+  swap_type : text;
+  source_chain : text;
+  destination_chain : text;
+  token_in_address : text;
+  token_out_address : text;
+  amount_in : text;
+  amount_out : text;
+  slippage : text;
+  tx_hash_in : text;
+  tx_hash_out : text;
+  status : text;
+  timestamp : nat64;
+};
+
+type SwapResult = variant {
+  Ok : SwapResponse;
+  Err : text;
+};
+
+type Result = variant {
+    Ok: text;
+    Err: text;
+};
+
+service : (opt InitArg) -> {
+  // Pool queries
+  get_pool_info : () -> (PoolsResponse) query;
+  update_pool_balances: (text, text, text) -> (Result);
+  initialize_pool_data: () -> (Result);
+
+  // Address queries
+  icp_address : () -> (text);
+  base_address : () -> (text);
+  solana_address : () -> (text);
+  bsc_address : () -> (text);
+
+  // Swap operations
+  icp_swap : (SwapArgs) -> (SwapResult);
+  
+  // Swap history queries
+  get_swap_history : () -> (vec SwapResponse) query;
+  get_swap_by_id : (text) -> (opt SwapResponse) query;
+  get_swap_history_paginated : (nat64, nat64) -> (vec SwapResponse) query;
+  get_swap_history_count : () -> (nat64) query;
+
+  // Solana-specific operations
+  nonce_account : () -> (text);
+  create_nonce_account : () -> (variant { Ok : text; Err : text });
+  create_associated_token_account : (text) -> (variant { Ok : text; Err : text });
+  associated_token_account : (text) -> (variant { Ok : text; Err : text });
+};

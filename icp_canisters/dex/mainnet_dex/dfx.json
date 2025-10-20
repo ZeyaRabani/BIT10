@@ -1,0 +1,26 @@
+{
+    "canisters": {
+        "mainnet_dex_backend": {
+            "candid": "src/mainnet_dex_backend/mainnet_dex_backend.did",
+            "package": "mainnet_dex_backend",
+            "type": "custom",
+            "build": [
+                "cargo build --no-default-features --target wasm32-unknown-unknown --release"
+            ],
+            "wasm": "target/wasm32-unknown-unknown/release/mainnet_dex_backend.wasm",
+            "metadata": [
+                {
+                    "name": "candid:service"
+                }
+            ]
+        }
+    },
+    "defaults": {
+        "build": {
+            "args": "",
+            "packtool": ""
+        }
+    },
+    "output_env_file": ".env",
+    "version": 1
+}
