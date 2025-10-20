@@ -2,11 +2,11 @@
 "use server"
 
 import { db } from '@/server/db'
-import { mbUsers, userSignups, mbPrincipalIdWhitelist, swap, teSwap, referralJune2025, referralJune2025Tasks } from '@/server/db/schema'
+import { mbUsers, userSignups, mbPrincipalIdWhitelist, swap, teSwap, dex } from '@/server/db/schema'
 import crypto from 'crypto'
 import { eq, desc, and } from 'drizzle-orm'
 
-interface NewTokenSwap {
+interface NewTokenBuy {
     newTokenSwapId: string;
     principalId: string;
     tickInName: string;
@@ -19,6 +19,25 @@ interface NewTokenSwap {
     transactionType: 'Swap' | 'Reverse Swap';
     network: 'ICP';
     transactionTimestamp: string;
+}
+
+interface NewDEXSwap {
+    swapId: string;
+    poolId: string;
+    amountIn: string;
+    amountOut: string;
+    sourceChain: string;
+    destinationChain: string;
+    swapType: string;
+    tickInWalletAddress: string;
+    tickOutWalletAddress: string;
+    tokenInAddress: string;
+    tokenOutAddress: string;
+    slippage: string;
+    status: string;
+    txHashIn: string;
+    txHashOut: string;
+    timestamp: number;
 }
 
 export const addNewUser = async ({ principalId }: { principalId: string }) => {
@@ -70,7 +89,7 @@ export const addWhitelistedAddress = async ({ address }: { address: string }) =>
     }
 }
 
-export const newTokenSwap = async ({ newTokenSwapId, principalId, tickInName, tickInAmount, tickInUSDAmount, tickInTxBlock, tickOutName, tickOutAmount, tickOutTxBlock, transactionType, network, transactionTimestamp }: NewTokenSwap) => {
+export const newTokenSwap = async ({ newTokenSwapId, principalId, tickInName, tickInAmount, tickInUSDAmount, tickInTxBlock, tickOutName, tickOutAmount, tickOutTxBlock, transactionType, network, transactionTimestamp }: NewTokenBuy) => {
     try {
         // const uuid = crypto.randomBytes(16).toString('hex');
         // const generateNewTokenSwapId = uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
@@ -98,6 +117,33 @@ export const newTokenSwap = async ({ newTokenSwapId, principalId, tickInName, ti
     }
 };
 
+export const newDEXSwap = async ({ swapId, poolId, amountIn, amountOut, sourceChain, destinationChain, swapType, tickInWalletAddress, tickOutWalletAddress, tokenInAddress, tokenOutAddress, slippage, status, txHashIn, txHashOut, timestamp }: NewDEXSwap) => {
+    try {
+        await db.insert(dex).values({
+            swapId: swapId,
+            poolId: poolId,
+            amountIn: amountIn,
+            amountOut: amountOut,
+            sourceChain: sourceChain,
+            destinationChain: destinationChain,
+            swapType: swapType,
+            tickInWalletAddress: tickInWalletAddress,
+            tickOutWalletAddress: tickOutWalletAddress,
+            tokenInAddress: tokenInAddress,
+            tokenOutAddress: tokenOutAddress,
+            slippage: slippage,
+            status: status,
+            txHashIn: txHashIn,
+            txHashOut: txHashOut,
+            timestamp: timestamp
+        });
+
+        return 'DEX Swap was successful';
+    } catch (error) {
+        return 'Error swapping tokens';
+    }
+};
+
 export const userRecentBIT10BuyActivity = async ({ paymentAddress, chain }: { paymentAddress: string, chain: string }) => {
     try {
         const data = await db.select({
@@ -120,6 +166,34 @@ export const userRecentBIT10BuyActivity = async ({ paymentAddress, chain }: { pa
         return data;
     } catch (error) {
         return 'Error fetching user recent activity';
+    }
+}
+
+export const userRecentDEXSwapActivity = async ({ source_chain, walletAddress }: { source_chain: string, walletAddress: string }) => {
+    try {
+        const data = await db.select({
+            swapId: dex.swapId,
+            status: dex.status,
+            tickInWalletAddress: dex.tickInWalletAddress,
+            amountIn: dex.amountIn,
+            amountOut: dex.amountOut,
+            tokenInAddress: dex.tokenInAddress,
+            tokenOutAddress: dex.tokenOutAddress,
+            sourceChain: dex.sourceChain,
+            destinationChain: dex.destinationChain,
+            txHashIn: dex.txHashIn,
+            txHashOut: dex.txHashOut,
+            timestamp: dex.timestamp
+        })
+            .from(dex)
+            .where(and(
+                eq(dex.tickInWalletAddress, walletAddress.toLowerCase()),
+                eq(dex.sourceChain, source_chain)
+            ))
+            .orderBy(desc(dex.timestamp));
+        return data;
+    } catch (error) {
+        return 'Error fetching user recent DEX activity';
     }
 }
 
@@ -157,50 +231,3 @@ export const testnetRevenue = async () => {
         return 'Error fetching testnet revenue';
     }
 }
-
-// Referral related code
-export const addNewReferral = async ({ referralCode, userId }: { referralCode: string, userId: string }) => {
-    try {
-        const existingUsers = await db.select({ userId: referralJune2025.userId }).from(referralJune2025).where(eq(referralJune2025.userId, userId));
-
-        if (existingUsers && existingUsers.length > 0) {
-            return 'User already exists';
-        } else {
-            await db.insert(referralJune2025).values({
-                referralCode: referralCode,
-                userId: userId,
-                usedAt: new Date().toISOString()
-            });
-        }
-    } catch (error) {
-        return 'Error adding new referral';
-    }
-};
-
-export const addNewReferralTasks = async ({ address }: { address: string }) => {
-    try {
-        const existingUsers = await db.select({ address: referralJune2025Tasks.address }).from(referralJune2025Tasks).where(eq(referralJune2025Tasks.address, address));
-
-        if (existingUsers && existingUsers.length > 0) {
-            return 'User already exists';
-        } else {
-            await db.insert(referralJune2025Tasks).values({
-                address: address
-            });
-        }
-    } catch (error) {
-        return 'Error adding new referral task';
-    }
-};
-
-export const addReferralQuestionsCompletedTasks = async ({ address }: { address: string }) => {
-    try {
-        await db
-            .update(referralJune2025Tasks)
-            .set({ questionnaire: true })
-            .where(eq(referralJune2025Tasks.address, address));
-        return 'Questionnaire marked as completed';
-    } catch (error) {
-        return 'Error adding new referral task';
-    }
-};

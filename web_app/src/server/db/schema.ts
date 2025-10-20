@@ -388,6 +388,33 @@ export const mbTokenSwap = pgTable('mb_token_swap', {
 		}
 	});
 
+export const dex = pgTable('dex', {
+	swapId: text('swap_id').primaryKey().notNull(),
+	poolId: text('pool_id').notNull(),
+	tickInWalletAddress: text('tick_in_wallet_address').notNull(),
+	tickOutWalletAddress: text('tick_out_wallet_address').notNull(),
+	swapType: text('swap_type').notNull(),
+	sourceChain: text('source_chain').notNull(),
+	destinationChain: text('destination_chain').notNull(),
+	tokenInAddress: text('token_in_address').notNull(),
+	tokenOutAddress: text('token_out_address').notNull(),
+	amountIn: text('amount_in').notNull(),
+	amountOut: text('amount_out').notNull(),
+	slippage: text('slippage').notNull(),
+	txHashIn: text('tx_hash_in').notNull(),
+	txHashOut: text('tx_hash_out').notNull(),
+	status: text('status').notNull(),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	timestamp: bigint('timestamp', { mode: 'number' }).notNull(),
+},
+	(table) => {
+		return {
+			idxDexDestinationChain: index('idx_dex_destination_chain').using('btree', table.destinationChain.asc().nullsLast()),
+			idxDexSourceChain: index('idx_dex_source_chain').using('btree', table.sourceChain.asc().nullsLast()),
+			idxDexTimestamp: index('idx_dex_timestamp').using('btree', table.timestamp.asc().nullsLast()),
+		}
+	});
+
 export const bit10TopRebalance = pgTable('bit10_top_rebalance', {
 	timestmpz: timestamp('timestmpz', { withTimezone: true, mode: 'string' }).primaryKey().notNull(),
 	indexValue: doublePrecision('index_value').notNull(),

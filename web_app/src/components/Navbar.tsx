@@ -21,6 +21,7 @@ const links = {
     ],
     app: [
         { title: 'Buy BIT10', link: '/buy' },
+        { title: 'DEX', link: '/dex' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' }
     ]

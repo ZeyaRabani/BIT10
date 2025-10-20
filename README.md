@@ -65,6 +65,7 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
   - **`ai_portfolio_manager/`** - AI Portfolio Manager canister running on the ICP canister.
   
   - **`dex/`** - DEX swap logic for same-chain and cross-chain token swaps on the ICP canister.
+    - `dex/` - Canister code for the DEX Mainnet.0
     - `testnet_dex_router/` - Canister code for the DEX router.
     - `testnet_dex_eth_asset_storage/` - Canister code for swapping tokens on Ethereum.
     - `testnet_dex_bsc_asset_storage/` - Canister code for swapping token on BSC.
@@ -96,6 +97,7 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 - AI Portfolio Manager: [anic3-viaaa-aaaap-qqcaq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=anic3-viaaa-aaaap-qqcaq-cai)
 - BIT10.BTC Faucet: [5wxtf-uqaaa-aaaap-qpvha-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=5wxtf-uqaaa-aaaap-qpvha-cai)
 - BIT10 Buy Canister: [6phs7-6yaaa-aaaap-qpvoq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=6phs7-6yaaa-aaaap-qpvoq-cai)
+- BIT10 DEX Canister: [bwwo2-dqaaa-aaaap-qqfzq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=bwwo2-dqaaa-aaaap-qqfzq-cai)
 - BIT10 Testnet Buy Canister: [feujt-7iaaa-aaaap-qqc4q-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=feujt-7iaaa-aaaap-qqc4q-cai)
 - BIT10 Testnet Liquidity Hub: [jskxc-iiaaa-aaaap-qpwrq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=jskxc-iiaaa-aaaap-qpwrq-cai)
 - BIT10 Testnet DEX: [t2vfi-5aaaa-aaaap-qqbfa-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=t2vfi-5aaaa-aaaap-qqbfa-cai)

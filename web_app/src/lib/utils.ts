@@ -103,11 +103,13 @@ export const getTokenName = (tokenAddress: string): string => {
       return 'ckBTC';
     case 'ss2fx-dyaaa-aaaar-qacoq-cai'.toLocaleLowerCase():
       return 'ckETH';
+    case 'xevnm-gaaaa-aaaar-qafnq-cai'.toLocaleLowerCase():
+      return 'ckUSDC';
     case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
       return 'ETH';
     case 'so11111111111111111111111111111111111111111'.toLocaleLowerCase():
       return 'SOL';
-    case 'epjfwdd5aufqssqem2qn1xzybapc8g4weggkzwytdt1v'.toLocaleLowerCase():
+    case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
     case '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d'.toLocaleLowerCase():
       return 'USDC';
     case '0x0000000000000000000000000000000000000000bnb'.toLocaleLowerCase():
@@ -129,11 +131,13 @@ export const getTokenExplorer = (tokenAddress: string): string => {
       return '/explorer/';
 
     case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
+    case '0x0000000000000000000000000000000000000000base'.toLocaleLowerCase():
+    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913'.toLocaleLowerCase():
     case '0x2d309c7c5fbbf74372edfc25b10842a7237b92de'.toLocaleLowerCase():
       return 'https://basescan.org/tx/';
 
-    case 'so11111111111111111111111111111111111111111'.toLocaleLowerCase():
-    case 'epjfwdd5aufqssqem2qn1xzybapc8g4weggkzwytdt1v'.toLocaleLowerCase():
+    case 'So11111111111111111111111111111111111111111'.toLocaleLowerCase():
+    case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
     case 'bity2anuhsbqiklyb7pziepjw2aywiizm287xqxuxe1'.toLocaleLowerCase():
       return 'https://explorer.solana.com/tx/';
 
