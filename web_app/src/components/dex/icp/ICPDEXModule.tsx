@@ -102,8 +102,6 @@ export const swapICPToken = async ({ values, fromToken, toToken, matchingPool, i
             const amount = Math.round(price * (10 ** tokenDecimals)).toFixed(0);
             const time = BigInt(Date.now()) * BigInt(1_000_000) + BigInt(300_000_000_000);
 
-            console.log(amount);
-
             const args = {
                 spender: {
                     owner: Principal.fromText(dexCanisterId),

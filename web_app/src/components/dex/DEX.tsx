@@ -576,8 +576,6 @@ export default function DEX() {
             const fromToken = selectedFromToken;
             const toToken = selectedToToken;
 
-            console.log(matchingPool);
-
             if (chain === 'icp') {
                 await swapICPToken({ values: values, fromToken: fromToken, toToken: toToken, matchingPool: matchingPool, icpAddress: icpAddress ? icpAddress : 'Guest' });
             } else {
