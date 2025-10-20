@@ -4,21 +4,10 @@ BIT10 pioneers the concept of an "S&P 500 for crypto assets." It provides users 
 
 ## 🖥️ Presentation
 
-For the World Computer Hacker League (WCHL) 2025, we have created the following demo videos to help you better understand BIT10. Please start by watching the Loom video presentation - it provides a smooth walkthrough of the platform.
+Presentations
+We created a playlist for all the videos created since the beginning of the World Computer Hacker League. All of the Videos are labelled "WCHL" then the round that video applies to E.g Regional or National and then what that video shows. These videos give a great overview of everything we did in this 4 month long hackathon.
 
-<!-- - Pitch Video: [youtu.be/Mceef9ahg_A](https://youtu.be/Mceef9ahg_A)
-- Pitch Deck: [BIT10 WCHL Deck.pdf](https://github.com/user-attachments/files/21993258/BIT10.WCHL.Deck.pdf)
-- WCHL National Round BIT10 Demo: [youtube.com/watch?v=YQdF3uXAY4A](https://www.youtube.com/watch?v=YQdF3uXAY4A)
-- WCHL National Round Cross Chain Lending and Borrowing: [youtube.com/watch?v=DCkX21094Ng](https://www.youtube.com/watch?v=DCkX21094Ng)
-- WCHL National Round Cross Chain DEX: [youtube.com/watch?v=sEe__ZwVW8U](https://www.youtube.com/watch?v=sEe__ZwVW8U)
-- WCHL National Round Market Cap Rebalance: [youtube.com/watch?v=UQW2NAXfGts](https://www.youtube.com/watch?v=UQW2NAXfGts)
-- WCHL National Round AI Portfolio Manager: [youtube.com/watch?v=tVY_6PrMrU4](https://www.youtube.com/watch?v=tVY_6PrMrU4) -->
-
-- Pitch Video: [youtube.com/watch?v=SXsD1xcYf2A](https://www.youtube.com/watch?v=SXsD1xcYf2A) 
-- WCHL Regional Round BIT10 Code Structure Demo: [youtube.com/watch?v=64hIUoCsRNo](https://www.youtube.com/watch?v=64hIUoCsRNo) 
-- WCHL Regional Round BIT10 Demo: [youtube.com/watch?v=_AT_RgoXSog](https://www.youtube.com/watch?v=_AT_RgoXSog)
-- WCHL Regional Round Cross Chain Lending and Borrowing Demo: [youtube.com/watch?v=GnrcTsCXQco](https://www.youtube.com/watch?v=GnrcTsCXQco)
-- WCHL Regional Buy BIT10 on Base Mainnet Demo: [youtube.com/watch?v=qfaFKKOQZVs](https://www.youtube.com/watch?v=qfaFKKOQZVs)
+https://www.youtube.com/playlist?list=PL7T2qlbuVFZ4I4APrZC15sbAUvQv65fIQ
 
 ### Extra instructions on how to use the entire system and FAQ's are in the Part 3 of the Gitbook.
 
