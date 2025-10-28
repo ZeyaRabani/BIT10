@@ -18,19 +18,6 @@ export const idlFactory = ({ IDL }) => {
         'token_b_chain': IDL.Text,
     });
     const PoolsResponse = IDL.Record({ 'pools': IDL.Vec(PoolInfo) });
-    const SwapArgs = IDL.Record({
-        'source_chain': IDL.Text,
-        'destination_chain': IDL.Text,
-        'token_in_address': IDL.Text,
-        'token_out_address': IDL.Text,
-        'tick_out_wallet_address': IDL.Text,
-        'amount_in': IDL.Text,
-        'tick_in_wallet_address': IDL.Text,
-        'pool_id': IDL.Text,
-        'expected_amount_out': IDL.Text,
-        'swap_type': IDL.Text,
-        'slippage': IDL.Text,
-    });
     const SwapResponse = IDL.Record({
         'source_chain': IDL.Text,
         'status': IDL.Text,
@@ -47,6 +34,19 @@ export const idlFactory = ({ IDL }) => {
         'pool_id': IDL.Text,
         'swap_type': IDL.Text,
         'tx_hash_out': IDL.Text,
+        'slippage': IDL.Text,
+    });
+    const SwapArgs = IDL.Record({
+        'source_chain': IDL.Text,
+        'destination_chain': IDL.Text,
+        'token_in_address': IDL.Text,
+        'token_out_address': IDL.Text,
+        'tick_out_wallet_address': IDL.Text,
+        'amount_in': IDL.Text,
+        'tick_in_wallet_address': IDL.Text,
+        'pool_id': IDL.Text,
+        'expected_amount_out': IDL.Text,
+        'swap_type': IDL.Text,
         'slippage': IDL.Text,
     });
     const SwapResult = IDL.Variant({ 'Ok': SwapResponse, 'Err': IDL.Text });
@@ -70,6 +70,19 @@ export const idlFactory = ({ IDL }) => {
             [],
         ),
         'get_pool_info': IDL.Func([], [PoolsResponse], ['query']),
+        'get_swap_by_address_and_chain': IDL.Func(
+            [IDL.Text, IDL.Text],
+            [IDL.Vec(SwapResponse)],
+            ['query'],
+        ),
+        'get_swap_by_id': IDL.Func([IDL.Text], [IDL.Opt(SwapResponse)], ['query']),
+        'get_swap_history': IDL.Func([], [IDL.Vec(SwapResponse)], ['query']),
+        'get_swap_history_count': IDL.Func([], [IDL.Nat64], ['query']),
+        'get_swap_history_paginated': IDL.Func(
+            [IDL.Nat64, IDL.Nat64],
+            [IDL.Vec(SwapResponse)],
+            ['query'],
+        ),
         'icp_address': IDL.Func([], [IDL.Text], []),
         'icp_swap': IDL.Func([SwapArgs], [SwapResult], []),
         'initialize_pool_data': IDL.Func([], [Result], []),

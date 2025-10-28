@@ -47,9 +47,9 @@ const privacyContent: PrivacySectionProps[] = [
     {
         title: 'Rights',
         content: [
-            'You have the right to obtain from us a copy of your Personal Information that we collected. You may also update, rectify, or delete your Personal Information anytime, by emailing us at ziyarabani@gmail.com.',
+            'You have the right to obtain from us a copy of your Personal Information that we collected. You may also update, rectify, or delete your Personal Information anytime, by emailing us at zeyarabani@bit10.app.',
             'However, we may keep the cached or archived information for a period of time.',
-            'You may also stop us from sharing your Personal Information with third party service providers, including marketing agencies, by sending us a request at ziyarabani@gmail.com.'
+            'You may also stop us from sharing your Personal Information with third party service providers, including marketing agencies, by sending us a request at zeyarabani@bit10.app.'
         ]
     },
     {
@@ -103,8 +103,8 @@ export default function Page() {
                         <h1 className='text-xl md:text-2xl font-semibold tracking-wide'>Contact Us</h1>
                         <p className='text-lg'>
                             If you have any questions or concerns about this Privacy Policy, please contact us at{' '}
-                            <a href='mailto:ziyarabani@gmail.com' className='text-blue-800 dark:text-blue-400 underline cursor-pointer'>
-                                ziyarabani@gmail.com
+                            <a href='mailto:zeyarabani@bit10.app' className='text-blue-800 dark:text-blue-400 underline cursor-pointer'>
+                                zeyarabani@bit10.app
                             </a>
                             .
                         </p>

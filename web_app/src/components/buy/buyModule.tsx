@@ -8,7 +8,7 @@ import { useQueries } from '@tanstack/react-query'
 import { whitelistedAddress } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { formatAddress, formatAmount } from '@/lib/utils'
-import { ChevronsUpDown, Loader2, Info, Wallet, ArrowUpDown } from 'lucide-react'
+import { ChevronsUpDown, Loader2, Info, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { buyPayTokensICP, buyReceiveTokensICP, fetchICPTokenBalance, buyICPBIT10Token } from './icp/ICPBuyModule'
@@ -474,6 +474,25 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [form.watch('payment_token'), currentPaymentTokens]);
 
+    const formatWalletAddress = (id: string) => {
+        if (!id) return '';
+        if (id.length <= 7) return id;
+        return `${id.slice(0, 6)}....${id.slice(-4)}`;
+    };
+
+    const handleCopyAddress = () => {
+        if (!userAddress) return;
+
+        navigator.clipboard.writeText(userAddress)
+            .then(() => {
+                toast.info('Wallet address copied to clipboard.');
+            })
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            .catch(err => {
+                toast.error('Failed to copy wallet address.')
+            });
+    };
+
     return (
         <>
             {isLoading ? (
@@ -490,13 +509,15 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                             <div className='bg-muted rounded-t-lg w-full px-4 py-2'>
                                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
                                     <div>You Pay</div>
-                                    <div className='flex flex-row space-x-1 items-center'>
-                                        <Wallet size={16} />
-                                        <p>{formatAmount(Number(payingTokenBalance))}</p>
-                                    </div>
+                                    {
+                                        chain &&
+                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer'>
+                                            From <b className='pl-1'>{formatWalletAddress(userAddress ?? '')}</b>
+                                        </Badge>
+                                    }
                                 </div>
-                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center w-full'>
-                                    <div className='text-4xl md:pt-[26px] text-center md:text-start flex flex-col space-y-1'>
+                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 justify-center w-full pt-2'>
+                                    <div className='text-4xl text-center md:text-start flex flex-col space-y-1'>
                                         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                                         {/* @ts-expect-error */}
                                         {selectedBIT10TokenPrice ? formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01) : '0'}
@@ -504,9 +525,9 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                         <TooltipProvider>
                                             <Tooltip delayDuration={300}>
                                                 <TooltipTrigger asChild>
-                                                    <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-1'>
+                                                    <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
                                                         &asymp; ${selectedBIT10TokenPrice ? formatAmount((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 1.01) : '0'}
-                                                        <Info className='w-4 h-4 cursor-pointer ml-1' />
+                                                        <Info className='w-4 h-4 cursor-pointer ml-1 mt-0.5' />
                                                     </div>
                                                 </TooltipTrigger>
                                                 <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
@@ -517,22 +538,30 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                         </TooltipProvider>
                                     </div>
 
-                                    <div className='grid grid-cols-5 items-center'>
+                                    <div className='flex flex-col space-y-0.5 justify-end w-full'>
                                         <FormField
                                             control={form.control}
                                             name='payment_token'
                                             render={({ field }) => (
-                                                <FormItem className='w-full px-2 col-span-4'>
+                                                <FormItem className='flex flex-row items-center justify-end w-full'>
                                                     <FormControl>
-                                                        <div>
+                                                        <div className='w-full md:ml-auto md:w-3/4'>
                                                             <Button
                                                                 type='button'
                                                                 variant='outline'
-                                                                className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
+                                                                className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                 onClick={() => setPaymentTokenDialogOpen(true)}
                                                             >
                                                                 {field.value
-                                                                    ? currentPaymentTokens.find((t) => t.value === field.value)?.label
+                                                                    ?
+                                                                    <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
+                                                                        <div className='border border-[#B4B3B3] rounded-full bg-black'>
+                                                                            <Image src={payingTokenImg} alt={form.watch('payment_token')} width={35} height={35} className='z-20' />
+                                                                        </div>
+                                                                        <div>
+                                                                            {currentPaymentTokens.find((t) => t.value === field.value)?.label}
+                                                                        </div>
+                                                                    </div>
                                                                     : 'Select token'}
                                                                 <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
                                                             </Button>
@@ -586,22 +615,29 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                 </FormItem>
                                             )}
                                         />
-
-                                        <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                            <Image src={payingTokenImg} alt={form.watch('payment_token')} width={75} height={75} className='z-20' />
+                                        <div className='text-end text-sm'>
+                                            {formatAmount(Number(payingTokenBalance))}
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 rounded-full p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' onClick={onSwitchToSell}>
+                            <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 rounded-full p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' onClick={onSwitchToSell} disabled={buying}>
                                 <ArrowUpDown className='h-8 w-8 transition-transform duration-700 group-hover:rotate-[180deg]' />
                             </Button>
 
                             <div className='bg-muted rounded-b-lg w-full px-4 py-2 -mt-6 md:mt-2'>
-                                <p>You Receive</p>
-                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center w-full'>
-                                    <div className='w-full md:w-3/4 flex flex-col space-y-1 pt-2 md:pt-[27px]'>
+                                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
+                                    <div>You Receive</div>
+                                    {
+                                        chain &&
+                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer'>
+                                            To <b>{formatWalletAddress(userAddress ?? '')}</b>
+                                        </Badge>
+                                    }
+                                </div>
+                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center w-full pt-3'>
+                                    <div className='w-full md:w-3/4 flex flex-col space-y-1 pt-1'>
                                         <FormField
                                             control={form.control}
                                             name='receive_amount'
@@ -609,7 +645,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                 <FormItem>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger className='dark:border-white'>
+                                                            <SelectTrigger className='border-2 dark:border-[#B4B3B3] bg-background!'>
                                                                 <SelectValue placeholder='Select number of tokens' />
                                                             </SelectTrigger>
                                                         </FormControl>
@@ -631,22 +667,30 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                         </div>
                                     </div>
 
-                                    <div className='grid grid-cols-5 items-center'>
+                                    <div className='flex justify-end items-start h-full w-full'>
                                         <FormField
                                             control={form.control}
                                             name='receive_token'
                                             render={({ field }) => (
-                                                <FormItem className='w-full px-2 col-span-4'>
+                                                <FormItem className='flex flex-row items-center justify-end w-full'>
                                                     <FormControl>
-                                                        <div>
+                                                        <div className='w-full md:ml-auto md:w-3/4'>
                                                             <Button
                                                                 type='button'
                                                                 variant='outline'
-                                                                className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
+                                                                className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                 onClick={() => setReceiveTokenDialogOpen(true)}
                                                             >
                                                                 {field.value
-                                                                    ? currentBIT10Tokens.find((t) => t.value === field.value)?.label
+                                                                    ?
+                                                                    <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
+                                                                        <div className='border border-[#B4B3B3] rounded-full bg-black'>
+                                                                            <Image src={BIT10Img as StaticImageData} alt='BIT10' width={35} height={35} className='z-20' />
+                                                                        </div>
+                                                                        <div>
+                                                                            {currentBIT10Tokens.find((t) => t.value === field.value)?.label}
+                                                                        </div>
+                                                                    </div>
                                                                     : 'Select token'}
                                                                 <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
                                                             </Button>
@@ -700,10 +744,6 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                 </FormItem>
                                             )}
                                         />
-
-                                        <div className='col-span-1 -ml-6 z-20 border-2 border-[#B4B3B3] rounded-full bg-black p-1.5'>
-                                            <Image src={BIT10Img as StaticImageData} alt='BIT10' width={75} height={75} className='z-20' />
-                                        </div>
                                     </div>
                                 </div>
                             </div>

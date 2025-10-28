@@ -25,11 +25,6 @@ const config = {
                 source: '/telegram',
                 destination: 'https://t.me/zr00083',
                 permanent: true,
-            },
-            {
-                source: '/github',
-                destination: 'https://github.com/ZeyaRabani/BIT10',
-                permanent: true,
             }
         ]
     },

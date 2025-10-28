@@ -7,7 +7,7 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { formatAddress, formatAmount } from '@/lib/utils'
-import { Settings, MoveLeft, ChevronsUpDown, Loader2, Info, Wallet, ArrowUpDown } from 'lucide-react'
+import { Settings, MoveLeft, ChevronsUpDown, Loader2, Info, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { fetchICPTokenBalance, swapICPToken } from './icp/ICPDEXModule'
@@ -629,6 +629,33 @@ export default function DEX() {
         return 'Swap';
     };
 
+    const userAddress = useMemo(() => {
+        if (chain === 'icp') {
+            return icpAddress;
+        } else {
+            return 'Guest';
+        }
+    }, [chain, icpAddress]);
+
+    const formatWalletAddress = (id: string) => {
+        if (!id) return '';
+        if (id.length <= 7) return id;
+        return `${id.slice(0, 6)}....${id.slice(-4)}`;
+    };
+
+    const handleCopyAddress = () => {
+        if (!userAddress) return;
+
+        navigator.clipboard.writeText(userAddress)
+            .then(() => {
+                toast.info('Wallet address copied to clipboard.');
+            })
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            .catch(err => {
+                toast.error('Failed to copy wallet address.')
+            });
+    };
+
     return (
         <div className='flex flex-col py-4 h-full items-center justify-center'>
             <Card className='border-none w-[300px] md:w-[560px] animate-fade-bottom-up bg-gray-200 dark:bg-[#1c1717]'>
@@ -729,13 +756,15 @@ export default function DEX() {
                                 <div className='bg-muted rounded-t-lg w-full px-4 py-2'>
                                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
                                         <div>From</div>
-                                        <div className='flex flex-row space-x-1 items-center'>
-                                            <Wallet size={16} />
-                                            <p>{formatAmount(Number(fetchTokenBalance))}</p>
-                                        </div>
+                                        {
+                                            chain &&
+                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer'>
+                                                From <b className='pl-1'>{formatWalletAddress(userAddress ?? '')}</b>
+                                            </Badge>
+                                        }
                                     </div>
-                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center w-full'>
-                                        <div className='flex flex-col space-y-1 pt-0 md:mt-7'>
+                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-start justify-center w-full pt-4'>
+                                        <div className='text-center md:text-start flex flex-col space-y-1 mt-1'>
                                             <FormField
                                                 control={form.control}
                                                 name='from_amount'
@@ -744,7 +773,7 @@ export default function DEX() {
                                                         <FormControl>
                                                             <Input
                                                                 type='number'
-                                                                className='border-mute pr-8'
+                                                                className='dark:border-[#B4B3B3] border-2'
                                                                 placeholder='From Amount'
                                                                 {...field}
                                                                 onChange={(e) => {
@@ -766,7 +795,7 @@ export default function DEX() {
                                                     <TooltipTrigger asChild>
                                                         <div className='flex flex-row space-x-1 text-sm items-center'>
                                                             &asymp; ${selectedFromTokenPrice ? formatAmount((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) * 1.01) : '0'}
-                                                            <Info className='w-4 h-4 cursor-pointer ml-1' />
+                                                            <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
                                                         </div>
                                                     </TooltipTrigger>
                                                     <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
@@ -777,24 +806,34 @@ export default function DEX() {
                                             </TooltipProvider>
                                         </div>
 
-                                        <div className='grid grid-cols-5 items-center'>
+                                        <div className='flex flex-col space-y-0.5 justify-end w-full'>
                                             <FormField
                                                 control={form.control}
                                                 name='from_token'
                                                 render={({ field }) => (
-                                                    <FormItem className='w-full px-2 col-span-4'>
+                                                    <FormItem className='flex flex-row items-center justify-end w-full'>
                                                         <FormControl>
-                                                            <div>
+                                                            <div className='w-full md:ml-auto md:w-3/4'>
                                                                 <Button
                                                                     type='button'
                                                                     variant='outline'
-                                                                    className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
+                                                                    className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-6', !field.value && 'text-muted-foreground')}
                                                                     onClick={() => setFromTokenDialogOpen(true)}
                                                                 >
                                                                     {field.value
                                                                         ? (() => {
                                                                             const token = supportedToken.find((t) => t.token_id === field.value);
-                                                                            return token ? token.label : 'Select token';
+                                                                            return token ?
+                                                                                <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
+                                                                                    <div className='relative border border-[#B4B3B3] rounded-full bg-black'>
+                                                                                        <Image src={selectedFromTokenImg} alt='From token' width={35} height={35} className='z-20' />
+                                                                                        <Image src={selectedFromTokenChainImg} alt='From Chain' height={15} className='absolute -bottom-0.5 right-0 border border-[#B4B3B3] rounded-full bg-white' />
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        {token.label}
+                                                                                    </div>
+                                                                                </div>
+                                                                                : 'Select token';
                                                                         })()
                                                                         : 'Select token'}
                                                                     <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
@@ -877,10 +916,8 @@ export default function DEX() {
                                                     </FormItem>
                                                 )}
                                             />
-
-                                            <div className='col-span-1 -ml-6 z-20 grid place-items-center relative border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                                <Image src={selectedFromTokenImg} alt='From' height={75} />
-                                                <Image src={selectedFromTokenChainImg} alt='From Chain' height={25} className='absolute -bottom-2 right-0 border-2 border-[#B4B3B3] rounded-full bg-white' />
+                                            <div className='text-end text-sm'>
+                                                {formatAmount(Number(fetchTokenBalance))}
                                             </div>
                                         </div>
                                     </div>
@@ -891,9 +928,19 @@ export default function DEX() {
                                 </Button>
 
                                 <div className='bg-muted rounded-b-lg w-full px-4 py-2 -mt-6 md:mt-2'>
-                                    <p>To</p>
-                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center w-full'>
-                                        <div className='flex flex-col space-y-1 md:mt-7'>
+                                    <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
+                                        <div>To</div>
+                                        {
+                                            chain &&
+                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer'>
+                                                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                                                {/* @ts-expect-error */}
+                                                To <b className='pl-1'>{formatWalletAddress(matchingPool?.pair_type === 'Cross Chain' ? form.watch('tick_out_wallet_address') : (userAddress ?? ''))}</b>
+                                            </Badge>
+                                        }
+                                    </div>
+                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-start justify-center w-full pt-3'>
+                                        <div className='text-center md:text-start flex flex-col space-y-1 mt-1'>
                                             <FormField
                                                 control={form.control}
                                                 name='to_amount'
@@ -902,7 +949,7 @@ export default function DEX() {
                                                         <FormControl>
                                                             <Input
                                                                 type='number'
-                                                                className='border-mute pr-8'
+                                                                className='dark:border-[#B4B3B3] border-2'
                                                                 placeholder='To Amount'
                                                                 {...field}
                                                                 onChange={(e) => {
@@ -918,27 +965,39 @@ export default function DEX() {
                                                     </FormItem>
                                                 )}
                                             />
-                                            <div className='text-sm'>&asymp; ${formatAmount(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))}</div>
+                                            <div className='text-sm'>
+                                                &asymp; ${formatAmount(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))}
+                                            </div>
                                         </div>
 
-                                        <div className='grid grid-cols-5 items-center'>
+                                        <div className='flex flex-col space-y-0.5 justify-end w-full'>
                                             <FormField
                                                 control={form.control}
                                                 name='to_token'
                                                 render={({ field }) => (
-                                                    <FormItem className='w-full px-2 col-span-4'>
+                                                    <FormItem className='flex flex-row items-center justify-end w-full'>
                                                         <FormControl>
-                                                            <div>
+                                                            <div className='w-full md:ml-auto md:w-3/4'>
                                                                 <Button
                                                                     type='button'
                                                                     variant='outline'
-                                                                    className={cn('py-5 pl-4 pr-6 mr-8 border-2 dark:border-[#B4B3B3] rounded-l-full z-10 w-full flex justify-between', !field.value && 'text-muted-foreground')}
+                                                                    className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-6', !field.value && 'text-muted-foreground')}
                                                                     onClick={() => setToTokenDialogOpen(true)}
                                                                 >
                                                                     {field.value
                                                                         ? (() => {
                                                                             const token = supportedToken.find((t) => t.token_id === field.value);
-                                                                            return token ? token.label : 'Select token';
+                                                                            return token ?
+                                                                                <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
+                                                                                    <div className='relative border border-[#B4B3B3] rounded-full bg-black'>
+                                                                                        <Image src={selectedToTokenImg} alt='To token' width={35} height={35} className='z-20' />
+                                                                                        <Image src={selectedToTokenChainImg} alt='To Chain' width={15} height={15} className='absolute -bottom-0.5 right-0 border border-[#B4B3B3] rounded-full bg-white' />
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        {token.label}
+                                                                                    </div>
+                                                                                </div>
+                                                                                : 'Select token';
                                                                         })()
                                                                         : 'Select token'}
                                                                     <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
@@ -1029,11 +1088,6 @@ export default function DEX() {
                                                     </FormItem>
                                                 )}
                                             />
-
-                                            <div className='col-span-1 -ml-6 z-20 grid place-items-center relative border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                                <Image src={selectedToTokenImg} alt='To' height={75} />
-                                                <Image src={selectedToTokenChainImg} alt='To Chain' height={25} className='absolute -bottom-2 right-0 border-2 border-[#B4B3B3] rounded-full bg-white' />
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

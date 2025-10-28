@@ -1,9 +1,28 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<rect width="64" height="64" fill="url(#pattern0_698_6)"/>
+<svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_716_266)">
+<path d="M110 55C110 24.6243 85.3757 0 55 0C24.6243 0 0 24.6243 0 55C0 85.3757 24.6243 110 55 110C85.3757 110 110 85.3757 110 55Z" fill="#3B00B9"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12.3439 58.1685C13.8886 79.2649 30.7352 96.1115 51.8318 97.656V102.421C28.1093 100.859 9.14131 81.8906 7.57983 58.1685H12.3439Z" fill="url(#paint0_linear_716_266)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M51.809 12.3212C30.7125 13.8659 13.8659 30.7125 12.3212 51.8091H7.55713C9.11853 28.0866 28.0866 9.11853 51.809 7.55713V12.3212Z" fill="#29ABE2"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M97.6559 51.7861C96.1114 30.6895 79.2648 13.8428 58.1682 12.2982V7.53418C81.8905 9.09559 100.859 28.0636 102.42 51.7861H97.6559Z" fill="url(#paint1_linear_716_266)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M58.1912 97.6333C79.2875 96.0888 96.1341 79.2422 97.6794 58.1455H102.443C100.881 81.8679 81.9139 100.836 58.1912 102.397V97.6333Z" fill="#29ABE2"/>
+<path d="M55.1436 23.356V46.4724L74.6818 55.2029L55.1436 23.356Z" fill="white" fill-opacity="0.6"/>
+<path d="M55.1434 23.356L35.6025 55.2029L55.1434 46.4724V23.356Z" fill="white"/>
+<path d="M55.1436 70.1833V85.8905L74.6948 58.8413L55.1436 70.1833Z" fill="white" fill-opacity="0.6"/>
+<path d="M55.1434 85.8905V70.1807L35.6025 58.8413L55.1434 85.8905Z" fill="white"/>
+<path d="M55.1436 66.5479L74.6818 55.2034L55.1436 46.478V66.5479Z" fill="white" fill-opacity="0.2"/>
+<path d="M35.6025 55.2034L55.1434 66.5479V46.478L35.6025 55.2034Z" fill="white" fill-opacity="0.6"/>
+</g>
 <defs>
-<pattern id="pattern0_698_6" patternContentUnits="objectBoundingBox" width="1" height="1">
-<use xlink:href="#image0_698_6" transform="scale(0.015625)"/>
-</pattern>
-<image id="image0_698_6" width="64" height="64" preserveAspectRatio="none" xlink:href="data:image/png;base64,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"/>
+<linearGradient id="paint0_linear_716_266" x1="40.2883" y1="92.5132" x2="10.5752" y2="67.4909" gradientUnits="userSpaceOnUse">
+<stop offset="0.21" stop-color="#ED1E79"/>
+<stop offset="1" stop-color="#522785"/>
+</linearGradient>
+<linearGradient id="paint1_linear_716_266" x1="90.9007" y1="41.8919" x2="61.1879" y2="16.8702" gradientUnits="userSpaceOnUse">
+<stop offset="0.21" stop-color="#F15A24"/>
+<stop offset="0.6841" stop-color="#FBB03B"/>
+</linearGradient>
+<clipPath id="clip0_716_266">
+<rect width="110" height="110" fill="white"/>
+</clipPath>
 </defs>
 </svg>

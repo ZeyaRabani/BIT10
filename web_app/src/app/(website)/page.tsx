@@ -135,7 +135,7 @@ export default function Page() {
             initial={{ opacity: 0.0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
-            src='https://www.youtube.com/embed/XBAx1-Py9Oo'
+            src='https://www.youtube.com/embed/uFhg9oJ6w0M'
             // height={1720}
             // width={1400}
             allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'

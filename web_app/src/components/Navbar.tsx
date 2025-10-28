@@ -15,7 +15,6 @@ import WalletBtn from './WalletBtn'
 const links = {
     web: [
         { title: 'About', link: '/' },
-        { title: 'Resources', link: '/resources' },
         { title: 'Investment Calculator', link: '/investment-calculator' },
         { title: 'GitBook', link: '/gitbook' }
     ],
