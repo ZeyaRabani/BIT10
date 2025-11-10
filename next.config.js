@@ -117,13 +117,11 @@ const config = {
             '@react-native-async-storage/async-storage': 'next/dist/compiled/react',
             'react-native': 'react-native-web',
         };
-        config.externals = [
-            ...(config.externals || []),
-            {
-                'pino-pretty': 'commonjs pino-pretty',
-                'pino': 'commonjs pino'
-            }
-        ];
+
+        config.externals.push({
+            'pino-pretty': 'commonjs pino-pretty',
+            'pino': 'commonjs pino'
+        });
         if (isServer) {
             config.externals.push({
                 'bufferutil': 'bufferutil',
