@@ -43,7 +43,7 @@ type AssetComparison = {
     currentValue: number;
     totalReturn: number;
     percentageReturn: number;
-    apy?: number;
+    apr?: number;
 };
 
 type ComparisonResult = {
@@ -225,13 +225,13 @@ export default function BIT10Comparison() {
         );
     }, [bit10ComparisonCalculator]);
 
-    const calculateAPY = (initialValue: number, finalValue: number, years: number): number => {
+    const calculateAPR = (initialValue: number, finalValue: number, years: number): number => {
         if (years <= 0 || initialValue <= 0) return 0;
         return (Math.pow(finalValue / initialValue, 1 / years) - 1) * 100;
     };
 
-    const apyData = useMemo(() => {
-        const calculatePeriodAPY = (data: BIT10Entry[], periodLabel: string) => {
+    const aprData = useMemo(() => {
+        const calculatePeriodAPR = (data: BIT10Entry[], periodLabel: string) => {
             if (!data || data.length < 2) return null;
 
             const firstEntry = data[0];
@@ -266,16 +266,16 @@ export default function BIT10Comparison() {
 
             return {
                 period: periodLabel,
-                bit10Top: calculateAPY(initialBIT10Top, finalBIT10Top, years),
-                btc: calculateAPY(initialBtc, finalBtc, years),
-                sp500: calculateAPY(initialSp500, finalSp500, years)
+                bit10Top: calculateAPR(initialBIT10Top, finalBIT10Top, years),
+                btc: calculateAPR(initialBtc, finalBtc, years),
+                sp500: calculateAPR(initialSp500, finalSp500, years)
             };
         };
 
         return {
-            '1Y': calculatePeriodAPY(bit10Comparison1Y, '1Y'),
-            '5Y': calculatePeriodAPY(bit10Comparison5Y, '5Y'),
-            '10Y': calculatePeriodAPY(bit10Comparison10Y, '10Y')
+            '1Y': calculatePeriodAPR(bit10Comparison1Y, '1Y'),
+            '5Y': calculatePeriodAPR(bit10Comparison5Y, '5Y'),
+            '10Y': calculatePeriodAPR(bit10Comparison10Y, '10Y')
         };
     }, [bit10Comparison1Y, bit10Comparison5Y, bit10Comparison10Y, safeParseFloat]);
 
@@ -314,7 +314,7 @@ export default function BIT10Comparison() {
         const startEntry = findClosestEntry(startDate);
         const endEntry = findClosestEntry(endDate);
 
-        // Calculate time difference in years for APY
+        // Calculate time difference in years for APR
         const timeDiffMs = endDate.getTime() - startDate.getTime();
         const timeDiffYears = timeDiffMs / (1000 * 60 * 60 * 24 * 365.25);
 
@@ -335,7 +335,7 @@ export default function BIT10Comparison() {
                     currentValue: 0,
                     totalReturn: 0,
                     percentageReturn: 0,
-                    apy: 0
+                    apr: 0
                 };
             }
 
@@ -344,7 +344,7 @@ export default function BIT10Comparison() {
             const percentageReturn =
                 ((currentValue - investmentAmount) / investmentAmount) * 100;
 
-            const apy = calculateAPY(investmentAmount, currentValue, timeDiffYears);
+            const apr = calculateAPR(investmentAmount, currentValue, timeDiffYears);
 
             return {
                 name,
@@ -352,7 +352,7 @@ export default function BIT10Comparison() {
                 currentValue: parseFloat(currentValue.toFixed(2)),
                 totalReturn: parseFloat(totalReturn.toFixed(2)),
                 percentageReturn: parseFloat(percentageReturn.toFixed(2)),
-                apy: parseFloat(apy.toFixed(2))
+                apr: parseFloat(apr.toFixed(2))
             };
         });
 
@@ -394,9 +394,9 @@ export default function BIT10Comparison() {
                 <div className='grid lg:grid-cols-3 gap-8'>
                     {['1Y', '5Y', '10Y'].map((period) => (
                         <div key={period} className='border-2 border-muted rounded py-8 px-3'>
-                            <h4 className='font-medium text-2xl text-center mb-2'>BIT10.TOP {period} APY</h4>
-                            {apyData[period as keyof typeof apyData] ? (
-                                <div className='font-bold text-4xl text-center'>{apyData[period as keyof typeof apyData]?.bit10Top.toFixed(2)}%</div>
+                            <h4 className='font-medium text-2xl text-center mb-2'>BIT10.TOP {period} APR</h4>
+                            {aprData[period as keyof typeof aprData] ? (
+                                <div className='font-bold text-4xl text-center'>{aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)}%</div>
                             ) : (
                                 <p className='text-center text-gray-500'>Loading...</p>
                             )}
@@ -589,7 +589,7 @@ export default function BIT10Comparison() {
                                                             <th className='text-center p-2'>Current Value</th>
                                                             <th className='text-center p-2'>Total Return</th>
                                                             <th className='text-center p-2'>% Return</th>
-                                                            <th className='text-center p-2'>APY</th>
+                                                            <th className='text-center p-2'>APR</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -623,7 +623,7 @@ export default function BIT10Comparison() {
                                                                     {formatAmount(asset.percentageReturn)}%
                                                                 </td>
                                                                 <td className='p-2 text-right'>
-                                                                    {asset.apy !== undefined ? `${asset.apy.toFixed(2)}%` : 'N/A'}
+                                                                    {asset.apr !== undefined ? `${asset.apr.toFixed(2)}%` : 'N/A'}
                                                                 </td>
                                                             </tr>
                                                         ))}

@@ -7,16 +7,15 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import WalletBtn from './WalletBtn'
-import { Menu, X, Home, BookText, BookCopy, ArrowRightLeft, Coins, HandCoins, BriefcaseBusiness, Landmark, Star } from 'lucide-react'
+import { Menu, X, Home, BookText, ArrowRightLeft, Coins, HandCoins, BriefcaseBusiness, Landmark, Star } from 'lucide-react'
 
 const links = {
     web: [
         { title: 'About', link: '/', icon: Home },
-        { title: 'Resources', link: '/resources', icon: BookCopy },
-        { title: 'Whitepaper', link: '/whitepaper', icon: BookText }
+        { title: 'GitBook', link: '/gitbook', icon: BookText }
     ],
     app: [
-        { title: 'Buy BIT10.TOP', link: '/buy', icon: Coins },
+        { title: 'Buy', link: '/buy', icon: Coins },
         { title: 'DEX', link: '/swap', icon: ArrowRightLeft },
         { title: 'Lend & Borrow', link: '/lend-and-borrow', icon: HandCoins },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },

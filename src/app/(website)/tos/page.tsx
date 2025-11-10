@@ -111,7 +111,7 @@ const termsContent: TermSectionProps[] = [
     {
         title: '14 Electronic Notices',
         content: [
-            'You consent to receive all communications, agreements, documents, receipts, notices, and disclosures electronically (collectively, our "Communications") that we provide in connection with the Agreement or the Website. You agree that we may provide our Communications to you by posting them on the Website. You may also contact our Legal team to request additional electronic copies of our Communications by sending a support request to ziyarabani@gmail.com.'
+            'You consent to receive all communications, agreements, documents, receipts, notices, and disclosures electronically (collectively, our "Communications") that we provide in connection with the Agreement or the Website. You agree that we may provide our Communications to you by posting them on the Website. You may also contact our Legal team to request additional electronic copies of our Communications by sending a support request to zeyarabani@bit10.app.'
         ]
     },
     {
@@ -173,7 +173,7 @@ const termsContent: TermSectionProps[] = [
             'The arbitrator, BIT10, and you will maintain the confidentiality of any arbitration proceedings, judgments and awards, including, but not limited to, all information gathered, prepared and presented for purposes of the arbitration or related to the disputes. The arbitrator will have the authority to make appropriate rulings to safeguard confidentiality, unless the law provides to the contrary. The duty of confidentiality does not apply to the extent that disclosure is necessary to prepare for or conduct the arbitration hearing on the merits, in connection with a court application for a preliminary remedy or in connection with a judicial challenge to an arbitration award or its enforcement, or to the extent that disclosure is otherwise required by law or judicial decision.',
             'You and BIT10 agree that for any arbitration you initiate, you will pay all AAA fees and costs. For any arbitration initiated by BIT10, BIT10 will pay all AAA fees and costs.',
             'Any claim arising out of or related to this Agreement must be filed within one year after such claim arose; otherwise, the claim is permanently barred, which means that you and BIT10 will not have the right to assert the claim.',
-            'You have the right to opt out of binding arbitration within 30 days of the date you first accepted the terms of this Section 16 by emailing us at ziyarabani@gmail.com. In order to be effective, the opt-out notice must include your full name and address and clearly indicate your intent to opt out of binding arbitration. By opting out of binding arbitration, you are agreeing to resolve disputes in accordance with Section 17.',
+            'You have the right to opt out of binding arbitration within 30 days of the date you first accepted the terms of this Section 16 by emailing us at zeyarabani@bit10.app. In order to be effective, the opt-out notice must include your full name and address and clearly indicate your intent to opt out of binding arbitration. By opting out of binding arbitration, you are agreeing to resolve disputes in accordance with Section 17.',
             'If any portion of this Section 16 is found to be unenforceable or unlawful for any reason, the unenforceable or unlawful provision will be severed from this Agreement, severance of the unenforceable or unlawful provision will have no impact whatsoever on the remainder of this Section 16 or the parties\' ability to compel arbitration of any remaining claims on an individual basis under this Section 16, and to the extent that any claims must therefore proceed on a class, collective, consolidated, or representative basis, such claims must be litigated in a civil court of competent jurisdiction and not in arbitration, and the parties agree that litigation of those claims will be stayed pending the outcome of any individual claims in arbitration. Further, if any part of this Section 16 is found to prohibit an individual claim seeking public injunctive relief, that provision will have no effect to the extent such relief is allowed to be sought out of arbitration, and the remainder of this Section 16 will be enforceable.'
         ]
     },
@@ -186,7 +186,7 @@ const termsContent: TermSectionProps[] = [
     {
         title: '24 Questions',
         content: [
-            'If you have any questions regarding this Privacy Policy contact us at ziyarabani@gmail.com.'
+            'If you have any questions regarding this Privacy Policy contact us at zeyarabani@bit10.app.'
         ]
     }
 ];
@@ -232,8 +232,8 @@ export default function Page() {
                         <h1 className='text-xl md:text-2xl font-semibold tracking-wide'>Contact Us</h1>
                         <p className='text-lg'>
                             If you have any questions or concerns about these Terms of Service, please contact us at{' '}
-                            <a href='mailto:ziyarabani@gmail.com' className='text-blue-800 dark:text-blue-400 underline cursor-pointer'>
-                                ziyarabani@gmail.com
+                            <a href='mailto:zeyarabani@bit10.app' className='text-blue-800 dark:text-blue-400 underline cursor-pointer'>
+                                zeyarabani@bit10.app
                             </a>
                             .
                         </p>

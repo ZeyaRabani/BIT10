@@ -17,11 +17,10 @@ import { Badge } from '@/components/ui/badge'
 const links = {
     web: [
         { title: 'About', link: '/' },
-        { title: 'Resources', link: '/resources' },
-        { title: 'Whitepaper', link: '/whitepaper' }
+        { title: 'GitBook', link: '/gitbook' }
     ],
     app: [
-        { title: 'Buy BIT10.TOP', link: '/buy' },
+        { title: 'Buy', link: '/buy' },
         { title: 'DEX', link: '/swap' },
         { title: 'Lend & Borrow', link: '/lend-and-borrow' },
         { title: 'Portfolio', link: '/portfolio' },

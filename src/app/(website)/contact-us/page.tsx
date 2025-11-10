@@ -76,7 +76,7 @@ export default function Page() {
                         <div>
                             <CardTitle className='text-2xl font-semibold leading-tight tracking-wider lg:text-3xl'>Let&apos;s talk about everything!</CardTitle>
                             <div className='mt-4 tracking-wide'>
-                                Hate forms? Send an <a href='mailto:ziyarabani@gmail.com' className='text-primary underline cursor-pointer'>email</a> instead.
+                                Hate forms? Send an <a href='mailto:zeyarabani@bit10.app' className='text-primary underline cursor-pointer'>email</a> instead.
                             </div>
                         </div>
                         <div className='mt-2 text-center p-2 md:p-8'>
