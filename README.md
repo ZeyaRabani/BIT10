@@ -82,6 +82,8 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 
 ## 🔗 ICP Canisters
 
+<!-- - BIT10 Mainnet Frontend: [https://xutyq-wyaaa-aaaap-qqgca-cai.icp0.io](https://xutyq-wyaaa-aaaap-qqgca-cai.icp0.io) -->
+<!-- - BIT10 Testnet Frontend: [https://hyti5-7iaaa-aaaap-qp4ba-cai.icp0.io](https://hyti5-7iaaa-aaaap-qp4ba-cai.icp0.io) -->
 - Oracle: [egcpt-yyaaa-aaaap-qp4ia-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=egcpt-yyaaa-aaaap-qp4ia-cai)
 - AI Portfolio Manager: [anic3-viaaa-aaaap-qqcaq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=anic3-viaaa-aaaap-qqcaq-cai)
 - BIT10.BTC Faucet: [5wxtf-uqaaa-aaaap-qpvha-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=5wxtf-uqaaa-aaaap-qpvha-cai)

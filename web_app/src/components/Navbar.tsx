@@ -19,7 +19,7 @@ const links = {
         { title: 'GitBook', link: '/gitbook' }
     ],
     app: [
-        { title: 'Buy BIT10', link: '/buy' },
+        { title: 'Buy', link: '/buy' },
         { title: 'DEX', link: '/dex' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' }
@@ -86,7 +86,7 @@ export default function Navbar() {
                                 handleNavigation(newActiveLink)
                             }
                         }}
-                        className='border-b-2 border-white'
+                        className='border-b-2 border-black dark:border-white'
                         transition={{
                             ease: 'easeInOut',
                             duration: 0.2,

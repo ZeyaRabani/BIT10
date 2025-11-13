@@ -109,12 +109,17 @@ export const idlFactory = ({ IDL }) => {
     'nonce_account': IDL.Func([], [IDL.Text], []),
     'solana_address': IDL.Func([], [IDL.Text], []),
     'solana_buy': IDL.Func([IDL.Text], [SwapResponse], []),
+    'solana_create_sell_transaction': IDL.Func(
+      [SwapArgs],
+      [TransactionResponse],
+      [],
+    ),
     'solana_create_transaction': IDL.Func(
       [SwapArgs],
       [TransactionResponse],
       [],
     ),
+    'solana_sell': IDL.Func([IDL.Text], [SwapResponse], []),
   });
 };
-// @ts-ignore
 export const init = ({ IDL }) => { return []; };

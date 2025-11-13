@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
-import { formatAddress, formatAmount, getTokenName, getTokenExplorer } from '@/lib/utils'
+import { formatAddress, formatCompactNumber, getTokenName, getTokenExplorer } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -48,7 +48,7 @@ export function DataTable<TData, TValue>({
     const customFilterFn = React.useCallback((row: { original: PortfolioTableDataType }, columnId: string, value: string) => {
         if (columnId === 'to') {
             const original = row.original;
-            const formattedAmount = formatAmount(Number(original.amountOut));
+            const formattedAmount = formatCompactNumber(Number(original.amountOut));
             const tokenName = getTokenName(original.tokenOutAddress);
             const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
             return searchableText.includes(value.toLowerCase());
@@ -150,7 +150,7 @@ export function DataTable<TData, TValue>({
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {formatAmount(Number(row.original.amountIn))}
+                            {formatCompactNumber(Number(row.original.amountIn))}
                         </div>
                         <div>{getTokenName(row.original.tokenInAddress)} (on {getTokenName(row.original.sourceChain)})</div>
                     </div>
@@ -159,7 +159,7 @@ export function DataTable<TData, TValue>({
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
                         <div>
-                            {formatAmount(Number(row.original.amountOut))}
+                            {formatCompactNumber(Number(row.original.amountOut))}
                         </div>
                         <div>{getTokenName(row.original.tokenOutAddress)} (on {getTokenName(row.original.destinationChain)})</div>
                     </div>

@@ -16,7 +16,7 @@ const links = {
         { title: 'GitBook', link: '/gitbook', icon: BookText }
     ],
     app: [
-        { title: 'Buy BIT10', link: '/buy', icon: Coins },
+        { title: 'Buy', link: '/buy', icon: Coins },
         { title: 'DEX', link: '/dex', icon: ArrowRightLeft },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark }

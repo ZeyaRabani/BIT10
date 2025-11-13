@@ -3,6 +3,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card'
 import BuyModule from './buyModule'
 import SellModule from './sellModule'
+// ToDo: Update this
+// import NewBuyModule from './newBuyModule'
 
 export default function Buy() {
     const [activeTab, setActiveTab] = useState('buy');
@@ -41,5 +43,8 @@ export default function Buy() {
                 </CardContent>
             </Card>
         </div>
+        // <>
+        //     <NewBuyModule />
+        // </>
     )
 }

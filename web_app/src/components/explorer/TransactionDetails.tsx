@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { formatAmount, getTokenName } from '@/lib/utils'
+import { formatCompactNumber, getTokenName } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 
 interface TransactionDetailsType {
@@ -123,12 +123,12 @@ export default function TransactionDetails({ transactionId }: { transactionId: s
 
                                         <div className='flex flex-col md:flex-row md:items-center md:justify-between hover:bg-accent hover:rounded py-1 px-2'>
                                             <div className='font-semibold tracking-wide'>Spent</div>
-                                            <div className='break-words'>{formatAmount(parseFloat(activity.transactionTickInAmount))} {getTokenName(activity.transactionTickInName)}</div>
+                                            <div className='break-words'>{formatCompactNumber(parseFloat(activity.transactionTickInAmount))} {getTokenName(activity.transactionTickInName)}</div>
                                         </div>
 
                                         <div className='flex flex-col md:flex-row md:items-center md:justify-between hover:bg-accent hover:rounded py-1 px-2'>
                                             <div className='font-semibold tracking-wide'>Recieved</div>
-                                            <div className='break-words'>{formatAmount(parseFloat(activity.transactionTickOutAmount))} {getTokenName(activity.transactionTickOutName)}</div>
+                                            <div className='break-words'>{formatCompactNumber(parseFloat(activity.transactionTickOutAmount))} {getTokenName(activity.transactionTickOutName)}</div>
                                         </div>
                                     </div>
                                 ))}

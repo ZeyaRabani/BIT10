@@ -5,7 +5,7 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import NodeCache from 'node-cache'
 import cron from 'node-cron'
 
-const cache = new NodeCache({ stdTTL: 86400 }); // 24 hr TTL (seconds)
+const cache = new NodeCache({ stdTTL: 21600 }); // 6 hr TTL (seconds)
 
 const YEARS_TO_CACHE = [1, 3, 5, 10, 15];
 
@@ -61,8 +61,8 @@ async function warmUpCache() {
     console.log('Cache warm-up completed.');
 }
 
-cron.schedule('0 16 * * *', async () => { // 4 PM ET
-    console.log('Running scheduled cache refresh (4 PM ET)...');
+cron.schedule('0 */6 * * *', async () => { // 6 hr
+    console.log('Running scheduled cache refresh...');
     await warmUpCache().catch(error => console.error('Error during scheduled cache refresh:', error));
 }, {
     timezone: 'America/New_York'

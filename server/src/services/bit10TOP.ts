@@ -1,12 +1,12 @@
 import { db } from '../db'
 import { bit10TopRebalance, bit10TopHistoricalData, bit10CollateralTokenPrices } from '../db/schema'
 import { desc, eq } from 'drizzle-orm'
-import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '../lib/buy.did'
 import axios from 'axios'
 import fs from 'fs/promises'
 import path from 'path'
 import cron from 'node-cron'
+const { Actor, HttpAgent } = require('@icp-sdk/core/agent')
 
 type Coin = {
     id: number;
@@ -32,7 +32,7 @@ type CoinData = {
     price: number;
 };
 
-type Bit10TOPEntry = {
+type BIT10TOPEntry = {
     timestmpz: string;
     tokenPrice: number;
     data: CoinData[];
@@ -79,8 +79,8 @@ export const fetchAndUpdateBIT10TOPData = async () => {
             });
         });
 
-        const newEntry: Bit10TOPEntry = { timestmpz, tokenPrice, data: coinsData };
-        let cachedData: Record<string, Bit10TOPEntry[]> = {};
+        const newEntry: BIT10TOPEntry = { timestmpz, tokenPrice, data: coinsData };
+        let cachedData: Record<string, BIT10TOPEntry[]> = {};
 
         try {
             const fileContent = await fs.readFile(jsonFilePath, 'utf-8');

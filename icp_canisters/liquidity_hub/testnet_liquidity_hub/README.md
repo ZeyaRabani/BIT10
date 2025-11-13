@@ -90,7 +90,7 @@ sequenceDiagram
 
   * `liquidity_hub/`
 
-    * `testnet_liquidity_hub/` – Canister code for the Liquidity Hub on ICP testnet.
+    * `testnet_liquidity_hub/` - Canister code for the Liquidity Hub on ICP testnet.
 
 ## 🔗 ICP Canisters
 

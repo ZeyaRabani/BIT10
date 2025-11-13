@@ -1,10 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 export const idlFactory = ({ IDL }) => {
   const SwapResponseData = IDL.Record({
     'token_in_amount': IDL.Text,
@@ -64,14 +57,61 @@ export const idlFactory = ({ IDL }) => {
     'token_out_address': IDL.Text,
   });
   return IDL.Service({
+    'associated_token_account': IDL.Func(
+      [IDL.Text],
+      [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+      [],
+    ),
     'base_address': IDL.Func([], [IDL.Text], []),
     'base_buy': IDL.Func([IDL.Text], [SwapResponse], []),
     'base_create_transaction': IDL.Func([SwapArgs], [TransactionResponse], []),
     'bit10_token': IDL.Func([], [BIT10TokenResponse], ['query']),
+    'bsc_address': IDL.Func([], [IDL.Text], []),
+    'bsc_buy': IDL.Func([IDL.Text], [SwapResponse], []),
+    'bsc_create_transaction': IDL.Func([SwapArgs], [TransactionResponse], []),
+    'create_associated_token_account': IDL.Func(
+      [IDL.Text],
+      [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+      [],
+    ),
+    'create_nonce_account': IDL.Func(
+      [],
+      [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+      [],
+    ),
     'get_buy_history': IDL.Func([], [IDL.Vec(SwapResponseData)], ['query']),
+    'get_buy_history_by_address_and_chain': IDL.Func(
+      [IDL.Text, IDL.Text],
+      [IDL.Vec(SwapResponseData)],
+      ['query'],
+    ),
     'get_sell_history': IDL.Func([], [IDL.Vec(SwapResponseData)], ['query']),
+    'get_sell_history_by_address_and_chain': IDL.Func(
+      [IDL.Text, IDL.Text],
+      [IDL.Vec(SwapResponseData)],
+      ['query'],
+    ),
+    'get_swap_history_by_swap_id': IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(SwapResponseData)],
+      ['query'],
+    ),
     'icp_buy': IDL.Func([ICPBuyArgs], [SwapResponse], []),
     'icp_sell': IDL.Func([ICPSellArgs], [SwapResponse], []),
+    'nonce_account': IDL.Func([], [IDL.Text], []),
+    'solana_address': IDL.Func([], [IDL.Text], []),
+    'solana_buy': IDL.Func([IDL.Text], [SwapResponse], []),
+    'solana_create_sell_transaction': IDL.Func(
+      [SwapArgs],
+      [TransactionResponse],
+      [],
+    ),
+    'solana_create_transaction': IDL.Func(
+      [SwapArgs],
+      [TransactionResponse],
+      [],
+    ),
+    'solana_sell': IDL.Func([IDL.Text], [SwapResponse], []),
   });
 };
 export const init = ({ IDL }) => { return []; };

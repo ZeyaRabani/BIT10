@@ -6,7 +6,7 @@ import { useEVMWallet } from '@/context/EVMWalletContext'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { formatAddress, formatAmount } from '@/lib/utils'
+import { formatAddress, formatCompactNumber } from '@/lib/utils'
 import { Settings, MoveLeft, ChevronsUpDown, Loader2, Info, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -27,7 +27,7 @@ import CKUSDCImg from '@/assets/tokens/ckusdc.svg'
 import USDCImg from '@/assets/tokens/usdc.svg'
 import ETHImg from '@/assets/tokens/eth.svg'
 import SOLImg from '@/assets/tokens/sol.svg'
-import ICPImg from '@/assets/wallet/icp-logo.svg'
+import ICPImg from '@/assets/tokens/icp.svg'
 import BaseImg from '@/assets/wallet/base-logo.svg'
 import BSCImg from '@/assets/wallet/bsc-logo.svg'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -632,9 +632,8 @@ export default function DEX() {
     const userAddress = useMemo(() => {
         if (chain === 'icp') {
             return icpAddress;
-        } else {
-            return 'Guest';
         }
+        return undefined;
     }, [chain, icpAddress]);
 
     const formatWalletAddress = (id: string) => {
@@ -753,23 +752,26 @@ export default function DEX() {
                         </CardHeader>
                         <CardContent className='flex flex-col space-y-2'>
                             <div className='relative flex flex-col items-center'>
-                                <div className='bg-muted rounded-t-lg w-full px-4 py-2'>
-                                    <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
+                                <div className='bg-muted rounded-t-lg w-full px-4 py-2 flex flex-col space-y-2'>
+                                    <div className='flex flex-row space-x-2 justify-between items-center'>
                                         <div>From</div>
                                         {
                                             chain &&
-                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer'>
-                                                From <b className='pl-1'>{formatWalletAddress(userAddress ?? '')}</b>
+                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center'>
+                                                <div className='font-light'>From</div>
+                                                <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
                                             </Badge>
                                         }
                                     </div>
-                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-start justify-center w-full pt-4'>
-                                        <div className='text-center md:text-start flex flex-col space-y-1 mt-1'>
+                                    {/* <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 bg-red-500'> */}
+                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2'>
+                                        <div className='flex flex-col space-y-0.5'>
                                             <FormField
                                                 control={form.control}
                                                 name='from_amount'
                                                 render={({ field }) => (
-                                                    <FormItem>
+                                                    // <FormItem className='py-[1.5px] bg-blue-500'>
+                                                    <FormItem className='py-[1.5px]'>
                                                         <FormControl>
                                                             <Input
                                                                 type='number'
@@ -789,35 +791,37 @@ export default function DEX() {
                                                     </FormItem>
                                                 )}
                                             />
-
-                                            <TooltipProvider>
-                                                <Tooltip delayDuration={300}>
-                                                    <TooltipTrigger asChild>
-                                                        <div className='flex flex-row space-x-1 text-sm items-center'>
-                                                            &asymp; ${selectedFromTokenPrice ? formatAmount((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) * 1.01) : '0'}
-                                                            <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
-                                                        </div>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                        Price in {selectedFromToken?.label} + 1% Liquidity Provider fee <br />
-                                                        $ {formatAmount(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))} + $ {formatAmount(0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)))} = $ {formatAmount((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) + (0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))))}
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
+                                            {/* <div className='pt-[0.5px] text-center md:text-start bg-green-500'> */}
+                                            <div className='pt-[0.5px] text-center md:text-start'>
+                                                <TooltipProvider>
+                                                    <Tooltip delayDuration={300}>
+                                                        <TooltipTrigger asChild>
+                                                            <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
+                                                                &asymp; ${selectedFromTokenPrice ? formatCompactNumber((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) * 1.01) : '0'}
+                                                                <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                            Price in {selectedFromToken?.label} + 1% Liquidity Provider fee <br />
+                                                            $ {formatCompactNumber(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))} + $ {formatCompactNumber(0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)))} = $ {formatCompactNumber((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) + (0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))))}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </div>
                                         </div>
-
-                                        <div className='flex flex-col space-y-0.5 justify-end w-full'>
+                                        <div className='flex flex-col space-y-0.5'>
                                             <FormField
                                                 control={form.control}
                                                 name='from_token'
                                                 render={({ field }) => (
-                                                    <FormItem className='flex flex-row items-center justify-end w-full'>
+                                                    // <FormItem className='flex flex-row items-center justify-end bg-blue-500'>
+                                                    <FormItem className='flex flex-row items-center justify-end'>
                                                         <FormControl>
-                                                            <div className='w-full md:ml-auto md:w-3/4'>
+                                                            <div className='w-full md:w-3/4 md:ml-auto'>
                                                                 <Button
                                                                     type='button'
                                                                     variant='outline'
-                                                                    className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-6', !field.value && 'text-muted-foreground')}
+                                                                    className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                     onClick={() => setFromTokenDialogOpen(true)}
                                                                 >
                                                                     {field.value
@@ -916,8 +920,9 @@ export default function DEX() {
                                                     </FormItem>
                                                 )}
                                             />
-                                            <div className='text-end text-sm'>
-                                                {formatAmount(Number(fetchTokenBalance))}
+                                            {/* <div className='text-sm text-center md:text-end pt-0.5 bg-green-500'> */}
+                                            <div className='text-sm text-center md:text-end pt-0.5'>
+                                                {formatCompactNumber(Number(fetchTokenBalance))}
                                             </div>
                                         </div>
                                     </div>
@@ -927,25 +932,28 @@ export default function DEX() {
                                     <ArrowUpDown className='h-8 w-8 transition-transform duration-700 group-hover:rotate-[180deg]' />
                                 </Button>
 
-                                <div className='bg-muted rounded-b-lg w-full px-4 py-2 -mt-6 md:mt-2'>
-                                    <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:justify-between md:items-center'>
+                                <div className='bg-muted rounded-b-lg w-full px-4 py-2 flex flex-col space-y-2 -mt-6 md:mt-2'>
+                                    <div className='flex flex-row space-x-2 justify-between items-center'>
                                         <div>To</div>
                                         {
                                             chain &&
-                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer'>
+                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center'>
+                                                <div className='font-light'>To</div>
                                                 {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                                                 {/* @ts-expect-error */}
-                                                To <b className='pl-1'>{formatWalletAddress(matchingPool?.pair_type === 'Cross Chain' ? form.watch('tick_out_wallet_address') : (userAddress ?? ''))}</b>
+                                                <div className='font-semibold'>{formatWalletAddress(matchingPool?.pair_type === 'Cross Chain' ? form.watch('tick_out_wallet_address') : (userAddress ?? ''))}</div>
                                             </Badge>
                                         }
                                     </div>
-                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-start justify-center w-full pt-3'>
-                                        <div className='text-center md:text-start flex flex-col space-y-1 mt-1'>
+                                    {/* <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 bg-red-500'> */}
+                                    <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2'>
+                                        <div className='flex flex-col space-y-0.5'>
                                             <FormField
                                                 control={form.control}
                                                 name='to_amount'
                                                 render={({ field }) => (
-                                                    <FormItem>
+                                                    // <FormItem className='py-[1.5px] bg-blue-500'>
+                                                    <FormItem className='py-[1.5px]'>
                                                         <FormControl>
                                                             <Input
                                                                 type='number'
@@ -965,23 +973,24 @@ export default function DEX() {
                                                     </FormItem>
                                                 )}
                                             />
-                                            <div className='text-sm'>
-                                                &asymp; ${formatAmount(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))}
+                                            {/* <div className='pt-[0.5px] text-center md:text-start bg-green-500'> */}
+                                            <div className='pt-[0.5px] text-center md:text-start'>
+                                                &asymp; ${formatCompactNumber(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))}
                                             </div>
                                         </div>
-
-                                        <div className='flex flex-col space-y-0.5 justify-end w-full'>
+                                        <div className='flex flex-col space-y-0.5'>
                                             <FormField
                                                 control={form.control}
                                                 name='to_token'
                                                 render={({ field }) => (
-                                                    <FormItem className='flex flex-row items-center justify-end w-full'>
+                                                    // <FormItem className='flex flex-row items-center justify-end bg-blue-500'>
+                                                    <FormItem className='flex flex-row items-center justify-end'>
                                                         <FormControl>
-                                                            <div className='w-full md:ml-auto md:w-3/4'>
+                                                            <div className='w-full md:w-3/4 md:ml-auto'>
                                                                 <Button
                                                                     type='button'
                                                                     variant='outline'
-                                                                    className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-6', !field.value && 'text-muted-foreground')}
+                                                                    className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                     onClick={() => setToTokenDialogOpen(true)}
                                                                 >
                                                                     {field.value
@@ -1138,7 +1147,7 @@ export default function DEX() {
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Minimum receive</div>
-                                            <div>{formatAmount((form.watch('to_amount') || 0) * (1 - Number(form.watch('slippage') || 0) / 100))} {selectedToToken?.label}</div>
+                                            <div>{formatCompactNumber((form.watch('to_amount') || 0) * (1 - Number(form.watch('slippage') || 0) / 100))} {selectedToToken?.label}</div>
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Liquidity Provider fee</div>
@@ -1160,7 +1169,7 @@ export default function DEX() {
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Exchange Rate</div>
-                                            <div>1 {selectedFromToken?.label} = {Number(selectedToTokenPrice) > 0 ? formatAmount(Number(selectedFromTokenPrice) / Number(selectedToTokenPrice)) : '0'} {selectedToToken?.label}</div>
+                                            <div>1 {selectedFromToken?.label} = {Number(selectedToTokenPrice) > 0 ? formatCompactNumber(Number(selectedFromTokenPrice) / Number(selectedToTokenPrice)) : '0'} {selectedToToken?.label}</div>
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Expected Time</div>
@@ -1168,19 +1177,14 @@ export default function DEX() {
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
                                             <div>Expected Output</div>
-                                            <div>{formatAmount(Number(form.watch('to_amount')))} {selectedToToken?.label}</div>
+                                            <div>{formatCompactNumber(Number(form.watch('to_amount')))} {selectedToToken?.label}</div>
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
 
                             {swaping && (
-                                <motion.div
-                                    className='text-center'
-                                    initial={{ y: 5, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 0.5, ease: 'easeOut' }}
-                                >
+                                <motion.div className='text-center' initial={{ y: 5, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, ease: 'easeOut' }}>
                                     Please keep this tab open until the swap is complete.
                                 </motion.div>
                             )}

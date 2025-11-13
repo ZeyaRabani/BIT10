@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
-import { cn, formatAmount } from '@/lib/utils'
+import { cn, formatCompactNumber } from '@/lib/utils'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Input } from '@/components/ui/input'
@@ -600,10 +600,10 @@ export default function BIT10Comparison() {
                                                             >
                                                                 <td className='p-2'>{asset.name}</td>
                                                                 <td className='p-2 text-right'>
-                                                                    ${formatAmount(asset.initialInvestment)}
+                                                                    ${formatCompactNumber(asset.initialInvestment)}
                                                                 </td>
                                                                 <td className='p-2 text-right text-green-600 dark:text-green-400'>
-                                                                    ${formatAmount(asset.currentValue)}
+                                                                    ${formatCompactNumber(asset.currentValue)}
                                                                 </td>
                                                                 <td
                                                                     className={`p-2 text-right ${asset.totalReturn >= 0
@@ -611,7 +611,7 @@ export default function BIT10Comparison() {
                                                                         : 'text-red-600 dark:text-red-400'
                                                                         }`}
                                                                 >
-                                                                    ${formatAmount(asset.totalReturn)}
+                                                                    ${formatCompactNumber(asset.totalReturn)}
                                                                 </td>
                                                                 <td
                                                                     className={`p-2 text-right ${asset.percentageReturn >= 0
@@ -620,7 +620,7 @@ export default function BIT10Comparison() {
                                                                         }`}
                                                                 >
                                                                     {asset.percentageReturn >= 0 ? '+' : ''}
-                                                                    {formatAmount(asset.percentageReturn)}%
+                                                                    {formatCompactNumber(asset.percentageReturn)}%
                                                                 </td>
                                                                 <td className='p-2 text-right'>
                                                                     {asset.apr !== undefined ? `${asset.apr.toFixed(2)}%` : 'N/A'}

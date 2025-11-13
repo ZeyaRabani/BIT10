@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { env } from '@/env'
 import { PublicKey, SystemProgram, LAMPORTS_PER_SOL, Connection, TransactionMessage, VersionedTransaction, ComputeBudgetProgram, TransactionInstruction } from '@solana/web3.js'
 import { getAssociatedTokenAddress, getAccount, createAssociatedTokenAccountInstruction, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
-import { formatAmount, getTokenName } from '@/lib/utils'
+import { formatCompactNumber, getTokenName } from '@/lib/utils'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory as buyidlFactory2 } from '@/lib/buy.did'
 import { newTokenSwap } from '@/actions/dbActions'
@@ -61,7 +61,7 @@ export const fetchSolanaTokenBalance = async ({ tokenAddress, publicKey, decimal
                 throw new Error('Failed to fetch balance after retries');
             }
 
-            const balanceSOL = formatAmount(balance / LAMPORTS_PER_SOL);
+            const balanceSOL = formatCompactNumber(balance / LAMPORTS_PER_SOL);
             return balanceSOL;
         } else {
             const tokenAddressPublicKey = new PublicKey(tokenAddress);

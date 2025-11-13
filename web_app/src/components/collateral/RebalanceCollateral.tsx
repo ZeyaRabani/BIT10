@@ -8,7 +8,7 @@ import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Badge } from '@/components/ui/badge'
 import { History, ExternalLink } from 'lucide-react'
-import { formatAmount, formatAddress } from '@/lib/utils'
+import { formatCompactNumber, formatAddress } from '@/lib/utils'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/buy.did'
 
@@ -82,7 +82,7 @@ const bit10Allocation: WalletDataType[] = [
     { walletAddress: 'GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', explorerAddress: 'https://stellar.expert/explorer/public/account/GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', bit10: ['BIT10.TOP'], tokenId: ['512'] },
 ];
 
-const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
+const color = ['#F7931A', '#3C3C3D', '#006097', '#F3BA2F', '#00FFA3', '#B51D06', '#C2A633', '#0033AD', '#29B6F6', '#ff0066'];
 
 export default function RebalanceCollateral() {
     const [innerRadius, setInnerRadius] = useState<number>(80);
@@ -352,7 +352,7 @@ export default function RebalanceCollateral() {
                                         <h1 className='text-2xl'>{data.bit10Name}</h1>
                                         <div className='text-lg flex flex-1 flex-row items-center justify-start'>
                                             Total Collateral: {''}
-                                            {formatAmount(data.targetValue)} USD
+                                            {formatCompactNumber(data.targetValue)} USD
                                             <Badge className='ml-1 text-white' style={{
                                                 backgroundColor: data.percentChange > 0 ? 'green' : 'red'
                                             }}>
@@ -415,7 +415,7 @@ export default function RebalanceCollateral() {
                                                             </td>
                                                             <td>
                                                                 {foundCollateralPrice
-                                                                    ? `${formatAmount(totalCollateral)} USD`
+                                                                    ? `${formatCompactNumber(totalCollateral)} USD`
                                                                     : 'Price not available'}
                                                             </td>
                                                         </tr>

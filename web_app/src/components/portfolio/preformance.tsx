@@ -14,7 +14,7 @@ import type { ChartConfig } from '@/components/ui/chart'
 
 const tabs = ['30D', '60D', '1Y', '3Y'];
 
-type Bit10Entry = {
+type BIT10Entry = {
     date: string;
     bit10Top: string;
     btc: string;
@@ -40,7 +40,7 @@ export default function Bit10Preformance() {
                 return null;
             }
 
-            const data = await response.json() as { bit10_top: Bit10Entry[] };
+            const data = await response.json() as { bit10_top: BIT10Entry[] };
             return { bit10_top: data.bit10_top.reverse() };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
@@ -61,7 +61,7 @@ export default function Bit10Preformance() {
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10TOPPreformance10Y = bit10Queries[0].data?.bit10_top ?? [];
 
-    const getBit10Performance = (data: Bit10Entry[], range: string) => {
+    const getBIT10Performance = (data: BIT10Entry[], range: string) => {
         if (!data || data.length === 0) {
             return [];
         }
@@ -101,45 +101,45 @@ export default function Bit10Preformance() {
         return filteredData;
     };
 
-    const selectedBit10Token30D = () => {
+    const selectedBIT10Token30D = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBit10Performance(bit10TOPPreformance10Y, '30D');
+            return getBIT10Performance(bit10TOPPreformance10Y, '30D');
         } else {
             return null;
         }
     };
 
-    const tokens30D = selectedBit10Token30D();
+    const tokens30D = selectedBIT10Token30D();
 
-    const selectedBit10Token60D = () => {
+    const selectedBIT10Token60D = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBit10Performance(bit10TOPPreformance10Y, '60D');
+            return getBIT10Performance(bit10TOPPreformance10Y, '60D');
         } else {
             return null;
         }
     };
 
-    const tokens60D = selectedBit10Token60D();
+    const tokens60D = selectedBIT10Token60D();
 
-    const selectedBit10Token1Y = () => {
+    const selectedBIT10Token1Y = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBit10Performance(bit10TOPPreformance10Y, '1Y');
+            return getBIT10Performance(bit10TOPPreformance10Y, '1Y');
         } else {
             return null;
         }
     };
 
-    const tokens1Y = selectedBit10Token1Y();
+    const tokens1Y = selectedBIT10Token1Y();
 
-    const selectedBit10Token3Y = () => {
+    const selectedBIT10Token3Y = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBit10Performance(bit10TOPPreformance10Y, '3Y');
+            return getBIT10Performance(bit10TOPPreformance10Y, '3Y');
         } else {
             return null;
         }
     };
 
-    const tokens3Y = selectedBit10Token3Y();
+    const tokens3Y = selectedBIT10Token3Y();
 
     const selectedBit10TokenChange = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
@@ -151,7 +151,7 @@ export default function Bit10Preformance() {
 
     const tokensChange = selectedBit10TokenChange();
 
-    const getPercentageChange = (data: Bit10Entry[], range: string) => {
+    const getPercentageChange = (data: BIT10Entry[], range: string) => {
         if (!data || data.length < 2) return 0;
 
         const lastEntry = data[data.length - 1];
@@ -214,7 +214,7 @@ export default function Bit10Preformance() {
 
     const tokenDataName = bit10PreformanceTokenDataName();
 
-    const bit10Tokens = ['BIT10.TOP'];
+    const bit10TokenName = ['BIT10.TOP'];
 
     const bit10PreformanceTokenName = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
@@ -326,7 +326,7 @@ export default function Bit10Preformance() {
                                     <SelectValue placeholder='Select Token' />
                                 </SelectTrigger>
                                 <SelectContent className='border-muted'>
-                                    {bit10Tokens.map((token) => (
+                                    {bit10TokenName.map((token) => (
                                         <SelectItem key={token} value={token}>
                                             {token}
                                         </SelectItem>

@@ -15,11 +15,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
-import { formatAmount } from '@/lib/utils'
+import { formatCompactNumber } from '@/lib/utils'
 
-const bit10Tokens = ['BIT10.TOP'];
+const bit10TokenName = ['BIT10.TOP'];
 
-const color = ['#ff0066', '#ff8c1a', '#1a1aff', '#ff1aff', '#3385ff', '#ffa366', '#33cc33', '#ffcc00', '#cc33ff', '#00cccc'];
+const color = ['#F7931A', '#3C3C3D', '#006097', '#F3BA2F', '#00FFA3', '#B51D06', '#C2A633', '#0033AD', '#29B6F6', '#ff0066'];
 
 export default function BalanceAndAllocation() {
     const [selectedAllocationToken, setSelectedAllocationToken] = useState('BIT10.TOP');
@@ -179,11 +179,11 @@ export default function BalanceAndAllocation() {
     const tokenData = [
         {
             token: 'BIT10.DEFI',
-            balance: `${formatAmount(Number(bit10DEFITokenBalance))}`
+            balance: `${formatCompactNumber(Number(bit10DEFITokenBalance))}`
         },
         {
             token: 'BIT10.TOP',
-            balance: `${formatAmount(Number(bit10TOPTokenBalance))}`
+            balance: `${formatCompactNumber(Number(bit10TOPTokenBalance))}`
         }
     ];
 
@@ -266,7 +266,7 @@ export default function BalanceAndAllocation() {
                                     className='aspect-square max-h-[300px]'
                                 >
                                     <PieChart>
-                                        {Number(formatAmount(Number(totalBIT10Tokens))) > 0 && (
+                                        {Number(formatCompactNumber(Number(totalBIT10Tokens))) > 0 && (
                                             <ChartTooltip
                                                 cursor={false}
                                                 content={<ChartTooltipContent hideLabel />}
@@ -294,7 +294,7 @@ export default function BalanceAndAllocation() {
                                                                     y={viewBox.cy}
                                                                     className='fill-foreground text-3xl font-bold'
                                                                 >
-                                                                    {formatAmount(Number(totalBIT10Tokens))}
+                                                                    {formatCompactNumber(Number(totalBIT10Tokens))}
                                                                 </tspan>
                                                                 <tspan
                                                                     x={viewBox.cx}
@@ -314,7 +314,7 @@ export default function BalanceAndAllocation() {
                             </div>
                             <div className='flex w-full flex-col space-y-3'>
                                 <div className='flex flex-row items-center justify-start space-x-2'>
-                                    <p className='text-3xl font-semibold'>{formatAmount(Number(totalBIT10Tokens))} BIT10</p>
+                                    <p className='text-3xl font-semibold'>{formatCompactNumber(Number(totalBIT10Tokens))} BIT10</p>
                                 </div>
                                 <div className='flex w-full flex-col space-y-3'>
                                     <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
@@ -323,7 +323,7 @@ export default function BalanceAndAllocation() {
                                             <div>Token Name</div>
                                             <div>No. of Tokens</div>
                                         </div>
-                                        {Number(formatAmount(Number(totalBIT10Tokens))) == 0 ? (
+                                        {Number(formatCompactNumber(Number(totalBIT10Tokens))) == 0 ? (
                                             <div className='text-center'>You currently own no BIT10 tokens</div>
                                         ) : (
                                             <>
@@ -367,7 +367,7 @@ export default function BalanceAndAllocation() {
                                     <SelectValue placeholder='Select Token' />
                                 </SelectTrigger>
                                 <SelectContent className='dark:border-muted'>
-                                    {bit10Tokens.map((token) => (
+                                    {bit10TokenName.map((token) => (
                                         <SelectItem key={token} value={token}>
                                             {token}
                                         </SelectItem>
@@ -441,7 +441,7 @@ export default function BalanceAndAllocation() {
                                                 ></div>
                                                 <div>{token.symbol}</div>
                                             </div>
-                                            <div>{formatAmount((token.marketCap / totalMarketCap) * 100)} %</div>
+                                            <div>{formatCompactNumber((token.marketCap / totalMarketCap) * 100)} %</div>
                                         </div>
                                     ))}
                                 </div>

@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type CellContext } from '@tanstack/react-table'
 import { DataTableViewOptions } from '@/components/ui/data-table-view-options'
-import { formatAmount, formatAddress, getTokenName, getTokenExplorer } from '@/lib/utils'
+import { formatCompactNumber, formatAddress, getTokenName, getTokenExplorer } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
@@ -124,7 +124,7 @@ export function DataTable<TData, TValue>({
             case 'tickIn':
                 return (
                     <div className='flex flex-row space-x-1 items-center'>
-                        <div>{formatAmount(parseFloat(row.original.tickInAmount))}</div>
+                        <div>{formatCompactNumber(parseFloat(row.original.tickInAmount))}</div>
                         <div>{getTokenName(row.original.tickInName)}</div>
                     </div>
                 );
@@ -134,7 +134,7 @@ export function DataTable<TData, TValue>({
                         <div>
                             {row.original.transactionType === 'Swap'
                                 ? row.original.tickOutAmount
-                                : formatAmount(parseFloat(row.original.tickOutAmount))}
+                                : formatCompactNumber(parseFloat(row.original.tickOutAmount))}
                         </div>
                         <div>{getTokenName(row.original.tickOutName)}</div>
                     </div>

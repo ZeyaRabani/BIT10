@@ -11,7 +11,7 @@ type CoinData = {
     price: number;
 };
 
-type Bit10TOPEntry = {
+type BIT10TOPEntry = {
     timestmpz: string;
     tokenPrice: number;
     data: CoinData[];
@@ -19,12 +19,12 @@ type Bit10TOPEntry = {
 
 const jsonFilePath = path.join(__dirname, '../../../data/bit10_top.json');
 const cache = new NodeCache();
-let latestData: { bit10_top_current_price: Bit10TOPEntry[] } | null = null;
+let latestData: { bit10_top_current_price: BIT10TOPEntry[] } | null = null;
 
 async function fetchData() {
     try {
         const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
-        const parsedData: { bit10_top_current_price: Bit10TOPEntry[] } = JSON.parse(fileContent);
+        const parsedData: { bit10_top_current_price: BIT10TOPEntry[] } = JSON.parse(fileContent);
         if (parsedData.bit10_top_current_price.length > 0) {
             latestData = { bit10_top_current_price: [parsedData.bit10_top_current_price[0]] };
             cache.set('bit10_top_current_price_data', latestData.bit10_top_current_price[0]);
@@ -49,7 +49,7 @@ export const handleBIT10TOPCurrentPrice = async (request: IncomingMessage, respo
         return;
     }
 
-    const cachedData = cache.get<Bit10TOPEntry>('bit10_top_current_price_data') || latestData;
+    const cachedData = cache.get<BIT10TOPEntry>('bit10_top_current_price_data') || latestData;
 
     if (cachedData) {
         response.writeHead(200, { 'Content-Type': 'application/json' });

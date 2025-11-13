@@ -2,7 +2,7 @@ import { toast } from 'sonner'
 import { env } from '@/env'
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js'
 import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
-import { formatAmount } from '@/lib/utils'
+import { formatCompactNumber } from '@/lib/utils'
 
 const getCustomConnection = (): Connection => {
     const rpcUrl = env.NEXT_PUBLIC_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com';
@@ -35,7 +35,7 @@ export const fetchSolanaBIT10Balance = async ({ tokenAddress, publicKey, decimal
                 throw new Error('Failed to fetch balance after retries');
             }
 
-            const balanceSOL = formatAmount(balance / LAMPORTS_PER_SOL);
+            const balanceSOL = formatCompactNumber(balance / LAMPORTS_PER_SOL);
             return balanceSOL;
         } else {
             const tokenAddressPublicKey = new PublicKey(tokenAddress);

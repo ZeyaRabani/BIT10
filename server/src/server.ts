@@ -18,6 +18,9 @@ import { handleTestBIT10MEMERebalanceData } from './routes/testBit10MEMERabalanc
 import { handleVerifyTransaction } from './routes/verifyTransaction'
 import { handelCreateTransaction } from './routes/createTransaction'
 import { handleBIT10ComparisonData } from './routes/bit10Comparison'
+import { handleBIT10TOPPrice, handleBIT10TOPBalance } from './institutions/api/v1/bit10TopPrice'
+import { handleBuyBIT10 } from './institutions/api/v1/buyBIT10'
+import { handleBuyBIT10Trx } from './institutions/api/v1/buyBIT10Trx'
 
 dotenv.config();
 
@@ -37,7 +40,11 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/test-bit10-meme-rebalance': handleTestBIT10MEMERebalanceData,
     '/verify-transaction': handleVerifyTransaction,
     '/create-transaction': handelCreateTransaction,
-    '/bit10-comparison': handleBIT10ComparisonData
+    '/bit10-comparison': handleBIT10ComparisonData,
+    '/api/v1/balancer/bit10top/price': handleBIT10TOPPrice,
+    '/api/v1/balancer/bit10top/balance': handleBIT10TOPBalance,
+    '/api/v1/trades/buy': handleBuyBIT10,
+    '/api/v1/trades/buy-bit10-trx': handleBuyBIT10Trx
 };
 
 const requestHandler = async (req: http.IncomingMessage, res: http.ServerResponse) => {

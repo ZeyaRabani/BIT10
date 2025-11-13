@@ -14,7 +14,7 @@ import { DataTable } from '@/components/ui/data-table-portfolio'
 import type { PortfolioTableDataType } from '@/components/ui/data-table-portfolio'
 import { DataTable as DEXDataTable } from '@/components/ui/data-table-dex-portfolio'
 import type { PortfolioTableDataType as DEXPortfolioTableDataType } from '@/components/ui/data-table-dex-portfolio'
-import { formatAmount, getTokenName } from '@/lib/utils'
+import { formatCompactNumber, getTokenName } from '@/lib/utils'
 
 const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
@@ -41,7 +41,7 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
             <DataTableColumnHeader column={column} title='Received' />
         ),
         filterFn: (row, columnId, value) => {
-            const formattedAmount = formatAmount(Number(row.original.tickOutAmount));
+            const formattedAmount = formatCompactNumber(Number(row.original.tickOutAmount));
             const tokenName = getTokenName(row.original.tickOutName);
             const searchableText = `${formattedAmount} ${tokenName}`.toLowerCase();
             return searchableText.includes((value as string).toLowerCase());
@@ -86,7 +86,7 @@ const recentSwapTableColumns: ColumnDef<DEXPortfolioTableDataType>[] = [
             <DataTableColumnHeader column={column} title='To' />
         ),
         filterFn: (row, columnId, value) => {
-            const formattedAmount = formatAmount(Number(row.original.amountOut));
+            const formattedAmount = formatCompactNumber(Number(row.original.amountOut));
             const tokenName = getTokenName(row.original.tokenOutAddress);
             const tokenChain = getTokenName(row.original.destinationChain);
             const searchableText = `${formattedAmount} ${tokenName} (on ${tokenChain})`.toLowerCase();

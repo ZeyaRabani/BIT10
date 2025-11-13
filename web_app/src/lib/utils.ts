@@ -55,13 +55,95 @@ export const formatAddress = (id: string) => {
   return `${id.slice(0, 9)}.....${id.slice(-9)}`;
 };
 
-export const formatAmount = (value: number | string | null | undefined): string => {
+export const formatCompactNumber = (value: number | string | null | undefined): string => {
+  let numValue: number;
+
+  if (typeof value === 'string') {
+    numValue = parseFloat(value);
+  } else {
+    numValue = value!;
+  }
+
+  if (numValue === null || numValue === undefined || isNaN(numValue)) return '-';
+  if (numValue === 0) return '0';
+
+  const absValue = Math.abs(numValue);
+  const isNegative = numValue < 0;
+  const sign = isNegative ? '-' : '';
+
+  if (absValue < 0.00000001 && absValue > 0) {
+    const scientific = absValue.toExponential(4);
+    const cleanScientific = scientific.replace('e+', 'e').replace('e-0', 'e-').replace(/e-(\d)$/, 'e-$1');
+    return sign + cleanScientific;
+  }
+
+  if (absValue < 1) {
+    const strValue = absValue.toFixed(20);
+    const [, decimalPart = ''] = strValue.split('.');
+
+    const firstNonZeroIndex = decimalPart.search(/[1-9]/);
+
+    if (firstNonZeroIndex === -1) return '0';
+
+    const significantDecimals = decimalPart.slice(0, firstNonZeroIndex + 4);
+    const formatted = parseFloat(`0.${significantDecimals}`);
+
+    let result = formatted.toFixed(Math.min(firstNonZeroIndex + 4, 8)).replace(/\.?0+$/, '');
+
+    if (parseFloat(result) >= 1) {
+      result = '1.0000';
+    }
+
+    return sign + result;
+  }
+
+  if (absValue < 1000) {
+    const rounded = Math.round(absValue * 10000) / 10000;
+    return sign + rounded.toFixed(4).replace(/\.?0+$/, '');
+  }
+
+  if (absValue < 1000000) {
+    const integerPart = Math.floor(absValue);
+    const decimalPart = absValue - integerPart;
+
+    const formattedInteger = integerPart.toLocaleString('en-US');
+
+    if (decimalPart === 0) {
+      return sign + formattedInteger;
+    }
+
+    const decimalStr = decimalPart.toFixed(6).slice(2).replace(/0+$/, '');
+
+    return sign + formattedInteger + (decimalStr ? '.' + decimalStr : '');
+  }
+
+  if (absValue < 1000000000) {
+    const millions = absValue / 1000000;
+    return sign + millions.toFixed(2).replace(/\.?0+$/, '') + 'M';
+  }
+
+  if (absValue < 1000000000000) {
+    const billions = absValue / 1000000000;
+    return sign + billions.toFixed(2).replace(/\.?0+$/, '') + 'B';
+  }
+
+  if (absValue < 1e15) {
+    const trillions = absValue / 1000000000000;
+    return sign + trillions.toFixed(2).replace(/\.?0+$/, '') + 'T';
+  }
+
+  const scientific = absValue.toExponential(2);
+  const cleanScientific = scientific.replace('e+', 'e').replace('e+0', 'e');
+
+  return sign + cleanScientific;
+};
+
+export const formatPreciseDecimal = (value: number | string | null | undefined): string => {
   let numValue: number;
   if (typeof value === 'string') {
     numValue = parseFloat(value);
   } else {
-    // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
-    numValue = value as number;
+    numValue = value!;
   }
 
   if (numValue === null || numValue === undefined || isNaN(numValue)) return '0';
