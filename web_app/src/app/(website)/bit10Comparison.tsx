@@ -286,7 +286,8 @@ export default function BIT10Comparison() {
             // @ts-expect-error
             initial_investment: '10',
             initial_investment_start_date: new Date('2015-07-29'),
-            initial_investment_end_date: new Date('2025-08-05'),
+            // initial_investment_end_date: new Date('2025-08-05'),
+            initial_investment_end_date: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000), // current date - 12 days
             initial_investment_token: 'BIT10.TOP'
         },
     });
@@ -389,8 +390,8 @@ export default function BIT10Comparison() {
     }
 
     return (
-        <div className='flex flex-col space-y-4'>
-            <div className='mt-4 py-4'>
+        <div className='flex flex-col items-center space-y-4'>
+            <div className='mt-4 py-4 w-full'>
                 <div className='grid lg:grid-cols-3 gap-8'>
                     {['1Y', '5Y', '10Y'].map((period) => (
                         <div key={period} className='border-2 border-muted rounded py-8 px-3'>
@@ -403,6 +404,16 @@ export default function BIT10Comparison() {
                         </div>
                     ))}
                 </div>
+            </div>
+
+            <div className='py-4 md:py-10'>
+                <h1 className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
+                    Diversify Your Portfolio Effortlessly <br /> with BIT10
+                </h1>
+
+                <p className='text-xl text-center dark:text-gray-300 max-w-4xl z-[1]'>
+                    Get instant access to the top 10 cryptos in one secure, over-collateralized token. No more picking winners - let BIT10 handle the diversification. Upgrade to Premium for auto-rebalancing and exclusive perks.
+                </p>
             </div>
 
             <div className='grid lg:grid-cols-5 gap-3'>

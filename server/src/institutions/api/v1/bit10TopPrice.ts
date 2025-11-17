@@ -59,8 +59,49 @@ let hermesClient: HermesClient | null = null;
 let currentPrices: Map<string, number> = new Map();
 let priceStreamEventSource: any = null;
 let baseDataCache: CoinDataInput[] = [];
+let cronJob: any = null;
 
 const TOTAL_SUPPLY = 25_000_000_000_000; // 25 Trillion
+
+export function getPriceData(): BIT10TOPEntryOutput | null {
+    return cache.get<BIT10TOPEntryOutput>('api_v1_balancer_bit10top_price') || latestData;
+}
+
+export async function cleanup() {
+    console.log('🧹 Cleaning up BIT10.TOP price data resources...');
+
+    if (cronJob) {
+        try {
+            cronJob.stop();
+            cronJob = null;
+            console.log('✅ Cron job stopped');
+        } catch (error) {
+            console.error('❌ Error stopping cron job:', error);
+        }
+    }
+
+    if (priceStreamEventSource) {
+        try {
+            priceStreamEventSource.close();
+            priceStreamEventSource = null;
+            console.log('✅ Pyth price stream closed');
+        } catch (error) {
+            console.error('❌ Error closing Pyth price stream:', error);
+        }
+    }
+
+    if (hermesClient) {
+        hermesClient = null;
+        console.log('✅ Hermes client cleared');
+    }
+
+    currentPrices.clear();
+    baseDataCache = [];
+    latestData = null;
+    pythFeedData = [];
+    cache.flushAll();
+    console.log('✅ All BIT10.TOP price data cleared');
+}
 
 async function loadPythFeed() {
     try {
@@ -88,6 +129,7 @@ async function startPriceStream(priceIds: string[]) {
     if (priceStreamEventSource) {
         try {
             priceStreamEventSource.close();
+            priceStreamEventSource = null;
         } catch (error) {
             console.error('Error closing existing stream:', error);
         }
@@ -116,13 +158,20 @@ async function startPriceStream(priceIds: string[]) {
 
         priceStreamEventSource.onerror = (error: any) => {
             console.error('Error receiving price updates:', error);
-            setTimeout(() => {
-                console.log('Attempting to restart price stream...');
-                const activePriceIds = Array.from(currentPrices.keys());
-                if (activePriceIds.length > 0) {
-                    startPriceStream(activePriceIds);
-                }
-            }, 5000);
+
+            if (priceStreamEventSource !== null) {
+                setTimeout(() => {
+                    console.log('Attempting to restart price stream...');
+                    const activePriceIds = Array.from(currentPrices.keys());
+                    if (activePriceIds.length > 0 && hermesClient) {
+                        startPriceStream(activePriceIds);
+                    }
+                }, 5000);
+            }
+        }
+
+        priceStreamEventSource.onclose = () => {
+            console.log('Pyth price stream closed');
         }
 
         console.log(`Started price stream for ${priceIds.length} tokens`);
@@ -161,6 +210,7 @@ function updateCachedDataWithCurrentPrices() {
     const totalCurrentMarketCap = transformedData.reduce((sum, coin) => {
         return sum + (coin.currentMarketCap || 0)
     }, 0);
+
     const dataWithWeights = transformedData.map(coin => ({
         ...coin,
         weightPercent: coin.currentMarketCap && totalCurrentMarketCap > 0
@@ -219,27 +269,85 @@ async function fetchBaseData() {
     }
 }
 
-cron.schedule('*/18 * * * *', async () => {
+cronJob = cron.schedule('*/18 * * * *', async () => {
     try {
-        console.log('Running scheduled update...');
+        console.log('Running scheduled BIT10.TOP update...');
         await loadPythFeed();
         await fetchBaseData();
     } catch (error) {
-        console.error('Error in scheduled data update:', error);
+        console.error('Error in scheduled BIT10.TOP data update:', error);
     }
-})
+}, {
+    scheduled: true,
+    timezone: 'UTC'
+});
 
 async function initialize() {
     try {
+        console.log('🚀 Initializing BIT10.TOP price service...');
         await initializePythConnection();
         await loadPythFeed();
         await fetchBaseData();
+        console.log('✅ BIT10.TOP price service initialized successfully');
     } catch (error) {
-        console.error('Error in initial data loading:', error);
+        console.error('❌ Error in BIT10.TOP initial data loading:', error);
     }
 }
 
 initialize();
+
+/**
+ * @swagger
+ * /api/v1/balancer/bit10top/price:
+ *   get:
+ *     summary: Get BIT10.TOP current price and token data
+ *     description: Returns the current price of the BIT10.TOP token, along with detailed information about all constituent tokens, including their prices, market caps, and weight percentages. The data is updated in real-time using Pyth Network price feeds. The price of the BIT10.TOP token is calculated in real-time (every 1 second), but token rebalancing occurs every 20 minutes. For real-time updates, use the WebSocket endpoint at `wss://eagleai-api.bit10.app/ws/price-feed`.
+ *     tags: [Balancer]
+ *     responses:
+ *       200:
+ *         description: Successful response with price and token data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/BIT10TOPPrice'
+ *             example:
+ *               token: "BIT10.TOP"
+ *               tokenPrice: 11.22
+ *               timestmpz: "2025-11-14T10:30:00.000Z"
+ *               data:
+ *                 - id: 1
+ *                   name: "Bitcoin"
+ *                   symbol: "BTC"
+ *                   circulatingSupply: 19500000
+ *                   pythFeedId: "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
+ *                   currentPrice: 43250.50
+ *                   currentMarketCap: 843484750000
+ *                   weightPercent: 45.5
+ *                 - id: 2
+ *                   name: "Ethereum"
+ *                   symbol: "ETH"
+ *                   circulatingSupply: 120000000
+ *                   pythFeedId: "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
+ *                   currentPrice: 2250.75
+ *                   currentMarketCap: 270090000000
+ *                   weightPercent: 30.2
+ *       404:
+ *         description: No data available
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "No data available"
+ *       405:
+ *         description: Method not allowed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Method Not Allowed"
+ */
 
 export const handleBIT10TOPPrice = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
@@ -251,7 +359,11 @@ export const handleBIT10TOPPrice = async (request: IncomingMessage, response: Se
     const cachedData = cache.get<BIT10TOPEntryOutput>('api_v1_balancer_bit10top_price') || latestData;
 
     if (cachedData) {
-        response.writeHead(200, { 'Content-Type': 'application/json' });
+        response.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            'Access-Control-Allow-Origin': '*'
+        });
         response.end(JSON.stringify(cachedData));
         return;
     }
@@ -259,6 +371,61 @@ export const handleBIT10TOPPrice = async (request: IncomingMessage, response: Se
     response.writeHead(404, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify({ error: 'No data available' }));
 }
+
+/**
+ * @swagger
+ * /api/v1/balancer/bit10top/balance:
+ *   get:
+ *     summary: Get BIT10.TOP token composition and balance
+ *     description: Returns the composition breakdown of the BIT10.TOP token, showing all constituent tokens and their weight percentages in the index. This endpoint provides a simplified view focused on the balance distribution. The weights of the BIT10.TOP token are calculated in real-time (every 1 second), but token rebalancing occurs every 20 minutes. For real-time updates, use the WebSocket endpoint at `wss://eagleai-api.bit10.app/ws/price-feed`.
+ *     tags: [Balancer]
+ *     responses:
+ *       200:
+ *         description: Successful response with balance composition
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/BIT10TOPBalance'
+ *             example:
+ *               token: "BIT10.TOP"
+ *               composition:
+ *                 - id: 1
+ *                   name: "Bitcoin"
+ *                   symbol: "BTC"
+ *                   weightPercent: 45.5
+ *                 - id: 2
+ *                   name: "Ethereum"
+ *                   symbol: "ETH"
+ *                   weightPercent: 30.2
+ *                 - id: 3
+ *                   name: "Cardano"
+ *                   symbol: "ADA"
+ *                   weightPercent: 12.3
+ *                 - id: 4
+ *                   name: "Solana"
+ *                   symbol: "SOL"
+ *                   weightPercent: 8.7
+ *                 - id: 5
+ *                   name: "Polkadot"
+ *                   symbol: "DOT"
+ *                   weightPercent: 3.3
+ *       404:
+ *         description: No data available
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "No data available"
+ *       405:
+ *         description: Method not allowed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Method Not Allowed"
+ */
 
 export const handleBIT10TOPBalance = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
@@ -280,7 +447,11 @@ export const handleBIT10TOPBalance = async (request: IncomingMessage, response: 
             }))
         };
 
-        response.writeHead(200, { 'Content-Type': 'application/json' });
+        response.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            'Access-Control-Allow-Origin': '*'
+        });
         response.end(JSON.stringify(balanceResponse));
         return;
     }
@@ -288,3 +459,13 @@ export const handleBIT10TOPBalance = async (request: IncomingMessage, response: 
     response.writeHead(404, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify({ error: 'No data available' }));
 }
+
+process.on('SIGINT', () => {
+    console.log('🛑 SIGINT received in BIT10.TOP module');
+    cleanup();
+});
+
+process.on('SIGTERM', () => {
+    console.log('🛑 SIGTERM received in BIT10.TOP module');
+    cleanup();
+});

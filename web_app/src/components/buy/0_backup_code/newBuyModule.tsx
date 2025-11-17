@@ -32,7 +32,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image, { type StaticImageData } from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { TransactionProgressDialog, type TransactionStep } from './TransactionProgressDialog';
+import { TransactionProgressDialog, type TransactionStep } from '../TransactionProgressDialog'
 
 interface WhitelistedPrincipal {
     userPrincipalId: string;
@@ -708,9 +708,11 @@ export default function NewBuyModule() {
             const tokenInAmount = isNaN(rawTokenInAmount) ? 0 : Number(rawTokenInAmount);
 
             if (chain === 'icp') {
+                // ToDo: Use the first one
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await buyICPBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount, tokenInAmount: tokenInAmount, icpAddress: icpAddress!, onStepUpdate: (updatedSteps) => { setICPTransactionSteps(updatedSteps) } });
+                // await buyICPBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount, tokenInAmount: tokenInAmount, icpAddress: icpAddress!, onStepUpdate: (updatedSteps) => { setICPTransactionSteps(updatedSteps) } });
+                await buyICPBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount, tokenInAmount: tokenInAmount, icpAddress: icpAddress! });
             } else if (chain === 'base') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error

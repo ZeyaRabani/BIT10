@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-"use client"
+'use client'
 
 import React from 'react'
 import { motion } from 'framer-motion'
@@ -13,12 +13,13 @@ import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards'
 import Image from 'next/image'
 import DefinityDevImg from '@/assets/home/DFINITYDev.jpg'
 import EasyaAppImg from '@/assets/home/easya_app.jpg'
+import ICPChainImg from '@/assets/wallet/icp-logo.svg'
+import BaseChainImg from '@/assets/wallet/base-logo.svg'
+import SolChainImg from '@/assets/wallet/solana-logo.svg'
+import BSCChainImg from '@/assets/wallet/bsc-logo.svg'
 import ICPImg from '@/assets/home/ICP.svg'
 import BSLImg from '@/assets/home/bsl.png'
 import EasyAImg from '@/assets/home/EasyA.png'
-// import { WobbleCard } from '@/components/ui/wobble-card'
-// import { CircleDot } from 'lucide-react'
-// import DashboardImg from '@/assets/home/dashboard.svg'
 
 const containerVariants = {
   visible: {
@@ -33,23 +34,43 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeInOut' } },
 };
 
-// const cardMotionFadeLeftProps = {
-//   initial: { opacity: 0.0, x: 40 },
-//   whileInView: { opacity: 1, x: 0 },
-//   transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
-// };
+const chains = [
+  {
+    name: 'Internet Computer',
+    logo: ICPChainImg,
+  },
+  {
+    name: 'Base',
+    logo: BaseChainImg,
+  },
+  {
+    name: 'Solana',
+    logo: SolChainImg,
+  },
+  {
+    name: 'Binance Smart Chain',
+    logo: BSCChainImg,
+  }
+]
 
-// const cardMotionFadeRightProps = {
-//   initial: { opacity: 0.0, x: -40 },
-//   whileInView: { opacity: 1, x: 0 },
-//   transition: { delay: 0.2, duration: 1, ease: 'easeInOut' }
-// };
-
-// const sectionMotionProps = {
-//   initial: { opacity: 0.0, x: -40 },
-//   whileInView: { opacity: 1, x: 0 },
-//   transition: { delay: 0.2, duration: 0.8, ease: 'easeInOut' }
-// };
+const whyChooseUs = [
+  {
+    title: 'Diversified',
+    desc: 'Instant exposure to top 10 cryptocurrencies',
+  },
+  {
+    title: 'Secure',
+    desc: '110% over-collateralized for your protection',
+  },
+  {
+    title: 'Automatic',
+    desc: 'Weekly rebalancing on Premium plan',
+  },
+  {
+    title: 'Multi-Chain',
+    desc: 'Live on ICP, Base, SOL, and more',
+  }
+]
 
 const testimonials = [
   {
@@ -101,6 +122,14 @@ export default function Page() {
               initial={{ opacity: 0.0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8, ease: 'easeInOut' }}
+              className='py-2 text-center dark:text-gray-300 text-xl'>
+              Diversified exposure to the top 10 cryptocurrencies with automatic rebalancing
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0.0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.8, ease: 'easeInOut' }}
               className='flex flex-row space-x-2 py-2 items-center justify-center'>
               <Button className='px-6 md:px-10' asChild>
                 <Link href='/launch'>
@@ -119,6 +148,63 @@ export default function Page() {
 
       <MaxWidthWrapper className='flex flex-col space-y-8 py-8'>
         <BIT10Comparison />
+
+        <div className='flex flex-col items-center space-y-2 py-4 md:py-8'>
+          <motion.h1
+            initial={{ opacity: 0.0, y: 80 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
+            className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
+            Live on 4 Chains
+          </motion.h1>
+
+          <motion.div
+            initial='hidden'
+            whileInView='visible'
+            variants={containerVariants}
+            className='flex flex-col md:flex-row md:space-x-6 items-center justify-evenly w-full space-y-3 md:space-y-0 py-4'>
+            {chains.map((chains, index) => (
+              <motion.div
+                variants={cardVariants}
+                key={index}
+                className='flex flex-col space-y-2 items-center justify-center py-6 px-2 border-2 border-accent rounded-lg w-full md:w-1/4 min-w-0'>
+                <Image src={chains.logo} height={80} width={80} quality={100} alt={chains.name} />
+                <div>{chains.name}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+
+        <div className='flex flex-col items-center space-y-2 py-4 md:py-8'>
+          <motion.h1
+            initial={{ opacity: 0.0, y: 80 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
+            className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
+            Why Choose BIT10?
+          </motion.h1>
+
+          <motion.div
+            initial='hidden'
+            whileInView='visible'
+            variants={containerVariants}
+            className='flex flex-col md:flex-row md:space-x-6 items-center justify-evenly w-full space-y-3 md:space-y-0 py-4'
+          >
+            {whyChooseUs.map((item, index) => (
+              <motion.div
+                variants={cardVariants}
+                key={index}
+                className='flex flex-col space-y-2 items-center justify-center py-6 px-2 border-2 border-accent rounded-lg w-full md:w-1/4 min-w-0'
+                style={{ height: '150px', width: '100' }}>
+                <div className='flex flex-col items-center justify-start h-full w-full'>
+                  <div className='text-primary text-2xl font-semibold'>{item.title}</div>
+                  <div className='text-lg text-center'>{item.desc}</div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+
         <div className='flex flex-col items-center space-y-2'>
           <motion.h1
             initial={{ opacity: 0.0, y: 80 }}
@@ -144,6 +230,15 @@ export default function Page() {
           ></motion.iframe>
         </div>
 
+        <div className='flex items-center justify-center py-4 md:py-8'>
+          <div className='border-2 border-accent bg-accent rounded-lg w-full max-w-4xl py-4 md:py-8 flex flex-col items-center justify-center space-y-4'>
+            <div className='text-3xl md:text-4xl font-semibold text-center'>Crypto Index Funds Market</div>
+            <div className='text-xl md:text-2xl font-semibold text-center'><span className='text-primary'>$150 billion</span> market cap</div>
+            <div className='text-xl md:text-2xl text-center'>Current AUM: <span className='font-semibold'>&lt; $5 billion</span></div>
+            <div className='text-2xl md:text-3xl font-semibold text-green-500 text-center'>AIM: 100x Growth Potential</div>
+          </div>
+        </div>
+
         <div className='flex flex-col antialiased items-center justify-center relative overflow-hidden'>
           <div className='my-8 text-center'>
             <motion.h1
@@ -167,117 +262,6 @@ export default function Page() {
             ))}
           </motion.div>
         </div>
-
-        {/* <div>
-          <motion.div
-            {...sectionMotionProps}
-            id='home-page-features'
-            className='text-3xl md:text-6xl font-bold py-4'>
-            Simplify your DeFi <br /> Investments with BIT10
-          </motion.div>
-
-          <motion.p
-            {...sectionMotionProps}
-            className='md:max-w-3xl'>
-            Discover BIT10, your gateway to a diversified, auto-rebalancing index of top crypto tokens, BRC-20s, and more. Simplify investing, reduce costs, and maximize returns across Bitcoin and beyond.</motion.p>
-          <div className='py-2 md:py-4 grid gap-6 overflow-hidden lg:overflow-visible'>
-            <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-              <motion.div
-                {...cardMotionFadeRightProps}
-                className='md:col-span-2 flex flex-col'>
-                <WobbleCard containerClassName='text-gray-200 flex-1 flex flex-col'>
-                  <div className='max-w-md flex-1'>
-                    <div className='text-2xl md:text-3xl font-semibold tracking-wide'>Decentralized Index Token</div>
-                    <div className='text-xl mt-2'>
-                      Invest in a token backed by the value of the top cryptocurrencies or specifically curated assets. Experience the potential benefits of diversification in the fast-evolving world of digital assets.
-                    </div>
-                  </div>
-                  <div className='absolute -right-[10%] -bottom-[80%] lg:-bottom-[40%]'>
-                    <Image src={DashboardImg} width={500} height={500} alt='Dashboard' />
-                  </div>
-                </WobbleCard>
-              </motion.div>
-
-              <motion.div
-                {...cardMotionFadeLeftProps}
-                className='md:col-span-1 flex flex-col'>
-                <WobbleCard containerClassName='md:col-span-1 bg-primary/50 text-[#030712] flex-1' className='flex flex-col items-start justify-center'>
-                  <div className='text-2xl md:text-3xl font-semibold tracking-wide'>Historical Performance Analysis</div>
-                  <div className='text-xl mt-2'>
-                    Explore the historical performance of your portfolio through interactive charts and graphs. Understand the growth potential by comparing it with traditional benchmarks like the S&P500.
-                  </div>
-                </WobbleCard>
-              </motion.div>
-            </div>
-
-            <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-              <motion.div
-                {...cardMotionFadeRightProps}
-                className='md:col-span-1 flex flex-col'>
-                <WobbleCard containerClassName='md:col-span-1 text-gray-200 flex-1' className='flex flex-col items-start justify-center'>
-                  <div className='text-2xl md:text-3xl font-semibold tracking-wide'>Customizable Portfolios</div>
-                  <div className='text-xl mt-2'>
-                    Tailor your investment strategy with customizable portfolios. Choose specific assets or let our algorithm optimize your holdings for maximum returns.
-                  </div>
-                </WobbleCard>
-              </motion.div>
-
-              <motion.div
-                {...cardMotionFadeLeftProps}
-                initial={{ ...cardMotionFadeLeftProps.initial, y: 40 }}
-                whileInView={{ ...cardMotionFadeLeftProps.whileInView, y: 0 }}
-                className='md:col-span-1 relative flex flex-col'>
-                <WobbleCard containerClassName='md:col-span-1 bg-primary/50 text-[#030712] flex-1' className='flex flex-col space-y-3 items-center justify-center'>
-                  <div className='absolute top-3 right-6'>
-                    <CircleDot className='h-6 w-6 font-semibold' />
-                  </div>
-                  <div className='text-2xl md:text-3xl font-semibold tracking-wide text-center'>Index Insight</div>
-                  <div className='text-xl text-center'>Simplify crypto investing with diversified, auto-rebalancing asset baskets.</div>
-                </WobbleCard>
-              </motion.div>
-
-              <motion.div
-                {...cardMotionFadeLeftProps}
-                className='md:col-span-1 flex flex-col'>
-                <WobbleCard containerClassName='md:col-span-1 text-gray-200 flex-1' className='flex flex-col items-start justify-center'>
-                  <div className='text-2xl md:text-3xl font-semibold tracking-wide'>User Account Security</div>
-                  <div className='text-xl mt-2'>
-                    Create a secure account with ease, and manage your profile and preferences. Enhance security with two-factor authentication for peace of mind.
-                  </div>
-                </WobbleCard>
-              </motion.div>
-            </div>
-
-            <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-              <motion.div
-                {...cardMotionFadeRightProps}
-                className='md:col-span-1 flex flex-col'>
-                <WobbleCard containerClassName='md:col-span-1 bg-primary/50 text-[#030712] flex-1 flex flex-col'>
-                  <div className='text-2xl md:text-3xl font-semibold tracking-wide'>Transparent Token Details</div>
-                  <div className='text-xl mt-2'>
-                    Gain insights into how our token operates, ensuring transparency and trust. Learn about the technology, methodology, and security measures behind our innovative investment solution.
-                  </div>
-                </WobbleCard>
-              </motion.div>
-
-              <motion.div
-                {...cardMotionFadeLeftProps}
-                className='md:col-span-2 flex flex-col'>
-                <WobbleCard containerClassName='text-gray-200 flex-1 flex flex-col'>
-                  <div className='max-w-md flex-1'>
-                    <div className='text-2xl md:text-3xl font-semibold tracking-wide'>Market Insights and News</div>
-                    <div className='text-xl mt-2'>
-                      Stay informed with regular market insights, news, and analysis. Access resources that help you make informed decisions in the dynamic cryptocurrency landscape.
-                    </div>
-                  </div>
-                  <div className='absolute -right-[10%] -bottom-[80%] lg:-bottom-[40%]'>
-                    <Image src={DashboardImg} width={500} height={500} alt='Dashboard' />
-                  </div>
-                </WobbleCard>
-              </motion.div>
-            </div>
-          </div>
-        </div> */}
       </MaxWidthWrapper>
     </div>
   )

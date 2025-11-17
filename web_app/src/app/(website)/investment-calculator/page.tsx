@@ -191,7 +191,8 @@ export default function Page() {
             // @ts-expect-error
             initial_investment: '10',
             initial_investment_start_date: new Date('2015-07-29'),
-            initial_investment_end_date: new Date('2025-08-05'),
+            // initial_investment_end_date: new Date('2025-08-05'),
+            initial_investment_end_date: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000), // current date - 12 days
             initial_investment_token: 'BIT10.TOP'
         },
     });

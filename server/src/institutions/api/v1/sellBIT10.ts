@@ -59,20 +59,20 @@ async function fetchPriceData(): Promise<{ ethPrice: number; bit10Price: number 
 
 /**
  * @swagger
- * /api/v1/trades/buy:
+ * /api/v1/trades/sell:
  *   post:
- *     summary: Create a BIT10 buy transaction on Base
+ *     summary: Create a BIT10 sell transaction on Base
  *     description: |
- *       Creates a new transaction for buying BIT10 tokens on the Base blockchain.
+ *       Creates a new transaction for selling BIT10 tokens on the Base blockchain.
  *       This endpoint requires authentication via API key and creates a transaction on the ICP canister.
  *       
  *       **Authentication**: Requires a Bearer token in the Authorization header
  *       
  *       **NOTE**: Use the following details for the request body
  *       - user_wallet_address = The address where you want to receive the BIT10 token. Type: String.
- *       - token_in_address = The address should be **0x0000000000000000000000000000000000000000b** for native ETH on Base. Type: String.
- *       - token_out_address = The address should be **0x2d309c7c5fbbf74372edfc25b10842a7237b92de** for BIT10.TOP on Base. Type: String.
- *       - token_out_amount = The number of BIT10.TOP tokens (on Base) you want to receive. Type: String.
+ *       - token_in_address = The address should be **0x2d309c7c5fbbf74372edfc25b10842a7237b92de** for BIT10.TOP on Base. Type: String.
+ *       - token_in_amount = The number of BIT10.TOP tokens (on Base) you want to sell. Type: String.
+ *       - token_out_address = The address should be **0x0000000000000000000000000000000000000000b** for native ETH on Base. Type: String.
  * 
  *       **Process Flow**:
  *       1. Validates API key
@@ -92,26 +92,26 @@ async function fetchPriceData(): Promise<{ ethPrice: number; bit10Price: number 
  *             required:
  *               - user_wallet_address
  *               - token_in_address
+ *               - token_in_amount
  *               - token_out_address
- *               - token_out_amount
  *             properties:
  *               user_wallet_address:
  *                 type: string
  *                 description: User's wallet address to receive BIT10 tokens
  *               token_in_address:
  *                 type: string
- *                 description: Input token address (ETH on Base). Use "0x0000000000000000000000000000000000000000b" as input for native ETH on Base
+ *                 description: Input token address (BIT10.TOP on Base). Use "0x2d309c7c5fbbf74372edfc25b10842a7237b92de" as input for BIT10.TOP token on Base.
+ *               token_in_amount:
+ *                 type: string
+ *                 description: Amount of BIT10.TOP tokens to sell
  *               token_out_address:
  *                 type: string
- *                 description: Output token address (BIT10.TOP on Base). Use "0x2d309c7c5fbbf74372edfc25b10842a7237b92de" as input for BIT10.TOP token on Base.
- *               token_out_amount:
- *                 type: string
- *                 description: Amount of BIT10.TOP tokens to receive
+ *                 description: Output token address (ETH on Base). Use "0x0000000000000000000000000000000000000000b" as input for native ETH on Base
  *           example:
  *             user_wallet_address: "0xuser1234567890abcdefuser1234567890abcdef"
- *             token_in_address: "0x0000000000000000000000000000000000000000b"
- *             token_out_address: "0x2d309c7c5fbbf74372edfc25b10842a7237b92de"
- *             token_out_amount: "1"
+ *             token_in_address: "0x2d309c7c5fbbf74372edfc25b10842a7237b92de"
+ *             token_in_amount: "1"
+ *             token_out_address: "0x0000000000000000000000000000000000000000b"
  *     responses:
  *       200:
  *         description: Transaction created successfully
@@ -169,7 +169,7 @@ async function fetchPriceData(): Promise<{ ethPrice: number; bit10Price: number 
  *               $ref: '#/components/schemas/Error'
  */
 
-export const handleBuyBIT10 = async (req: http.IncomingMessage, res: http.ServerResponse) => {
+export const handleSellBIT10 = async (req: http.IncomingMessage, res: http.ServerResponse) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -224,13 +224,13 @@ export const handleBuyBIT10 = async (req: http.IncomingMessage, res: http.Server
             try {
                 const requestData = JSON.parse(body);
 
-                const { token_in_address, token_out_address, user_wallet_address, token_out_amount } = requestData;
+                const { token_in_address, token_in_amount, token_out_address, user_wallet_address } = requestData;
 
-                if (!token_in_address || !token_out_address || !user_wallet_address || !token_out_amount) {
+                if (!token_in_address || !token_in_amount || !token_out_address || !user_wallet_address) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({
                         error: 'Missing required fields',
-                        message: 'All fields are required: token_in_address, token_out_address, user_wallet_address, token_out_amount'
+                        message: 'All fields are required: token_in_address, token_in_amount, token_out_address, user_wallet_address'
                     }));
                     return;
                 }
@@ -246,18 +246,18 @@ export const handleBuyBIT10 = async (req: http.IncomingMessage, res: http.Server
                     return;
                 }
 
-                const tokenOutAmountNum = parseFloat(token_out_amount);
+                const tokenOutAmountNum = parseFloat(token_in_amount);
                 if (isNaN(tokenOutAmountNum) || tokenOutAmountNum <= 0) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({
-                        error: 'Invalid token_out_amount',
-                        message: 'token_out_amount must be a valid positive number'
+                        error: 'Invalid token_in_amount',
+                        message: 'token_in_amount must be a valid positive number'
                     }));
                     return;
                 }
 
                 const calculatedTokenInAmount = (priceData.bit10Price / priceData.ethPrice) * tokenOutAmountNum;
-                const token_in_amount = calculatedTokenInAmount.toFixed(18);
+                const token_out_amount = calculatedTokenInAmount.toFixed(18);
 
                 const canisterId = '6phs7-6yaaa-aaaap-qpvoq-cai';
                 const agent = new HttpAgent({ host: 'https://icp-api.io' });
@@ -267,7 +267,7 @@ export const handleBuyBIT10 = async (req: http.IncomingMessage, res: http.Server
                     canisterId,
                 });
 
-                const response = await actor.base_create_transaction({
+                const response = await actor.base_create_sell_transaction({
                     user_wallet_address: user_wallet_address,
                     token_in_address: token_in_address,
                     token_in_amount: token_in_amount,
@@ -282,9 +282,9 @@ export const handleBuyBIT10 = async (req: http.IncomingMessage, res: http.Server
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(enhancedResponse));
             } catch (error) {
-                console.error('Error processing buy request:', error);
+                console.error('Error processing sell request:', error);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
-                let errorMessage = 'Failed to process buy request';
+                let errorMessage = 'Failed to process sell request';
                 if (error && typeof error === 'object' && error !== null && 'message' in error) {
                     errorMessage = (error as { message?: string }).message || errorMessage;
                 }
@@ -298,7 +298,7 @@ export const handleBuyBIT10 = async (req: http.IncomingMessage, res: http.Server
         res.writeHead(405, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             error: 'Method Not Allowed',
-            message: 'Use POST method with JSON body containing: token_in_address, token_out_address, user_wallet_address, token_out_amount'
+            message: 'Use POST method with JSON body containing: token_in_address, token_in_amount, token_out_address, user_wallet_address'
         }));
     }
 };

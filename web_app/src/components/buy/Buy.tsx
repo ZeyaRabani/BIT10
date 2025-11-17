@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card'
 import BuyModule from './buyModule'
 import SellModule from './sellModule'
-// ToDo: Update this
-// import NewBuyModule from './newBuyModule'
 
 export default function Buy() {
     const [activeTab, setActiveTab] = useState('buy');
@@ -32,19 +29,9 @@ export default function Buy() {
     };
 
     return (
-        <div className='flex flex-col py-4 h-full items-center justify-center'>
-            <Card className='border-none w-[300px] md:w-[560px] animate-fade-bottom-up bg-gray-200 dark:bg-[#1c1717]'>
-                <CardHeader>
-                    <CardTitle>Buy BIT10</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {activeTab === 'buy' && <BuyModule onSwitchToSell={() => handleTabChange('sell')} />}
-                    {activeTab === 'sell' && <SellModule onSwitchToBuy={() => handleTabChange('buy')} />}
-                </CardContent>
-            </Card>
-        </div>
-        // <>
-        //     <NewBuyModule />
-        // </>
+        <>
+            {activeTab === 'buy' && <BuyModule onSwitchToSell={() => handleTabChange('sell')} />}
+            {activeTab === 'sell' && <SellModule onSwitchToBuy={() => handleTabChange('buy')} />}
+        </>
     )
 }

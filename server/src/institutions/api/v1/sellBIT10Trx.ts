@@ -4,12 +4,12 @@ import { idlFactory } from '../../../lib/buy.did'
 
 /**
  * @swagger
- * /api/v1/trades/buy-bit10-trx:
+ * /api/v1/trades/sell-bit10-trx:
  *   post:
- *     summary: Process a BIT10 buy transaction by hash
+ *     summary: Process a BIT10 sell transaction by hash
  *     description: |
  *       Processes an existing transaction using its transaction hash. This endpoint requires authentication 
- *       via API key and executes the buy operation on the ICP canister.
+ *       via API key and executes the sell operation on the ICP canister.
  *       
  *       **Authentication**: Requires a Bearer token in the Authorization header.
  *       
@@ -19,7 +19,7 @@ import { idlFactory } from '../../../lib/buy.did'
  *       3. Calls the ICP canister to process the transaction.
  *       4. Returns the processing result (Ok/Err variant).
  *       
- *       **Use Case**: After creating a transaction via `/api/v1/trades/buy`, use this endpoint 
+ *       **Use Case**: After creating a transaction via `/api/v1/trades/sell`, use this endpoint 
  *       to execute the transaction once the on-chain transaction is confirmed.
  *     tags: [Trades]
  *     security:
@@ -29,7 +29,7 @@ import { idlFactory } from '../../../lib/buy.did'
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/BuyTrxRequest'
+ *             $ref: '#/components/schemas/SellTrxRequest'
  *           example:
  *             trx_hash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
  *     responses:
@@ -79,7 +79,7 @@ import { idlFactory } from '../../../lib/buy.did'
  *                 transaction_type:
  *                   type: string
  *                   description: Type of transaction. Buy, Sell, or Reverted
- *                   example: "Buy"
+ *                   example: "Sell"
  *                 network:
  *                   type: string
  *                   description: Chain used for the transaction
@@ -98,7 +98,7 @@ import { idlFactory } from '../../../lib/buy.did'
  *               token_out_address: "0xtoken1234567890abcdefuser1234567890abcdef"
  *               token_out_amount: "1"
  *               token_out_tx_hash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
- *               transaction_type: "Buy"
+ *               transaction_type: "Sell"
  *               network: "Base"
  *               transaction_timestamp: "1760476996699879516"
  *       400:
@@ -178,7 +178,7 @@ import { idlFactory } from '../../../lib/buy.did'
  *                   message: "Received unexpected response from canister"
  */
 
-export const handleBuyBIT10Trx = async (req: http.IncomingMessage, res: http.ServerResponse) => {
+export const handleSellBIT10Trx = async (req: http.IncomingMessage, res: http.ServerResponse) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -253,7 +253,7 @@ export const handleBuyBIT10Trx = async (req: http.IncomingMessage, res: http.Ser
                     canisterId,
                 });
 
-                const transfer = await actor.base_buy(trx_hash);
+                const transfer = await actor.base_sell(trx_hash);
 
                 if (transfer.Ok) {
                     res.writeHead(200, { 'Content-Type': 'application/json' });
