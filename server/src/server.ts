@@ -25,6 +25,7 @@ import { handleBuyBIT10Trx } from './institutions/api/v1/buyBIT10Trx'
 import { handleSellBIT10 } from './institutions/api/v1/sellBIT10'
 import { handleSellBIT10Trx } from './institutions/api/v1/sellBIT10Trx'
 import { swaggerSpec } from './swagger'
+import { handleGetCoinGeckoData, fetchAndCacheCoinGeckoData } from './routes/bit10CGTest'
 
 dotenv.config();
 
@@ -53,7 +54,8 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/api/v1/trades/buy': handleBuyBIT10,
     '/api/v1/trades/buy-bit10-trx': handleBuyBIT10Trx,
     '/api/v1/trades/sell': handleSellBIT10,
-    '/api/v1/trades/sell-bit10-trx': handleSellBIT10Trx
+    '/api/v1/trades/sell-bit10-trx': handleSellBIT10Trx,
+    '/test-get-crypto-values': handleGetCoinGeckoData
 };
 
 const generateSwaggerHTML = () => {
@@ -245,7 +247,8 @@ server.listen(PORT, '::', async () => {
             fetchAndUpdateBIT10DEFIData(),
             fetchAndUpdateBIT10BRC20Data(),
             fetchAndUpdateBIT10TOPData(),
-            fetchAndUpdateBIT10MEMEData()
+            fetchAndUpdateBIT10MEMEData(),
+            fetchAndCacheCoinGeckoData()
         ]);
 
         results.forEach((result, index) => {

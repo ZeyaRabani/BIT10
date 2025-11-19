@@ -594,7 +594,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                             <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
                                                                         </TooltipTrigger>
                                                                         <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                                            Price in {form.watch('payment_token')} + 1% Management fee <br />
+                                                                            Price of {form.watch('payment_token')} (in USD) + 1% Management fee <br />
                                                                             $ {formatCompactNumber(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatCompactNumber(0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatCompactNumber((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0'))))}
                                                                         </TooltipContent>
                                                                     </Tooltip>

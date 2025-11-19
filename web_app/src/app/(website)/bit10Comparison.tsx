@@ -391,6 +391,16 @@ export default function BIT10Comparison() {
 
     return (
         <div className='flex flex-col items-center space-y-4'>
+            <div className='py-4 md:py-10'>
+                <h1 className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
+                    Diversify Your Portfolio Effortlessly <br /> with BIT10
+                </h1>
+
+                <p className='text-xl text-center dark:text-gray-300 max-w-4xl z-[1]'>
+                    Get instant access to the top 10 cryptos in one secure, over-collateralized token. No more picking winners - let BIT10 handle the diversification. Upgrade to Premium for auto-rebalancing and exclusive perks.
+                </p>
+            </div>
+
             <div className='mt-4 py-4 w-full'>
                 <div className='grid lg:grid-cols-3 gap-8'>
                     {['1Y', '5Y', '10Y'].map((period) => (
@@ -404,16 +414,6 @@ export default function BIT10Comparison() {
                         </div>
                     ))}
                 </div>
-            </div>
-
-            <div className='py-4 md:py-10'>
-                <h1 className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
-                    Diversify Your Portfolio Effortlessly <br /> with BIT10
-                </h1>
-
-                <p className='text-xl text-center dark:text-gray-300 max-w-4xl z-[1]'>
-                    Get instant access to the top 10 cryptos in one secure, over-collateralized token. No more picking winners - let BIT10 handle the diversification. Upgrade to Premium for auto-rebalancing and exclusive perks.
-                </p>
             </div>
 
             <div className='grid lg:grid-cols-5 gap-3'>

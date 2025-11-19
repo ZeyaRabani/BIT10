@@ -4,9 +4,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { AuroraBackground } from '@/components/ui/aurora-background'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { ExternalLink } from 'lucide-react'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import BIT10Comparison from './bit10Comparison'
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards'
@@ -18,7 +15,6 @@ import BaseChainImg from '@/assets/wallet/base-logo.svg'
 import SolChainImg from '@/assets/wallet/solana-logo.svg'
 import BSCChainImg from '@/assets/wallet/bsc-logo.svg'
 import ICPImg from '@/assets/home/ICP.svg'
-import BSLImg from '@/assets/home/bsl.png'
 import EasyAImg from '@/assets/home/EasyA.png'
 
 const containerVariants = {
@@ -94,10 +90,10 @@ const parterners = [
     name: 'ICP',
     logo: ICPImg,
   },
-  {
-    name: 'BSL',
-    logo: BSLImg,
-  },
+  // {
+  //   name: 'BSL',
+  //   logo: BSLImg,
+  // },
   {
     name: 'EasyA',
     logo: EasyAImg,
@@ -115,7 +111,7 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
               className='text-4xl md:text-6xl font-bold text-center bg-clip-text dark:text-transparent dark:bg-gradient-to-b dark:from-neutral-50 dark:to-neutral-400 bg-opacity-50 pb-2'>
-              BIT10 <br /> <span className='italic'>Crypto Index Funds</span>
+              BIT10 <br /> <span className='italic'>On-Chain Crypto Index Funds</span>
             </motion.h1>
 
             <motion.div
@@ -125,31 +121,12 @@ export default function Page() {
               className='py-2 text-center dark:text-gray-300 text-xl'>
               Diversified exposure to the top 10 cryptocurrencies with automatic rebalancing
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0.0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.8, ease: 'easeInOut' }}
-              className='flex flex-row space-x-2 py-2 items-center justify-center'>
-              <Button className='px-6 md:px-10' asChild>
-                <Link href='/launch'>
-                  Launch App
-                </Link>
-              </Button>
-              <a href='https://gitbook.bit10.app' target='_blank' rel='noreferrer noopener'>
-                <Button variant='outline' className='tracking-wider border-muted dark:text-white'>
-                  Read GitBook <ExternalLink className='h-4 w-4' />
-                </Button>
-              </a>
-            </motion.div>
           </div>
         </div>
       </AuroraBackground>
 
-      <MaxWidthWrapper className='flex flex-col space-y-8 py-8'>
-        <BIT10Comparison />
-
-        <div className='flex flex-col items-center space-y-2 py-4 md:py-8'>
+      <MaxWidthWrapper className='flex flex-col space-y-8 pb-8 pt-4'>
+        <div className='flex flex-col items-center space-y-2 pb-4 md:pb-8'>
           <motion.h1
             initial={{ opacity: 0.0, y: 80 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -205,6 +182,8 @@ export default function Page() {
           </motion.div>
         </div>
 
+        <BIT10Comparison />
+
         <div className='flex flex-col items-center space-y-2'>
           <motion.h1
             initial={{ opacity: 0.0, y: 80 }}
@@ -230,14 +209,14 @@ export default function Page() {
           ></motion.iframe>
         </div>
 
-        <div className='flex items-center justify-center py-4 md:py-8'>
+        {/* <div className='flex items-center justify-center py-4 md:py-8'>
           <div className='border-2 border-accent bg-accent rounded-lg w-full max-w-4xl py-4 md:py-8 flex flex-col items-center justify-center space-y-4'>
             <div className='text-3xl md:text-4xl font-semibold text-center'>Crypto Index Funds Market</div>
             <div className='text-xl md:text-2xl font-semibold text-center'><span className='text-primary'>$150 billion</span> market cap</div>
             <div className='text-xl md:text-2xl text-center'>Current AUM: <span className='font-semibold'>&lt; $5 billion</span></div>
             <div className='text-2xl md:text-3xl font-semibold text-green-500 text-center'>AIM: 100x Growth Potential</div>
           </div>
-        </div>
+        </div> */}
 
         <div className='flex flex-col antialiased items-center justify-center relative overflow-hidden'>
           <div className='my-8 text-center'>

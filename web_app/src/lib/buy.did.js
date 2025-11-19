@@ -54,6 +54,18 @@ export const idlFactory = ({ IDL }) => {
   const BIT10TokenResponse = IDL.Record({
     'tokens': IDL.Vec(IDL.Tuple(IDL.Text, TokenDetails)),
   });
+  const TokenAvailability = IDL.Record({
+    'token_available_supply': IDL.Text,
+    'total_tokens_sold': IDL.Text,
+    'total_tokens_bought': IDL.Text,
+    'chain': IDL.Text,
+    'token_address': IDL.Text,
+    'total_chain_supply': IDL.Text,
+  });
+  const Result_TokenAvailability = IDL.Variant({
+    'Ok': TokenAvailability,
+    'Err': IDL.Text,
+  });
   const ICPBuyArgs = IDL.Record({
     'token_in_address': IDL.Text,
     'token_out_address': IDL.Text,
@@ -65,6 +77,16 @@ export const idlFactory = ({ IDL }) => {
     'token_out_address': IDL.Text,
   });
   return IDL.Service({
+    'add_data_to_buy_history': IDL.Func(
+      [SwapResponseData],
+      [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+      [],
+    ),
+    'add_data_to_sell_history': IDL.Func(
+      [SwapResponseData],
+      [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+      [],
+    ),
     'associated_token_account': IDL.Func(
       [IDL.Text],
       [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
@@ -72,11 +94,28 @@ export const idlFactory = ({ IDL }) => {
     ),
     'base_address': IDL.Func([], [IDL.Text], []),
     'base_buy': IDL.Func([IDL.Text], [SwapResponse], []),
+    'base_create_sell_transaction': IDL.Func(
+      [SwapArgs],
+      [TransactionResponse],
+      [],
+    ),
     'base_create_transaction': IDL.Func([SwapArgs], [TransactionResponse], []),
+    'base_sell': IDL.Func([IDL.Text], [SwapResponse], []),
     'bit10_token': IDL.Func([], [BIT10TokenResponse], ['query']),
+    'bit10_token_available_supply': IDL.Func(
+      [IDL.Text],
+      [Result_TokenAvailability],
+      ['query'],
+    ),
     'bsc_address': IDL.Func([], [IDL.Text], []),
     'bsc_buy': IDL.Func([IDL.Text], [SwapResponse], []),
+    'bsc_create_sell_transaction': IDL.Func(
+      [SwapArgs],
+      [TransactionResponse],
+      [],
+    ),
     'bsc_create_transaction': IDL.Func([SwapArgs], [TransactionResponse], []),
+    'bsc_sell': IDL.Func([IDL.Text], [SwapResponse], []),
     'create_associated_token_account': IDL.Func(
       [IDL.Text],
       [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],

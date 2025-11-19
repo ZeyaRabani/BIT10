@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import * as z from 'zod'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
+import { useEVMWallet } from '@/context/EVMWalletContext'
 import { useQueries } from '@tanstack/react-query'
 import { whitelistedAddress } from '@/actions/dbActions'
 import { toast } from 'sonner'
@@ -10,6 +11,7 @@ import { ChevronsUpDown, Loader2, Info, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { sellPayTokensICP, sellReceiveTokensICP, fetchICPTokenBalance, sellICPBIT10Token } from './icp/ICPBuyModule'
+import { sellPayTokensBase, sellReceiveTokensBase, fetchBaseTokenBalance, sellBaseBIT10Token } from './base/BaseBuyModule'
 import BIT10Img from '@/assets/tokens/bit10.svg'
 import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -65,6 +67,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
 
     const { chain } = useChain();
     const { icpAddress } = useICPWallet();
+    const { evmAddress } = useEVMWallet();
 
     const fetchWhitelistedAddress = async () => {
         try {
@@ -93,13 +96,14 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         if (chain == 'icp') {
             return icpAddress;
         }
-        // else if (chain == 'base' || chain == 'bsc') {
-        //     return evmAddress;
-        // } else if (chain == 'solana') {
+        else if (chain == 'base' || chain == 'bsc') {
+            return evmAddress;
+        }
+        // else if (chain == 'solana') {
         //     return wallet.publicKey?.toBase58();
         // }
         return undefined;
-    }, [icpAddress, chain]);
+    }, [chain, icpAddress, evmAddress]);
 
     const isApproved = (whitelistedPrincipal as WhitelistedPrincipal[]).some(
         (item) => item.userPrincipalId.toLocaleLowerCase() === userAddress?.toLocaleLowerCase()
@@ -152,10 +156,16 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                 queryFn: () => fetchRecievePrice('ICP'),
                 refetchInterval: 30000, // 30 sec.
             },
+            {
+                queryKey: ['ethPrice'],
+                queryFn: () => fetchRecievePrice('ETH'),
+                refetchInterval: 30000, // 30 sec.
+            },
         ],
     });
 
     const icpAmount = useMemo(() => receivePriceQueries[0].data, [receivePriceQueries]);
+    const ethAmount = useMemo(() => receivePriceQueries[1].data, [receivePriceQueries]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -195,11 +205,18 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             if (receiveToken === 'ICP') {
                 return icpAmount ?? 0;
             }
-        } else {
+        }
+        // Base
+        else if (chain === 'base') {
+            if (receiveToken === 'ETH') {
+                return ethAmount ?? 0;
+            }
+        }
+        else {
             return 0;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chain, form.watch('to_token'), icpAmount]);
+    }, [chain, form.watch('to_token'), icpAmount, ethAmount]);
 
     const fromBalanceQueries = useQueries({
         queries: [
@@ -222,6 +239,16 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                 enabled: !!icpAddress && chain === 'icp' && !!payingTokenAddress,
                 refetchInterval: 30000, // 30 seconds
             },
+            // For Base
+            {
+                queryKey: ['paymentTokenBalanceTOP', evmAddress, payingTokenAddress, chain],
+                queryFn: () => {
+                    if (!evmAddress || chain !== 'base' || !payingTokenAddress) return '0';
+                    return fetchBaseTokenBalance({ tokenAddress: '0x2d309c7c5FbBf74372EdfC25B10842a7237b92dE', address: evmAddress });
+                },
+                enabled: !!evmAddress && chain === 'base' && !!payingTokenAddress,
+                refetchInterval: 30000, // 30 seconds
+            }
         ],
     });
 
@@ -230,6 +257,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             return fromBalanceQueries[0].data;
         } else if (payingTokenAddress == 'g37b3-lqaaa-aaaap-qp4hq-cai') {
             return fromBalanceQueries[1].data;
+        } else if (payingTokenAddress == '0x2d309c7c5FbBf74372EdfC25B10842a7237b92dE') {
+            return fromBalanceQueries[2].data;
         }
         return '0';
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -239,12 +268,12 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const balance = Number(payingTokenBalance);
 
     // ToDo: temp.
-    const sellDisabledConditions = chain === 'base' || chain === 'solana' || chain === 'bsc' || !chain || !isApproved || selling || fromAmount > balance || fromAmount <= 0 || balance <= 0;
+    const sellDisabledConditions = chain === 'solana' || chain === 'bsc' || !chain || !isApproved || selling || fromAmount > balance || fromAmount <= 0 || balance <= 0;
 
     const getSellMessage = (): string => {
         if (!chain) return 'Connect your wallet to continue';
         // ToDo: temp.
-        if (chain === 'base' || chain === 'solana' || chain === 'bsc') return `Selling coming soon on ${chain === 'base' ? 'Base' : chain === 'solana' ? 'Solana' : 'Binance Smart Chain'}`;
+        if (chain === 'solana' || chain === 'bsc') return `Selling coming soon on ${chain === 'solana' ? 'Solana' : 'Binance Smart Chain'}`;
         if (!isApproved) return 'Access Restricted';
         if (selling) return 'Selling...';
         if (fromAmount >= balance || fromAmount >= balance * 1.01 && !selling) return 'Your balance is too low for this transaction';
@@ -255,6 +284,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const currentPaymentTokens = useMemo(() => {
         if (chain === 'icp') {
             return sellPayTokensICP;
+        } else if (chain === 'base') {
+            return sellPayTokensBase;
         } else {
             return sellPayTokensICP;
         }
@@ -263,6 +294,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const currentReceiveTokens = useMemo(() => {
         if (chain === 'icp') {
             return sellReceiveTokensICP;
+        } else if (chain === 'base') {
+            return sellReceiveTokensBase;
         } else {
             return sellReceiveTokensICP;
         }
@@ -288,12 +321,16 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             }
 
             const tokenInAmount = isNaN(values.from_bit10_amount) ? 0 : Number(values.from_bit10_amount);
-
+            const tokenOutAmount = (form.watch('from_bit10_amount') * selectedBIT10TokenPrice) / Number(receiveingTokenPrice);
 
             if (chain === 'icp') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
                 await sellICPBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenInAmount: tokenInAmount, icpAddress: icpAddress! });
+            } else if (chain === 'base') {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                await sellBaseBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenInAmount: tokenInAmount, tokenOutAmount: tokenOutAmount, baseAddress: evmAddress! });
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -353,7 +390,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
 
     const receiveAmount = useMemo(() => {
         if (selectedBIT10TokenPrice > 0 && Number(receiveingTokenPrice) > 0) {
-            const amount = (Number(form.watch('from_bit10_amount')) * selectedBIT10TokenPrice * 0.99) / Number(receiveingTokenPrice);
+            const amount = (((form.watch('from_bit10_amount') * 1.01) * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / Number(receiveingTokenPrice));
             return Number(amount.toFixed(8));
         }
         return 0;
@@ -475,17 +512,16 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                         <div className='pt-[0.5px] text-center md:text-start'>
                                                             <TooltipProvider>
                                                                 <Tooltip delayDuration={300}>
-                                                                    <TooltipTrigger asChild>
-                                                                        <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
-                                                                            &asymp; ${formatCompactNumber(form.watch('from_bit10_amount') * selectedBIT10TokenPrice)}
+                                                                    <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
+                                                                        &asymp; ${formatCompactNumber((form.watch('from_bit10_amount') * selectedBIT10TokenPrice) * 1.01)}
+                                                                        <TooltipTrigger asChild>
                                                                             <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
-                                                                        </div>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                                        The Management Fee (1%) is deducted from your output amount <br />
-                                                                        You sell {formatCompactNumber(Number(form.watch('from_bit10_amount')))} {form.watch('from_bit10_token')} worth ${formatCompactNumber(Number(form.watch('from_bit10_amount')) * selectedBIT10TokenPrice)},
-                                                                        receive {formatCompactNumber(receiveAmount)} {form.watch('to_token')}
-                                                                    </TooltipContent>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                                            Price of {form.watch('from_bit10_token')} (in USD) + 1% Management fee <br />
+                                                                            $ {formatCompactNumber((form.watch('from_bit10_amount') * selectedBIT10TokenPrice))} + $ {formatCompactNumber(0.01 * ((form.watch('from_bit10_amount') * selectedBIT10TokenPrice)))} = $ {formatCompactNumber((form.watch('from_bit10_amount') * selectedBIT10TokenPrice) * 1.01)}
+                                                                        </TooltipContent>
+                                                                    </div>
                                                                 </Tooltip>
                                                             </TooltipProvider>
                                                         </div>
@@ -596,11 +632,11 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                     <div className='flex flex-col space-y-[1.5px]'>
                                                         {/* <div className='text-4xl text-center md:text-start text-wrap pt-[3px] bg-blue-500'> */}
                                                         <div className='text-4xl text-center md:text-start text-wrap pt-[3px]'>
-                                                            {formatCompactNumber(receiveAmount)}
+                                                            {formatCompactNumber(((form.watch('from_bit10_amount') * selectedBIT10TokenPrice) / Number(receiveingTokenPrice)))}
                                                         </div>
                                                         {/* <div className='bg-green-500'> */}
                                                         <div>
-                                                            &asymp; ${formatCompactNumber(Number(receiveAmount) * Number(receiveingTokenPrice))}
+                                                            &asymp; ${formatCompactNumber(form.watch('from_bit10_amount') * selectedBIT10TokenPrice)}
                                                         </div>
                                                     </div>
                                                     <div className='flex flex-col space-y-0.5'>
