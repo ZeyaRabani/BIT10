@@ -5,10 +5,12 @@ import NodeCache from 'node-cache'
 import cron from 'node-cron'
 
 type CoinData = {
-    id: number;
-    name: string;
+    id: string;
     symbol: string;
+    name: string;
+    image: string;
     price: number;
+    marketCap: number;
 };
 
 type BIT10TOPEntry = {
@@ -36,7 +38,7 @@ async function fetchData() {
 }
 
 // cron.schedule('*/30 * * * * *', () => { // 30 sec
-cron.schedule('*/20 * * * *', () => { // 20 min
+cron.schedule('*/10 * * * *', () => { // 10 min
     fetchData().catch(error => console.error('Error in fetchData:', error));
 });
 

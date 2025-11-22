@@ -71,7 +71,7 @@ export default function Page() {
     const [processing, setProcessing] = useState<boolean>(false);
     const [calculationResult, setCalculationResult] = useState<ComparisonResult | null>(null);
 
-    const fetchBit10Comparison = async (year: number) => {
+    const fetchBIT10Comparison = async (year: number) => {
         const validYears = [15];
         if (!validYears.includes(year)) {
             toast.error('Invalid year selected.');
@@ -99,7 +99,7 @@ export default function Page() {
         queries: [
             {
                 queryKey: ['bit10TokenComparison15Y'],
-                queryFn: () => fetchBit10Comparison(15)
+                queryFn: () => fetchBIT10Comparison(15)
             }
         ],
     });

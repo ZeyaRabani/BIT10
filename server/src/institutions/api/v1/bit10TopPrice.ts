@@ -6,15 +6,16 @@ import cron from 'node-cron'
 import { HermesClient } from '@pythnetwork/hermes-client'
 
 type CoinDataInput = {
-    id: number;
-    name: string;
+    id: string;
     symbol: string;
-    marketCap: number;
+    name: string;
+    image: string;
     price: number;
+    marketCap: number;
 }
 
 type CoinDataOutput = {
-    id: number;
+    id: string;
     name: string;
     symbol: string;
     circulatingSupply: number;

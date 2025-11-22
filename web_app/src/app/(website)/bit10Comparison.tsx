@@ -1,25 +1,35 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Card, CardTitle, CardContent, CardHeader, CardDescription, CardFooter } from '@/components/ui/card'
+import { Card, CardTitle, CardContent, CardHeader, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import AnimatedBackground from '@/components/ui/animated-background'
 import { CartesianGrid, XAxis, YAxis, LineChart, Line } from 'recharts'
+import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
-import * as z from 'zod'
-import { Loader2 } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form'
+import Link from 'next/link'
+import Image, { type StaticImageData } from 'next/image'
+import ICPChainImg from '@/assets/wallet/icp-logo.svg'
+import BaseChainImg from '@/assets/wallet/base-logo.svg'
+import SolChainImg from '@/assets/wallet/solana-logo.svg'
+import BSCChainImg from '@/assets/wallet/bsc-logo.svg'
 import { Button } from '@/components/ui/button'
-import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
-import { cn, formatCompactNumber } from '@/lib/utils'
-import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { motion } from 'framer-motion'
+import { CheckIcon, XIcon } from 'lucide-react'
+
+const containerVariants = {
+    visible: {
+        transition: {
+            staggerChildren: 0.3,
+        },
+    },
+};
+
+const cardVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeInOut' } },
+};
 
 const tabs = ['10Y', '5Y', '3Y', '1Y'];
 
@@ -37,41 +47,162 @@ type ProcessedDataPoint = {
     sp500Value: number;
 };
 
-type AssetComparison = {
-    name: string;
-    initialInvestment: number;
-    currentValue: number;
-    totalReturn: number;
-    percentageReturn: number;
-    apr?: number;
-};
+const chains = [
+    {
+        name: 'Internet Computer',
+        logo: ICPChainImg as StaticImageData,
+    },
+    {
+        name: 'Base',
+        logo: BaseChainImg as StaticImageData,
+    },
+    {
+        name: 'Solana',
+        logo: SolChainImg as StaticImageData,
+    },
+    {
+        name: 'Binance Smart Chain',
+        logo: BSCChainImg as StaticImageData,
+    }
+]
 
-type ComparisonResult = {
-    startDate: string;
-    endDate: string;
-    assets: AssetComparison[];
-};
+const color = ['#F7931A', '#3C3C3D', '#006097', '#F3BA2F', '#00FFA3', '#B51D06', '#C2A633', '#0033AD', '#29B6F6', '#ff0066'];
 
-const FormSchema = z.object({
-    initial_investment: z.string()
-        .min(1, { message: 'Amount is required' })
-        .transform((val) => Number(val))
-        .refine((val) => !isNaN(val) && val > 0, { message: 'Must be a positive number' }),
-    initial_investment_start_date: z.date({
-        required_error: 'Please choose a valid start date',
-    }),
-    initial_investment_end_date: z.date({
-        required_error: 'Please choose a valid end date after the start date',
-    }),
-    initial_investment_token: z.string({
-        required_error: 'Select a token'
-    })
-});
+const pricingItems = [
+    {
+        title: 'Free',
+        tagline: 'Perfect for getting started with BIT10.',
+        price: 'Free',
+        features: [
+            {
+                text: 'Instant Top 10 Crypto Exposure',
+                negative: false,
+            },
+            {
+                text: '110% Over-Collateralized',
+                negative: false,
+            },
+            {
+                text: 'Diversified Portfolio',
+                negative: false,
+            },
+            {
+                text: '1% Management Fee',
+                negative: null,
+            },
+            {
+                text: '3 Weekly Raffle Entries',
+                negative: null,
+            },
+            {
+                text: 'AI Portfolio Manager',
+                negative: true,
+            },
+            {
+                text: 'Priority Email Support',
+                negative: true,
+            },
+            {
+                text: 'License',
+                negative: true,
+            },
+            {
+                text: 'Integration Consultation',
+                negative: true,
+            }
+        ]
+    },
+    {
+        title: 'Pro',
+        tagline: 'Advanced tools and reduced fees for serious traders.',
+        price: '9.99 USDC',
+        features: [
+            {
+                text: 'Instant Top 10 Crypto Exposure',
+                negative: false,
+            },
+            {
+                text: '110% Over-Collateralized',
+                negative: false,
+            },
+            {
+                text: 'Diversified Portfolio',
+                negative: false,
+            },
+            {
+                text: '0.5% Management Fee',
+                negative: null,
+            },
+            {
+                text: '5 Weekly Raffle Entries',
+                negative: null,
+            },
+            {
+                text: 'AI Portfolio Manager',
+                negative: false,
+            },
+            {
+                text: 'Priority Email Support',
+                negative: false,
+            },
+            {
+                text: 'License',
+                negative: true,
+            },
+            {
+                text: 'Integration Consultation',
+                negative: true,
+            }
+        ]
+    },
+    {
+        title: 'Institution',
+        tagline: 'High-performance solutions for institutions.',
+        price: '1000 USDC',
+        features: [
+            {
+                text: 'Instant Top 10 Crypto Exposure',
+                negative: false,
+            },
+            {
+                text: '110% Over-Collateralized',
+                negative: false,
+            },
+            {
+                text: 'Diversified Portfolio',
+                negative: false,
+            },
+            {
+                text: '0.4% Management Fee',
+                negative: null,
+            },
+            {
+                text: '7 Weekly Raffle Entries',
+                negative: null,
+            },
+            {
+                text: 'AI Portfolio Manager',
+                negative: false,
+            },
+            {
+                text: 'Priority Email Support',
+                negative: false,
+            },
+            {
+                text: 'License',
+                negative: false,
+            },
+            {
+                text: 'Integration Consultation',
+                negative: false,
+            }
+        ]
+    }
+]
 
 export default function BIT10Comparison() {
     const [activeTab, setActiveTab] = useState('10Y');
-    const [processing, setProcessing] = useState<boolean>(false);
-    const [calculationResult, setCalculationResult] = useState<ComparisonResult | null>(null);
+    const [innerRadius, setInnerRadius] = useState<number>(80);
 
     const handleTabChange = (label: string | null) => {
         if (label) {
@@ -79,7 +210,7 @@ export default function BIT10Comparison() {
         }
     };
 
-    const fetchBit10Comparison = async (year: number) => {
+    const fetchBIT10Comparison = async (year: number) => {
         const validYears = [1, 3, 5, 10, 15];
         if (!validYears.includes(year)) {
             toast.error('Invalid year selected.');
@@ -103,27 +234,43 @@ export default function BIT10Comparison() {
         }
     };
 
+    const fetchBIT10Tokens = async (tokenPriceAPI: string) => {
+        const response = await fetch(tokenPriceAPI);
+
+        if (!response.ok) {
+            toast.error('Error fetching BIT10 price. Please try again!');
+        }
+
+        let data;
+        let returnData;
+        if (tokenPriceAPI === 'bit10-latest-price-top') {
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            returnData = data.data ?? 0;
+        }
+        return returnData;
+    };
+
     const bit10Queries = useQueries({
         queries: [
             {
                 queryKey: ['bit10TokenComparison10Y'],
-                queryFn: () => fetchBit10Comparison(10)
+                queryFn: () => fetchBIT10Comparison(10)
             },
             {
                 queryKey: ['bit10TokenComparison5Y'],
-                queryFn: () => fetchBit10Comparison(5)
+                queryFn: () => fetchBIT10Comparison(5)
             },
             {
                 queryKey: ['bit10TokenComparison3Y'],
-                queryFn: () => fetchBit10Comparison(3)
+                queryFn: () => fetchBIT10Comparison(3)
             },
             {
                 queryKey: ['bit10TokenComparison1Y'],
-                queryFn: () => fetchBit10Comparison(1)
+                queryFn: () => fetchBIT10Comparison(1)
             },
             {
-                queryKey: ['bit10TokenComparison15Y'],
-                queryFn: () => fetchBit10Comparison(15)
+                queryKey: ['bit10TOPTokenList'],
+                queryFn: () => fetchBIT10Tokens('bit10-latest-price-top')
             }
         ],
     });
@@ -138,7 +285,7 @@ export default function BIT10Comparison() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const bit10Comparison1Y = bit10Queries[3].data?.bit10_top ?? [];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const bit10ComparisonCalculator = bit10Queries[4].data?.bit10_top ?? [];
+    const bit10TOPTokens = bit10Queries[4].data as { id: number, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
 
     const investmentChartConfig = {
         bit10TopValue: {
@@ -217,14 +364,6 @@ export default function BIT10Comparison() {
         (value: number) => `$${value}`, []
     );
 
-    const availableDatesSet = useMemo(() => {
-        return new Set(
-            bit10ComparisonCalculator.map(entry =>
-                new Date(entry.date).toDateString()
-            )
-        );
-    }, [bit10ComparisonCalculator]);
-
     const calculateAPR = (initialValue: number, finalValue: number, years: number): number => {
         if (years <= 0 || initialValue <= 0) return 0;
         return (Math.pow(finalValue / initialValue, 1 / years) - 1) * 100;
@@ -279,133 +418,58 @@ export default function BIT10Comparison() {
         };
     }, [bit10Comparison1Y, bit10Comparison5Y, bit10Comparison10Y, safeParseFloat]);
 
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            initial_investment: '10',
-            initial_investment_start_date: new Date('2015-07-29'),
-            // initial_investment_end_date: new Date('2025-08-05'),
-            initial_investment_end_date: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000), // current date - 12 days
-            initial_investment_token: 'BIT10.TOP'
-        },
-    });
+    const tokens = (Array.isArray(bit10TOPTokens) ? bit10TOPTokens : []) as { name: string; symbol: string; marketCap: number }[];
 
-    const calculateAllReturns = (
-        investmentAmount: number,
-        startDate: Date,
-        endDate: Date
-    ): ComparisonResult | null => {
-        if (!bit10ComparisonCalculator || bit10ComparisonCalculator.length === 0) {
-            return null;
-        }
-
-        const findClosestEntry = (targetDate: Date) => {
-            return bit10ComparisonCalculator.reduce((closest, entry) => {
-                const entryDate = new Date(entry.date);
-                const diff = Math.abs(entryDate.getTime() - targetDate.getTime());
-                const closestDiff = Math.abs(
-                    new Date(closest.date).getTime() - targetDate.getTime()
-                );
-                return diff < closestDiff ? entry : closest;
-            });
-        };
-
-        const startEntry = findClosestEntry(startDate);
-        const endEntry = findClosestEntry(endDate);
-
-        // Calculate time difference in years for APR
-        const timeDiffMs = endDate.getTime() - startDate.getTime();
-        const timeDiffYears = timeDiffMs / (1000 * 60 * 60 * 24 * 365.25);
-
-        const tokens: { key: keyof BIT10Entry; name: string }[] = [
-            { key: 'bit10Top', name: 'BIT10.TOP' },
-            { key: 'btc', name: 'Bitcoin' },
-            { key: 'sp500', name: 'S&P500' },
-        ];
-
-        const assets: AssetComparison[] = tokens.map(({ key, name }) => {
-            const startPrice = safeParseFloat(startEntry[key]);
-            const endPrice = safeParseFloat(endEntry[key]);
-
-            if (startPrice === 0) {
-                return {
-                    name,
-                    initialInvestment: investmentAmount,
-                    currentValue: 0,
-                    totalReturn: 0,
-                    percentageReturn: 0,
-                    apr: 0
-                };
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1200) {
+                setInnerRadius(90);
+            } else if (window.innerWidth >= 768) {
+                setInnerRadius(70);
+            } else {
+                setInnerRadius(70);
             }
-
-            const currentValue = investmentAmount * (endPrice / startPrice);
-            const totalReturn = currentValue - investmentAmount;
-            const percentageReturn =
-                ((currentValue - investmentAmount) / investmentAmount) * 100;
-
-            const apr = calculateAPR(investmentAmount, currentValue, timeDiffYears);
-
-            return {
-                name,
-                initialInvestment: investmentAmount,
-                currentValue: parseFloat(currentValue.toFixed(2)),
-                totalReturn: parseFloat(totalReturn.toFixed(2)),
-                percentageReturn: parseFloat(percentageReturn.toFixed(2)),
-                apr: parseFloat(apr.toFixed(2))
-            };
-        });
-
-        return {
-            startDate: startEntry.date,
-            endDate: endEntry.date,
-            assets,
         };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    const bit10AllocationChartConfig: ChartConfig = {
+        ...Object.fromEntries(
+            tokens.map((token, index) => [
+                token.symbol,
+                {
+                    label: token.symbol,
+                    color: color[index % color.length],
+                }
+            ])
+        )
     };
 
-    async function onSubmit(values: z.infer<typeof FormSchema>) {
-        try {
-            setProcessing(true);
-            setCalculationResult(null);
+    const totalMarketCap = tokens.reduce((sum, token) => sum + token.marketCap, 0);
 
-            const result = calculateAllReturns(
-                values.initial_investment,
-                values.initial_investment_start_date,
-                values.initial_investment_end_date
-            );
-
-            if (result) {
-                setCalculationResult(result);
-                toast.success('Investment calculation completed successfully!');
-            } else {
-                toast.error('Unable to calculate returns. Please try again.');
-            }
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {
-            toast.error('An error occurred while processing your request.');
-        } finally {
-            setProcessing(false);
-        }
-    }
+    const bit10AllocationPieChartData = tokens.map((token, index) => ({
+        name: token.symbol,
+        value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(4)),
+        fill: color[index % color.length],
+    }));
 
     return (
         <div className='flex flex-col items-center space-y-4'>
-            <div className='py-4 md:py-10'>
-                <h1 className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
-                    Diversify Your Portfolio Effortlessly <br /> with BIT10
-                </h1>
-
-                <p className='text-xl text-center dark:text-gray-300 max-w-4xl z-[1]'>
-                    Get instant access to the top 10 cryptos in one secure, over-collateralized token. No more picking winners - let BIT10 handle the diversification. Upgrade to Premium for auto-rebalancing and exclusive perks.
-                </p>
+            <div className='text-3xl md:text-5xl text-center font-semibold'>
+                BIT10.TOP Returns
             </div>
 
             <div className='mt-4 py-4 w-full'>
                 <div className='grid lg:grid-cols-3 gap-8'>
                     {['1Y', '5Y', '10Y'].map((period) => (
                         <div key={period} className='border-2 border-muted rounded py-8 px-3'>
-                            <h4 className='font-medium text-2xl text-center mb-2'>BIT10.TOP {period} APR</h4>
+                            <h4 className='font-medium text-2xl text-center mb-2'>{period} APR</h4>
                             {aprData[period as keyof typeof aprData] ? (
                                 <div className='font-bold text-4xl text-center'>{aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)}%</div>
                             ) : (
@@ -416,9 +480,173 @@ export default function BIT10Comparison() {
                 </div>
             </div>
 
-            <div className='grid lg:grid-cols-5 gap-3'>
-                <div className='lg:col-span-3'>
+            <div className='text-xl'>
+                * Historical performance; past results are not indicative of future returns.
+            </div>
+
+            <div className='flex flex-col items-center space-y-2 w-full'>
+                <motion.h1
+                    initial={{ opacity: 0.0, y: 80 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
+                    className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
+                    Live on 4 Chains
+                </motion.h1>
+
+                <motion.div
+                    initial='hidden'
+                    whileInView='visible'
+                    variants={containerVariants}
+                    className='flex flex-col md:flex-row md:space-x-6 items-center justify-evenly w-full space-y-3 md:space-y-0 py-4'>
+                    {chains.map((chains, index) => (
+                        <motion.div
+                            variants={cardVariants}
+                            key={index}
+                            className='flex flex-col space-y-2 items-center justify-center py-6 px-2 border-2 border-accent rounded-lg w-full md:w-1/4 min-w-0'>
+                            <Image src={chains.logo} height={80} width={80} quality={100} alt={chains.name} />
+                            <div>{chains.name}</div>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </div>
+
+            <div className='py-4'>
+                <div className='text-3xl md:text-5xl font-semibold text-center'>
+                    Simple pricing based on your need
+                </div>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-0 py-4 md:pt-16'>
+                    {pricingItems.map((item) => (
+                        <Card key={item.title} className={`${item.title === 'Pro' ? 'p-6 md:-mt-6 border-primary' : 'p-6 dark:border-muted'} flex flex-col space-y-4 border-2 shadow-lg`}>
+                            <div className='text-2xl font-semibold text-center'>{item.title}</div>
+                            <div className='text-center text-gray-500 mb-4'>{item.tagline}</div>
+                            <div className='text-center text-3xl font-bold tracking-wide'>{item.price}<span className='text-lg'>{item.title === 'Pro' ? '/month' : item.title === 'Institution' ? '/year' : ''}</span></div>
+                            <div className='flex w-full justify-center'>
+                                {item.title === 'Free' ? (
+                                    <Button className='w-full md:w-3/4' asChild>
+                                        <Link href='/buy'>Buy BIT10.TOP</Link>
+                                    </Button>
+                                ) : (
+                                    <Button variant='outline' className='w-full md:w-3/4'>
+                                        Coming soon
+                                    </Button>
+                                )}
+                            </div>
+                            <div className='flex flex-col space-y-4'>
+                                {item.features.map((feature, index) => (
+                                    <div key={index} className='flex flex-row space-x-2 items-center'>
+                                        <div>
+                                            {feature.negative ? (
+                                                <XIcon className='h-6 w-6 text-red-500' />
+                                            ) : (
+                                                <CheckIcon className='h-6 w-6 text-green-500' />
+                                            )}
+                                        </div>
+                                        <div>{feature.text}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+
+            {/* <div className='pb-4'>
+                <Button asChild className='text-xl font-semibold'>
+                    <Link href='/buy'>
+                        Buy BIT10.TOP
+                    </Link>
+                </Button>
+            </div> */}
+
+            <div className='grid lg:grid-cols-2 gap-3'>
+                <div>
                     <Card className='border-muted animate-fade-left-slow'>
+                        <CardHeader className='flex flex-col lg:flex-row items-center justify-between'>
+                            <CardTitle>BIT10.TOP Allocations</CardTitle>
+                        </CardHeader>
+                        <CardContent className='flex flex-col space-y-4'>
+                            {isLoading ? (
+                                <div className='flex flex-col h-full space-y-2'>
+                                    <Skeleton className='h-[300px] lg:h-[400px] w-full' />
+                                </div>
+                            ) : (
+                                <div className='grid md:grid-cols-2 gap-4 items-center'>
+                                    <div className='flex-1'>
+                                        <ChartContainer
+                                            config={bit10AllocationChartConfig}
+                                            className='aspect-square max-h-[300px]'
+                                        >
+                                            <PieChart>
+                                                <ChartTooltip
+                                                    cursor={false}
+                                                    content={<ChartTooltipContent hideLabel />}
+                                                />
+                                                <Pie
+                                                    data={bit10AllocationPieChartData}
+                                                    dataKey='value'
+                                                    nameKey='name'
+                                                    innerRadius={innerRadius}
+                                                    strokeWidth={5}
+                                                >
+                                                    <Label
+                                                        content={({ viewBox }) => {
+                                                            if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                                return (
+                                                                    <text
+                                                                        x={viewBox.cx}
+                                                                        y={viewBox.cy}
+                                                                        textAnchor='middle'
+                                                                        dominantBaseline='middle'
+                                                                    >
+                                                                        <tspan
+                                                                            x={viewBox.cx}
+                                                                            y={viewBox.cy}
+                                                                            className='fill-foreground text-xl font-bold'
+                                                                        >
+                                                                            BIT10.TOP
+                                                                        </tspan>
+                                                                        <tspan
+                                                                            x={viewBox.cx}
+                                                                            y={(viewBox.cy ?? 0) + 24}
+                                                                            className='fill-muted-foreground'
+                                                                        >
+                                                                            Allocations
+                                                                        </tspan>
+                                                                    </text>
+                                                                )
+                                                            }
+                                                        }}
+                                                    />
+                                                </Pie>
+                                            </PieChart>
+                                        </ChartContainer>
+                                    </div>
+                                    <div className='flex w-full flex-col space-y-3'>
+                                        <div className='flex flex-col'>
+                                            {tokens?.sort((a, b) => b.marketCap - a.marketCap).map((token, index) => (
+                                                <div
+                                                    key={index}
+                                                    className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'
+                                                >
+                                                    <div className='flex flex-row items-center space-x-1'>
+                                                        <div
+                                                            className='w-3 h-3 rounded'
+                                                            style={{ backgroundColor: color[index % color.length] }}
+                                                        ></div>
+                                                        <div>{token.name}</div>
+                                                    </div>
+                                                    <div>{((token.marketCap / totalMarketCap) * 100).toFixed(2)} %</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+                <div>
+                    <Card className='border-muted animate-fade-right-slow'>
                         <CardHeader className='flex flex-col lg:flex-row items-center justify-between'>
                             <div className='flex flex-1 flex-col justify-center gap-1 pb-3 sm:pb-0'>
                                 <CardTitle>$100 Investment Growth Comparison</CardTitle>
@@ -460,196 +688,6 @@ export default function BIT10Comparison() {
                                 </div>
                             )}
                         </CardContent>
-                    </Card>
-                </div>
-                <div className='lg:col-span-2'>
-                    <Card className='border-muted animate-fade-right-slow h-full flex flex-col'>
-                        <CardHeader>
-                            <CardTitle>
-                                BIT10 Investment Calculator
-                            </CardTitle>
-                            <CardDescription>
-                                Estimate your returns and see how your investment would have grown over time.
-                            </CardDescription>
-                        </CardHeader>
-                        <Form {...form}>
-                            <div onSubmit={form.handleSubmit(onSubmit)} className='flex-1 flex flex-col'>
-                                <CardContent className='flex-1'>
-                                    <div className='flex flex-col space-y-2'>
-                                        <FormField
-                                            control={form.control}
-                                            name='initial_investment'
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Initial Investment</FormLabel>
-                                                    <FormControl>
-                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='border-muted' />
-                                                    </FormControl>
-                                                    <FormDescription>
-                                                        Enter the amount (in USD) you want to invest
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name='initial_investment_start_date'
-                                            render={({ field }) => (
-                                                <FormItem className='flex flex-col'>
-                                                    <FormLabel>Date of Initial Investment</FormLabel>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
-                                                                    {field.value ? (
-                                                                        format(field.value, 'PPP')
-                                                                    ) : (
-                                                                        <span>Select start date</span>
-                                                                    )}
-                                                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                                                </Button>
-                                                            </FormControl>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className='w-auto p-0 border-muted' align='start'>
-                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' className='rounded-md' />
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    <FormDescription>
-                                                        When your investment begins
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name='initial_investment_end_date'
-                                            render={({ field }) => (
-                                                <FormItem className='flex flex-col'>
-                                                    <FormLabel>Date of Final Investment</FormLabel>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
-                                                                    {field.value ? (
-                                                                        format(field.value, 'PPP')
-                                                                    ) : (
-                                                                        <span>Select end date</span>
-                                                                    )}
-                                                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                                                </Button>
-                                                            </FormControl>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className='w-auto p-0 border-muted' align='start'>
-                                                            <Calendar mode='single' selected={field.value} onSelect={field.onChange} disabled={(date) => !availableDatesSet.has(date.toDateString())} captionLayout='dropdown' className='rounded-md' />
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    <FormDescription>
-                                                        When your investment ends
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name='initial_investment_token'
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Token</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger className='border-muted'>
-                                                                <SelectValue placeholder='Select a investment token' />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value='BIT10.TOP'>BIT10.TOP</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormDescription>
-                                                        Select the token for your investment calculation
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </CardContent>
-                                <CardFooter className='flex flex-col space-y-4'>
-                                    <Button className='w-full' disabled={isLoading || processing} onClick={form.handleSubmit(onSubmit)}>
-                                        {processing && <Loader2 className='animate-spin mr-2' size={15} />}
-                                        {processing ? 'Calculating...' : 'Calculate'}
-                                    </Button>
-
-                                    {calculationResult && (
-                                        <div className='w-full p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-900/20'>
-                                            <h3 className='font-semibold text-green-800 dark:text-green-200 mb-3'>
-                                                Investment Comparison
-                                            </h3>
-                                            <div className='overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 max-w-[80vw]'>
-                                                <table className='w-full text-sm border-collapse '>
-                                                    <thead>
-                                                        <tr className='border-b border-green-200 dark:border-green-800'>
-                                                            <th className='text-left p-2'>Asset</th>
-                                                            <th className='text-center p-2'>Initial Capital</th>
-                                                            <th className='text-center p-2'>Current Value</th>
-                                                            <th className='text-center p-2'>Total Return</th>
-                                                            <th className='text-center p-2'>% Return</th>
-                                                            <th className='text-center p-2'>APR</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {calculationResult.assets.map((asset) => (
-                                                            <tr
-                                                                key={asset.name}
-                                                                className='border-b border-green-200 dark:border-green-800 last:border-0'
-                                                            >
-                                                                <td className='p-2'>{asset.name}</td>
-                                                                <td className='p-2 text-right'>
-                                                                    ${formatCompactNumber(asset.initialInvestment)}
-                                                                </td>
-                                                                <td className='p-2 text-right text-green-600 dark:text-green-400'>
-                                                                    ${formatCompactNumber(asset.currentValue)}
-                                                                </td>
-                                                                <td
-                                                                    className={`p-2 text-right ${asset.totalReturn >= 0
-                                                                        ? 'text-green-600 dark:text-green-400'
-                                                                        : 'text-red-600 dark:text-red-400'
-                                                                        }`}
-                                                                >
-                                                                    ${formatCompactNumber(asset.totalReturn)}
-                                                                </td>
-                                                                <td
-                                                                    className={`p-2 text-right ${asset.percentageReturn >= 0
-                                                                        ? 'text-green-600 dark:text-green-400'
-                                                                        : 'text-red-600 dark:text-red-400'
-                                                                        }`}
-                                                                >
-                                                                    {asset.percentageReturn >= 0 ? '+' : ''}
-                                                                    {formatCompactNumber(asset.percentageReturn)}%
-                                                                </td>
-                                                                <td className='p-2 text-right'>
-                                                                    {asset.apr !== undefined ? `${asset.apr.toFixed(2)}%` : 'N/A'}
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div className='pt-2 text-xs text-gray-500 dark:text-gray-400'>
-                                                Period: From {new Date(calculationResult.startDate).toLocaleDateString()} to{' '}
-                                                {new Date(calculationResult.endDate).toLocaleDateString()}
-                                            </div>
-                                        </div>
-                                    )}
-                                </CardFooter>
-                            </div>
-                        </Form>
                     </Card>
                 </div>
             </div>

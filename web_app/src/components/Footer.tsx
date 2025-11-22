@@ -15,7 +15,6 @@ import Link from 'next/link'
 import Image, { type StaticImageData } from 'next/image'
 import XImg from '@/assets/footer/x.svg'
 import TelegramImg from '@/assets/footer/telegram.svg'
-// import GitHubImg from '@/assets/footer/github.svg'
 
 interface FooterLinkType {
     title: string;
@@ -35,10 +34,6 @@ const forCompany: FooterLinkType[] = [
     {
         title: 'Contact Us',
         link: '/contact-us'
-    },
-    {
-        title: 'Team',
-        link: '/team'
     }
 ]
 
@@ -65,27 +60,7 @@ const companySocial: SocialLinkType[] = [
     {
         link: 'https://t.me/zr00083',
         imageName: TelegramImg as StaticImageData,
-    },
-    // {
-    //     link: '#',
-    //     imageName: 'discord.svg',
-    // },
-    // {
-    //     link: 'https://www.youtube.com/@Bit10Startup',
-    //     imageName: 'youtube.svg',
-    // },
-    // {
-    //     link: '#',
-    //     imageName: 'linkedin.svg',
-    // },
-    // {
-    //     link: 'https://github.com/ZeyaRabani/BIT10',
-    //     imageName: GitHubImg as StaticImageData,
-    // },
-    // {
-    //     link: '#',
-    //     imageName: 'reddit.svg',
-    // }
+    }
 ]
 
 const FormSchema = z.object({

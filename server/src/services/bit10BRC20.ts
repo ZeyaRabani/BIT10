@@ -192,5 +192,5 @@ export const fetchAndUpdateBit10BRC20RebalanceData = async () => {
     }
 }
 
-// cron.schedule('*/10 * * * * *', fetchAndUpdateBit10BRC20RebalanceData); // 30 sec
+// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10BRC20RebalanceData); // 30 sec
 cron.schedule('0 10 * * 5', fetchAndUpdateBit10BRC20RebalanceData); // Every Friday at 3:30 PM IST

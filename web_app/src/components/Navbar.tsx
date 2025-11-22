@@ -99,7 +99,7 @@ export default function Navbar() {
                                     key={index}
                                     type='button'
                                     aria-label={`${label.title} view`}
-                                    className='md:w-auto w-full mx-2 px-3 py-2 hover:rounded hover:text-white hover:bg-primary cursor-pointer'
+                                    className='md:w-auto w-full mx-2 px-3 py-2 hover:rounded hover:text-white hover:bg-primary cursor-pointer font-semibold tracking-wide'
                                 >
                                     {label.title}
                                 </button>
@@ -114,7 +114,7 @@ export default function Navbar() {
                             <WalletBtn />
                         ) : (
                             <Link href='/launch' passHref>
-                                <Button className='rounded-full'>Launch App</Button>
+                                <Button className='rounded-full font-semibold tracking-wide'>Launch App</Button>
                             </Link>
                         )}
                 </div>

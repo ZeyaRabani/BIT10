@@ -2,7 +2,7 @@ import http from 'http'
 import { WebSocketServer, WebSocket } from 'ws'
 import dotenv from 'dotenv'
 import { fetchAndUpdateBIT10DEFIData } from './services/bit10DEFI'
-import { fetchAndUpdateBIT10BRC20Data } from './services/bit10BRC20'
+// import { fetchAndUpdateBIT10BRC20Data } from './services/bit10BRC20'
 import { fetchAndUpdateBIT10TOPData } from './services/bit10TOP'
 import { fetchAndUpdateBIT10MEMEData } from './services/bit10MEME'
 import { handleBIT10DEFICurrentPrice } from './routes/bit10DEFICurrentPrice'
@@ -19,13 +19,13 @@ import { handleTestBIT10MEMERebalanceData } from './routes/testBit10MEMERabalanc
 import { handleVerifyTransaction } from './routes/verifyTransaction'
 import { handelCreateTransaction } from './routes/createTransaction'
 import { handleBIT10ComparisonData } from './routes/bit10Comparison'
+import { handleTokenCurrentPrices } from './routes/tokenPrices'
 import { handleBIT10TOPPrice, handleBIT10TOPBalance, getPriceData, cleanup as cleanupPriceData } from './institutions/api/v1/bit10TopPrice'
 import { handleBuyBIT10 } from './institutions/api/v1/buyBIT10'
 import { handleBuyBIT10Trx } from './institutions/api/v1/buyBIT10Trx'
 import { handleSellBIT10 } from './institutions/api/v1/sellBIT10'
 import { handleSellBIT10Trx } from './institutions/api/v1/sellBIT10Trx'
 import { swaggerSpec } from './swagger'
-import { handleGetCoinGeckoData, fetchAndCacheCoinGeckoData } from './routes/bit10CGTest'
 
 dotenv.config();
 
@@ -49,13 +49,13 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/verify-transaction': handleVerifyTransaction,
     '/create-transaction': handelCreateTransaction,
     '/bit10-comparison': handleBIT10ComparisonData,
+    '/token-prices': handleTokenCurrentPrices,
     '/api/v1/balancer/bit10top/price': handleBIT10TOPPrice,
     '/api/v1/balancer/bit10top/balance': handleBIT10TOPBalance,
     '/api/v1/trades/buy': handleBuyBIT10,
     '/api/v1/trades/buy-bit10-trx': handleBuyBIT10Trx,
     '/api/v1/trades/sell': handleSellBIT10,
-    '/api/v1/trades/sell-bit10-trx': handleSellBIT10Trx,
-    '/test-get-crypto-values': handleGetCoinGeckoData
+    '/api/v1/trades/sell-bit10-trx': handleSellBIT10Trx
 };
 
 const generateSwaggerHTML = () => {
@@ -245,10 +245,8 @@ server.listen(PORT, '::', async () => {
     try {
         const results = await Promise.allSettled([
             fetchAndUpdateBIT10DEFIData(),
-            fetchAndUpdateBIT10BRC20Data(),
             fetchAndUpdateBIT10TOPData(),
-            fetchAndUpdateBIT10MEMEData(),
-            fetchAndCacheCoinGeckoData()
+            fetchAndUpdateBIT10MEMEData()
         ]);
 
         results.forEach((result, index) => {
