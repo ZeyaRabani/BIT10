@@ -120,7 +120,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
             toast.error('Error fetching BIT10 price. Please try again!');
         }
 
-        const data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> };
+        const data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: string, name: string, symbol: string, price: number }> };
         return data ?? [];
     }, []);
 
@@ -135,7 +135,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     });
 
     const bit10TOPPrice = useMemo(() => bit10PriceQueries[0]?.data?.tokenPrice, [bit10PriceQueries]);
-    const bit10TOPTokens = useMemo(() => bit10PriceQueries[0]?.data?.data as { id: number, name: string, symbol: string, marketCap: number, price: number }[] | undefined, [bit10PriceQueries]);
+    const bit10TOPTokens = useMemo(() => bit10PriceQueries[0]?.data?.data as { id: string, name: string, symbol: string, marketCap: number, price: number }[] | undefined, [bit10PriceQueries]);
 
     const fetchPayWithPrice = useCallback(async (currency: string) => {
         const response = await fetch(`https://api.coinbase.com/v2/prices/${currency}-USD/buy`);

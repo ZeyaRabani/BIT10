@@ -40,7 +40,7 @@ export default function BalanceAndAllocation() {
         let data;
         let returnData;
         if (tokenPriceAPI === 'bit10-latest-price-top') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: string, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         }
         return returnData;
@@ -87,7 +87,7 @@ export default function BalanceAndAllocation() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10TOPTokens = bit10Queries[0].data as { id: number, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
+    const bit10TOPTokens = bit10Queries[0].data as { id: string, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
     const bit10TOPPrice = Array.isArray(bit10TOPTokens) ? (bit10TOPTokens.reduce((sum, token) => sum + token.marketCap, 0) / 25_000_000_000_000) * 100 : 0;
     const icpBIT10DEFIokenBalance = bit10Queries[1].data as bigint | undefined;
     const icpBIT10TOPTokenBalance = bit10Queries[2].data!;

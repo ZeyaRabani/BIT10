@@ -244,7 +244,7 @@ export default function BIT10Comparison() {
         let data;
         let returnData;
         if (tokenPriceAPI === 'bit10-latest-price-top') {
-            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: number, name: string, symbol: string, price: number }> }
+            data = await response.json() as { timestmpz: string, tokenPrice: number, data: Array<{ id: string, name: string, symbol: string, price: number }> }
             returnData = data.data ?? 0;
         }
         return returnData;
@@ -285,7 +285,7 @@ export default function BIT10Comparison() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const bit10Comparison1Y = bit10Queries[3].data?.bit10_top ?? [];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const bit10TOPTokens = bit10Queries[4].data as { id: number, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
+    const bit10TOPTokens = bit10Queries[4].data as { id: string, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
 
     const investmentChartConfig = {
         bit10TopValue: {

@@ -19,7 +19,7 @@ type BIT10Entry = {
 
 const color = ['#F7931A', '#3C3C3D', '#006097', '#F3BA2F', '#00FFA3', '#B51D06', '#C2A633', '#0033AD', '#29B6F6', '#ff0066'];
 
-export default function TokenDetails({ token_price, token_name, token_list }: { token_price: number, token_name: string, token_list: { id: number; name: string; symbol: string; marketCap: number; price: number; }[] }) {
+export default function TokenDetails({ token_price, token_name, token_list }: { token_price: number, token_name: string, token_list: { id: string; name: string; symbol: string; marketCap: number; price: number; }[] }) {
     const [activeTab, setActiveTab] = useState('3Y');
     const [innerRadius, setInnerRadius] = useState<number>(80);
 

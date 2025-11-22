@@ -21,7 +21,7 @@ interface WalletDataType {
 }
 
 type CoinData = {
-    id: number;
+    id: string;
     name: string;
     symbol: string;
     tokenAddress?: string;
@@ -36,7 +36,7 @@ type BIT10Entry = {
 };
 
 type CoinSetData = {
-    id: number;
+    id: string;
     name: string;
     symbol: string;
     tokenAddress?: string;
@@ -72,14 +72,14 @@ interface RebalanceData {
 const bit10Allocation: WalletDataType[] = [
     { walletAddress: 'bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'] },
 
-    { walletAddress: '0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', bit10: ['BIT10.TOP'], tokenId: ['1027', '1975'] },
-    { walletAddress: 'bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', explorerAddress: 'https://mempool.space/address/bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', bit10: ['BIT10.TOP'], tokenId: ['1'] },
-    { walletAddress: '0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', explorerAddress: 'https://bscscan.com/address/0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', bit10: ['BIT10.TOP'], tokenId: ['52', '1839', '74', '2010', '1831'] },
-    { walletAddress: 'KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', explorerAddress: 'https://explorer.solana.com/address/KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', bit10: ['BIT10.TOP'], tokenId: ['5426'] },
-    { walletAddress: 'TXHicWyMh8pBryemgawayVztrxVx75dtzb', explorerAddress: 'https://tronscan.org/#/address/TXHicWyMh8pBryemgawayVztrxVx75dtzb', bit10: ['BIT10.TOP'], tokenId: ['1958'] },
-    { walletAddress: '0x545a402305d54bf34b588c169b51c24f8d1b4c01', explorerAddress: 'https://app.hyperliquid.xyz/explorer/address/0x545a402305d54bf34b588c169b51c24f8d1b4c01', bit10: ['BIT10.TOP'], tokenId: ['32196'] },
-    { walletAddress: '0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', explorerAddress: 'https://suiscan.xyz/mainnet/account/0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', bit10: ['BIT10.TOP'], tokenId: ['20947'] },
-    { walletAddress: 'GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', explorerAddress: 'https://stellar.expert/explorer/public/account/GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', bit10: ['BIT10.TOP'], tokenId: ['512'] },
+    { walletAddress: '0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', bit10: ['BIT10.TOP'], tokenId: ['ethereum', 'chainlink', 'leo-token'] },
+    { walletAddress: 'bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', explorerAddress: 'https://mempool.space/address/bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', bit10: ['BIT10.TOP'], tokenId: ['bitcoin'] },
+    { walletAddress: '0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', explorerAddress: 'https://bscscan.com/address/0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', bit10: ['BIT10.TOP'], tokenId: ['ripple', 'binancecoin', 'dogecoin', 'cardano', 'zcash'] },
+    { walletAddress: 'KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', explorerAddress: 'https://explorer.solana.com/address/KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', bit10: ['BIT10.TOP'], tokenId: ['solana'] },
+    { walletAddress: 'TXHicWyMh8pBryemgawayVztrxVx75dtzb', explorerAddress: 'https://tronscan.org/#/address/TXHicWyMh8pBryemgawayVztrxVx75dtzb', bit10: ['BIT10.TOP'], tokenId: ['tron'] },
+    { walletAddress: '0x545a402305d54bf34b588c169b51c24f8d1b4c01', explorerAddress: 'https://app.hyperliquid.xyz/explorer/address/0x545a402305d54bf34b588c169b51c24f8d1b4c01', bit10: ['BIT10.TOP'], tokenId: ['hyperliquid'] },
+    { walletAddress: '0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', explorerAddress: 'https://suiscan.xyz/mainnet/account/0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', bit10: ['BIT10.TOP'], tokenId: ['sui'] },
+    { walletAddress: 'GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', explorerAddress: 'https://stellar.expert/explorer/public/account/GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', bit10: ['BIT10.TOP'], tokenId: ['stellar'] },
 ];
 
 const color = ['#F7931A', '#3C3C3D', '#006097', '#F3BA2F', '#00FFA3', '#B51D06', '#C2A633', '#0033AD', '#29B6F6', '#ff0066'];
@@ -176,10 +176,10 @@ export default function RebalanceCollateral() {
         timestmpz: string,
         indexValue: number,
         priceOfTokenToBuy: number,
-        newTokens: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        added: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        removed: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-        retained: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
+        newTokens: { id: string, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        added: { id: string, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        removed: { id: string, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+        retained: { id: string, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
     };
 
     useEffect(() => {
@@ -379,7 +379,7 @@ export default function RebalanceCollateral() {
                                                         );
 
                                                         const foundCollateralPrice = data.bit10Data.find(
-                                                            (collateral: { id: number }) =>
+                                                            (collateral: { id: string }) =>
                                                                 collateral.id.toString() === token.id.toString()
                                                         );
 

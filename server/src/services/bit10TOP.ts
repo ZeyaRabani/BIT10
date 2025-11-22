@@ -147,7 +147,7 @@ export const fetchAndUpdateBIT10TOPData = async () => {
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBIT10TOPData); // 30 sec
 cron.schedule('*/10 * * * *', fetchAndUpdateBIT10TOPData); // 10 min
 
-export const fetchAndUpdateBit10TOPRebalanceData = async () => {
+export const fetchAndUpdateBIT10TOPRebalanceData = async () => {
     try {
         const priceOfTokenToBuyResult = await db.select({
             priceoftokentobuy: bit10CollateralTokenPrices.priceOfTokenToBuy
@@ -248,5 +248,5 @@ export const fetchAndUpdateBit10TOPRebalanceData = async () => {
     }
 }
 
-// cron.schedule('*/30 * * * * *', fetchAndUpdateBit10TOPRebalanceData); // 30 sec
-cron.schedule('0 10 * * 5', fetchAndUpdateBit10TOPRebalanceData); // Every Friday at 3:30 PM IST
+// cron.schedule('*/30 * * * * *', fetchAndUpdateBIT10TOPRebalanceData); // 30 sec
+cron.schedule('0 10 * * 5', fetchAndUpdateBIT10TOPRebalanceData); // Every Friday at 3:30 PM IST

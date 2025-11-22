@@ -14,10 +14,10 @@ export async function GET(request: NextRequest, context: { params: Promise<{ ind
                     timestmpz: string,
                     indexValue: number,
                     priceOfTokenToBuy: number,
-                    newTokens: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-                    added: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-                    removed: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
-                    retained: { id: number, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
+                    newTokens: { id: string, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+                    added: { id: string, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+                    removed: { id: string, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[],
+                    retained: { id: string, name: string, symbol: string, marketCap: number, price: number, noOfTokens: number, tokenAddress?: string, chain?: string }[]
                 }[]
             };
 
