@@ -39,7 +39,7 @@ const whyChooseUs = [
   },
   {
     title: 'Automatic',
-    desc: 'Weekly rebalancing on Premium plan',
+    desc: 'Weekly rebalancing to stay up-to-date',
   },
   {
     title: 'Multi-Chain',

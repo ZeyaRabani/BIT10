@@ -227,10 +227,9 @@ export const handleTokenCurrentPrices = async (request: IncomingMessage, respons
 
         response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({
-            timestamp: new Date().toISOString(),
+            timestamp: cachedData.timestmpz,
             bit10_price: cachedData.tokenPrice,
-            token_price: cgToken.current_price,
-            token_id: token_id
+            token_price: cgToken.current_price
         }));
 
     } catch (error) {
