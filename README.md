@@ -2,9 +2,9 @@
 
 BIT10 pioneers the concept of an "S&P 500 for crypto assets." It provides users with a streamlined way to diversify their exposure to DeFi assets by tracking major crypto tokens. BIT10 is an All-In-One Decentralized Cross-Chain Asset Manager. Starting with index funds, then to DEX's and then lending. All cross-chain.
 
-## 🖥️ Presentation
+## 🖥️ Presentation 
 
-Presentations
+Presentation
 We created a playlist for all the videos created since the beginning of the World Computer Hacker League. All of the Videos are labelled "WCHL" then the round that video applies to E.g Regional or National and then what that video shows. These videos give a great overview of everything we did in this 4 month long hackathon.
 
 https://www.youtube.com/playlist?list=PL7T2qlbuVFZ4I4APrZC15sbAUvQv65fIQ
