@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Coins, ArrowRightLeft, BriefcaseBusiness, Home, BookText, Calculator, Landmark } from 'lucide-react'
+import { Menu, X, Coins, ArrowRightLeft, BriefcaseBusiness, Home, BookText, Calculator, Landmark, GiftIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -19,7 +19,8 @@ const links = {
         { title: 'Buy', link: '/buy', icon: Coins },
         { title: 'DEX', link: '/dex', icon: ArrowRightLeft },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
-        { title: 'Collateral', link: '/collateral', icon: Landmark }
+        { title: 'Collateral', link: '/collateral', icon: Landmark },
+        { title: 'Rewards', link: '/rewards', icon: GiftIcon }
     ]
 };
 
@@ -72,7 +73,7 @@ export default function ResponsiveNavbar() {
                                 <div className='grid px-8 text-xl py-2 gap-2 w-full mb-4'>
                                     {links[appMode ? 'app' : 'web'].map(({ title, link, icon: Icon }) => (
                                         <Link key={link} href={link} onClick={() => pathname === link && toggleMenu()}>
-                                            <div className='border-b-2 py-2 px-2 cursor-pointer w-full flex flex-row justify-between items-center'>
+                                            <div className='border-b-2 pt-0.5 pb-2 px-2 cursor-pointer w-full flex flex-row justify-between items-center'>
                                                 {title}
                                                 <Icon />
                                             </div>

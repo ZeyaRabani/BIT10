@@ -5,6 +5,7 @@ import { fetchAndUpdateBIT10DEFIData } from './services/bit10DEFI'
 // import { fetchAndUpdateBIT10BRC20Data } from './services/bit10BRC20'
 import { fetchAndUpdateBIT10TOPData } from './services/bit10TOP'
 import { fetchAndUpdateBIT10MEMEData } from './services/bit10MEME'
+import { fetchAndUpdateBIT10TOPComparisonData } from './services/bit10TOPComparison'
 import { handleBIT10DEFICurrentPrice } from './routes/bit10DEFICurrentPrice'
 import { handleBIT10DEFIFilterData } from './routes/bit10DEFIFilterData'
 import { handleBIT10BRC20CurrentPrice } from './routes/bit10BRC20CurrentPrice'
@@ -244,6 +245,7 @@ server.listen(PORT, '::', async () => {
 
     try {
         const results = await Promise.allSettled([
+            fetchAndUpdateBIT10TOPComparisonData(),
             fetchAndUpdateBIT10DEFIData(),
             fetchAndUpdateBIT10TOPData(),
             fetchAndUpdateBIT10MEMEData()

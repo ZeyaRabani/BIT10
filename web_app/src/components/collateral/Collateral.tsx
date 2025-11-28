@@ -8,7 +8,8 @@ export default function Collateral() {
     return (
         <Card className='border-muted w-full lg:col-span-1 bg-transparent'>
             <CardHeader>
-                <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Collateral</div>
+                <div className='text-2xl md:text-4xl text-center md:text-start font-semibold'>BIT10 Collateral</div>
+                <div className='text-lg md:text-xl text-center md:text-start text-muted-foreground'>View the assets backing BIT10 tokens</div>
             </CardHeader>
             <CardContent className='flex flex-col space-y-4'>
                 <RebalanceCollateral />

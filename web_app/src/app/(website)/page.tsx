@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import BIT10Comparison from './bit10Comparison'
 import AnimatedBackground from '@/components/ui/animated-background'
-import { CheckIcon } from 'lucide-react'
+import { CheckIcon, TrendingUpIcon, ShieldIcon, ZapIcon, NetworkIcon } from 'lucide-react'
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards'
 import Image from 'next/image'
 import DefinityDevImg from '@/assets/home/DFINITYDev.jpg'
@@ -32,18 +32,22 @@ const whyChooseUs = [
   {
     title: 'Diversified',
     desc: 'Instant exposure to top 10 cryptocurrencies',
+    icon: TrendingUpIcon
   },
   {
     title: 'Secure',
     desc: '110% over-collateralized for your protection',
+    icon: ShieldIcon
   },
   {
     title: 'Automatic',
     desc: 'Weekly rebalancing to stay up-to-date',
+    icon: ZapIcon
   },
   {
     title: 'Multi-Chain',
     desc: 'Live on ICP, Base, SOL, and more',
+    icon: NetworkIcon
   }
 ]
 
@@ -91,6 +95,12 @@ export default function Page() {
       {/* <AuroraBackground className='md:max-h-[60vh]'> */}
       <div className='md:min-h-[60vh] flex flex-col items-center justify-center'>
         <div className='relative flex flex-col gap-4 items-center justify-center md:px-4'>
+          <div className='hidden dark:block'>
+            <Image src='/logo/logo.png' alt='logo' width={80} height={80} />
+          </div>
+          <div className='block dark:hidden'>
+            <Image src='/logo/logo-circle.png' alt='logo' width={90} height={90} />
+          </div>
           <div className='p-4 max-w-7xl mx-auto relative z-10 w-full pt-8 md:pt-0'>
             <motion.h1
               initial={{ opacity: 0.0, y: 40 }}
@@ -105,7 +115,7 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8, ease: 'easeInOut' }}
               className='py-2 text-center dark:text-gray-300 text-xl max-w-4xl'>
-              BIT10.TOP offers instant, diversified exposure to the top 10 cryptocurrencies in one secure, over-collateralized, auto-rebalancing token.
+              Our flagship crypto index fund, BIT10.TOP, offers instant and diversified exposure to the top 10 cryptocurrencies via a single, secure, over-collateralized token.
             </motion.div>
           </div>
         </div>
@@ -140,7 +150,7 @@ export default function Page() {
           ></motion.iframe>
         </div>
 
-        <div className='flex flex-col items-center space-y-2 py-4 md:py-8'>
+        <div className='flex flex-col items-center space-y-2'>
           <motion.h1
             initial={{ opacity: 0.0, y: 80 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -159,18 +169,19 @@ export default function Page() {
               <motion.div
                 variants={cardVariants}
                 key={index}
-                className='flex flex-col space-y-2 items-center justify-center py-6 px-2 border-2 border-accent rounded-lg w-full md:w-1/4 min-w-0'
-                style={{ height: '150px', width: '100' }}>
+                className='flex flex-col space-y-2 items-center justify-center py-6 px-2 border-2 border-accent rounded-2xl w-full md:w-1/4 min-w-0'
+                style={{ height: '200px', width: '100' }}>
                 <div className='flex flex-col items-center justify-start h-full w-full'>
-                  <div className='text-primary text-2xl font-semibold'>{item.title}</div>
-                  <div className='text-lg text-center'>{item.desc}</div>
+                  <div className='mb-2 flex justify-center'>{item.icon && <item.icon className='h-12 w-12 text-primary' />}</div>
+                  <div className='text-2xl font-semibold'>{item.title}</div>
+                  <div className='text-lg text-center max-w-56'>{item.desc}</div>
                 </div>
               </motion.div>
             ))}
           </motion.div>
         </div>
 
-        <div className='flex flex-col items-center space-y-4 py-4'>
+        <div className='flex flex-col items-center space-y-4'>
           <motion.div initial={{ opacity: 0.0, y: 80 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }} className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
             BIT10&apos;s Vision
           </motion.div>
@@ -186,7 +197,7 @@ export default function Page() {
             </div>
             {
               activeTab === 'Today' ?
-                <div className='border-2 border-accent bg-accent rounded-lg w-full md:w-[60vw] p-4 md:p-8 flex flex-col items-center justify-center space-y-4'>
+                <div className='border-2 border-accent bg-accent rounded-2xl w-full md:w-[60vw] p-4 md:p-8 flex flex-col items-center justify-center space-y-4'>
                   <div className='flex flex-row w-full space-x-2 items-center justify-start'>
                     <div><CheckIcon className='text-green-500' /></div>
                     <div className='text-xl'>Weekly auto-rebalancing</div>
@@ -204,7 +215,7 @@ export default function Page() {
                     <div className='text-xl'>Instant exposure to top 10 cryptocurrencies in one token</div>
                   </div>
                 </div> :
-                <div className='border-2 border-accent bg-accent rounded-lg w-full md:w-[60vw] p-4 md:p-8 flex flex-col items-center justify-center space-y-4'>
+                <div className='border-2 border-accent bg-accent rounded-2xl w-full md:w-[60vw] p-4 md:p-8 flex flex-col items-center justify-center space-y-4'>
                   <div className='flex flex-row w-full space-x-2 items-center justify-start'>
                     <div><CheckIcon className='text-green-500' /></div>
                     <div className='text-xl'>AI-driven smart portfolio management</div>
@@ -228,7 +239,7 @@ export default function Page() {
         </div>
 
         <div className='flex flex-col antialiased items-center justify-center relative overflow-hidden'>
-          <div className='my-8 text-center'>
+          <div>
             <motion.h1
               initial={{ opacity: 0.0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -244,7 +255,7 @@ export default function Page() {
 
           <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='flex flex-col md:flex-row items-center justify-evenly w-full space-y-3 md:space-y-0'>
             {parterners.map((partner, index) => (
-              <motion.div variants={cardVariants} key={index} className={`p-2 border-2 border-accent rounded-lg ${partner.name === 'BSL' ? 'bg-black' : 'bg-white dark:bg-gray-100'}`}>
+              <motion.div variants={cardVariants} key={index} className={`p-2 border-2 border-accent rounded-2xl ${partner.name === 'BSL' ? 'bg-black' : 'bg-white dark:bg-gray-100'}`}>
                 <Image src={partner.logo} height={50} width={400} quality={100} alt={partner.name} />
               </motion.div>
             ))}

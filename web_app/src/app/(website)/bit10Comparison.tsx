@@ -158,7 +158,7 @@ const pricingItems = [
     {
         title: 'Institution',
         tagline: 'High-performance solutions for institutions.',
-        price: '1000 USDC',
+        price: '10,000 USDC',
         features: [
             {
                 text: 'Instant Top 10 Crypto Exposure',
@@ -357,11 +357,52 @@ export default function BIT10Comparison() {
     const currentData = investmentData[activeTab as keyof typeof investmentData];
 
     const tickFormatter = useMemo(() =>
-        (value: string) => value.slice(0, value.indexOf(',')), []
+        (value: string) => {
+            const yearMatch = /\d{4}/.exec(value);
+            return yearMatch ? yearMatch[0] : value;
+        }, []
     );
 
-    const yAxisFormatter = useMemo(() =>
-        (value: number) => `$${value}`, []
+    const buildYAxisMeta = (data: ProcessedDataPoint[], tab: string) => {
+        if (!data || data.length === 0) {
+            return { domain: [0, 10000], ticks: [0, 10000] };
+        }
+
+        const allValues = data.flatMap(point => [
+            point.bit10TopValue,
+            point.btcValue,
+            point.sp500Value,
+        ]);
+        const maxValue = Math.max(...allValues);
+
+        if (tab === '10Y') {
+            const roundedMax = Math.max(10000, Math.ceil(maxValue / 10000) * 10000);
+            const ticks = Array.from(
+                { length: Math.floor(roundedMax / 10000) + 1 },
+                (_, idx) => idx * 10000
+            );
+            return { domain: [0, roundedMax], ticks };
+        }
+
+        const lines = 8;
+        const paddedMax = maxValue * 1.05;
+        const rawStep = paddedMax / lines;
+        const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+        const step = Math.ceil(rawStep / magnitude) * magnitude;
+        const ticks = Array.from({ length: lines + 1 }, (_, idx) => Math.round(idx * step));
+        const topBound = ticks[ticks.length - 1];
+
+        return { domain: [0, topBound], ticks };
+    };
+
+    const { domain: yDomain, ticks: yTicks } = useMemo(
+        () => buildYAxisMeta(currentData, activeTab),
+        [currentData, activeTab]
+    );
+
+    const yAxisFormatter = useMemo(
+        () => (value: number) => `$${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+        []
     );
 
     const calculateAPR = (initialValue: number, finalValue: number, years: number): number => {
@@ -454,7 +495,7 @@ export default function BIT10Comparison() {
     const totalMarketCap = tokens.reduce((sum, token) => sum + token.marketCap, 0);
 
     const bit10AllocationPieChartData = tokens.map((token, index) => ({
-        name: token.symbol,
+        name: token.symbol.toUpperCase(),
         value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(4)),
         fill: color[index % color.length],
     }));
@@ -468,10 +509,10 @@ export default function BIT10Comparison() {
             <div className='mt-4 py-4 w-full'>
                 <div className='grid lg:grid-cols-3 gap-8'>
                     {['1Y', '5Y', '10Y'].map((period) => (
-                        <div key={period} className='border-2 border-muted rounded py-8 px-3'>
+                        <div key={period} className='border-2 border-muted rounded-2xl py-8 px-3'>
                             <h4 className='font-medium text-2xl text-center mb-2'>{period} APR</h4>
                             {aprData[period as keyof typeof aprData] ? (
-                                <div className='font-bold text-4xl text-center'>{aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)}%</div>
+                                <div className={`font-bold text-4xl text-center ${Number(aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)) > 0 ? 'text-green-500' : 'text-red-500'}`}>{aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)}%</div>
                             ) : (
                                 <p className='text-center text-gray-500'>Loading...</p>
                             )}
@@ -480,9 +521,9 @@ export default function BIT10Comparison() {
                 </div>
             </div>
 
-            <div className='text-xl'>
+            {/* <div className='text-xl'>
                 * Historical performance; past results are not indicative of future returns.
-            </div>
+            </div> */}
 
             <div className='flex flex-col items-center space-y-2 w-full'>
                 <motion.h1
@@ -490,7 +531,7 @@ export default function BIT10Comparison() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
                     className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
-                    Live on 4 Chains
+                    Supported Chains
                 </motion.h1>
 
                 <motion.div
@@ -502,7 +543,7 @@ export default function BIT10Comparison() {
                         <motion.div
                             variants={cardVariants}
                             key={index}
-                            className='flex flex-col space-y-2 items-center justify-center py-6 px-2 border-2 border-accent rounded-lg w-full md:w-1/4 min-w-0'>
+                            className='flex flex-col space-y-2 items-center justify-center py-6 px-2 border-2 border-accent rounded-2xl w-full md:w-1/4 min-w-0'>
                             <Image src={chains.logo} height={80} width={80} quality={100} alt={chains.name} />
                             <div>{chains.name}</div>
                         </motion.div>
@@ -516,7 +557,7 @@ export default function BIT10Comparison() {
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-0 py-4 md:pt-16'>
                     {pricingItems.map((item) => (
-                        <Card key={item.title} className={`${item.title === 'Pro' ? 'p-6 md:-mt-6 border-primary' : 'p-6 dark:border-muted'} flex flex-col space-y-4 border-2 shadow-lg`}>
+                        <Card key={item.title} className={`${item.title === 'Pro' ? 'p-6 md:-mt-6 border-primary' : 'p-6 dark:border-muted'} flex flex-col space-y-4 border-2 rounded-2xl shadow-lg`}>
                             <div className='text-2xl font-semibold text-center'>{item.title}</div>
                             <div className='text-center text-gray-500 mb-4'>{item.tagline}</div>
                             <div className='text-center text-3xl font-bold tracking-wide'>{item.price}<span className='text-lg'>{item.title === 'Pro' ? '/month' : item.title === 'Institution' ? '/year' : ''}</span></div>
@@ -560,7 +601,7 @@ export default function BIT10Comparison() {
 
             <div className='grid lg:grid-cols-2 gap-3'>
                 <div>
-                    <Card className='border-muted animate-fade-left-slow'>
+                    <Card className='border-muted rounded-2xl animate-fade-left-slow'>
                         <CardHeader className='flex flex-col lg:flex-row items-center justify-between'>
                             <CardTitle>BIT10.TOP Allocations</CardTitle>
                         </CardHeader>
@@ -646,7 +687,7 @@ export default function BIT10Comparison() {
                     </Card>
                 </div>
                 <div>
-                    <Card className='border-muted animate-fade-right-slow'>
+                    <Card className='border-muted rounded-2xl animate-fade-right-slow'>
                         <CardHeader className='flex flex-col lg:flex-row items-center justify-between'>
                             <div className='flex flex-1 flex-col justify-center gap-1 pb-3 sm:pb-0'>
                                 <CardTitle>$100 Investment Growth Comparison</CardTitle>
@@ -676,8 +717,8 @@ export default function BIT10Comparison() {
                                     <ChartContainer config={investmentChartConfig} className='max-h-[300px] lg:max-h-[600px] w-full'>
                                         <LineChart accessibilityLayer data={currentData}>
                                             <CartesianGrid vertical={false} />
-                                            <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' />
-                                            <YAxis tickLine={true} axisLine={true} tickMargin={8} tickCount={5} stroke='#D5520E' tickFormatter={yAxisFormatter} />
+                                            <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' interval='preserveStartEnd' />
+                                            <YAxis tickLine axisLine tickMargin={8} stroke='#D5520E' domain={Array.isArray(yDomain) ? yDomain.filter((v): v is number => typeof v === 'number') : yDomain} ticks={yTicks} tickFormatter={yAxisFormatter} />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <ChartLegend content={<ChartLegendContent />} />
                                             <Line dataKey='bit10TopValue' type='linear' stroke='green' name={investmentChartConfig.bit10TopValue.label} strokeWidth={2} dot={false} />

@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
-import { Badge } from '@/components/ui/badge'
-import { History, ExternalLink } from 'lucide-react'
+import { Card } from '@/components/ui/card'
+import { HistoryIcon, DollarSignIcon, CoinsIcon, TrendingUpIcon, ShieldIcon, ExternalLinkIcon } from 'lucide-react'
 import { formatCompactNumber, formatAddress } from '@/lib/utils'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/buy.did'
@@ -287,15 +287,53 @@ export default function RebalanceCollateral() {
                 <div className='flex flex-col space-y-4 md:space-y-8'>
                     {
                         bit10RebalanceData.map((data, index) => (
-                            <div key={index} className='animate-fade-left-slow'>
-                                <div className='flex flex-col md:flex-row space-y-2 justify-center md:justify-between md:space-y-0'>
-                                    <div className='text-2xl'>{data.bit10Name}</div>
+                            <div key={index} className='animate-fade-left-slow flex flex-col space-y-2'>
+                                <div className='flex flex-col md:flex-row space-y-2 items-center justify-center md:justify-between md:space-y-0'>
+                                    <div className='text-2xl font-semibold'>{data.bit10Name}</div>
                                     <Button asChild>
                                         <Link href={`/collateral/${data.bit10RebalanceHistory}`}>
-                                            <History />
+                                            <HistoryIcon />
                                             Rebalance History
                                         </Link>
                                     </Button>
+                                </div>
+                                <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-4'>
+                                    <Card className='border-2 border-muted p-3 flex flex-col space-y-2'>
+                                        <div className='flex flex-row space-x-0.5 items-center justify-start'>
+                                            <div><DollarSignIcon strokeWidth={2.5} className='h-5 w-5' /></div>
+                                            <div className='text-lg'>Total Collateral</div>
+                                        </div>
+                                        <div className='flex flex-row items-end justify-start space-x-2'>
+                                            <div className='text-4xl font-semibold'>${formatCompactNumber(data.targetValue)}</div>
+                                            <div className={`${data.percentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                                {data.percentChange > 0 ? '+' : '-'}{data.percentChange.toFixed(4)}%
+                                            </div>
+                                        </div>
+                                    </Card>
+                                    <Card className='border-2 border-muted p-3 flex flex-col space-y-2'>
+                                        <div className='flex flex-row space-x-0.5 items-center justify-start'>
+                                            <div><CoinsIcon strokeWidth={2.5} className='h-5 w-5' /></div>
+                                            <div className='text-lg'>{data.bit10Name} Price</div>
+                                        </div>
+                                        <div className='text-4xl font-semibold'>${formatCompactNumber(data.bit10Price)}</div>
+                                    </Card>
+                                    <Card className='border-2 border-muted p-3 flex flex-col space-y-2'>
+                                        <div className='flex flex-row space-x-0.5 items-center justify-start'>
+                                            <div><TrendingUpIcon strokeWidth={2.5} className='h-5 w-5' /></div>
+                                            <div className='text-lg'>Total Supply</div>
+                                        </div>
+                                        <div className='text-4xl font-semibold'>{formatCompactNumber(data.bit10Supply)}</div>
+                                    </Card>
+                                    <Card className='border-2 border-muted p-3 flex flex-col space-y-2'>
+                                        <div className='flex flex-row space-x-0.5 items-center justify-start'>
+                                            <div><ShieldIcon strokeWidth={2.5} className='h-5 w-5' /></div>
+                                            <div className='text-lg'>Coverage Ratio</div>
+                                        </div>
+                                        <div className='flex flex-row items-end justify-start space-x-2'>
+                                            <div className='text-4xl font-semibold'>110%</div>
+                                            <div className='text-green-500'>Over-collateralized</div>
+                                        </div>
+                                    </Card>
                                 </div>
                                 <div className='grid md:grid-cols-3 gap-4 items-center'>
                                     <div className='flex-1'>
@@ -349,18 +387,6 @@ export default function RebalanceCollateral() {
                                         </ChartContainer>
                                     </div>
                                     <div className='flex w-full flex-col space-y-3 col-span-2'>
-                                        <h1 className='text-2xl'>{data.bit10Name}</h1>
-                                        <div className='text-lg flex flex-1 flex-row items-center justify-start'>
-                                            Total Collateral: {''}
-                                            {formatCompactNumber(data.targetValue)} USD
-                                            <Badge className='ml-1 text-white' style={{
-                                                backgroundColor: data.percentChange > 0 ? 'green' : 'red'
-                                            }}>
-                                                {data.percentChange.toFixed(4)} %
-                                            </Badge>
-                                        </div>
-                                        <h1 className='text-lg flex flex-row items-center'>{data.bit10Name} Price: {data.bit10Price.toFixed(4)} USD</h1>
-                                        <h1 className='text-lg'>Token Supply (100% Collateral Coverage): {data.bit10Supply} {data.bit10Name}</h1>
                                         <table className='w-full table-auto text-lg'>
                                             <thead>
                                                 <tr className='p-1 rounded'>
@@ -403,14 +429,14 @@ export default function RebalanceCollateral() {
                                                                     className='w-3 h-3 rounded'
                                                                     style={{ backgroundColor: color[index % color.length] }}
                                                                 ></div>
-                                                                <span>{token.symbol}</span>
+                                                                <span className='uppercase'>{token.symbol}</span>
                                                                 <span>({formatAddress(foundAllocation?.walletAddress ?? '')})</span>
                                                                 <a
                                                                     href={foundAllocation?.explorerAddress}
                                                                     target='_blank'
                                                                     rel='noopener noreferrer'
                                                                 >
-                                                                    <ExternalLink size={16} className='text-primary' />
+                                                                    <ExternalLinkIcon size={16} className='text-primary' />
                                                                 </a>
                                                             </td>
                                                             <td>

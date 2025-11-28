@@ -656,7 +656,7 @@ export default function DEX() {
     };
 
     return (
-        <div className='flex flex-col py-4 h-full items-center justify-center'>
+        <div className='flex flex-col h-full items-center justify-center'>
             <Card className='border-none w-[300px] md:w-[560px] animate-fade-bottom-up bg-gray-200 dark:bg-[#1c1717]'>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>

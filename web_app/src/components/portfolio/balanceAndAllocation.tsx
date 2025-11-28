@@ -89,7 +89,7 @@ export default function BalanceAndAllocation() {
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10TOPTokens = bit10Queries[0].data as { id: string, name: string, symbol: string, marketCap: number, price: number }[] | undefined;
     const bit10TOPPrice = Array.isArray(bit10TOPTokens) ? (bit10TOPTokens.reduce((sum, token) => sum + token.marketCap, 0) / 25_000_000_000_000) * 100 : 0;
-    const icpBIT10DEFIokenBalance = bit10Queries[1].data as bigint | undefined;
+    const icpBIT10DEFITokenBalance = bit10Queries[1].data as bigint | undefined;
     const icpBIT10TOPTokenBalance = bit10Queries[2].data!;
     const baseBIT10TOPTokenBalance = bit10Queries[3].data!;
     const solanaBIT10TOPTokenBalance = bit10Queries[4].data!;
@@ -97,7 +97,7 @@ export default function BalanceAndAllocation() {
 
     const totalTokens = () => {
         if (chain === 'icp' && isICPConnected) {
-            const total = Number(icpBIT10DEFIokenBalance!) + Number(icpBIT10TOPTokenBalance);
+            const total = Number(icpBIT10DEFITokenBalance!) + Number(icpBIT10TOPTokenBalance);
             return (total / 100000000);
         } else if (chain === 'base' && isEVMConnected) {
             const total = Number(baseBIT10TOPTokenBalance);
@@ -148,7 +148,7 @@ export default function BalanceAndAllocation() {
     const bit10DEFI = () => {
         if (chain === 'icp' && isICPConnected) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return (Number(icpBIT10DEFIokenBalance) / 100000000);
+            return (Number(icpBIT10DEFITokenBalance) / 100000000);
         } else {
             return 0;
         }

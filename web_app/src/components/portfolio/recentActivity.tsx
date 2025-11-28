@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 import { useQueries } from '@tanstack/react-query'
@@ -8,13 +8,16 @@ import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { useEVMWallet } from '@/context/EVMWalletContext'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import AnimatedBackground from '@/components/ui/animated-background'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/ui/data-table-portfolio'
 import type { PortfolioTableDataType } from '@/components/ui/data-table-portfolio'
 import { DataTable as DEXDataTable } from '@/components/ui/data-table-dex-portfolio'
 import type { PortfolioTableDataType as DEXPortfolioTableDataType } from '@/components/ui/data-table-dex-portfolio'
 import { formatCompactNumber, getTokenName } from '@/lib/utils'
+
+const tabs = ['BIT10 Activity', 'DEX Activity'];
 
 const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
     {
@@ -119,6 +122,13 @@ export default function RecentActivity() {
     const { isEVMConnected, evmAddress } = useEVMWallet();
     const { connected: isSolanaConnected } = useWallet();
     const wallet = useWallet();
+    const [activeTab, setActiveTab] = useState('BIT10 Activity');
+
+    const handleTabChange = (label: string | null) => {
+        if (label) {
+            setActiveTab(label)
+        }
+    }
 
     const fetchRecentActivity = async () => {
         let response;
@@ -194,30 +204,34 @@ export default function RecentActivity() {
             ) : (
                 <div className='flex flex-col space-y-1'>
                     <Card className='border-muted animate-fade-bottom-up-slow'>
-                        <CardHeader>
-                            <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent activity</div>
-                        </CardHeader>
-                        <CardContent>
-                            <DataTable
-                                columns={portfolioTableColumns}
-                                data={recentActivityData ?? []}
-                                userSearchColumn='tickOutName'
-                                inputPlaceHolder='Search by Received token name'
-                            />
-                        </CardContent>
-                    </Card>
-
-                    <Card className='border-muted animate-fade-bottom-up-slow'>
-                        <CardHeader>
-                            <div className='text-2xl md:text-4xl text-center md:text-start'>Your recent DEX activity</div>
-                        </CardHeader>
-                        <CardContent>
-                            <DEXDataTable
-                                columns={recentSwapTableColumns}
-                                data={recentDEXActivityData ?? []}
-                                userSearchColumn='to'
-                                inputPlaceHolder='Search by Received token name'
-                            />
+                        <CardContent className='py-4 fleex flex-col space-y-4'>
+                            <div className='relative flex flex-row space-x-2 items-center justify-center border border-muted rounded-md px-2 py-1.5 w-full lg:w-1/2'>
+                                <AnimatedBackground defaultValue='BIT10 Activity' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
+                                    {tabs.map((label, index) => (
+                                        <button key={index} data-id={label} type='button' className={`inline-flex px-6 items-center justify-center text-lg text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'} flex-grow`}>
+                                            {label}
+                                        </button>
+                                    ))}
+                                </AnimatedBackground>
+                            </div>
+                            {
+                                activeTab === 'BIT10 Activity' &&
+                                <DataTable
+                                    columns={portfolioTableColumns}
+                                    data={recentActivityData ?? []}
+                                    userSearchColumn='tickOutName'
+                                    inputPlaceHolder='Search by Received token name'
+                                />
+                            }
+                            {
+                                activeTab === 'DEX Activity' &&
+                                <DEXDataTable
+                                    columns={recentSwapTableColumns}
+                                    data={recentDEXActivityData ?? []}
+                                    userSearchColumn='to'
+                                    inputPlaceHolder='Search by Received token name'
+                                />
+                            }
                         </CardContent>
                     </Card>
                 </div>

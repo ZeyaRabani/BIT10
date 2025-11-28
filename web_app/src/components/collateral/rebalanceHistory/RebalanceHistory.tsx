@@ -432,7 +432,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     <TableBody>
                                                         {entry.newTokens.map((token) => (
                                                             <TableRow key={token.id}>
-                                                                <TableCell>{token.symbol}</TableCell>
+                                                                <TableCell className='uppercase'>{token.symbol}</TableCell>
                                                                 <TableCell>${formatCompactNumber(token.price)}</TableCell>
                                                                 <TableCell>{formatCompactNumber(token.noOfTokens)}</TableCell>
                                                             </TableRow>
@@ -480,7 +480,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             💰 External Liquidity Required: ${formatCompactNumber(rebalanceResult.externalLiquidityAmount)}
                                                         </p>
                                                         <p className='text-purple-600 dark:text-purple-400 text-sm mt-1'>
-                                                            Tokens requiring external funds: {rebalanceResult.externalTokens.map(t => t.symbol).join(', ')}
+                                                            Tokens requiring external funds: <span className='uppercase'>{rebalanceResult.externalTokens.map(t => t.symbol).join(', ')}</span>
                                                         </p>
                                                     </div>
                                                 )}
@@ -529,7 +529,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     {/* @ts-ignore */}
                                                     {nextEntry.newTokens.map((token) => (
                                                         <TableRow key={token.id}>
-                                                            <TableCell>{token.symbol}</TableCell>
+                                                            <TableCell className='uppercase'>{token.symbol}</TableCell>
                                                             <TableCell>${formatCompactNumber(token.price)}</TableCell>
                                                             <TableCell>{formatCompactNumber(token.noOfTokens)}</TableCell>
                                                         </TableRow>
@@ -547,7 +547,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                 <TableBody>
                                                     {entry.newTokens.map((token) => (
                                                         <TableRow key={token.id}>
-                                                            <TableCell>{token.symbol}</TableCell>
+                                                            <TableCell className='uppercase'>{token.symbol}</TableCell>
                                                             <TableCell>${formatCompactNumber(token.price)}</TableCell>
                                                             <TableCell>{formatCompactNumber(token.noOfTokens)}</TableCell>
                                                         </TableRow>
@@ -575,10 +575,10 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     <TableBody>
                                                         {rebalanceResult.internalSwaps.map((trade, tradeIndex) => (
                                                             <TableRow key={tradeIndex}>
-                                                                <TableCell className='font-medium text-red-600 dark:text-red-400'>{trade.sellToken}</TableCell>
+                                                                <TableCell className='font-medium uppercase text-red-600 dark:text-red-400'>{trade.sellToken}</TableCell>
                                                                 <TableCell>{formatCompactNumber(trade.sellAmount)}</TableCell>
                                                                 <TableCell className='text-center text-gray-500'>→</TableCell>
-                                                                <TableCell className='font-medium text-green-600 dark:text-green-400'>{trade.buyToken}</TableCell>
+                                                                <TableCell className='font-medium uppercase text-green-600 dark:text-green-400'>{trade.buyToken}</TableCell>
                                                                 <TableCell>{formatCompactNumber(trade.buyAmount)}</TableCell>
                                                                 <TableCell>${formatCompactNumber(trade.valueUSD)}</TableCell>
                                                             </TableRow>
@@ -616,7 +616,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             {rebalanceResult.externalTokens.map((tokenDetail) => (
                                                                 <div key={tokenDetail.symbol} className='bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-700'>
                                                                     <div className='flex justify-between items-center'>
-                                                                        <span className='font-semibold text-purple-800 dark:text-purple-200'>
+                                                                        <span className='font-semibold uppercase text-purple-800 dark:text-purple-200'>
                                                                             {tokenDetail.symbol}
                                                                         </span>
                                                                         <span className='text-purple-700 dark:text-purple-300 font-medium'>

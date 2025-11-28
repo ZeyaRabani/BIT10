@@ -22,7 +22,8 @@ const links = {
         { title: 'Buy', link: '/buy' },
         { title: 'DEX', link: '/dex' },
         { title: 'Portfolio', link: '/portfolio' },
-        { title: 'Collateral', link: '/collateral' }
+        { title: 'Collateral', link: '/collateral' },
+        { title: 'Rewards', link: '/rewards' }
     ]
 };
 
@@ -72,7 +73,13 @@ export default function Navbar() {
             <nav className='flex items-center justify-between py-2 px-2.5 md:px-12'>
                 <div className='flex lg:flex-1'>
                     <Link href='/' passHref>
-                        <div className='flex flex-row items-center justify-start'>
+                        {/* <div className='flex flex-row items-center justify-start'>
+                            <Image src='/logo/logo-circle.png' alt='logo' width={60} height={60} />
+                        </div> */}
+                        <div className='flex-row items-center justify-start hidden dark:block'>
+                            <Image src='/logo/logo.png' alt='logo' width={60} height={60} />
+                        </div>
+                        <div className='flex flex-row items-center justify-start dark:hidden'>
                             <Image src='/logo/logo-circle.png' alt='logo' width={60} height={60} />
                         </div>
                     </Link>
