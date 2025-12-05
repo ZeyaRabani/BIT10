@@ -66,19 +66,19 @@
 
     /* Handle */
     ::-webkit-scrollbar-thumb {
-        background-color: #d99228 !important;
+        background-color: #1A9A4B !important;
         border-radius: 10px;
     }
 
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
-        background: #94790f;
+        background: #147A3C;
         border-radius: 10px;
     }
 
     /* Highlighted text */
     ::selection {
-        background-color: #EA580C;
+        background-color: #21C15C;
         color: #fff;
     }
 

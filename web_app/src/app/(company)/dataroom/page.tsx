@@ -277,11 +277,11 @@ export default function Page() {
                                     <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                     <defs>
                                         <linearGradient id='bit10DeFi' x1='0' y1='0' x2='0' y2='1'>
-                                            <stop offset='5%' stopColor='#D5520E' stopOpacity={0.8} />
-                                            <stop offset='95%' stopColor='#D5520E' stopOpacity={0.1} />
+                                            <stop offset='5%' stopColor='#21C45D' stopOpacity={0.8} />
+                                            <stop offset='95%' stopColor='#21C45D' stopOpacity={0.1} />
                                         </linearGradient>
                                     </defs>
-                                    <Area dataKey='bit10DeFi' type='natural' fill='#D5520E' fillOpacity={0.4} stroke='#D5520E' stackId='a' />
+                                    <Area dataKey='bit10DeFi' type='natural' fill='#21C45D' fillOpacity={0.4} stroke='#21C45D' stackId='a' />
                                     {selection.startX !== null && selection.endX !== null && (
                                         <ReferenceArea x1={selection.startX} x2={selection.endX} strokeOpacity={0.3} />
                                     )}

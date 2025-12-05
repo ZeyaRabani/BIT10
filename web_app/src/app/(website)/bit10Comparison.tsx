@@ -475,44 +475,32 @@ export default function BIT10Comparison() {
 
     return (
         <div className='flex flex-col items-center space-y-4'>
-            <div className='text-4xl md:text-6xl font-semibold text-center'>
-                BIT10.TOP Annualized Returns (AR)
-            </div>
-
-            <div className='w-full'>
-                <div className='grid lg:grid-cols-3 gap-8'>
+            <div className='flex flex-col space-y-2 items-center justify-center w-full'>
+                <motion.div initial={{ opacity: 0.0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-semibold text-center'>
+                    BIT10.TOP Annualized Returns (AR)
+                </motion.div>
+                <motion.div initial='hidden' whileInView='visible' viewport={{ once: true }} variants={containerVariants} className='grid lg:grid-cols-3 gap-8 w-full'>
                     {['1Y', '5Y', '10Y'].map((period) => (
-                        <div key={period} className='border-2 bg-card border-muted rounded-2xl py-8 px-3'>
+                        <motion.div variants={cardVariants} key={period} className='border-2 bg-card border-muted rounded-2xl py-8 px-3'>
                             <h4 className='font-semibold text-2xl text-center mb-2'>{period} AR</h4>
                             {aprData[period as keyof typeof aprData] ? (
                                 <div className={`font-bold text-4xl text-center ${Number(aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)) > 0 ? 'text-primary' : 'text-red-500'}`}>{Number(aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)) > 0 && '+'}{aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)}%</div>
                             ) : (
                                 <p className='text-center text-gray-500'>Loading...</p>
                             )}
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
             </div>
 
             <div className='flex flex-col items-center space-y-2 w-full'>
-                <motion.h1
-                    initial={{ opacity: 0.0, y: 80 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
-                    className='text-4xl md:text-6xl font-semibold text-center z-[1]'>
+                <motion.h1 initial={{ opacity: 0.0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-semibold text-center z-[1]'>
                     Supported Chains
                 </motion.h1>
 
-                <motion.div
-                    initial='hidden'
-                    whileInView='visible'
-                    variants={containerVariants}
-                    className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-6 w-full h-full py-4'>
+                <motion.div initial='hidden' whileInView='visible' viewport={{ once: true }} variants={containerVariants} className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-6 w-full h-full py-4'>
                     {chains.map((chains, index) => (
-                        <motion.div
-                            variants={cardVariants}
-                            key={index}
-                            className='flex flex-col space-y-2 items-center justify-start py-6 px-2 border-2 bg-card border-muted rounded-2xl w-full min-w-0 h-full'>
+                        <motion.div variants={cardVariants} key={index} className='flex flex-col space-y-2 items-center justify-start py-6 px-2 border-2 bg-card border-muted rounded-2xl w-full min-w-0 h-full'>
                             {chains.logo &&
                                 <Image src={chains.logo} height={80} width={80} quality={100} alt={chains.name} />
                             }
@@ -522,28 +510,18 @@ export default function BIT10Comparison() {
                 </motion.div>
             </div>
 
-            <div>
-                <div className='text-4xl md:text-6xl font-semibold text-center'>
+            <div className='flex flex-col space-y-4 items-center justify-center'>
+                <motion.div initial={{ opacity: 0.0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-semibold text-center'>
                     Simple pricing based on your needs
-                </div>
-                <div className='grid grid-cols-1 md:grid-cols-3 py-4 md:pt-16 gap-4 md:gap-0'>
+                </motion.div>
+                <div className='grid grid-cols-1 md:grid-cols-3 py-4 md:pt-8 gap-4 md:gap-0'>
                     {pricingItems.map((item, index) => {
                         const isPro = item.title === 'Pro';
                         const isFree = item.title === 'Free';
                         return (
                             <Card
                                 key={item.title}
-                                className={cn(
-                                    'flex flex-col space-y-4 p-6 border-2 shadow-lg',
-                                    index === 0 &&
-                                    'md:rounded-l-2xl md:rounded-r-none rounded-2xl border-2',
-                                    index === 1 &&
-                                    'md:rounded-t-2xl md:rounded-b-none rounded-2xl border-2',
-                                    index === 2 &&
-                                    'md:rounded-r-2xl md:rounded-l-none rounded-2xl border-2',
-                                    isPro && 'md:-mt-6 border-primary'
-                                )}
-                            >
+                                className={cn('flex flex-col space-y-4 p-6 border-2 shadow-lg', index === 0 && 'md:rounded-l-2xl md:rounded-r-none rounded-2xl border-2', index === 1 && 'md:rounded-t-2xl md:rounded-b-none rounded-2xl border-2', index === 2 && 'md:rounded-r-2xl md:rounded-l-none rounded-2xl border-2', isPro && 'md:-mt-6 border-primary')}>
                                 <div className='text-2xl font-semibold text-center'>
                                     {item.title}
                                 </div>
@@ -557,11 +535,11 @@ export default function BIT10Comparison() {
 
                                 <div className='flex w-full justify-center'>
                                     {isFree ? (
-                                        <Button className='w-full md:w-1/2' asChild>
+                                        <Button className='w-full lg:w-1/2' asChild>
                                             <Link href='/buy'>Buy BIT10.TOP</Link>
                                         </Button>
                                     ) : isPro ? (
-                                        <Button variant='outline' className='w-full md:w-1/2' disabled>
+                                        <Button variant='outline' className='w-full lg:w-1/2' disabled>
                                             Coming soon
                                         </Button>
                                     ) : (
@@ -606,44 +584,19 @@ export default function BIT10Comparison() {
                         ) : (
                             <div className='grid md:grid-cols-2 gap-4 items-center'>
                                 <div className='flex-1'>
-                                    <ChartContainer
-                                        config={bit10AllocationChartConfig}
-                                        className='aspect-square max-h-[300px]'
-                                    >
+                                    <ChartContainer config={bit10AllocationChartConfig} className='aspect-square max-h-[300px]'>
                                         <PieChart>
-                                            <ChartTooltip
-                                                cursor={false}
-                                                content={<ChartTooltipContent hideLabel />}
-                                            />
-                                            <Pie
-                                                data={bit10AllocationPieChartData}
-                                                dataKey='value'
-                                                nameKey='name'
-                                                innerRadius={innerRadius}
-                                                strokeWidth={5}
-                                            >
+                                            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                                            <Pie data={bit10AllocationPieChartData} dataKey='value' nameKey='name' innerRadius={innerRadius} strokeWidth={5}>
                                                 <Label
                                                     content={({ viewBox }) => {
                                                         if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
                                                             return (
-                                                                <text
-                                                                    x={viewBox.cx}
-                                                                    y={viewBox.cy}
-                                                                    textAnchor='middle'
-                                                                    dominantBaseline='middle'
-                                                                >
-                                                                    <tspan
-                                                                        x={viewBox.cx}
-                                                                        y={viewBox.cy}
-                                                                        className='fill-foreground text-xl font-bold'
-                                                                    >
+                                                                <text x={viewBox.cx} y={viewBox.cy} textAnchor='middle' dominantBaseline='middle'>
+                                                                    <tspan x={viewBox.cx} y={viewBox.cy} className='fill-foreground text-xl font-bold'>
                                                                         BIT10.TOP
                                                                     </tspan>
-                                                                    <tspan
-                                                                        x={viewBox.cx}
-                                                                        y={(viewBox.cy ?? 0) + 24}
-                                                                        className='fill-muted-foreground'
-                                                                    >
+                                                                    <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 24} className='fill-muted-foreground'>
                                                                         Allocations
                                                                     </tspan>
                                                                 </text>
@@ -658,15 +611,9 @@ export default function BIT10Comparison() {
                                 <div className='flex w-full flex-col space-y-3'>
                                     <div className='flex flex-col'>
                                         {tokens?.sort((a, b) => b.marketCap - a.marketCap).map((token, index) => (
-                                            <div
-                                                key={index}
-                                                className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'
-                                            >
+                                            <div key={index} className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'>
                                                 <div className='flex flex-row items-center space-x-1'>
-                                                    <div
-                                                        className='w-3 h-3 rounded'
-                                                        style={{ backgroundColor: color[index % color.length] }}
-                                                    ></div>
+                                                    <div className='w-3 h-3 rounded' style={{ backgroundColor: color[index % color.length] }} />
                                                     <div>{token.name}</div>
                                                 </div>
                                                 <div>{((token.marketCap / totalMarketCap) * 100).toFixed(2)} %</div>
@@ -705,8 +652,8 @@ export default function BIT10Comparison() {
                                 <ChartContainer config={investmentChartConfig} className='max-h-[300px] lg:max-h-[600px] w-full'>
                                     <LineChart accessibilityLayer data={currentData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' interval='preserveStartEnd' />
-                                        <YAxis tickLine axisLine tickMargin={8} stroke='#D5520E' domain={Array.isArray(yDomain) ? yDomain.filter((v): v is number => typeof v === 'number') : yDomain} ticks={yTicks} tickFormatter={yAxisFormatter} />
+                                        <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#21C45D' interval='preserveStartEnd' />
+                                        <YAxis tickLine axisLine tickMargin={8} stroke='#21C45D' domain={Array.isArray(yDomain) ? yDomain.filter((v): v is number => typeof v === 'number') : yDomain} ticks={yTicks} tickFormatter={yAxisFormatter} />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                         <ChartLegend content={<ChartLegendContent />} />
                                         <Line dataKey='bit10TopValue' type='linear' stroke='green' name={investmentChartConfig.bit10TopValue.label} strokeWidth={2} dot={false} />

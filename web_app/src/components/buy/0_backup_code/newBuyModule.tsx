@@ -935,17 +935,17 @@ export default function NewBuyModule() {
                                                     axisLine={true}
                                                     tickMargin={8}
                                                     tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                    stroke="#D5520E"
+                                                    stroke="#21C45D"
                                                 />
                                                 <YAxis
                                                     tickLine={true}
                                                     axisLine={true}
                                                     tickMargin={8}
                                                     tickCount={3}
-                                                    stroke="#D5520E"
+                                                    stroke="#21C45D"
                                                 />
                                                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                                <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                                <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                             </LineChart>
                                         </ChartContainer>
                                     }
@@ -960,17 +960,17 @@ export default function NewBuyModule() {
                                                     axisLine={true}
                                                     tickMargin={8}
                                                     tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                    stroke="#D5520E"
+                                                    stroke="#21C45D"
                                                 />
                                                 <YAxis
                                                     tickLine={true}
                                                     axisLine={true}
                                                     tickMargin={8}
                                                     tickCount={3}
-                                                    stroke="#D5520E"
+                                                    stroke="#21C45D"
                                                 />
                                                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                                <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                                <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                             </LineChart>
                                         </ChartContainer>
                                     }
@@ -985,17 +985,17 @@ export default function NewBuyModule() {
                                                     axisLine={true}
                                                     tickMargin={8}
                                                     tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                    stroke="#D5520E"
+                                                    stroke="#21C45D"
                                                 />
                                                 <YAxis
                                                     tickLine={true}
                                                     axisLine={true}
                                                     tickMargin={8}
                                                     tickCount={3}
-                                                    stroke="#D5520E"
+                                                    stroke="#21C45D"
                                                 />
                                                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                                <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                                <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                             </LineChart>
                                         </ChartContainer>
                                     }
@@ -1010,17 +1010,17 @@ export default function NewBuyModule() {
                                                     axisLine={true}
                                                     tickMargin={8}
                                                     tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                    stroke="#D5520E"
+                                                    stroke="#21C45D"
                                                 />
                                                 <YAxis
                                                     tickLine={true}
                                                     axisLine={true}
                                                     tickMargin={8}
                                                     tickCount={3}
-                                                    stroke="#D5520E"
+                                                    stroke="#21C45D"
                                                 />
                                                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                                <Line dataKey={tokenDataName} type='linear' stroke='#D5520E' strokeWidth={2} dot={false} />
+                                                <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                             </LineChart>
                                         </ChartContainer>
                                     }

@@ -1189,7 +1189,7 @@ export default function DEX() {
                                 </motion.div>
                             )}
 
-                            <Button className='w-full rounded-lg' disabled={swapDisabledConditions}>
+                            <Button className='w-full' disabled={swapDisabledConditions}>
                                 {swaping && <Loader2 className='animate-spin mr-2' size={15} />}
                                 {getSwapMessage()}
                             </Button>

@@ -27,7 +27,7 @@ import EasyAImg from '@/assets/home/EasyA.png'
 const containerVariants = {
   visible: {
     transition: {
-      staggerChildren: 0.3,
+      staggerChildren: 0.1,
     },
   },
 };
@@ -35,6 +35,21 @@ const containerVariants = {
 const cardVariants = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeInOut' } },
+};
+
+const imageVariants = {
+  hidden: {
+    x: '100%',
+    opacity: 0,
+  },
+  visible: {
+    x: '0%',
+    opacity: 1,
+    transition: {
+      duration: 0.5,
+      ease: 'easeOut',
+    },
+  },
 };
 
 const whyChooseUs = [
@@ -94,32 +109,29 @@ export default function Page() {
       <div className='py-8 flex flex-col items-center justify-center'>
         <div className='flex flex-col gap-4 items-center justify-center md:px-4'>
           <div className='p-4 max-w-7xl mx-auto z-10 w-full pt-8 md:pt-0'>
-            <motion.h1
-              initial={{ opacity: 0.0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
-              className='text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50 pb-2'>
+            <motion.h1 initial={{ opacity: 0.0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50 pb-2'>
               On-Chain Crypto Index Funds
             </motion.h1>
 
-            <div className='flex flex-col md:flex-row space-x-4 items-center justify-center py-6'>
+            <div className='flex flex-col md:flex-row md:space-x-4 items-center justify-center py-6'>
               <div className='flex flex-col space-y-2 items-center'>
-                <div className='flex'>
+                <motion.div initial={{ opacity: 0.0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, ease: 'easeInOut' }}>
                   <Image src={BIT10Img} alt='logo' width={85} height={85} className='border-2 w-16 md:w-16 lg:w-20 rounded-full' />
-                </div>
-                <div className='text-xl font-semibold text-primary'>BIT10.TOP</div>
+                </motion.div>
+                <motion.div initial={{ opacity: 0.0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, ease: 'easeInOut' }} className='text-xl font-semibold text-primary'>BIT10.TOP</motion.div>
               </div>
-              <div className='text-6xl md:-mt-5'>=</div>
+              <div className='text-6xl md:-mt-5 animate-fade-bottom-up'>=</div>
               <div className='flex flex-col space-y-2 items-start justify-center'>
-                <div className='flex flex-row items-center justify-center -space-x-3 w-full'>
+                <motion.div variants={containerVariants} initial='hidden' whileInView='visible' viewport={{ once: true }} className='flex flex-row items-center justify-center -space-x-3 w-full'>
                   {[BTCImg, ETHImg, XRPImg, BNBImg, SOLImg, TRXImg, DogeImg, ADAImg, BCHImg, AVAXImg].map((imgSrc, index) => (
-                    <Image key={index} src={imgSrc} alt='logo' width={85} height={85} className='border-2 rounded-full w-9 md:w-16 lg:w-20 h-full object-cover bg-gray-200' />
+                    <motion.div key={index} variants={imageVariants}>
+                      <Image src={imgSrc} alt='logo' width={85} height={85} className='border-2 rounded-full w-9 md:w-16 lg:w-20 h-full object-cover bg-gray-200' />
+                    </motion.div>
                   ))}
-                </div>
-                <div className='text-xl font-semibold text-center'>
+                </motion.div>
+                <motion.div initial={{ opacity: 0.0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, ease: 'easeInOut' }} className='text-xl font-semibold text-center'>
                   Top 10 cryptocurrencies in a single, secure, over-collateralized token.
-                </div>
+                </motion.div>
               </div>
             </div>
           </div>
@@ -130,17 +142,14 @@ export default function Page() {
         <BIT10Comparison />
 
         <div className='flex flex-col items-center space-y-2'>
-          <motion.h1
-            initial={{ opacity: 0.0, y: 80 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
-            className='text-4xl md:text-6xl font-semibold z-[1]'>
+          <motion.h1 initial={{ opacity: 0.0, y: 80 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-semibold z-[1]'>
             How BIT10 works?
           </motion.h1>
 
           <motion.iframe
             initial={{ opacity: 0.0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
             src='https://www.youtube.com/embed/uFhg9oJ6w0M'
             // height={1720}
@@ -152,27 +161,13 @@ export default function Page() {
         </div>
 
         <div className='flex flex-col items-center space-y-2'>
-          <motion.h1
-            initial={{ opacity: 0.0, y: 80 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
-            className='text-4xl md:text-6xl font-semibold z-[1]'>
+          <motion.h1 initial={{ opacity: 0.0, y: 80 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-semibold text-center z-[1]'>
             Why Choose BIT10.TOP?
           </motion.h1>
 
-          <motion.div
-            initial='hidden'
-            whileInView='visible'
-            variants={containerVariants}
-            className='grid grid-cols-2 md:grid-cols-4 md:gap-6 w-full h-full py-4'
-          >
+          <motion.div initial='hidden' whileInView='visible' variants={containerVariants} viewport={{ once: true }} className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full h-full py-4'>
             {whyChooseUs.map((item, index) => (
-              <motion.div
-                variants={cardVariants}
-                key={index}
-                className='flex flex-col space-y-2 items-center justify-start py-6 px-2 border-2 bg-card border-muted rounded-2xl w-full min-w-0 h-full'
-                style={{ height: '215px', width: '100' }}
-              >
+              <motion.div variants={cardVariants} viewport={{ once: true }} key={index} className='flex flex-col space-y-2 items-center justify-start py-6 px-2 border-2 bg-card border-muted rounded-2xl w-full min-w-0 h-full'>
                 <div className='flex flex-col items-center justify-start h-full w-full'>
                   <div className='mb-2 flex justify-center'>{item.icon && <item.icon className='h-12 w-12 text-primary' />}</div>
                   <div className='text-2xl font-semibold text-center'>{item.title}</div>
@@ -185,11 +180,7 @@ export default function Page() {
 
         <div className='flex flex-col antialiased items-center justify-center relative overflow-hidden'>
           <div>
-            <motion.h1
-              initial={{ opacity: 0.0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
-              className='text-4xl md:text-6xl font-semibold'>Our Partners</motion.h1>
+            <motion.h1 initial={{ opacity: 0.0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-semibold'>Our Partners</motion.h1>
           </div>
 
           <InfiniteMovingCards
@@ -198,13 +189,9 @@ export default function Page() {
             speed='slow'
           />
 
-          <motion.div
-            initial='hidden' whileInView='visible' variants={containerVariants}
-            className='flex flex-col md:flex-row items-center justify-evenly w-full space-y-3 md:space-y-0'>
+          <motion.div initial='hidden' whileInView='visible' viewport={{ once: true }} variants={containerVariants} className='flex flex-col md:flex-row items-center justify-evenly w-full space-y-3 md:space-y-0'>
             {parterners.map((partner, index) => (
-              <motion.div
-                variants={cardVariants}
-                key={index} className={`p-2 border-2 border-accent rounded-2xl bg-white`}>
+              <motion.div variants={cardVariants} key={index} className='p-2 border-2 border-accent rounded-2xl bg-white'>
                 <Image src={partner.logo} height={50} width={400} quality={100} alt={partner.name} />
               </motion.div>
             ))}

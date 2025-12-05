@@ -100,11 +100,7 @@ export default function Footer() {
 
     return (
         <MaxWidthWrapper>
-            <motion.footer
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
-                className='bg-accent my-2.5 md:my-6 rounded backdrop-blur-0'>
+            <motion.footer initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }} className='bg-accent my-2.5 md:my-6 rounded backdrop-blur-0'>
                 <div className='container p-6 mx-auto'>
 
                     <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4'>

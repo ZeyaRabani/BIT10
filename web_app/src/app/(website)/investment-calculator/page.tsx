@@ -326,14 +326,14 @@ export default function Page() {
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickFormatter={tickFormatter}
-                                                stroke='#D5520E'
+                                                stroke='#21C45D'
                                             />
                                             <YAxis
                                                 tickLine={true}
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickCount={5}
-                                                stroke='#D5520E'
+                                                stroke='#21C45D'
                                                 tickFormatter={yAxisFormatter}
                                             />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
