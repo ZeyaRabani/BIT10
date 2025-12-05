@@ -494,14 +494,14 @@ export default function Page() {
                                     </Button>
 
                                     {calculationResult && (
-                                        <div className='w-full p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-900/20'>
-                                            <h3 className='font-semibold text-green-800 dark:text-green-200 mb-3'>
+                                        <div className='w-full p-4 border border-green-800 rounded-lg bg-green-900/20'>
+                                            <h3 className='font-semibold text-green-200 mb-3'>
                                                 Investment Comparison
                                             </h3>
                                             <div className='overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 max-w-[80vw]'>
                                                 <table className='w-full text-sm border-collapse '>
                                                     <thead>
-                                                        <tr className='border-b border-green-200 dark:border-green-800'>
+                                                        <tr className='border-b border-green-800'>
                                                             <th className='text-left p-2'>Asset</th>
                                                             <th className='text-center p-2'>Initial Capital</th>
                                                             <th className='text-center p-2'>Current Value</th>
@@ -513,27 +513,27 @@ export default function Page() {
                                                         {calculationResult.assets.map((asset) => (
                                                             <tr
                                                                 key={asset.name}
-                                                                className='border-b border-green-200 dark:border-green-800 last:border-0'
+                                                                className='border-b border-green-800 last:border-0'
                                                             >
                                                                 <td className='p-2'>{asset.name}</td>
                                                                 <td className='p-2 text-right'>
                                                                     ${asset.initialInvestment.toLocaleString()}
                                                                 </td>
-                                                                <td className='p-2 text-right text-green-600 dark:text-green-400'>
+                                                                <td className='p-2 text-right text-green-400'>
                                                                     ${asset.currentValue.toLocaleString()}
                                                                 </td>
                                                                 <td
                                                                     className={`p-2 text-right ${asset.totalReturn >= 0
-                                                                        ? 'text-green-600 dark:text-green-400'
-                                                                        : 'text-red-600 dark:text-red-400'
+                                                                        ? 'text-green-400'
+                                                                        : 'text-red-400'
                                                                         }`}
                                                                 >
                                                                     ${asset.totalReturn.toLocaleString()}
                                                                 </td>
                                                                 <td
                                                                     className={`p-2 text-right ${asset.percentageReturn >= 0
-                                                                        ? 'text-green-600 dark:text-green-400'
-                                                                        : 'text-red-600 dark:text-red-400'
+                                                                        ? 'text-green-400'
+                                                                        : 'text-red-400'
                                                                         }`}
                                                                 >
                                                                     {asset.percentageReturn >= 0 ? '+' : ''}
@@ -544,7 +544,7 @@ export default function Page() {
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <div className='pt-2 text-xs text-gray-500 dark:text-gray-400'>
+                                            <div className='pt-2 text-xs text-gray-400'>
                                                 Period: From {new Date(calculationResult.startDate).toLocaleDateString()} to{' '}
                                                 {new Date(calculationResult.endDate).toLocaleDateString()}
                                             </div>

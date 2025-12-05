@@ -6,7 +6,7 @@ import { useEVMWallet } from '@/context/EVMWalletContext'
 import { useQueries } from '@tanstack/react-query'
 import { whitelistedAddress } from '@/actions/dbActions'
 import { toast } from 'sonner'
-import { formatAddress, formatCompactNumber } from '@/lib/utils'
+import { formatAddress, formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils'
 import { ChevronsUpDown, Loader2, Info, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -428,7 +428,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             {isLoading ? (
                 <div className='flex flex-col-reverse space-y-2 md:space-y-0 lg:grid lg:grid-cols-5 gap-4'>
                     <div className='flex flex-col space-y-2 lg:space-y-4 lg:col-span-3'>
-                        <Card className='border-none animate-fade-left bg-gray-200 dark:bg-[#1c1717]'>
+                        <Card className='border-none animate-fade-left'>
                             <CardHeader>
                                 <CardTitle className='flex flex-row space-x-2 items-center justify-between'>
                                     <Skeleton className='bg-muted rounded-md w-16 h-12' />
@@ -440,7 +440,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                             </CardContent>
                         </Card>
 
-                        <Card className='border-none animate-fade-left bg-gray-200 dark:bg-[#1c1717]'>
+                        <Card className='border-none animate-fade-left'>
                             <CardHeader>
                                 <CardTitle>
                                     <Skeleton className='bg-muted rounded-md w-16 h-8' />
@@ -453,7 +453,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                     </div>
 
                     <div className='md:col-span-2'>
-                        <Card className='border-none animate-fade-right bg-gray-200 dark:bg-[#1c1717] flex flex-col space-y-2'>
+                        <Card className='border-none animate-fade-right flex flex-col space-y-2'>
                             <CardHeader>
                                 <CardTitle>Sell</CardTitle>
                             </CardHeader>
@@ -473,7 +473,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                     </div>
 
                     <div className='md:col-span-2'>
-                        <Card className='border-none animate-fade-right bg-gray-200 dark:bg-[#1c1717]'>
+                        <Card className='border-none animate-fade-right'>
                             <CardHeader>
                                 <CardTitle>Sell</CardTitle>
                             </CardHeader>
@@ -486,7 +486,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                     <div>You Sell</div>
                                                     {
                                                         chain &&
-                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center'>
+                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
                                                             <div className='font-light'>From</div>
                                                             <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
                                                         </Badge>
@@ -502,7 +502,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                                 // <FormItem className='py-[1.5px] bg-blue-500'>
                                                                 <FormItem className='py-[1.5px]'>
                                                                     <FormControl>
-                                                                        <Input {...field} placeholder='BIT10 Tokens to sell' className='dark:border-[#B4B3B3]' />
+                                                                        <Input {...field} placeholder='BIT10 Tokens to sell' className='border-[#B4B3B3]' />
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>
@@ -513,13 +513,13 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                             <TooltipProvider>
                                                                 <Tooltip delayDuration={300}>
                                                                     <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
-                                                                        &asymp; ${formatCompactNumber((form.watch('from_bit10_amount') * selectedBIT10TokenPrice) * 1.01)}
+                                                                        &asymp; ${formatCompactPercentNumber((form.watch('from_bit10_amount') * selectedBIT10TokenPrice) * 1.01)}
                                                                         <TooltipTrigger asChild>
                                                                             <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
                                                                         </TooltipTrigger>
                                                                         <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                                                             Price of {form.watch('from_bit10_token')} (in USD) + 1% Management fee <br />
-                                                                            $ {formatCompactNumber((form.watch('from_bit10_amount') * selectedBIT10TokenPrice))} + $ {formatCompactNumber(0.01 * ((form.watch('from_bit10_amount') * selectedBIT10TokenPrice)))} = $ {formatCompactNumber((form.watch('from_bit10_amount') * selectedBIT10TokenPrice) * 1.01)}
+                                                                            $ {formatCompactPercentNumber((form.watch('from_bit10_amount') * selectedBIT10TokenPrice))} + $ {formatCompactPercentNumber(0.01 * ((form.watch('from_bit10_amount') * selectedBIT10TokenPrice)))} = $ {formatCompactPercentNumber((form.watch('from_bit10_amount') * selectedBIT10TokenPrice) * 1.01)}
                                                                         </TooltipContent>
                                                                     </div>
                                                                 </Tooltip>
@@ -538,7 +538,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                                             <Button
                                                                                 type='button'
                                                                                 variant='outline'
-                                                                                className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
+                                                                                className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                                 onClick={() => setPaymentTokenDialogOpen(true)}
                                                                             >
                                                                                 {field.value
@@ -563,7 +563,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                                                         placeholder='Search tokens'
                                                                                         value={paymentTokenSearch}
                                                                                         onChange={(e) => setPaymentTokenSearch(e.target.value)}
-                                                                                        className='dark:border-[#B4B3B3]'
+                                                                                        className='border-[#B4B3B3]'
                                                                                     />
                                                                                     <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
                                                                                         {filteredPaymentTokens.length === 0 ? (
@@ -590,7 +590,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div>
-                                                                                                        <Badge variant='outline'>{token.tokenType}</Badge>
+                                                                                                        <Badge variant='outline' className='border-muted-foreground'>{token.tokenType}</Badge>
                                                                                                     </div>
                                                                                                 </Button>
                                                                                             ))
@@ -621,7 +621,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                     <div>You Receive</div>
                                                     {
                                                         chain &&
-                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center'>
+                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
                                                             <div className='font-light'>To</div>
                                                             <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
                                                         </Badge>
@@ -636,7 +636,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                         </div>
                                                         {/* <div className='bg-green-500'> */}
                                                         <div>
-                                                            &asymp; ${formatCompactNumber(form.watch('from_bit10_amount') * selectedBIT10TokenPrice)}
+                                                            &asymp; ${formatCompactPercentNumber(form.watch('from_bit10_amount') * selectedBIT10TokenPrice)}
                                                         </div>
                                                     </div>
                                                     <div className='flex flex-col space-y-0.5'>
@@ -651,7 +651,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                                             <Button
                                                                                 type='button'
                                                                                 variant='outline'
-                                                                                className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
+                                                                                className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                                 onClick={() => setReceiveTokenDialogOpen(true)}
                                                                             >
                                                                                 {field.value
@@ -676,7 +676,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                                                         placeholder='Search tokens'
                                                                                         value={receiveTokenSearch}
                                                                                         onChange={(e) => setReceiveTokenSearch(e.target.value)}
-                                                                                        className='dark:border-[#B4B3B3]'
+                                                                                        className='border-[#B4B3B3]'
                                                                                     />
                                                                                     <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
                                                                                         {filteredReceiveTokens.length === 0 ? (
@@ -703,7 +703,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div>
-                                                                                                        <Badge variant='outline'>{token.tokenType}</Badge>
+                                                                                                        <Badge variant='outline' className='border-muted-foreground'>{token.tokenType}</Badge>
                                                                                                     </div>
                                                                                                 </Button>
                                                                                             ))

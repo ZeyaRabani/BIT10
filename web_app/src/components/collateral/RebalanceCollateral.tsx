@@ -8,7 +8,7 @@ import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Card } from '@/components/ui/card'
 import { HistoryIcon, DollarSignIcon, CoinsIcon, TrendingUpIcon, ShieldIcon, ExternalLinkIcon } from 'lucide-react'
-import { formatCompactNumber, formatAddress } from '@/lib/utils'
+import { formatCompactPercentNumber, formatAddress } from '@/lib/utils'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/buy.did'
 
@@ -74,7 +74,7 @@ const bit10Allocation: WalletDataType[] = [
 
     { walletAddress: '0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', bit10: ['BIT10.TOP'], tokenId: ['ethereum', 'chainlink', 'leo-token'] },
     { walletAddress: 'bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', explorerAddress: 'https://mempool.space/address/bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', bit10: ['BIT10.TOP'], tokenId: ['bitcoin'] },
-    { walletAddress: '0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', explorerAddress: 'https://bscscan.com/address/0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', bit10: ['BIT10.TOP'], tokenId: ['ripple', 'binancecoin', 'dogecoin', 'cardano', 'zcash'] },
+    { walletAddress: '0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', explorerAddress: 'https://bscscan.com/address/0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', bit10: ['BIT10.TOP'], tokenId: ['ripple', 'binancecoin', 'dogecoin', 'cardano', 'zcash', 'bitcoin-cash'] },
     { walletAddress: 'KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', explorerAddress: 'https://explorer.solana.com/address/KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', bit10: ['BIT10.TOP'], tokenId: ['solana'] },
     { walletAddress: 'TXHicWyMh8pBryemgawayVztrxVx75dtzb', explorerAddress: 'https://tronscan.org/#/address/TXHicWyMh8pBryemgawayVztrxVx75dtzb', bit10: ['BIT10.TOP'], tokenId: ['tron'] },
     { walletAddress: '0x545a402305d54bf34b588c169b51c24f8d1b4c01', explorerAddress: 'https://app.hyperliquid.xyz/explorer/address/0x545a402305d54bf34b588c169b51c24f8d1b4c01', bit10: ['BIT10.TOP'], tokenId: ['hyperliquid'] },
@@ -234,7 +234,7 @@ export default function RebalanceCollateral() {
                 tokens?.map((token, index) => [
                     token.symbol,
                     {
-                        label: token.symbol,
+                        label: token.symbol.toLocaleUpperCase(),
                         color: color[index % color.length],
                     }
                 ]) ?? []
@@ -249,7 +249,7 @@ export default function RebalanceCollateral() {
 
         return tokens.map((token, index) => ({
             name: token.symbol,
-            value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(4)),
+            value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(2)),
             fill: color[index % color.length],
         }));
     };
@@ -278,7 +278,7 @@ export default function RebalanceCollateral() {
             {isLoading ? (
                 <div className='w-full animate-fade-left-slow'>
                     <div className='flex flex-col h-full space-y-2 pt-8'>
-                        {['h-12 w-28', 'h-72'].map((classes, index) => (
+                        {['h-12 w-28', 'h-44', 'h-72'].map((classes, index) => (
                             <Skeleton key={index} className={classes} />
                         ))}
                     </div>
@@ -304,9 +304,9 @@ export default function RebalanceCollateral() {
                                             <div className='text-lg'>Total Collateral</div>
                                         </div>
                                         <div className='flex flex-row items-end justify-start space-x-2'>
-                                            <div className='text-4xl font-semibold'>${formatCompactNumber(data.targetValue)}</div>
+                                            <div className='text-4xl font-semibold'>${formatCompactPercentNumber(data.targetValue)}</div>
                                             <div className={`${data.percentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                                {data.percentChange > 0 ? '+' : '-'}{data.percentChange.toFixed(4)}%
+                                                {data.percentChange > 0 ? '+' : ''}{data.percentChange.toFixed(2)}%
                                             </div>
                                         </div>
                                     </Card>
@@ -315,14 +315,14 @@ export default function RebalanceCollateral() {
                                             <div><CoinsIcon strokeWidth={2.5} className='h-5 w-5' /></div>
                                             <div className='text-lg'>{data.bit10Name} Price</div>
                                         </div>
-                                        <div className='text-4xl font-semibold'>${formatCompactNumber(data.bit10Price)}</div>
+                                        <div className='text-4xl font-semibold'>${formatCompactPercentNumber(data.bit10Price)}</div>
                                     </Card>
                                     <Card className='border-2 border-muted p-3 flex flex-col space-y-2'>
                                         <div className='flex flex-row space-x-0.5 items-center justify-start'>
                                             <div><TrendingUpIcon strokeWidth={2.5} className='h-5 w-5' /></div>
                                             <div className='text-lg'>Total Supply</div>
                                         </div>
-                                        <div className='text-4xl font-semibold'>{formatCompactNumber(data.bit10Supply)}</div>
+                                        <div className='text-4xl font-semibold'>{formatCompactPercentNumber(data.bit10Supply)}</div>
                                     </Card>
                                     <Card className='border-2 border-muted p-3 flex flex-col space-y-2'>
                                         <div className='flex flex-row space-x-0.5 items-center justify-start'>
@@ -441,7 +441,7 @@ export default function RebalanceCollateral() {
                                                             </td>
                                                             <td>
                                                                 {foundCollateralPrice
-                                                                    ? `${formatCompactNumber(totalCollateral)} USD`
+                                                                    ? `${formatCompactPercentNumber(totalCollateral)} USD`
                                                                     : 'Price not available'}
                                                             </td>
                                                         </tr>

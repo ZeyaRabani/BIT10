@@ -7,6 +7,7 @@
 
 import { type Config } from 'tailwindcss'
 const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
+const defaultTheme = require('tailwindcss/defaultTheme')
 
 export default {
 	darkMode: ['class'],
@@ -14,7 +15,8 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				sansSerif: ['Source Sans Pro', 'sans-serif']
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+				dmSans: ['DM Sans', ...defaultTheme.fontFamily.sans],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

@@ -1,15 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
-// import { AuroraBackground } from '@/components/ui/aurora-background'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import BIT10Comparison from './bit10Comparison'
-import AnimatedBackground from '@/components/ui/animated-background'
-import { CheckIcon, TrendingUpIcon, ShieldIcon, ZapIcon, NetworkIcon } from 'lucide-react'
+import { TrendingUpIcon, ShieldIcon, ZapIcon, NetworkIcon } from 'lucide-react'
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards'
 import Image from 'next/image'
+import BIT10Img from '@/assets/tokens/bit10.svg'
+import BTCImg from '@/assets/tokens/btc.svg'
+import ETHImg from '@/assets/tokens/eth.svg'
+import XRPImg from '@/assets/tokens/xrp.svg'
+import BNBImg from '@/assets/tokens/bnb.svg'
+import SOLImg from '@/assets/tokens/sol.svg'
+import TRXImg from '@/assets/tokens/trx.svg'
+import DogeImg from '@/assets/tokens/doge.svg'
+import ADAImg from '@/assets/tokens/cardano.svg'
+import BCHImg from '@/assets/tokens/bch.svg'
+import AVAXImg from '@/assets/tokens/avax.svg'
 import DefinityDevImg from '@/assets/home/DFINITYDev.jpg'
 import EasyaAppImg from '@/assets/home/easya_app.jpg'
 import ICPImg from '@/assets/home/ICP.svg'
@@ -30,8 +39,18 @@ const cardVariants = {
 
 const whyChooseUs = [
   {
+    title: 'Low Cost',
+    desc: 'Pay 1 transaction fee instead of 10',
+    icon: NetworkIcon
+  },
+  {
+    title: 'Auto-Rebalanced',
+    desc: 'Weekly rebalancing to stay up-to-date',
+    icon: ZapIcon
+  },
+  {
     title: 'Diversified',
-    desc: 'Instant exposure to top 10 cryptocurrencies',
+    desc: 'Instant exposure to Top 10 cryptocurrencies',
     icon: TrendingUpIcon
   },
   {
@@ -39,19 +58,7 @@ const whyChooseUs = [
     desc: '110% over-collateralized for your protection',
     icon: ShieldIcon
   },
-  {
-    title: 'Automatic',
-    desc: 'Weekly rebalancing to stay up-to-date',
-    icon: ZapIcon
-  },
-  {
-    title: 'Multi-Chain',
-    desc: 'Live on ICP, Base, SOL, and more',
-    icon: NetworkIcon
-  }
 ]
-
-const tabs = ['Today', 'Tomorrow'];
 
 const testimonials = [
   {
@@ -82,47 +89,44 @@ const parterners = [
 ]
 
 export default function Page() {
-  const [activeTab, setActiveTab] = useState('Today');
-
-  const handleTabChange = (label: string | null) => {
-    if (label) {
-      setActiveTab(label)
-    }
-  }
-
   return (
     <div>
-      {/* <AuroraBackground className='md:max-h-[60vh]'> */}
-      <div className='md:min-h-[60vh] flex flex-col items-center justify-center'>
-        <div className='relative flex flex-col gap-4 items-center justify-center md:px-4'>
-          <div className='hidden dark:block'>
-            <Image src='/logo/logo.png' alt='logo' width={80} height={80} />
-          </div>
-          <div className='block dark:hidden'>
-            <Image src='/logo/logo-circle.png' alt='logo' width={90} height={90} />
-          </div>
-          <div className='p-4 max-w-7xl mx-auto relative z-10 w-full pt-8 md:pt-0'>
+      <div className='py-8 flex flex-col items-center justify-center'>
+        <div className='flex flex-col gap-4 items-center justify-center md:px-4'>
+          <div className='p-4 max-w-7xl mx-auto z-10 w-full pt-8 md:pt-0'>
             <motion.h1
               initial={{ opacity: 0.0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
-              className='text-4xl md:text-6xl font-bold text-center bg-clip-text dark:text-transparent dark:bg-gradient-to-b dark:from-neutral-50 dark:to-neutral-400 bg-opacity-50 pb-2'>
-              BIT10 <br /> <span>On-Chain Crypto Index Funds</span>
+              className='text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50 pb-2'>
+              On-Chain Crypto Index Funds
             </motion.h1>
 
-            <motion.div
-              initial={{ opacity: 0.0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.8, ease: 'easeInOut' }}
-              className='py-2 text-center dark:text-gray-300 text-xl max-w-4xl'>
-              Our flagship crypto index fund, BIT10.TOP, offers instant and diversified exposure to the top 10 cryptocurrencies via a single, secure, over-collateralized token.
-            </motion.div>
+            <div className='flex flex-col md:flex-row space-x-4 items-center justify-center py-6'>
+              <div className='flex flex-col space-y-2 items-center'>
+                <div className='flex'>
+                  <Image src={BIT10Img} alt='logo' width={85} height={85} className='border-2 w-16 md:w-16 lg:w-20 rounded-full' />
+                </div>
+                <div className='text-xl font-semibold text-primary'>BIT10.TOP</div>
+              </div>
+              <div className='text-6xl md:-mt-5'>=</div>
+              <div className='flex flex-col space-y-2 items-start justify-center'>
+                <div className='flex flex-row items-center justify-center -space-x-3 w-full'>
+                  {[BTCImg, ETHImg, XRPImg, BNBImg, SOLImg, TRXImg, DogeImg, ADAImg, BCHImg, AVAXImg].map((imgSrc, index) => (
+                    <Image key={index} src={imgSrc} alt='logo' width={85} height={85} className='border-2 rounded-full w-9 md:w-16 lg:w-20 h-full object-cover bg-gray-200' />
+                  ))}
+                </div>
+                <div className='text-xl font-semibold text-center'>
+                  Top 10 cryptocurrencies in a single, secure, over-collateralized token.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      {/* </AuroraBackground> */}
 
-      <MaxWidthWrapper className='flex flex-col space-y-8 pb-8 pt-4'>
+      <MaxWidthWrapper className='flex flex-col space-y-4 pb-8 pt-4'>
         <BIT10Comparison />
 
         <div className='flex flex-col items-center space-y-2'>
@@ -130,11 +134,8 @@ export default function Page() {
             initial={{ opacity: 0.0, y: 80 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
-            className='text-3xl md:text-3xl text-center font-semibold z-[1]'>
-            Discover how<br />
-            <span className='text-4xl md:text-[5rem] font-bold mt-1 leading-none'>
-              BIT10 works
-            </span>
+            className='text-4xl md:text-6xl font-semibold z-[1]'>
+            How BIT10 works?
           </motion.h1>
 
           <motion.iframe
@@ -155,86 +156,30 @@ export default function Page() {
             initial={{ opacity: 0.0, y: 80 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
-            className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
-            Why Choose BIT10?
+            className='text-4xl md:text-6xl font-semibold z-[1]'>
+            Why Choose BIT10.TOP?
           </motion.h1>
 
           <motion.div
             initial='hidden'
             whileInView='visible'
             variants={containerVariants}
-            className='flex flex-col md:flex-row md:space-x-6 items-center justify-evenly w-full space-y-3 md:space-y-0 py-4'
+            className='grid grid-cols-2 md:grid-cols-4 md:gap-6 w-full h-full py-4'
           >
             {whyChooseUs.map((item, index) => (
               <motion.div
                 variants={cardVariants}
                 key={index}
-                className='flex flex-col space-y-2 items-center justify-center py-6 px-2 border-2 border-accent rounded-2xl w-full md:w-1/4 min-w-0'
-                style={{ height: '200px', width: '100' }}>
+                className='flex flex-col space-y-2 items-center justify-start py-6 px-2 border-2 bg-card border-muted rounded-2xl w-full min-w-0 h-full'
+                style={{ height: '215px', width: '100' }}
+              >
                 <div className='flex flex-col items-center justify-start h-full w-full'>
                   <div className='mb-2 flex justify-center'>{item.icon && <item.icon className='h-12 w-12 text-primary' />}</div>
-                  <div className='text-2xl font-semibold'>{item.title}</div>
+                  <div className='text-2xl font-semibold text-center'>{item.title}</div>
                   <div className='text-lg text-center max-w-56'>{item.desc}</div>
                 </div>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-
-        <div className='flex flex-col items-center space-y-4'>
-          <motion.div initial={{ opacity: 0.0, y: 80 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }} className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
-            BIT10&apos;s Vision
-          </motion.div>
-          <motion.div initial='hidden' whileInView='visible' variants={cardVariants} className='flex flex-col space-y-4 md:space-y-8 items-center'>
-            <div className='relative grid grid-cols-2 gap-2 md:gap-8 items-center justify-between border border-muted rounded-md px-2 py-1.5 w-full md:w-[50vw]'>
-              <AnimatedBackground defaultValue='Today' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
-                {tabs.map((label, index) => (
-                  <button key={index} data-id={label} type='button' className={`inline-flex px-6 items-center justify-center text-xl text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'} flex-grow`}>
-                    {label}
-                  </button>
-                ))}
-              </AnimatedBackground>
-            </div>
-            {
-              activeTab === 'Today' ?
-                <div className='border-2 border-accent bg-accent rounded-2xl w-full md:w-[60vw] p-4 md:p-8 flex flex-col items-center justify-center space-y-4'>
-                  <div className='flex flex-row w-full space-x-2 items-center justify-start'>
-                    <div><CheckIcon className='text-green-500' /></div>
-                    <div className='text-xl'>Weekly auto-rebalancing</div>
-                  </div>
-                  <div className='flex flex-row w-full space-x-2 items-center justify-start'>
-                    <div><CheckIcon className='text-green-500' /></div>
-                    <div className='text-xl'>Live on 4 major blockchain networks</div>
-                  </div>
-                  <div className='flex flex-row w-full space-x-2 items-center justify-start'>
-                    <div><CheckIcon className='text-green-500' /></div>
-                    <div className='text-xl'>110% over-collateralized security model</div>
-                  </div>
-                  <div className='flex flex-row w-full space-x-2 items-center justify-start'>
-                    <div><CheckIcon className='text-green-500' /></div>
-                    <div className='text-xl'>Instant exposure to top 10 cryptocurrencies in one token</div>
-                  </div>
-                </div> :
-                <div className='border-2 border-accent bg-accent rounded-2xl w-full md:w-[60vw] p-4 md:p-8 flex flex-col items-center justify-center space-y-4'>
-                  <div className='flex flex-row w-full space-x-2 items-center justify-start'>
-                    <div><CheckIcon className='text-green-500' /></div>
-                    <div className='text-xl'>AI-driven smart portfolio management</div>
-                  </div>
-                  <div className='flex flex-row w-full space-x-2 items-center justify-start'>
-                    <div><CheckIcon className='text-green-500' /></div>
-                    <div className='text-xl'>Regulated licensing framework for institutions</div>
-                  </div>
-                  <div className='flex flex-row w-full space-x-2 items-center justify-start'>
-                    <div><CheckIcon className='text-green-500' /></div>
-                    <div className='text-xl'>Create custom index funds tailored to any strategy</div>
-                  </div>
-                  <div className='flex flex-row w-full space-x-2 items-center justify-start'>
-                    <div><CheckIcon className='text-green-500' /></div>
-                    <div className='text-xl'>Automated yield-generating vaults for enhanced returns</div>
-                  </div>
-                </div>
-            }
-
           </motion.div>
         </div>
 
@@ -244,7 +189,7 @@ export default function Page() {
               initial={{ opacity: 0.0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
-              className='text-4xl font-bold leading-10 sm:text-5xl sm:leading-none md:text-6xl'>Our Partners</motion.h1>
+              className='text-4xl md:text-6xl font-semibold'>Our Partners</motion.h1>
           </div>
 
           <InfiniteMovingCards
@@ -253,9 +198,13 @@ export default function Page() {
             speed='slow'
           />
 
-          <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='flex flex-col md:flex-row items-center justify-evenly w-full space-y-3 md:space-y-0'>
+          <motion.div
+            initial='hidden' whileInView='visible' variants={containerVariants}
+            className='flex flex-col md:flex-row items-center justify-evenly w-full space-y-3 md:space-y-0'>
             {parterners.map((partner, index) => (
-              <motion.div variants={cardVariants} key={index} className={`p-2 border-2 border-accent rounded-2xl ${partner.name === 'BSL' ? 'bg-black' : 'bg-white dark:bg-gray-100'}`}>
+              <motion.div
+                variants={cardVariants}
+                key={index} className={`p-2 border-2 border-accent rounded-2xl bg-white`}>
                 <Image src={partner.logo} height={50} width={400} quality={100} alt={partner.name} />
               </motion.div>
             ))}

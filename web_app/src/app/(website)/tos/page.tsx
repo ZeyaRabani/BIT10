@@ -232,7 +232,7 @@ export default function Page() {
                         <h1 className='text-xl md:text-2xl font-semibold tracking-wide'>Contact Us</h1>
                         <p className='text-lg'>
                             If you have any questions or concerns about these Terms of Service, please contact us at{' '}
-                            <a href='mailto:zeyarabani@bit10.app' className='text-blue-800 dark:text-blue-400 underline cursor-pointer'>
+                            <a href='mailto:zeyarabani@bit10.app' className='text-blue-400 underline cursor-pointer'>
                                 zeyarabani@bit10.app
                             </a>
                             .

@@ -250,7 +250,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
 
         return {
             day: formatter.format(date),
-            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(4)),
+            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(2)),
         };
     });
 
@@ -262,7 +262,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
             tokens.map((token, index) => [
                 token.symbol,
                 {
-                    label: token.symbol,
+                    label: token.symbol.toLocaleUpperCase(),
                     color: color[index % color.length],
                 }
             ])
@@ -273,7 +273,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
 
     const bit10AllocationPieChartData = tokens.map((token, index) => ({
         name: token.symbol,
-        value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(4)),
+        value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(2)),
         fill: color[index % color.length],
     }));
 
@@ -281,7 +281,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
         <>
             {isLoading ? (
                 <div className='flex flex-col space-y-2 lg:space-y-4 lg:col-span-3'>
-                    <Card className='border-none animate-fade-left bg-gray-200 dark:bg-[#1c1717]'>
+                    <Card className='border-none animate-fade-left'>
                         <CardHeader>
                             <CardTitle className='flex flex-row space-x-2 items-center justify-between'>
                                 <Skeleton className='bg-muted rounded-md w-16 h-12' />
@@ -293,7 +293,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                         </CardContent>
                     </Card>
 
-                    <Card className='border-none animate-fade-left bg-gray-200 dark:bg-[#1c1717]'>
+                    <Card className='border-none animate-fade-left'>
                         <CardHeader>
                             <CardTitle>
                                 <Skeleton className='bg-muted rounded-md w-16 h-8' />
@@ -306,7 +306,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                 </div>
             ) : (
                 <div className='flex flex-col space-y-2 lg:space-y-4 lg:col-span-3'>
-                    <Card className='border-none animate-fade-left bg-gray-200 dark:bg-[#1c1717]'>
+                    <Card className='border-none animate-fade-left'>
                         <CardHeader>
                             <CardTitle className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:items-center md:justify-between'>
                                 <div className='md:text-3xl'>${(token_price).toFixed(2)}</div>
@@ -325,7 +325,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                                 key={index}
                                                 data-id={label}
                                                 type='button'
-                                                className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}
+                                                className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light`}
                                             >
                                                 {label}
                                             </button>
@@ -440,7 +440,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                         </CardContent>
                     </Card>
 
-                    <Card className='border-none animate-fade-left bg-gray-200 dark:bg-[#1c1717]'>
+                    <Card className='border-none animate-fade-left'>
                         <CardHeader>
                             <CardTitle className='md:text-3xl'>
                                 Allocation
@@ -511,7 +511,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                                     className='w-3 h-3 rounded'
                                                     style={{ backgroundColor: color[index % color.length] }}
                                                 ></div>
-                                                <div>{token.name} ({token.symbol})</div>
+                                                <div>{token.name} ({token.symbol.toLocaleUpperCase()})</div>
                                             </div>
                                             <div>{((token.marketCap / totalMarketCap) * 100).toFixed(1)} %</div>
                                         </div>

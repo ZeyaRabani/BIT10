@@ -7,7 +7,7 @@ export function BIT10BTCRequest({ email, principalId }: { email: string, princip
             <Head />
             <Preview>BIT10.BTC token request</Preview>
             <Tailwind>
-                <Body className='bg-[#f3f3f5] font-sansSerif'>
+                <Body className='bg-[#f3f3f5] font-dmSans'>
                     <Container className='w-[680px] max-w-full mx-auto'>
                         <Section className='flex py-2'>
                             <Heading className='text-4xl font-bold text-black px-4'>

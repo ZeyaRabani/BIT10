@@ -250,7 +250,7 @@ export default function Bit10Preformance() {
 
         return {
             day: formatter.format(date),
-            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(4)),
+            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(2)),
         };
     });
 
@@ -266,7 +266,7 @@ export default function Bit10Preformance() {
 
         return {
             day: formatter.format(date),
-            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(4)),
+            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(2)),
         };
     });
 
@@ -282,7 +282,7 @@ export default function Bit10Preformance() {
 
         return {
             day: formatter.format(date),
-            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(4)),
+            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(2)),
         };
     });
 
@@ -298,7 +298,7 @@ export default function Bit10Preformance() {
 
         return {
             day: formatter.format(date),
-            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(4)),
+            [tokenDataName]: parseFloat(Number(entry.bit10Top).toFixed(2)),
         };
     });
 
@@ -348,7 +348,7 @@ export default function Bit10Preformance() {
                                             key={index}
                                             data-id={label}
                                             type='button'
-                                            className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}
+                                            className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98]`}
                                         >
                                             {label}
                                         </button>

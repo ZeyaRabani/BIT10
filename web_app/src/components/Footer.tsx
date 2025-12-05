@@ -104,12 +104,12 @@ export default function Footer() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
-                className='bg-blue-100/80 dark:bg-accent my-2.5 md:my-6 rounded backdrop-blur-0'>
+                className='bg-accent my-2.5 md:my-6 rounded backdrop-blur-0'>
                 <div className='container p-6 mx-auto'>
 
                     <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4'>
                         <div className='sm:col-span-2'>
-                            <h1 className='max-w-lg text-xl font-semibold tracking-wide text-black dark:text-white'>Subscribe to Our Newsletter to Get Updates:</h1>
+                            <h1 className='max-w-lg text-xl font-semibold tracking-wide'>Subscribe to Our Newsletter to Get Updates:</h1>
                             <Form {...form}>
                                 <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off' className='flex flex-col mx-auto mt-6 md:space-x-2 space-y-3 md:space-y-0 md:flex-row'>
                                     <FormField
@@ -160,7 +160,7 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    <hr className='my-6 border-gray-200 dark:border-gray-700 h-2' />
+                    <hr className='my-6 border-gray-700 h-2' />
 
                     <div className='sm:flex sm:items-center sm:justify-between'>
                         <div className='flex flex-col space-y-2'>

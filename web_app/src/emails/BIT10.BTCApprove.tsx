@@ -7,7 +7,7 @@ export function BIT10BTCApprove({ email, principalId }: { email: string, princip
             <Head />
             <Preview>BIT10.BTC token request approved</Preview>
             <Tailwind>
-                <Body className='bg-[#f3f3f5] font-sansSerif pt-4'>
+                <Body className='bg-[#f3f3f5] font-dmSans pt-4'>
                     <Container className='w-[680px] max-w-full mx-auto bg-white rounded-md'>
                         <Section className='flex items-center justify-center p-4'>
                             <Img width={114} src='https://bit10.app/logo/logo-with-name.png' />

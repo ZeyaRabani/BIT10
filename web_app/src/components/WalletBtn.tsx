@@ -430,11 +430,11 @@ export default function WalletBtn() {
     return (
         <div>
             {isICPConnected || isEVMConnected || isSolanaConnected ? (
-                <Button variant='destructive' onClick={handleDisconnect} className='w-full'>Disconnect wallet</Button>
+                <Button variant='destructive' onClick={handleDisconnect} className='w-full rounded-full'>Disconnect wallet</Button>
             ) : (
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <Button disabled={isConnecting} className='w-full'>
+                        <Button disabled={isConnecting} className='w-full rounded-full'>
                             {isConnecting && <Loader2 className='animate-spin' size={15} />}
                             {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                         </Button>

@@ -11,7 +11,7 @@ export const metadata = constructMetadata();
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <body className={cn('min-h-screen bg-background antialiased font-sansSerif')}>
+      <body className={cn('min-h-screen bg-background antialiased font-dmSans tracking-wide')}>
         <CSPostHogProvider>
           <TRPCReactProvider>
             <Providers>

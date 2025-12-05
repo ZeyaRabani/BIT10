@@ -8,7 +8,7 @@ import React from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import InformationCard from '@/components/InformationCard'
 import { useQueries } from '@tanstack/react-query'
-import { formatCompactNumber } from '@/lib/utils'
+import { formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -415,8 +415,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                     return (
                                         <div key={entry.timestmpz} className='border p-4 rounded-lg border-muted'>
                                             <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                                            <p className='text-lg'>Index Value: {formatCompactNumber(entry.indexValue)} USD</p>
-                                            <p className='text-lg'>Total Collateral: {formatCompactNumber(calculateTotalCollateral(entry.newTokens))} USD</p>
+                                            <p className='text-lg'>Index Value: {formatCompactPercentNumber(entry.indexValue)} USD</p>
+                                            <p className='text-lg'>Total Collateral: {formatCompactPercentNumber(calculateTotalCollateral(entry.newTokens))} USD</p>
                                             <h3 className='font-medium my-2'>
                                                 Allocation (Effective {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
                                             </h3>
@@ -433,7 +433,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                         {entry.newTokens.map((token) => (
                                                             <TableRow key={token.id}>
                                                                 <TableCell className='uppercase'>{token.symbol}</TableCell>
-                                                                <TableCell>${formatCompactNumber(token.price)}</TableCell>
+                                                                <TableCell>${formatCompactPercentNumber(token.price)}</TableCell>
                                                                 <TableCell>{formatCompactNumber(token.noOfTokens)}</TableCell>
                                                             </TableRow>
                                                         ))}
@@ -453,19 +453,19 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                 return (
                                     <div key={entry.timestmpz} className='border border-muted p-4 rounded-lg'>
                                         <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                                        <p className='text-lg'>Index Value: {formatCompactNumber(entry.indexValue)} USD</p>
-                                        <p className='text-lg'>Total Collateral: {formatCompactNumber(calculateTotalCollateral(entry.newTokens))} USD</p>
+                                        <p className='text-lg'>Index Value: {formatCompactPercentNumber(entry.indexValue)} USD</p>
+                                        <p className='text-lg'>Total Collateral: {formatCompactPercentNumber(calculateTotalCollateral(entry.newTokens))} USD</p>
 
                                         {isDebugMode &&
                                             <>
                                                 {rebalanceResult.collateralChange !== 'same' && (
                                                     <div className={`rounded-lg p-3 my-3 ${rebalanceResult.collateralChange === 'increase'
-                                                        ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
-                                                        : 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
+                                                        ? 'bg-green-900/20 border border-green-800'
+                                                        : 'bg-blue-900/20 border border-blue-800'
                                                         }`}>
                                                         <p className={`font-medium ${rebalanceResult.collateralChange === 'increase'
-                                                            ? 'text-green-700 dark:text-green-300'
-                                                            : 'text-blue-700 dark:text-blue-300'
+                                                            ? 'text-green-300'
+                                                            : 'text-blue-300'
                                                             }`}>
                                                             {rebalanceResult.collateralChange === 'increase' ? '📈 ' : '📉 '}
                                                             Collateral Value {rebalanceResult.collateralChange === 'increase' ? 'Increased' : 'Decreased'} by ${formatCompactNumber(rebalanceResult.collateralChangeAmount)}
@@ -475,27 +475,27 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                 )}
 
                                                 {rebalanceResult.needsExternalLiquidity && (
-                                                    <div className='bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3 my-3'>
-                                                        <p className='text-purple-700 dark:text-purple-300 font-medium'>
+                                                    <div className='bg-purple-900/20 border border-purple-800 rounded-lg p-3 my-3'>
+                                                        <p className='text-purple-300 font-medium'>
                                                             💰 External Liquidity Required: ${formatCompactNumber(rebalanceResult.externalLiquidityAmount)}
                                                         </p>
-                                                        <p className='text-purple-600 dark:text-purple-400 text-sm mt-1'>
+                                                        <p className='text-purple-400 text-sm mt-1'>
                                                             Tokens requiring external funds: <span className='uppercase'>{rebalanceResult.externalTokens.map(t => t.symbol).join(', ')}</span>
                                                         </p>
                                                     </div>
                                                 )}
 
                                                 <div className={`rounded-lg p-3 my-3 ${rebalanceAnalysis.type === 'growth'
-                                                    ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                                                    ? 'bg-green-900/20 border border-green-800'
                                                     : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal'
-                                                        ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
-                                                        : 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800'
+                                                        ? 'bg-blue-900/20 border border-blue-800'
+                                                        : 'bg-orange-900/20 border border-orange-800'
                                                     }`}>
                                                     <p className={`font-medium ${rebalanceAnalysis.type === 'growth'
-                                                        ? 'text-green-700 dark:text-green-300'
+                                                        ? 'text-green-300'
                                                         : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal'
-                                                            ? 'text-blue-700 dark:text-blue-300'
-                                                            : 'text-orange-700 dark:text-orange-300'
+                                                            ? 'text-blue-300'
+                                                            : 'text-orange-300'
                                                         }`}>
                                                         {rebalanceAnalysis.type === 'growth' && '📈 '}
                                                         {rebalanceAnalysis.type === 'identical' && '🔄 '}
@@ -530,7 +530,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     {nextEntry.newTokens.map((token) => (
                                                         <TableRow key={token.id}>
                                                             <TableCell className='uppercase'>{token.symbol}</TableCell>
-                                                            <TableCell>${formatCompactNumber(token.price)}</TableCell>
+                                                            <TableCell>${formatCompactPercentNumber(token.price)}</TableCell>
                                                             <TableCell>{formatCompactNumber(token.noOfTokens)}</TableCell>
                                                         </TableRow>
                                                     ))}
@@ -548,7 +548,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     {entry.newTokens.map((token) => (
                                                         <TableRow key={token.id}>
                                                             <TableCell className='uppercase'>{token.symbol}</TableCell>
-                                                            <TableCell>${formatCompactNumber(token.price)}</TableCell>
+                                                            <TableCell>${formatCompactPercentNumber(token.price)}</TableCell>
                                                             <TableCell>{formatCompactNumber(token.noOfTokens)}</TableCell>
                                                         </TableRow>
                                                     ))}
@@ -575,10 +575,10 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     <TableBody>
                                                         {rebalanceResult.internalSwaps.map((trade, tradeIndex) => (
                                                             <TableRow key={tradeIndex}>
-                                                                <TableCell className='font-medium uppercase text-red-600 dark:text-red-400'>{trade.sellToken}</TableCell>
+                                                                <TableCell className='font-medium uppercase text-red-400'>{trade.sellToken}</TableCell>
                                                                 <TableCell>{formatCompactNumber(trade.sellAmount)}</TableCell>
                                                                 <TableCell className='text-center text-gray-500'>→</TableCell>
-                                                                <TableCell className='font-medium uppercase text-green-600 dark:text-green-400'>{trade.buyToken}</TableCell>
+                                                                <TableCell className='font-medium uppercase text-green-400'>{trade.buyToken}</TableCell>
                                                                 <TableCell>{formatCompactNumber(trade.buyAmount)}</TableCell>
                                                                 <TableCell>${formatCompactNumber(trade.valueUSD)}</TableCell>
                                                             </TableRow>
@@ -587,12 +587,12 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                 </Table>
                                             ) : (
                                                 <div className={`border rounded-lg p-4 ${rebalanceAnalysis.type === 'rebalance'
-                                                    ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
-                                                    : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                                                    ? 'bg-yellow-900/20 border-yellow-800'
+                                                    : 'bg-gray-800 border-gray-700'
                                                     }`}>
                                                     <p className={`text-center ${rebalanceAnalysis.type === 'rebalance'
-                                                        ? 'text-yellow-700 dark:text-yellow-300'
-                                                        : 'text-gray-600 dark:text-gray-400'
+                                                        ? 'text-yellow-300'
+                                                        : 'text-gray-400'
                                                         }`}>
                                                         {rebalanceAnalysis.type === 'rebalance'
                                                             ? `⚠️ ${rebalanceAnalysis.reason} - but no significant trades calculated (amounts too small)`
@@ -607,23 +607,23 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                             {rebalanceResult.needsExternalLiquidity && rebalanceResult.externalTokens.length > 0 && (
                                                 <div className='mt-4'>
                                                     <h3 className='font-medium mb-3'>External Liquidity Breakdown</h3>
-                                                    <div className='bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4'>
-                                                        <p className='text-purple-700 dark:text-purple-300 mb-3'>
+                                                    <div className='bg-purple-900/20 border border-purple-800 rounded-lg p-4'>
+                                                        <p className='text-purple-300 mb-3'>
                                                             Total additional funds needed: <span className='font-semibold'>${formatCompactNumber(rebalanceResult.externalLiquidityAmount)}</span>
                                                         </p>
 
                                                         <div className='space-y-3'>
                                                             {rebalanceResult.externalTokens.map((tokenDetail) => (
-                                                                <div key={tokenDetail.symbol} className='bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-700'>
+                                                                <div key={tokenDetail.symbol} className='bg-gray-800 rounded-lg p-3 border border-purple-700'>
                                                                     <div className='flex justify-between items-center'>
-                                                                        <span className='font-semibold uppercase text-purple-800 dark:text-purple-200'>
+                                                                        <span className='font-semibold uppercase text-purple-200'>
                                                                             {tokenDetail.symbol}
                                                                         </span>
-                                                                        <span className='text-purple-700 dark:text-purple-300 font-medium'>
+                                                                        <span className='text-purple-300 font-medium'>
                                                                             ${formatCompactNumber(tokenDetail.valueNeeded)}
                                                                         </span>
                                                                     </div>
-                                                                    <div className='mt-2 text-sm text-purple-600 dark:text-purple-400'>
+                                                                    <div className='mt-2 text-sm text-purple-400'>
                                                                         <div className='flex justify-between'>
                                                                             <span>Tokens needed:</span>
                                                                             <span className='font-mono'>{formatCompactNumber(tokenDetail.tokensNeeded)}</span>
@@ -637,7 +637,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             ))}
                                                         </div>
 
-                                                        <p className='text-purple-600 dark:text-purple-400 text-xs mt-3 italic'>
+                                                        <p className='text-purple-400 text-xs mt-3 italic'>
                                                             * These tokens require external funding as internal swaps cannot cover the full target allocation.
                                                         </p>
                                                     </div>

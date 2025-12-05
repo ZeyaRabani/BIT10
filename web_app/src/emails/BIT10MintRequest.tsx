@@ -7,7 +7,7 @@ export function BIT10MintRequest({ newTokenMintId, principalId, mintAmount, mint
             <Head />
             <Preview>{mintName} Mint request</Preview>
             <Tailwind>
-                <Body className='bg-[#f3f3f5] font-sansSerif'>
+                <Body className='bg-[#f3f3f5] font-dmSans'>
                     <Container className='w-[680px] max-w-full mx-auto'>
                         <Section className='flex py-2'>
                             <Heading className='text-4xl font-bold text-black px-4'>

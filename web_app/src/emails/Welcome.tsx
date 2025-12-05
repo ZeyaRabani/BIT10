@@ -7,7 +7,7 @@ export function Welcome() {
             <Head />
             <Preview> 🎉 Exciting News: BIT10 Testnet is Live!</Preview>
             <Tailwind>
-                <Body className='bg-[#f3f3f5] font-sansSerif'>
+                <Body className='bg-[#f3f3f5] font-dmSans'>
                     <Container className='w-[680px] max-w-full mx-auto'>
                         <Section className='flex p-4'>
                             <Img width='180' src='https://bit10.app/logo/logo-with-name.png' />

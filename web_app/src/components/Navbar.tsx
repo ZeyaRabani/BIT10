@@ -6,7 +6,6 @@ import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import AnimatedBackground from '@/components/ui/animated-background'
-import ModeToggle from './ModeToggle'
 import ResponsiveNavbar from './ResponsiveNavbar'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -19,7 +18,7 @@ const links = {
         { title: 'GitBook', link: '/gitbook' }
     ],
     app: [
-        { title: 'Buy', link: '/buy' },
+        { title: 'Buy BIT10.TOP', link: '/buy' },
         { title: 'DEX', link: '/dex' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
@@ -73,19 +72,13 @@ export default function Navbar() {
             <nav className='flex items-center justify-between py-2 px-2.5 md:px-12'>
                 <div className='flex lg:flex-1'>
                     <Link href='/' passHref>
-                        {/* <div className='flex flex-row items-center justify-start'>
-                            <Image src='/logo/logo-circle.png' alt='logo' width={60} height={60} />
-                        </div> */}
-                        <div className='flex-row items-center justify-start hidden dark:block'>
-                            <Image src='/logo/logo.png' alt='logo' width={60} height={60} />
-                        </div>
-                        <div className='flex flex-row items-center justify-start dark:hidden'>
-                            <Image src='/logo/logo-circle.png' alt='logo' width={60} height={60} />
+                        <div className='flex flex-row items-center justify-start'>
+                            <Image src='/logo/logo-title.png' alt='logo' width={100} height={100} />
                         </div>
                     </Link>
                 </div>
 
-                <div className='hidden lg:pl-16 lg:flex'>
+                <div className='hidden lg:flex'>
                     <AnimatedBackground
                         defaultValue={activeLink || '/'}
                         onValueChange={(newActiveLink) => {
@@ -93,7 +86,6 @@ export default function Navbar() {
                                 handleNavigation(newActiveLink)
                             }
                         }}
-                        className='border-b-2 border-black dark:border-white'
                         transition={{
                             ease: 'easeInOut',
                             duration: 0.2,
@@ -106,28 +98,28 @@ export default function Navbar() {
                                     key={index}
                                     type='button'
                                     aria-label={`${label.title} view`}
-                                    className='md:w-auto w-full mx-2 px-3 py-2 hover:rounded hover:text-white hover:bg-primary cursor-pointer font-semibold tracking-wide'
+                                    className='md:w-auto w-full mx-2 px-4 py-2.5 hover:rounded-full hover:bg-muted cursor-pointer font-semibold tracking-wide'
                                 >
                                     {label.title}
                                 </button>
                             );
                         })}
                     </AnimatedBackground>
+
+                    <div>
+                        {
+                            appMode ? (
+                                <WalletBtn />
+                            ) : (
+                                <Link href='/launch' passHref>
+                                    <Button className='rounded-full font-semibold'>Launch App</Button>
+                                </Link>
+                            )}
+                    </div>
                 </div>
 
-                <div className='hidden lg:flex lg:flex-1 lg:justify-end'>
-                    {
-                        appMode ? (
-                            <WalletBtn />
-                        ) : (
-                            <Link href='/launch' passHref>
-                                <Button className='rounded-full font-semibold tracking-wide'>Launch App</Button>
-                            </Link>
-                        )}
-                </div>
 
                 <div className='flex space-x-2 justify-between items-center ml-2'>
-                    <ModeToggle />
                     <ResponsiveNavbar />
                 </div>
             </nav>

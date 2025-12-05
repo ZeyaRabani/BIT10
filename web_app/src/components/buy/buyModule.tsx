@@ -7,7 +7,7 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
 import { whitelistedAddress } from '@/actions/dbActions'
 import { toast } from 'sonner'
-import { formatAddress, formatCompactNumber } from '@/lib/utils'
+import { formatAddress, formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils'
 import { ChevronsUpDown, Loader2, Info, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -511,7 +511,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
             {isLoading ? (
                 <div className='flex flex-col-reverse space-y-2 md:space-y-0 lg:grid lg:grid-cols-5 gap-4'>
                     <div className='flex flex-col space-y-2 lg:space-y-4 lg:col-span-3'>
-                        <Card className='border-none animate-fade-left bg-gray-200 dark:bg-[#1c1717]'>
+                        <Card className='border-none animate-fade-left'>
                             <CardHeader>
                                 <CardTitle className='flex flex-row space-x-2 items-center justify-between'>
                                     <Skeleton className='bg-muted rounded-md w-16 h-12' />
@@ -523,7 +523,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                             </CardContent>
                         </Card>
 
-                        <Card className='border-none animate-fade-left bg-gray-200 dark:bg-[#1c1717]'>
+                        <Card className='border-none animate-fade-left'>
                             <CardHeader>
                                 <CardTitle>
                                     <Skeleton className='bg-muted rounded-md w-16 h-8' />
@@ -536,7 +536,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                     </div>
 
                     <div className='md:col-span-2'>
-                        <Card className='border-none animate-fade-right bg-gray-200 dark:bg-[#1c1717] flex flex-col space-y-2'>
+                        <Card className='border-none animate-fade-right flex flex-col space-y-2'>
                             <CardHeader>
                                 <CardTitle>Buy</CardTitle>
                             </CardHeader>
@@ -556,7 +556,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                     </div>
 
                     <div className='md:col-span-2'>
-                        <Card className='border-none animate-fade-right bg-gray-200 dark:bg-[#1c1717]'>
+                        <Card className='border-none animate-fade-right'>
                             <CardHeader>
                                 <CardTitle>Buy</CardTitle>
                             </CardHeader>
@@ -569,7 +569,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                     <div>You Pay</div>
                                                     {
                                                         chain &&
-                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center'>
+                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
                                                             <div className='font-light'>From</div>
                                                             <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
                                                         </Badge>
@@ -587,7 +587,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                         {/* <div className='pt-[0.5px] text-center md:text-start bg-green-500'> */}
                                                         <div className='pt-[0.5px] text-center md:text-start'>
                                                             <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
-                                                                &asymp; ${selectedBIT10TokenPrice ? formatCompactNumber((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 1.01) : '0'}
+                                                                &asymp; ${selectedBIT10TokenPrice ? formatCompactPercentNumber((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 1.01) : '0'}
                                                                 <TooltipProvider>
                                                                     <Tooltip delayDuration={300}>
                                                                         <TooltipTrigger asChild>
@@ -595,7 +595,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                         </TooltipTrigger>
                                                                         <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                                                             Price of {form.watch('payment_token')} (in USD) + 1% Management fee <br />
-                                                                            $ {formatCompactNumber(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatCompactNumber(0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatCompactNumber((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0'))))}
+                                                                            $ {formatCompactPercentNumber(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatCompactPercentNumber(0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatCompactPercentNumber((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0'))))}
                                                                         </TooltipContent>
                                                                     </Tooltip>
                                                                 </TooltipProvider>
@@ -614,7 +614,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                             <Button
                                                                                 type='button'
                                                                                 variant='outline'
-                                                                                className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
+                                                                                className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                                 onClick={() => setPaymentTokenDialogOpen(true)}
                                                                             >
                                                                                 {field.value
@@ -639,7 +639,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                                         placeholder='Search tokens'
                                                                                         value={paymentTokenSearch}
                                                                                         onChange={(e) => setPaymentTokenSearch(e.target.value)}
-                                                                                        className='dark:border-[#B4B3B3]'
+                                                                                        className='border-[#B4B3B3]'
                                                                                     />
                                                                                     <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
                                                                                         {filteredPaymentTokens.length === 0 ? (
@@ -666,7 +666,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div>
-                                                                                                        <Badge variant='outline'>{token.tokenType}</Badge>
+                                                                                                        <Badge variant='outline' className='border-muted-foreground'>{token.tokenType}</Badge>
                                                                                                     </div>
                                                                                                 </Button>
                                                                                             ))
@@ -697,7 +697,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                     <div>You Receive</div>
                                                     {
                                                         chain &&
-                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center'>
+                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
                                                             <div className='font-light'>To</div>
                                                             <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
                                                         </Badge>
@@ -714,7 +714,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                 <FormItem className='pt-px pb-[1.5px]'>
                                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                                         <FormControl>
-                                                                            <SelectTrigger className='border-2 dark:border-[#B4B3B3] bg-background! md:w-3/4'>
+                                                                            <SelectTrigger className='border-2 border-[#B4B3B3] bg-background! md:w-3/4'>
                                                                                 <SelectValue placeholder='Select number of tokens' />
                                                                             </SelectTrigger>
                                                                         </FormControl>
@@ -732,7 +732,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                         />
                                                         {/* <div className='text-center md:text-start bg-green-500'> */}
                                                         <div className='text-center md:text-start'>
-                                                            <div> &asymp; ${formatCompactNumber((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))))}</div>
+                                                            <div> &asymp; ${formatCompactPercentNumber((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))))}</div>
                                                         </div>
                                                     </div>
                                                     <div className='flex flex-col space-y-0.5'>
@@ -747,7 +747,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                             <Button
                                                                                 type='button'
                                                                                 variant='outline'
-                                                                                className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
+                                                                                className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                                 onClick={() => setReceiveTokenDialogOpen(true)}
                                                                             >
                                                                                 {field.value
@@ -772,7 +772,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                                         placeholder='Search tokens'
                                                                                         value={receiveTokenSearch}
                                                                                         onChange={(e) => setReceiveTokenSearch(e.target.value)}
-                                                                                        className='dark:border-[#B4B3B3]'
+                                                                                        className='border-[#B4B3B3]'
                                                                                     />
                                                                                     <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
                                                                                         {filteredReceiveTokens.length === 0 ? (
@@ -799,7 +799,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div>
-                                                                                                        <Badge variant='outline'>{token.tokenType}</Badge>
+                                                                                                        <Badge variant='outline' className='border-muted-foreground'>{token.tokenType}</Badge>
                                                                                                     </div>
                                                                                                 </Button>
                                                                                             ))
@@ -865,7 +865,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                             </div>
                                         )}
 
-                                        <Button className='w-full rounded-lg' disabled={buyDisabledConditions}>
+                                        <Button className='w-full' disabled={buyDisabledConditions}>
                                             {buying && <Loader2 className='animate-spin mr-2' size={15} />}
                                             {getBuyMessage()}
                                         </Button>

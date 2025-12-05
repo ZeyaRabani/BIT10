@@ -106,7 +106,7 @@ export const InfiniteMovingCards = ({
                                     aria-hidden='true'
                                     className='user-select-none -z-1 pointer-events-none absolute -left-0.5 -top-0.5 h-[calc(100%_+_4px)] w-[calc(100%_+_4px)]'
                                 ></div>
-                                <div className='relative text-sm leading-[1.6] text-gray-800 dark:text-gray-100 font-normal'>
+                                <div className='relative text-sm leading-[1.6] font-normal'>
                                     {item.tweet}
                                 </div>
                                 <div className='flex flex-row items-center space-x-1 pt-4'>

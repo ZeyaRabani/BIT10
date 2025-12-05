@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { Card } from '@/components/ui/card'
-import { DollarSignIcon, WalletIcon, ClockIcon, GiftIcon, Loader2Icon, CheckIcon, XIcon, BanknoteIcon } from 'lucide-react'
+import { DollarSignIcon, WalletIcon, ClockIcon, GiftIcon, Loader2Icon, XIcon, BanknoteIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/cashback.did'
@@ -374,7 +374,7 @@ export default function Rewards() {
             return 'Next cashback round starting soon...';
         }
         if (parseFloat(cashbackAmount) <= 0) {
-            return 'No purchase made after Cashback Round started';
+            return 'No purchase made after cashback round started.';
         }
         else if (isAvailableCountdownPassed) {
             return `Claim before ${availableLastCountdown}`;
@@ -405,39 +405,34 @@ export default function Rewards() {
     };
 
     return (
-        <div className='flex flex-col space-y-4 md:space-y-6'>
+        <div className='flex flex-col space-y-4'>
             <div className='flex flex-col items-center'>
-                <div className='text-2xl md:text-4xl font-semibold text-center'>BIT10 Cashback Rewards & Weekly Raffle</div>
-                <div className='text-lg md:text-xl text-muted-foreground text-center'>Buy BIT10.TOP, earn 5% cashback, and enter our weekly raffle for a chance to win prizes.</div>
+                <div className='text-2xl md:text-4xl font-semibold text-center'>Cashback Rewards & Weekly Raffle</div>
             </div>
 
             {isLoading ?
                 <div className='grid md:grid-cols-3 gap-4'>
-                    <Card className='border-2 border-muted p-4 flex flex-col space-y-2'>
+                    <Card className='border-2 p-4 flex flex-col space-y-2'>
                         <Skeleton className='w-full h-28' />
                     </Card>
-                    <Card className='border-2 border-muted p-4 flex flex-col space-y-2'>
+                    <Card className='border-2 p-4 flex flex-col space-y-2'>
                         <Skeleton className='w-full h-28' />
                     </Card>
-                    <Card className='border-2 border-muted p-4 flex flex-col space-y-2'>
+                    <Card className='border-2 p-4 flex flex-col space-y-2'>
                         <Skeleton className='w-full h-28' />
                     </Card>
                 </div> :
                 <div className='grid md:grid-cols-3 gap-4'>
-                    <Card className='border-2 border-muted p-4 flex flex-col space-y-2'>
+                    <Card className='border-2 p-4 flex flex-col space-y-2'>
                         <div className='flex flex-row space-x-1 items-center justify-start'>
                             <div><DollarSignIcon strokeWidth={2.5} size='24' /></div>
-                            <div className='text-lg md:text-xl'>Weekly Raffle Pool</div>
+                            <div className='text-lg md:text-xl'>Weekly Raffle Prize Pool</div>
                         </div>
                         <div className='text-4xl font-semibold'>
-                            $100
-                        </div>
-                        <div className='flex flex-row space-x-1 items-center'>
-                            <div><Loader2Icon size='18' className='animate-spin' /></div>
-                            <div>Comming soon..</div>
+                            100 USDC
                         </div>
                     </Card>
-                    <Card className='border-2 border-muted p-4 flex flex-col space-y-2'>
+                    <Card className='border-2 p-4 flex flex-col space-y-2'>
                         <div className='flex flex-row space-x-1 items-center justify-start'>
                             <div><WalletIcon strokeWidth={2.5} size='24' /></div>
                             <div className='text-lg md:text-xl'>Your BIT10 holdings</div>
@@ -445,18 +440,8 @@ export default function Rewards() {
                         <div className='text-4xl font-semibold'>
                             {formatCompactNumber(totalBIT10Tokens)} BIT10
                         </div>
-                        {totalBIT10Tokens > 0.9 ?
-                            <div className='flex flex-row space-x-1 items-center'>
-                                <div><CheckIcon size='18' className='text-green-500' /></div>
-                                <div>Eligible for Rewards</div>
-                            </div> :
-                            <div className='flex flex-row space-x-1 items-center'>
-                                <div><XIcon size='18' className='text-red-500' /></div>
-                                <div>Not eligible. Need more than 0.9 BIT10.</div>
-                            </div>
-                        }
                     </Card>
-                    <Card className='border-2 border-muted p-4 flex flex-col space-y-2'>
+                    <Card className='border-2 p-4 flex flex-col space-y-2'>
                         <div className='flex flex-row space-x-1 items-center justify-start'>
                             <div><ClockIcon strokeWidth={2.5} size='24' /></div>
                             <div className='text-lg md:text-xl'>Cashback Pending</div>
@@ -464,44 +449,59 @@ export default function Rewards() {
                         <div className='text-4xl font-semibold'>
                             {cashbackAmount}
                         </div>
-                        <div>{getClaimStatusText()}</div>
                     </Card>
                 </div>
             }
 
-            <div className='grid md:grid-cols-2 gap-2'>
-                <Card className='border-2 border-muted p-4 md:py-12 flex flex-col items-center justify-center space-y-2 w-full'>
-                    <div className='text-3xl'>Claim Cashback</div>
-                    <div>
-                        <BanknoteIcon size='88' strokeWidth='1' />
+            <div className='grid md:grid-cols-2 gap-4'>
+                <Card className='border-2 p-4 flex flex-col space-y-4'>
+                    <div className='flex flex-row space-x-1 items-center justify-center'>
+                        <div> <BanknoteIcon strokeWidth={2.5} size='24' /></div>
+                        <div className='text-lg md:text-xl'>Claim 5% Cashback</div>
                     </div>
-                    <Button disabled={isClaimButtonDisabled} onClick={claimICPReward}>
-                        {claimCashback && <Loader2Icon className='animate-spin mr-2' size={15} />}
-                        {getClaimButtonText()}
-                    </Button>
-                    <p className='text-muted-foreground text-center'>{getClaimStatusText()}</p>
+                    <div className='flex items-center justify-center'>
+                        <Button disabled={isClaimButtonDisabled} onClick={claimICPReward}>
+                            {claimCashback && <Loader2Icon className='animate-spin mr-2' size={15} />}
+                            {getClaimButtonText()}
+                        </Button>
+                    </div>
+                    <p className='text-muted-foreground text-center'>
+                        {totalBIT10Tokens < 0.9 ? (
+                            <div className='flex flex-row space-x-1 items-start bg-red-500'>
+                                <div><XIcon size='18' className='text-red-500' /></div>
+                                <div>Not eligible. Need more than 0.9 BIT10 for cashback.</div>
+                            </div>
+                        ) : (
+                            <div>{getClaimStatusText()}</div>
+                        )
+                        }
+                    </p>
+                    <div>
+                        <div className='text-xl font-semibold'>Eligibility and Rules</div>
+                        <div className='flex flex-col space-y-2'>
+                            <div><b>Minimum Holding Requirement</b>: You must hold at least 0.9 BIT10 tokens to get cashback.</div>
+                            <div><b>Buy and Hold Condition</b>: You only earn cashback on BIT10 tokens that you buy and keep during the cashback round.</div>
+                            <div><b>Claiming Cashback</b>: You can claim your cashback after the Cashback Period starts and before it ends</div>
+                            <div><b>Buy and Sell Transactions</b>: If you buy BIT10 and later sell some, you&apos;ll only get cashback for the tokens you still hold-not the ones you sold.</div>
+                        </div>
+                    </div>
                 </Card>
 
-                <Card className='border-2 border-muted p-4 md:py-12 flex flex-col items-center justify-center space-y-2 w-full'>
-                    <div className='text-3xl'>Enter Raffle</div>
-                    <div>
-                        <GiftIcon size='86' strokeWidth='1' />
+                <Card className='border-2 p-4 flex flex-col space-y-4'>
+                    <div className='flex flex-row space-x-1 justify-center'>
+                        <div> <GiftIcon strokeWidth={2.5} size='24' /></div>
+                        <div className='text-lg md:text-xl'>Weekly Raffle</div>
                     </div>
-                    <Button disabled>Enter Raffle</Button>
-                    <p className='text-muted-foreground text-center'>Coming soon..</p>
+                    <div className='flex justify-center'>
+                        <Button disabled>
+                            Enter Raffle
+                        </Button>
+                    </div>
+                    <p className='text-muted-foreground text-center'>
+                        Coming soon..
+                    </p>
                 </Card>
             </div>
-
-            <Card className='border-2 border-muted p-4 flex flex-col space-y-3'>
-                <div className='text-2xl font-semibold'>How Cashback Rewards Work</div>
-                <div className='text-xl font-semibold'>Eligibility and Rules:</div>
-                <div className='flex flex-col space-y-2'>
-                    <div><b>Minimum Holding Requirement</b>: Users must hold at least 0.9 BIT10 tokens in total to be eligible for cashback rewards.</div>
-                    <div><b>Buy and Hold Condition</b>: Users must purchase and hold BIT10 tokens after the Cashback Round starts to qualify for rewards.</div>
-                    <div><b>Claiming Cashback</b>: Users can claim cashback once the Cashback Period begins, but claims must be made before the end of the Cashback Claiming Period.</div>
-                    <div><b>Buy and Sell Transactions</b>: Cashback rewards will only be granted for BIT10 tokens that are purchased and held during the Cashback Round. If a user buys and then sells BIT10 tokens, they will receive cashback only for the tokens they still hold and not for the ones sold.</div>
-                </div>
-            </Card>
         </div>
     )
 }

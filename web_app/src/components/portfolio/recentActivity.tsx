@@ -208,7 +208,7 @@ export default function RecentActivity() {
                             <div className='relative flex flex-row space-x-2 items-center justify-center border border-muted rounded-md px-2 py-1.5 w-full lg:w-1/2'>
                                 <AnimatedBackground defaultValue='BIT10 Activity' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
                                     {tabs.map((label, index) => (
-                                        <button key={index} data-id={label} type='button' className={`inline-flex px-6 items-center justify-center text-lg text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'} flex-grow`}>
+                                        <button key={index} data-id={label} type='button' className={`inline-flex px-6 items-center justify-center text-lg text-center transition-transform active:scale-[0.98] flex-grow`}>
                                             {label}
                                         </button>
                                     ))}

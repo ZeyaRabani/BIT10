@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
-import { formatCompactNumber } from '@/lib/utils'
+import { formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils'
 
 const bit10TokenName = ['BIT10.TOP'];
 
@@ -215,7 +215,7 @@ export default function BalanceAndAllocation() {
             tokens.map((token, index) => [
                 token.symbol,
                 {
-                    label: token.symbol,
+                    label: token.symbol.toUpperCase(),
                     color: color[index % color.length],
                 }
             ])
@@ -226,7 +226,7 @@ export default function BalanceAndAllocation() {
 
     const bit10AllocationPieChartData = tokens.map((token, index) => ({
         name: token.symbol,
-        value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(4)),
+        value: parseFloat(((token.marketCap / totalMarketCap) * 100).toFixed(2)),
         fill: color[index % color.length],
     }));
 
@@ -234,7 +234,7 @@ export default function BalanceAndAllocation() {
         <div>
             {isLoading ? (
                 <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
-                    <Card className='border-muted w-full lg:col-span-1 animate-fade-left-slow bg-transparent'>
+                    <Card className='border-muted w-full lg:col-span-1 animate-fade-left-slow'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -243,7 +243,7 @@ export default function BalanceAndAllocation() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className='border-muted w-full lg:col-span-1 animate-fade-right-slow bg-transparent'>
+                    <Card className='border-muted w-full lg:col-span-1 animate-fade-right-slow'>
                         <CardContent>
                             <div className='flex flex-col h-full space-y-2 pt-8'>
                                 {['h-10 w-3/4', 'h-44'].map((classes, index) => (
@@ -255,7 +255,7 @@ export default function BalanceAndAllocation() {
                 </div>
             ) : (
                 <div className='flex flex-col lg:grid lg:grid-cols-2 space-y-2 lg:space-y-0 space-x-0 lg:gap-4'>
-                    <Card className='border-muted w-full lg:col-span-1 animate-fade-left-slow bg-transparent'>
+                    <Card className='border-muted w-full lg:col-span-1 animate-fade-left-slow'>
                         <CardHeader>
                             <div className='text-2xl md:text-4xl text-center md:text-start'>Your Current Balance</div>
                         </CardHeader>
@@ -359,14 +359,14 @@ export default function BalanceAndAllocation() {
                         </CardContent>
                     </Card>
 
-                    <Card className='border-muted w-full lg:col-span-1 animate-fade-right-slow bg-transparent'>
+                    <Card className='border-muted w-full lg:col-span-1 animate-fade-right-slow'>
                         <CardHeader className='flex flex-col md:flex-row items-center md:justify-between'>
                             <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Allocations</div>
                             <Select onValueChange={setSelectedAllocationToken} defaultValue={selectedAllocationToken}>
-                                <SelectTrigger className='w-[180px] dark:border-muted'>
+                                <SelectTrigger className='w-[180px]'>
                                     <SelectValue placeholder='Select Token' />
                                 </SelectTrigger>
-                                <SelectContent className='dark:border-muted'>
+                                <SelectContent>
                                     {bit10TokenName.map((token) => (
                                         <SelectItem key={token} value={token}>
                                             {token}
@@ -439,9 +439,9 @@ export default function BalanceAndAllocation() {
                                                     className='w-3 h-3 rounded'
                                                     style={{ backgroundColor: color[index % color.length] }}
                                                 ></div>
-                                                <div>{token.symbol}</div>
+                                                <div className='uppercase'>{token.symbol}</div>
                                             </div>
-                                            <div>{formatCompactNumber((token.marketCap / totalMarketCap) * 100)} %</div>
+                                            <div>{formatCompactPercentNumber((token.marketCap / totalMarketCap) * 100)} %</div>
                                         </div>
                                     ))}
                                 </div>

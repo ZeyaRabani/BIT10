@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Card, CardTitle, CardContent, CardHeader, CardDescription } from '@/components/ui/card'
+import { Card, CardTitle, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 import AnimatedBackground from '@/components/ui/animated-background'
 import { CartesianGrid, XAxis, YAxis, LineChart, Line } from 'recharts'
 import { Label, Pie, PieChart } from 'recharts'
@@ -63,6 +64,10 @@ const chains = [
     {
         name: 'Binance Smart Chain',
         logo: BSCChainImg as StaticImageData,
+    },
+    {
+        name: 'More coming soon...',
+        // ToDo: logo: BSCChainImg as StaticImageData,
     }
 ]
 
@@ -83,7 +88,7 @@ const pricingItems = [
                 negative: false,
             },
             {
-                text: 'Diversified Portfolio',
+                text: 'Weekly Auto-Rebalancing',
                 negative: false,
             },
             {
@@ -91,30 +96,22 @@ const pricingItems = [
                 negative: null,
             },
             {
-                text: '3 Weekly Raffle Entries',
-                negative: null,
+                text: '5% Cashback',
+                negative: true,
+            },
+            {
+                text: '3 Weekly Raffles',
+                negative: true,
             },
             {
                 text: 'AI Portfolio Manager',
-                negative: true,
-            },
-            {
-                text: 'Priority Email Support',
-                negative: true,
-            },
-            {
-                text: 'License',
-                negative: true,
-            },
-            {
-                text: 'Integration Consultation',
                 negative: true,
             }
         ]
     },
     {
         title: 'Pro',
-        tagline: 'Advanced tools and reduced fees for serious traders.',
+        tagline: 'Advanced tools and reduced fees for committed investors.',
         price: '9.99 USDC',
         features: [
             {
@@ -126,7 +123,7 @@ const pricingItems = [
                 negative: false,
             },
             {
-                text: 'Diversified Portfolio',
+                text: 'Weekly Auto-Rebalancing',
                 negative: false,
             },
             {
@@ -134,68 +131,44 @@ const pricingItems = [
                 negative: null,
             },
             {
-                text: '5 Weekly Raffle Entries',
-                negative: null,
+                text: '5% Cashback',
+                negative: false,
+            },
+            {
+                text: '3 Weekly Raffles',
+                negative: false,
             },
             {
                 text: 'AI Portfolio Manager',
                 negative: false,
-            },
-            {
-                text: 'Priority Email Support',
-                negative: false,
-            },
-            {
-                text: 'License',
-                negative: true,
-            },
-            {
-                text: 'Integration Consultation',
-                negative: true,
             }
         ]
     },
     {
-        title: 'Institution',
+        title: 'Institutional',
         tagline: 'High-performance solutions for institutions.',
-        price: '10,000 USDC',
+        price: 'Custom',
         features: [
-            {
-                text: 'Instant Top 10 Crypto Exposure',
-                negative: false,
-            },
-            {
-                text: '110% Over-Collateralized',
-                negative: false,
-            },
-            {
-                text: 'Diversified Portfolio',
-                negative: false,
-            },
-            {
-                text: '0.4% Management Fee',
-                negative: null,
-            },
-            {
-                text: '7 Weekly Raffle Entries',
-                negative: null,
-            },
-            {
-                text: 'AI Portfolio Manager',
-                negative: false,
-            },
-            {
-                text: 'Priority Email Support',
-                negative: false,
-            },
-            {
-                text: 'License',
-                negative: false,
-            },
-            {
-                text: 'Integration Consultation',
-                negative: false,
-            }
+            // {
+            //     text: 'Instant Top 10 Crypto Exposure',
+            //     negative: false,
+            // },
+            // {
+            //     text: '110% Over-Collateralized',
+            //     negative: false,
+            // },
+            // {
+            //     text: 'Weekly Auto-Rebalancing',
+            //     negative: false,
+            // },
+            // {
+            //     text: '0.5% Management Fee',
+            //     negative: null,
+            // },
+            // {
+            //     text: 'AI Portfolio Manager',
+            //     negative: false,
+            // }
         ]
     }
 ]
@@ -502,17 +475,17 @@ export default function BIT10Comparison() {
 
     return (
         <div className='flex flex-col items-center space-y-4'>
-            <div className='text-3xl md:text-5xl text-center font-semibold'>
-                BIT10.TOP Returns
+            <div className='text-4xl md:text-6xl font-semibold text-center'>
+                BIT10.TOP Annualized Returns (AR)
             </div>
 
-            <div className='mt-4 py-4 w-full'>
+            <div className='w-full'>
                 <div className='grid lg:grid-cols-3 gap-8'>
                     {['1Y', '5Y', '10Y'].map((period) => (
-                        <div key={period} className='border-2 border-muted rounded-2xl py-8 px-3'>
-                            <h4 className='font-medium text-2xl text-center mb-2'>{period} APR</h4>
+                        <div key={period} className='border-2 bg-card border-muted rounded-2xl py-8 px-3'>
+                            <h4 className='font-semibold text-2xl text-center mb-2'>{period} AR</h4>
                             {aprData[period as keyof typeof aprData] ? (
-                                <div className={`font-bold text-4xl text-center ${Number(aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)) > 0 ? 'text-green-500' : 'text-red-500'}`}>{aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)}%</div>
+                                <div className={`font-bold text-4xl text-center ${Number(aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)) > 0 ? 'text-primary' : 'text-red-500'}`}>{Number(aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)) > 0 && '+'}{aprData[period as keyof typeof aprData]?.bit10Top.toFixed(2)}%</div>
                             ) : (
                                 <p className='text-center text-gray-500'>Loading...</p>
                             )}
@@ -521,16 +494,12 @@ export default function BIT10Comparison() {
                 </div>
             </div>
 
-            {/* <div className='text-xl'>
-                * Historical performance; past results are not indicative of future returns.
-            </div> */}
-
             <div className='flex flex-col items-center space-y-2 w-full'>
                 <motion.h1
                     initial={{ opacity: 0.0, y: 80 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }}
-                    className='text-3xl md:text-5xl text-center font-semibold z-[1]'>
+                    className='text-4xl md:text-6xl font-semibold text-center z-[1]'>
                     Supported Chains
                 </motion.h1>
 
@@ -538,199 +507,217 @@ export default function BIT10Comparison() {
                     initial='hidden'
                     whileInView='visible'
                     variants={containerVariants}
-                    className='flex flex-col md:flex-row md:space-x-6 items-center justify-evenly w-full space-y-3 md:space-y-0 py-4'>
+                    className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-6 w-full h-full py-4'>
                     {chains.map((chains, index) => (
                         <motion.div
                             variants={cardVariants}
                             key={index}
-                            className='flex flex-col space-y-2 items-center justify-center py-6 px-2 border-2 border-accent rounded-2xl w-full md:w-1/4 min-w-0'>
-                            <Image src={chains.logo} height={80} width={80} quality={100} alt={chains.name} />
-                            <div>{chains.name}</div>
+                            className='flex flex-col space-y-2 items-center justify-start py-6 px-2 border-2 bg-card border-muted rounded-2xl w-full min-w-0 h-full'>
+                            {chains.logo &&
+                                <Image src={chains.logo} height={80} width={80} quality={100} alt={chains.name} />
+                            }
+                            <div className='font-semibold text-center'>{chains.name}</div>
                         </motion.div>
                     ))}
                 </motion.div>
             </div>
 
-            <div className='py-4'>
-                <div className='text-3xl md:text-5xl font-semibold text-center'>
-                    Simple pricing based on your need
+            <div>
+                <div className='text-4xl md:text-6xl font-semibold text-center'>
+                    Simple pricing based on your needs
                 </div>
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-0 py-4 md:pt-16'>
-                    {pricingItems.map((item) => (
-                        <Card key={item.title} className={`${item.title === 'Pro' ? 'p-6 md:-mt-6 border-primary' : 'p-6 dark:border-muted'} flex flex-col space-y-4 border-2 rounded-2xl shadow-lg`}>
-                            <div className='text-2xl font-semibold text-center'>{item.title}</div>
-                            <div className='text-center text-gray-500 mb-4'>{item.tagline}</div>
-                            <div className='text-center text-3xl font-bold tracking-wide'>{item.price}<span className='text-lg'>{item.title === 'Pro' ? '/month' : item.title === 'Institution' ? '/year' : ''}</span></div>
-                            <div className='flex w-full justify-center'>
-                                {item.title === 'Free' ? (
-                                    <Button className='w-full md:w-3/4' asChild>
-                                        <Link href='/buy'>Buy BIT10.TOP</Link>
-                                    </Button>
-                                ) : (
-                                    <Button variant='outline' className='w-full md:w-3/4'>
-                                        Coming soon
-                                    </Button>
+                <div className='grid grid-cols-1 md:grid-cols-3 py-4 md:pt-16 gap-4 md:gap-0'>
+                    {pricingItems.map((item, index) => {
+                        const isPro = item.title === 'Pro';
+                        const isFree = item.title === 'Free';
+                        return (
+                            <Card
+                                key={item.title}
+                                className={cn(
+                                    'flex flex-col space-y-4 p-6 border-2 shadow-lg',
+                                    index === 0 &&
+                                    'md:rounded-l-2xl md:rounded-r-none rounded-2xl border-2',
+                                    index === 1 &&
+                                    'md:rounded-t-2xl md:rounded-b-none rounded-2xl border-2',
+                                    index === 2 &&
+                                    'md:rounded-r-2xl md:rounded-l-none rounded-2xl border-2',
+                                    isPro && 'md:-mt-6 border-primary'
                                 )}
-                            </div>
-                            <div className='flex flex-col space-y-4'>
-                                {item.features.map((feature, index) => (
-                                    <div key={index} className='flex flex-row space-x-2 items-center'>
-                                        <div>
+                            >
+                                <div className='text-2xl font-semibold text-center'>
+                                    {item.title}
+                                </div>
+                                <div className='text-center text-gray-500 mb-4'>
+                                    {item.tagline}
+                                </div>
+                                <div className='text-center text-3xl font-bold tracking-wide'>
+                                    {item.price}
+                                    {!isFree && <span className='text-lg'>/month</span>}
+                                </div>
+
+                                <div className='flex w-full justify-center'>
+                                    {isFree ? (
+                                        <Button className='w-full md:w-1/2' asChild>
+                                            <Link href='/buy'>Buy BIT10.TOP</Link>
+                                        </Button>
+                                    ) : isPro ? (
+                                        <Button variant='outline' className='w-full md:w-1/2' disabled>
+                                            Coming soon
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant='outline'
+                                            className='w-full md:w-fit md:px-16'
+                                            onClick={() => (window.location.href = 'mailto:zeyarabani@bit10.app')}
+                                        >
+                                            Talk to us
+                                        </Button>
+                                    )}
+                                </div>
+
+                                <div className='flex flex-col space-y-4'>
+                                    {item.features.map((feature, index) => (
+                                        <div key={index} className='flex flex-row space-x-2 items-center'>
                                             {feature.negative ? (
-                                                <XIcon className='h-6 w-6 text-red-500' />
+                                                <XIcon className='h-6 w-6 text-red-500 flex-shrink-0' />
                                             ) : (
-                                                <CheckIcon className='h-6 w-6 text-green-500' />
+                                                <CheckIcon className='h-6 w-6 text-primary flex-shrink-0' />
                                             )}
+                                            <div className='text-sm'>{feature.text}</div>
                                         </div>
-                                        <div>{feature.text}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
-                    ))}
+                                    ))}
+                                </div>
+                            </Card>
+                        );
+                    })}
                 </div>
             </div>
 
-            {/* <div className='pb-4'>
-                <Button asChild className='text-xl font-semibold'>
-                    <Link href='/buy'>
-                        Buy BIT10.TOP
-                    </Link>
-                </Button>
-            </div> */}
-
-            <div className='grid lg:grid-cols-2 gap-3'>
-                <div>
-                    <Card className='border-muted rounded-2xl animate-fade-left-slow'>
-                        <CardHeader className='flex flex-col lg:flex-row items-center justify-between'>
-                            <CardTitle>BIT10.TOP Allocations</CardTitle>
-                        </CardHeader>
-                        <CardContent className='flex flex-col space-y-4'>
-                            {isLoading ? (
-                                <div className='flex flex-col h-full space-y-2'>
-                                    <Skeleton className='h-[300px] lg:h-[400px] w-full' />
-                                </div>
-                            ) : (
-                                <div className='grid md:grid-cols-2 gap-4 items-center'>
-                                    <div className='flex-1'>
-                                        <ChartContainer
-                                            config={bit10AllocationChartConfig}
-                                            className='aspect-square max-h-[300px]'
-                                        >
-                                            <PieChart>
-                                                <ChartTooltip
-                                                    cursor={false}
-                                                    content={<ChartTooltipContent hideLabel />}
-                                                />
-                                                <Pie
-                                                    data={bit10AllocationPieChartData}
-                                                    dataKey='value'
-                                                    nameKey='name'
-                                                    innerRadius={innerRadius}
-                                                    strokeWidth={5}
-                                                >
-                                                    <Label
-                                                        content={({ viewBox }) => {
-                                                            if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
-                                                                return (
-                                                                    <text
+            <div className='grid lg:grid-cols-2 gap-3 w-full'>
+                <Card className='border-muted rounded-2xl animate-fade-left-slow h-full'>
+                    <CardHeader className='text-4xl md:text-6xl font-semibold'>
+                        <CardTitle>BIT10.TOP Allocations</CardTitle>
+                    </CardHeader>
+                    <CardContent className='flex flex-col space-y-4 justify-center md:h-3/4'>
+                        {isLoading ? (
+                            <div className='flex flex-col h-full space-y-2'>
+                                <Skeleton className='h-[300px] lg:h-[400px] w-full' />
+                            </div>
+                        ) : (
+                            <div className='grid md:grid-cols-2 gap-4 items-center'>
+                                <div className='flex-1'>
+                                    <ChartContainer
+                                        config={bit10AllocationChartConfig}
+                                        className='aspect-square max-h-[300px]'
+                                    >
+                                        <PieChart>
+                                            <ChartTooltip
+                                                cursor={false}
+                                                content={<ChartTooltipContent hideLabel />}
+                                            />
+                                            <Pie
+                                                data={bit10AllocationPieChartData}
+                                                dataKey='value'
+                                                nameKey='name'
+                                                innerRadius={innerRadius}
+                                                strokeWidth={5}
+                                            >
+                                                <Label
+                                                    content={({ viewBox }) => {
+                                                        if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                            return (
+                                                                <text
+                                                                    x={viewBox.cx}
+                                                                    y={viewBox.cy}
+                                                                    textAnchor='middle'
+                                                                    dominantBaseline='middle'
+                                                                >
+                                                                    <tspan
                                                                         x={viewBox.cx}
                                                                         y={viewBox.cy}
-                                                                        textAnchor='middle'
-                                                                        dominantBaseline='middle'
+                                                                        className='fill-foreground text-xl font-bold'
                                                                     >
-                                                                        <tspan
-                                                                            x={viewBox.cx}
-                                                                            y={viewBox.cy}
-                                                                            className='fill-foreground text-xl font-bold'
-                                                                        >
-                                                                            BIT10.TOP
-                                                                        </tspan>
-                                                                        <tspan
-                                                                            x={viewBox.cx}
-                                                                            y={(viewBox.cy ?? 0) + 24}
-                                                                            className='fill-muted-foreground'
-                                                                        >
-                                                                            Allocations
-                                                                        </tspan>
-                                                                    </text>
-                                                                )
-                                                            }
-                                                        }}
-                                                    />
-                                                </Pie>
-                                            </PieChart>
-                                        </ChartContainer>
-                                    </div>
-                                    <div className='flex w-full flex-col space-y-3'>
-                                        <div className='flex flex-col'>
-                                            {tokens?.sort((a, b) => b.marketCap - a.marketCap).map((token, index) => (
-                                                <div
-                                                    key={index}
-                                                    className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'
-                                                >
-                                                    <div className='flex flex-row items-center space-x-1'>
-                                                        <div
-                                                            className='w-3 h-3 rounded'
-                                                            style={{ backgroundColor: color[index % color.length] }}
-                                                        ></div>
-                                                        <div>{token.name}</div>
-                                                    </div>
-                                                    <div>{((token.marketCap / totalMarketCap) * 100).toFixed(2)} %</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
-                <div>
-                    <Card className='border-muted rounded-2xl animate-fade-right-slow'>
-                        <CardHeader className='flex flex-col lg:flex-row items-center justify-between'>
-                            <div className='flex flex-1 flex-col justify-center gap-1 pb-3 sm:pb-0'>
-                                <CardTitle>$100 Investment Growth Comparison</CardTitle>
-                                <CardDescription>
-                                    Performance of a $100 investment in each asset since tracking began
-                                </CardDescription>
-                            </div>
-                            <div className='flex flex-col lg:flex-row items-center space-y-2 lg:space-x-4 lg:space-y-0'>
-                                <div className='relative flex flex-row space-x-2 items-center justify-center border border-muted rounded-md px-2 py-1.5'>
-                                    <AnimatedBackground defaultValue='10Y' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
-                                        {tabs.map((label, index) => (
-                                            <button key={index} data-id={label} type='button' className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-zinc-800 dark:text-zinc-50'}`}>
-                                                {label}
-                                            </button>
-                                        ))}
-                                    </AnimatedBackground>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className='flex flex-col space-y-4'>
-                            {isLoading ? (
-                                <div className='flex flex-col h-full space-y-2'>
-                                    <Skeleton className='h-[300px] lg:h-[400px] w-full' />
-                                </div>
-                            ) : (
-                                <div className='select-none -ml-4'>
-                                    <ChartContainer config={investmentChartConfig} className='max-h-[300px] lg:max-h-[600px] w-full'>
-                                        <LineChart accessibilityLayer data={currentData}>
-                                            <CartesianGrid vertical={false} />
-                                            <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' interval='preserveStartEnd' />
-                                            <YAxis tickLine axisLine tickMargin={8} stroke='#D5520E' domain={Array.isArray(yDomain) ? yDomain.filter((v): v is number => typeof v === 'number') : yDomain} ticks={yTicks} tickFormatter={yAxisFormatter} />
-                                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                            <ChartLegend content={<ChartLegendContent />} />
-                                            <Line dataKey='bit10TopValue' type='linear' stroke='green' name={investmentChartConfig.bit10TopValue.label} strokeWidth={2} dot={false} />
-                                            <Line dataKey='btcValue' type='linear' stroke='orange' name={investmentChartConfig.btcValue.label} strokeWidth={2} dot={false} />
-                                            <Line dataKey='sp500Value' type='linear' stroke='blue' name={investmentChartConfig.sp500Value.label} strokeWidth={2} dot={false} />
-                                        </LineChart>
+                                                                        BIT10.TOP
+                                                                    </tspan>
+                                                                    <tspan
+                                                                        x={viewBox.cx}
+                                                                        y={(viewBox.cy ?? 0) + 24}
+                                                                        className='fill-muted-foreground'
+                                                                    >
+                                                                        Allocations
+                                                                    </tspan>
+                                                                </text>
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                            </Pie>
+                                        </PieChart>
                                     </ChartContainer>
                                 </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
+                                <div className='flex w-full flex-col space-y-3'>
+                                    <div className='flex flex-col'>
+                                        {tokens?.sort((a, b) => b.marketCap - a.marketCap).map((token, index) => (
+                                            <div
+                                                key={index}
+                                                className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'
+                                            >
+                                                <div className='flex flex-row items-center space-x-1'>
+                                                    <div
+                                                        className='w-3 h-3 rounded'
+                                                        style={{ backgroundColor: color[index % color.length] }}
+                                                    ></div>
+                                                    <div>{token.name}</div>
+                                                </div>
+                                                <div>{((token.marketCap / totalMarketCap) * 100).toFixed(2)} %</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+                <Card className='border-muted rounded-2xl animate-fade-right-slow h-full'>
+                    <CardHeader className='flex flex-col lg:flex-row items-center justify-between'>
+                        <div className='flex flex-1 flex-col justify-center gap-1 pb-3 sm:pb-0'>
+                            <CardTitle>$100 Investment Growth Comparison</CardTitle>
+                        </div>
+                        <div className='flex flex-col lg:flex-row items-center space-y-2 lg:space-x-4 lg:space-y-0'>
+                            <div className='relative flex flex-row space-x-2 items-center justify-center border border-muted rounded-md px-2 py-1.5'>
+                                <AnimatedBackground defaultValue='10Y' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
+                                    {tabs.map((label, index) => (
+                                        <button key={index} data-id={label} type='button' className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] ${activeTab === label ? 'text-zinc-50' : 'text-primary-foreground'}`}>
+                                            {label}
+                                        </button>
+                                    ))}
+                                </AnimatedBackground>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className='flex flex-col space-y-4'>
+                        {isLoading ? (
+                            <div className='flex flex-col h-full space-y-2'>
+                                <Skeleton className='h-[300px] lg:h-[400px] w-full' />
+                            </div>
+                        ) : (
+                            <div className='select-none -ml-4'>
+                                <ChartContainer config={investmentChartConfig} className='max-h-[300px] lg:max-h-[600px] w-full'>
+                                    <LineChart accessibilityLayer data={currentData}>
+                                        <CartesianGrid vertical={false} />
+                                        <XAxis dataKey='day' tickLine={true} axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#D5520E' interval='preserveStartEnd' />
+                                        <YAxis tickLine axisLine tickMargin={8} stroke='#D5520E' domain={Array.isArray(yDomain) ? yDomain.filter((v): v is number => typeof v === 'number') : yDomain} ticks={yTicks} tickFormatter={yAxisFormatter} />
+                                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                        <ChartLegend content={<ChartLegendContent />} />
+                                        <Line dataKey='bit10TopValue' type='linear' stroke='green' name={investmentChartConfig.bit10TopValue.label} strokeWidth={2} dot={false} />
+                                        <Line dataKey='btcValue' type='linear' stroke='orange' name={investmentChartConfig.btcValue.label} strokeWidth={2} dot={false} />
+                                        <Line dataKey='sp500Value' type='linear' stroke='blue' name={investmentChartConfig.sp500Value.label} strokeWidth={2} dot={false} />
+                                    </LineChart>
+                                </ChartContainer>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )

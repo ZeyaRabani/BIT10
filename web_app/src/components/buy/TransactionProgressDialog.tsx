@@ -61,11 +61,11 @@ export const TransactionProgressDialog: React.FC<TransactionProgressDialogProps>
                             <div className='flex-1'>
                                 <p
                                     className={`font-medium ${step.status === 'completed'
-                                        ? 'text-green-600 dark:text-green-400'
+                                        ? 'text-green-400'
                                         : step.status === 'loading'
-                                            ? 'text-blue-600 dark:text-blue-400'
+                                            ? 'text-blue-400'
                                             : step.status === 'error'
-                                                ? 'text-red-600 dark:text-red-400'
+                                                ? 'text-red-400'
                                                 : 'text-gray-500'
                                         }`}
                                 >
@@ -80,13 +80,13 @@ export const TransactionProgressDialog: React.FC<TransactionProgressDialogProps>
                 </div>
 
                 {/* {allCompleted && (
-                    <div className='text-center text-sm text-green-600 dark:text-green-400 font-medium'>
+                    <div className='text-center text-sm text-green-400 font-medium'>
                         All steps completed successfully!
                     </div>
                 )}
 
                 {hasError && (
-                    <div className='text-center text-sm text-red-600 dark:text-red-400 font-medium'>
+                    <div className='text-center text-sm text-red-400 font-medium'>
                         Transaction failed. Please try again.
                     </div>
                 )} */}

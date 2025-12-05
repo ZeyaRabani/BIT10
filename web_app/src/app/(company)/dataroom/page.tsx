@@ -169,7 +169,7 @@ export default function Page() {
 
                 <div>
                     <Select defaultValue={locale} onValueChange={handleLanguageChange}>
-                        <SelectTrigger className={`w-[180px] dark:border-white ${isPending && 'pointer-events-none opacity-60'}`}>
+                        <SelectTrigger className={`w-[180px] ${isPending && 'pointer-events-none opacity-60'}`}>
                             <SelectValue placeholder='Select a language' />
                         </SelectTrigger>
                         <SelectContent>

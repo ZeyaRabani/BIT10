@@ -6,7 +6,7 @@ import { useEVMWallet } from '@/context/EVMWalletContext'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { formatAddress, formatCompactNumber } from '@/lib/utils'
+import { formatAddress, formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils'
 import { Settings, MoveLeft, ChevronsUpDown, Loader2, Info, ArrowUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -657,7 +657,7 @@ export default function DEX() {
 
     return (
         <div className='flex flex-col h-full items-center justify-center'>
-            <Card className='border-none w-[300px] md:w-[560px] animate-fade-bottom-up bg-gray-200 dark:bg-[#1c1717]'>
+            <Card className='border-none w-[300px] md:w-[560px] animate-fade-bottom-up'>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
                         <CardHeader>
@@ -757,7 +757,7 @@ export default function DEX() {
                                         <div>From</div>
                                         {
                                             chain &&
-                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center'>
+                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
                                                 <div className='font-light'>From</div>
                                                 <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
                                             </Badge>
@@ -775,7 +775,7 @@ export default function DEX() {
                                                         <FormControl>
                                                             <Input
                                                                 type='number'
-                                                                className='dark:border-[#B4B3B3] border-2'
+                                                                className='border-[#B4B3B3] border-2'
                                                                 placeholder='From Amount'
                                                                 {...field}
                                                                 onChange={(e) => {
@@ -797,13 +797,13 @@ export default function DEX() {
                                                     <Tooltip delayDuration={300}>
                                                         <TooltipTrigger asChild>
                                                             <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
-                                                                &asymp; ${selectedFromTokenPrice ? formatCompactNumber((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) * 1.01) : '0'}
+                                                                &asymp; ${selectedFromTokenPrice ? formatCompactPercentNumber((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) * 1.01) : '0'}
                                                                 <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
                                                             </div>
                                                         </TooltipTrigger>
                                                         <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                                             Price in {selectedFromToken?.label} + 1% Liquidity Provider fee <br />
-                                                            $ {formatCompactNumber(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))} + $ {formatCompactNumber(0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)))} = $ {formatCompactNumber((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) + (0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))))}
+                                                            $ {formatCompactPercentNumber(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))} + $ {formatCompactPercentNumber(0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)))} = $ {formatCompactPercentNumber((Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice)) + (0.01 * (Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))))}
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
@@ -821,7 +821,7 @@ export default function DEX() {
                                                                 <Button
                                                                     type='button'
                                                                     variant='outline'
-                                                                    className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
+                                                                    className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                     onClick={() => setFromTokenDialogOpen(true)}
                                                                 >
                                                                     {field.value
@@ -904,7 +904,7 @@ export default function DEX() {
                                                                                                 </div>
                                                                                             </div>
 
-                                                                                            <Badge variant='outline' className='hidden md:block'>
+                                                                                            <Badge variant='outline' className='hidden md:block border-muted-foreground'>
                                                                                                 {token.token_type}
                                                                                             </Badge>
                                                                                         </Button>
@@ -937,7 +937,7 @@ export default function DEX() {
                                         <div>To</div>
                                         {
                                             chain &&
-                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center'>
+                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
                                                 <div className='font-light'>To</div>
                                                 {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                                                 {/* @ts-expect-error */}
@@ -957,7 +957,7 @@ export default function DEX() {
                                                         <FormControl>
                                                             <Input
                                                                 type='number'
-                                                                className='dark:border-[#B4B3B3] border-2'
+                                                                className='border-[#B4B3B3] border-2'
                                                                 placeholder='To Amount'
                                                                 {...field}
                                                                 onChange={(e) => {
@@ -975,7 +975,7 @@ export default function DEX() {
                                             />
                                             {/* <div className='pt-[0.5px] text-center md:text-start bg-green-500'> */}
                                             <div className='pt-[0.5px] text-center md:text-start'>
-                                                &asymp; ${formatCompactNumber(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))}
+                                                &asymp; ${formatCompactPercentNumber(Number(form.watch('to_amount')) * parseFloat(selectedToTokenPrice))}
                                             </div>
                                         </div>
                                         <div className='flex flex-col space-y-0.5'>
@@ -990,7 +990,7 @@ export default function DEX() {
                                                                 <Button
                                                                     type='button'
                                                                     variant='outline'
-                                                                    className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
+                                                                    className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
                                                                     onClick={() => setToTokenDialogOpen(true)}
                                                                 >
                                                                     {field.value
@@ -1081,7 +1081,7 @@ export default function DEX() {
                                                                                                 </div>
                                                                                             </div>
 
-                                                                                            <Badge variant='outline' className='hidden md:block'>
+                                                                                            <Badge variant='outline' className='hidden md:block border-muted-foreground'>
                                                                                                 {token.token_type}
                                                                                             </Badge>
                                                                                         </Button>
