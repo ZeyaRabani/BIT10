@@ -157,4 +157,4 @@ BIT10 is structured using:
 - **Rust** for the ICP Canisters
 - **Dfinity** for decentralized canister management.
 - **Drizzle ORM** for efficient database interaction.
-- **tRPC** for type-safe API routing.
+- **tRPC** for type-safe API routing .
