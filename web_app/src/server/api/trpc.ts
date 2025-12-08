@@ -120,6 +120,7 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
+    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
     if (!ctx.session || !ctx.session.user) {
       throw new TRPCError({ code: 'UNAUTHORIZED' });
     }

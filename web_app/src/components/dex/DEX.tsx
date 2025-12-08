@@ -577,7 +577,7 @@ export default function DEX() {
             const toToken = selectedToToken;
 
             if (chain === 'icp') {
-                await swapICPToken({ values: values, fromToken: fromToken, toToken: toToken, matchingPool: matchingPool, icpAddress: icpAddress ? icpAddress : 'Guest' });
+                await swapICPToken({ values: values, fromToken: fromToken, toToken: toToken, matchingPool: matchingPool, icpAddress: icpAddress ?? 'Guest' });
             } else {
                 toast.error('Unsupported chain');
             }

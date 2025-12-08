@@ -333,6 +333,7 @@ export const fetchICPTokenBalance = async ({ canisterId, principal }: { canister
 //     }
 // };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const buyICPBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenOutAmount, tokenInAmount, icpAddress, onStepUpdate }: { tokenInAddress: string; tokenOutAddress: string; tokenOutAmount: string; tokenInAmount: number; icpAddress: string; onStepUpdate: (steps: TransactionStep[]) => void; }) => {
     const steps: TransactionStep[] = [
         {

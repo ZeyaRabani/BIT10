@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Coins, ArrowRightLeft, BriefcaseBusiness, Home, BookText, Calculator, Landmark, GiftIcon } from 'lucide-react'
+import { Menu, X, Coins, BriefcaseBusiness, Home, BookText, Calculator, Landmark, GiftIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -17,7 +17,6 @@ const links = {
     ],
     app: [
         { title: 'Buy BIT10.TOP', link: '/buy', icon: Coins },
-        // { title: 'DEX', link: '/dex', icon: ArrowRightLeft },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
         { title: 'Rewards', link: '/rewards', icon: GiftIcon }
