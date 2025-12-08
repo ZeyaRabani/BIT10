@@ -7,7 +7,6 @@ import { Card, CardTitle, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import AnimatedBackground from '@/components/ui/animated-background'
-import { Triangle } from 'lucide-react'
 import { CartesianGrid, XAxis, YAxis, LineChart, Line } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
@@ -363,11 +362,8 @@ export default function Bit10Preformance() {
                                         30D %
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
-                                    <Triangle fill={percentageChange30Days >= 0 ? 'green' : 'red'} color={percentageChange30Days >= 0 ? 'green' : 'red'} className={percentageChange30Days > 0 ? '' : 'rotate-180'} />
-                                    <p className='font-bold tracking-wider'>
-                                        {percentageChange30Days.toFixed(2)}%
-                                    </p>
+                                <CardContent className={`text-start text-3xl font-bold tracking-wider ${percentageChange30Days >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                                    {Number(percentageChange30Days) > 0 && '+'}{percentageChange30Days.toFixed(2)}%
                                 </CardContent>
                             </Card>
 
@@ -377,11 +373,8 @@ export default function Bit10Preformance() {
                                         60D %
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
-                                    <Triangle fill={percentageChange60Days >= 0 ? 'green' : 'red'} color={percentageChange60Days >= 0 ? 'green' : 'red'} className={percentageChange60Days > 0 ? '' : 'rotate-180'} />
-                                    <p className='font-bold tracking-wider'>
-                                        {percentageChange60Days.toFixed(2)}%
-                                    </p>
+                                <CardContent className={`text-start text-3xl font-bold tracking-wider ${percentageChange60Days >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                                    {Number(percentageChange60Days) > 0 && '+'}{percentageChange60Days.toFixed(2)}%
                                 </CardContent>
                             </Card>
 
@@ -391,11 +384,8 @@ export default function Bit10Preformance() {
                                         1Y %
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
-                                    <Triangle fill={percentageChange1Year >= 0 ? 'green' : 'red'} color={percentageChange1Year >= 0 ? 'green' : 'red'} className={percentageChange1Year > 0 ? '' : 'rotate-180'} />
-                                    <p className='font-bold tracking-wider'>
-                                        {percentageChange1Year.toFixed(2)}%
-                                    </p>
+                                <CardContent className={`text-start text-3xl font-bold tracking-wider ${percentageChange1Year >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                                    {Number(percentageChange1Year) > 0 && '+'}{percentageChange1Year.toFixed(2)}%
                                 </CardContent>
                             </Card>
 
@@ -405,11 +395,8 @@ export default function Bit10Preformance() {
                                         3Y %
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className='text-start flex flex-row space-x-2 items-center text-3xl'>
-                                    <Triangle fill={percentageChange3Year >= 0 ? 'green' : 'red'} color={percentageChange3Year >= 0 ? 'green' : 'red'} className={percentageChange3Year > 0 ? '' : 'rotate-180'} />
-                                    <p className='font-bold tracking-wider'>
-                                        {percentageChange3Year.toFixed(2)}%
-                                    </p>
+                                <CardContent className={`text-start text-3xl font-bold tracking-wider ${percentageChange3Year >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                                    {Number(percentageChange3Year) > 0 && '+'}{percentageChange3Year.toFixed(2)}%
                                 </CardContent>
                             </Card>
                         </div>
@@ -425,14 +412,14 @@ export default function Bit10Preformance() {
                                             axisLine={true}
                                             tickMargin={8}
                                             tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke="#21C45D"
+                                            stroke='#ffffff'
                                         />
                                         <YAxis
                                             tickLine={true}
                                             axisLine={true}
                                             tickMargin={8}
                                             tickCount={3}
-                                            stroke="#21C45D"
+                                            stroke='#ffffff'
                                         />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                         <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
@@ -450,14 +437,14 @@ export default function Bit10Preformance() {
                                             axisLine={true}
                                             tickMargin={8}
                                             tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke="#21C45D"
+                                            stroke='#ffffff'
                                         />
                                         <YAxis
                                             tickLine={true}
                                             axisLine={true}
                                             tickMargin={8}
                                             tickCount={3}
-                                            stroke="#21C45D"
+                                            stroke='#ffffff'
                                         />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                         <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
@@ -475,14 +462,14 @@ export default function Bit10Preformance() {
                                             axisLine={true}
                                             tickMargin={8}
                                             tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke="#21C45D"
+                                            stroke='#ffffff'
                                         />
                                         <YAxis
                                             tickLine={true}
                                             axisLine={true}
                                             tickMargin={8}
                                             tickCount={3}
-                                            stroke="#21C45D"
+                                            stroke='#ffffff'
                                         />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                         <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
@@ -500,14 +487,14 @@ export default function Bit10Preformance() {
                                             axisLine={true}
                                             tickMargin={8}
                                             tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke="#21C45D"
+                                            stroke='#ffffff'
                                         />
                                         <YAxis
                                             tickLine={true}
                                             axisLine={true}
                                             tickMargin={8}
                                             tickCount={3}
-                                            stroke="#21C45D"
+                                            stroke='#ffffff'
                                         />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                         <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />

@@ -25,7 +25,6 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image, { type StaticImageData } from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
@@ -46,14 +45,16 @@ interface BuyingTokenPriceResponse {
     };
 };
 
-const bit10Amount = ['1', '2'];
-
 const FormSchema = z.object({
     payment_token: z.string({
         required_error: 'Please select a payment token',
     }),
-    receive_amount: z.string({
-        required_error: 'Please select the number of BIT10 tokens to receive',
+    receive_amount: z.number({
+        required_error: 'A number is required.'
+    }).min(1, {
+        message: 'Minimum of 1 BIT10 token is required.'
+    }).max(8, {
+        message: 'The maximum number of BIT10 tokens you can buy is 8.'
     }),
     receive_token: z.string({
         required_error: 'Please select the BIT10 token to receive',
@@ -192,7 +193,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             payment_token: 'Ethereum',
-            receive_amount: '1',
+            receive_amount: 1,
             receive_token: 'BIT10.TOP'
         },
     });
@@ -350,7 +351,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    const fromAmount = Number((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01);
+    const fromAmount = Number((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01);
     const balance = Number(payingTokenBalance);
 
     const buyDisabledConditions = !chain || !isApproved || buying || fromAmount >= balance || fromAmount >= balance * 1.01 || balance <= 0 || fromAmount <= 0 || Number(form.watch('receive_amount')) <= 0;
@@ -411,7 +412,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                 return;
             }
 
-            const rawTokenInAmount = ((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01); // 1% Management fee
+            const rawTokenInAmount = ((values.receive_amount * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01); // 1% Management fee
             const tokenInAmount = isNaN(rawTokenInAmount) ? 0 : Number(rawTokenInAmount);
 
             if (chain === 'icp') {
@@ -582,12 +583,12 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                         <div className='text-4xl text-center md:text-start text-wrap pt-[3px]'>
                                                             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                                                             {/* @ts-expect-error */}
-                                                            {selectedBIT10TokenPrice ? formatCompactNumber((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01) : '0'}
+                                                            {selectedBIT10TokenPrice ? formatCompactNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01) : '0'}
                                                         </div>
                                                         {/* <div className='pt-[0.5px] text-center md:text-start bg-green-500'> */}
                                                         <div className='pt-[0.5px] text-center md:text-start'>
                                                             <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
-                                                                &asymp; ${selectedBIT10TokenPrice ? formatCompactPercentNumber((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 1.01) : '0'}
+                                                                &asymp; ${selectedBIT10TokenPrice ? formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 1.01) : '0'}
                                                                 <TooltipProvider>
                                                                     <Tooltip delayDuration={300}>
                                                                         <TooltipTrigger asChild>
@@ -595,7 +596,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                         </TooltipTrigger>
                                                                         <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                                                             Price of {form.watch('payment_token')} (in USD) + 1% Management fee <br />
-                                                                            $ {formatCompactPercentNumber(parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatCompactPercentNumber(0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatCompactPercentNumber((parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (parseFloat(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0'))))}
+                                                                            $ {formatCompactPercentNumber(form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatCompactPercentNumber(0.01 * (form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0'))))}
                                                                         </TooltipContent>
                                                                     </Tooltip>
                                                                 </TooltipProvider>
@@ -709,30 +710,39 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                         <FormField
                                                             control={form.control}
                                                             name='receive_amount'
-                                                            render={({ field }) => (
-                                                                // <FormItem className='pt-px pb-[1.5px] bg-blue-500'>
-                                                                <FormItem className='pt-px pb-[1.5px]'>
-                                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                        <FormControl>
-                                                                            <SelectTrigger className='border-2 border-[#B4B3B3] bg-background! md:w-3/4'>
-                                                                                <SelectValue placeholder='Select number of tokens' />
-                                                                            </SelectTrigger>
-                                                                        </FormControl>
-                                                                        <SelectContent>
-                                                                            {bit10Amount.map((number) => (
-                                                                                <SelectItem key={number} value={number}>
-                                                                                    {number}
-                                                                                </SelectItem>
-                                                                            ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
+                                                            render={({ field }) => {
+                                                                const numericValue = field.value ?? 1;
+                                                                const handleIncrement = () => {
+                                                                    if (numericValue < 8) field.onChange(numericValue + 1);
+                                                                };
+                                                                const handleDecrement = () => {
+                                                                    if (numericValue > 1) field.onChange(numericValue - 1);
+                                                                };
+                                                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                    const value = parseInt(e.target.value, 10) || 1;
+                                                                    const clampedValue = Math.min(Math.max(value, 1), 8);
+                                                                    field.onChange(clampedValue);
+                                                                };
+                                                                const handleBlur = () => {
+                                                                    const clampedValue = Math.max(1, Math.min(numericValue, 8));
+                                                                    field.onChange(clampedValue);
+                                                                };
+                                                                return (
+                                                                    // <FormItem className='bg-blue-500'>
+                                                                    <FormItem>
+                                                                        <div className='flex items-center justify-between rounded-full gap-1 border-2 border-[#B4B3B3] bg-background! md:w-3/4'>
+                                                                            <Button type='button' variant='ghost' onClick={handleDecrement} disabled={numericValue <= 1}>-</Button>
+                                                                            <Input type='number' min='1' max='8' step='1' value={numericValue} onChange={handleChange} onBlur={handleBlur} className='text-center focus-visible:ring-0 focus-visible:ring-offset-0' />
+                                                                            <Button type='button' variant='ghost' onClick={handleIncrement} disabled={numericValue >= 8}>+</Button>
+                                                                        </div>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                );
+                                                            }}
                                                         />
                                                         {/* <div className='text-center md:text-start bg-green-500'> */}
                                                         <div className='text-center md:text-start'>
-                                                            <div> &asymp; ${formatCompactPercentNumber((parseInt(form.watch('receive_amount')) * parseFloat(selectedBIT10TokenPrice.toFixed(4))))}</div>
+                                                            <div> &asymp; ${formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(4))))}</div>
                                                         </div>
                                                     </div>
                                                     <div className='flex flex-col space-y-0.5'>
@@ -852,7 +862,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                     </div>
                                                     <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
                                                         <div>Expected Output</div>
-                                                        <div>{formatCompactNumber(parseFloat(form.watch('receive_amount')))} {form.watch('receive_token')}</div>
+                                                        <div>{formatCompactNumber(form.watch('receive_amount'))} {form.watch('receive_token')}</div>
                                                     </div>
                                                 </AccordionContent>
                                             </AccordionItem>

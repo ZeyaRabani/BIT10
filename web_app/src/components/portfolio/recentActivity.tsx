@@ -66,7 +66,7 @@ const portfolioTableColumns: ColumnDef<PortfolioTableDataType>[] = [
 
 const recentSwapTableColumns: ColumnDef<DEXPortfolioTableDataType>[] = [
     {
-        accessorKey: 'tokenSwapId',
+        accessorKey: 'dexTokenSwapId',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Swap ID' />
         ),

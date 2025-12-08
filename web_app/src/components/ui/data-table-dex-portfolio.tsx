@@ -130,7 +130,7 @@ export function DataTable<TData, TValue>({
 
     const renderCellContent = (cell: CellContext<PortfolioTableDataType, unknown>, row: { original: PortfolioTableDataType }) => {
         switch (cell.column.id) {
-            case 'tokenSwapId':
+            case 'dexTokenSwapId':
                 return (
                     <div className='flex flex-row space-x-2 items-center'>
                         <div>{formatAddress(row.original.swapId)}</div>
@@ -148,20 +148,20 @@ export function DataTable<TData, TValue>({
                 );
             case 'from':
                 return (
-                    <div className='flex flex-row space-x-1 items-center'>
+                    <div className='flex flex-col space-y-1'>
                         <div>
-                            {formatCompactNumber(Number(row.original.amountIn))}
+                            {formatCompactNumber(Number(row.original.amountIn))} {getTokenName(row.original.tokenInAddress)}
                         </div>
-                        <div>{getTokenName(row.original.tokenInAddress)} (on {getTokenName(row.original.sourceChain)})</div>
+                        <div>(on {getTokenName(row.original.sourceChain)})</div>
                     </div>
                 );
             case 'to':
                 return (
-                    <div className='flex flex-row space-x-1 items-center'>
+                    <div className='flex flex-col space-y-1'>
                         <div>
-                            {formatCompactNumber(Number(row.original.amountOut))}
+                            {formatCompactNumber(Number(row.original.amountOut))} {getTokenName(row.original.tokenOutAddress)}
                         </div>
-                        <div>{getTokenName(row.original.tokenOutAddress)} (on {getTokenName(row.original.destinationChain)})</div>
+                        <div>(on {getTokenName(row.original.destinationChain)})</div>
                     </div>
                 );
             case 'token_swap_on':
@@ -207,7 +207,7 @@ export function DataTable<TData, TValue>({
             <div className='flex items-center'>
                 <div className='flex w-full items-center'>
                     <div className='w-10 z-20 pl-1 text-center pointer-events-none flex items-center justify-center'><Search height={20} width={20} /></div>
-                    <Input className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 border-muted' placeholder={inputPlaceHolder}
+                    <Input className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 border-muted rounded-full' placeholder={inputPlaceHolder}
                         value={(table.getColumn(userSearchColumn)?.getFilterValue() as string) ?? ''}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                             table.getColumn(userSearchColumn)?.setFilterValue(event.target.value)

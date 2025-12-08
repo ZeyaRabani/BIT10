@@ -392,7 +392,7 @@ export default function WalletBtn() {
                 return (
                     <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='flex flex-col space-y-2'>
                         <motion.div variants={cardVariantsLeft}
-                            className='border-2 border-muted hover:bg-muted rounded-md px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
+                            className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
                             onClick={() => handleChainSelect('icp')}
                         >
                             <Image src={ICPLogo} alt='ICP' className='rounded' height='26' width='26' />
@@ -400,7 +400,7 @@ export default function WalletBtn() {
                         </motion.div>
 
                         <motion.div variants={cardVariantsLeft}
-                            className='border-2 border-muted hover:bg-muted rounded-md px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
+                            className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
                             onClick={() => handleChainSelect('base')}
                         >
                             <Image src={BaseLogo} alt='Base' className='rounded' height='30' width='30' />
@@ -408,7 +408,7 @@ export default function WalletBtn() {
                         </motion.div>
 
                         <motion.div variants={cardVariantsLeft}
-                            className='border-2 border-muted hover:bg-muted rounded-md px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
+                            className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
                             onClick={() => handleChainSelect('solana')}
                         >
                             <Image src={SolanaLogo} alt='Solana' className='rounded' height='26' width='26' />
@@ -416,7 +416,7 @@ export default function WalletBtn() {
                         </motion.div>
 
                         <motion.div variants={cardVariantsLeft}
-                            className='border-2 border-muted hover:bg-muted rounded-md px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
+                            className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
                             onClick={() => handleChainSelect('bsc')}
                         >
                             <Image src={BSCLogo} alt='BSC' className='rounded' height='30' width='30' />

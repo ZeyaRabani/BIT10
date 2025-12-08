@@ -253,7 +253,7 @@ export default function Page() {
                                                         <stop offset='95%' stopColor='#ff8c1a' stopOpacity={0.1} />
                                                     </linearGradient>
                                                 </defs>
-                                                <Area dataKey='bit10' type='natural' fill='#ff8c1a' fillOpacity={0.4} stroke='#ff8c1a' stackId='a' />
+                                                <Area dataKey='bit10' type='natural' fill='#21C45D' fillOpacity={0.4} stroke='#21C45D' stackId='a' />
                                                 <ChartLegend content={<ChartLegendContent />} />
                                             </AreaChart>
                                         </ChartContainer>

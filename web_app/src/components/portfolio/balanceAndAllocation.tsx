@@ -178,12 +178,12 @@ export default function BalanceAndAllocation() {
 
     const tokenData = [
         {
-            token: 'BIT10.DEFI',
-            balance: `${formatCompactNumber(Number(bit10DEFITokenBalance))}`
-        },
-        {
             token: 'BIT10.TOP',
             balance: `${formatCompactNumber(Number(bit10TOPTokenBalance))}`
+        },
+        {
+            token: 'BIT10.DEFI',
+            balance: `${formatCompactNumber(Number(bit10DEFITokenBalance))}`
         }
     ];
 
@@ -301,7 +301,7 @@ export default function BalanceAndAllocation() {
                                                                     y={(viewBox.cy ?? 0) + 24}
                                                                     className='fill-muted-foreground'
                                                                 >
-                                                                    BIT10 Balance
+                                                                    Total Balance
                                                                 </tspan>
                                                             </text>
                                                         )
@@ -313,9 +313,6 @@ export default function BalanceAndAllocation() {
                                 </ChartContainer>
                             </div>
                             <div className='flex w-full flex-col space-y-3'>
-                                <div className='flex flex-row items-center justify-start space-x-2'>
-                                    <p className='text-3xl font-semibold'>{formatCompactNumber(Number(totalBIT10Tokens))} BIT10</p>
-                                </div>
                                 <div className='flex w-full flex-col space-y-3'>
                                     <h1 className='text-xl md:text-2xl font-semibold'>Portfolio Holdings</h1>
                                     <div className='flex flex-col space-y-1 py-1'>
@@ -334,9 +331,7 @@ export default function BalanceAndAllocation() {
                                                     })
                                                     .map((token, index) => {
                                                         const isTopToken = token.token === 'BIT10.TOP';
-                                                        const tokenValue = isTopToken
-                                                            ? (parseFloat(token.balance) * bit10TOPPrice).toFixed(2) + ' USD'
-                                                            : '';
+                                                        const tokenValue = isTopToken && '$' + (parseFloat(token.balance) * bit10TOPPrice).toFixed(2);
 
                                                         return (
                                                             <div key={index} className='flex flex-row justify-between items-center hover:bg-accent py-1 px-2 rounded'>

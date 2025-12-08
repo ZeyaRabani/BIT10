@@ -165,7 +165,7 @@ export function DataTable<TData, TValue>({
             <div className='flex items-center'>
                 <div className='flex w-full items-center'>
                     <div className='w-10 z-20 pl-1 text-center pointer-events-none flex items-center justify-center'><Search height={20} width={20} /></div>
-                    <Input className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 border-muted' placeholder={inputPlaceHolder}
+                    <Input className='w-full md:max-w-md -mx-10 pl-10 pr-8 py-2 z-10 border-muted rounded-full' placeholder={inputPlaceHolder}
                         value={(table.getColumn(userSearchColumn)?.getFilterValue() as string) ?? ''}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                             table.getColumn(userSearchColumn)?.setFilterValue(event.target.value)

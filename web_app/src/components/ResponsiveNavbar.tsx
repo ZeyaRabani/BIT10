@@ -17,7 +17,7 @@ const links = {
     ],
     app: [
         { title: 'Buy BIT10.TOP', link: '/buy', icon: Coins },
-        { title: 'DEX', link: '/dex', icon: ArrowRightLeft },
+        // { title: 'DEX', link: '/dex', icon: ArrowRightLeft },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
         { title: 'Rewards', link: '/rewards', icon: GiftIcon }

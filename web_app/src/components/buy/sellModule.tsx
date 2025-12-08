@@ -629,13 +629,13 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                 </div>
                                                 {/* <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 bg-red-500'> */}
                                                 <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2'>
-                                                    <div className='flex flex-col space-y-[1.5px]'>
-                                                        {/* <div className='text-4xl text-center md:text-start text-wrap pt-[3px] bg-blue-500'> */}
-                                                        <div className='text-4xl text-center md:text-start text-wrap pt-[3px]'>
+                                                    <div className='flex flex-col space-y-[1.5px] text-center md:text-start'>
+                                                        {/* <div className='text-4xl text-wrap pt-[3px] bg-blue-500'> */}
+                                                        <div className='text-4xl text-wrap pt-[3px]'>
                                                             {formatCompactNumber(((form.watch('from_bit10_amount') * selectedBIT10TokenPrice) / Number(receiveingTokenPrice)))}
                                                         </div>
-                                                        {/* <div className='bg-green-500'> */}
-                                                        <div>
+                                                        {/* <div className='pt-px bg-green-500'> */}
+                                                        <div className='pt-px'>
                                                             &asymp; ${formatCompactPercentNumber(form.watch('from_bit10_amount') * selectedBIT10TokenPrice)}
                                                         </div>
                                                     </div>

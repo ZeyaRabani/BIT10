@@ -347,14 +347,14 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                stroke="#21C45D"
+                                                stroke='#ffffff'
                                             />
                                             <YAxis
                                                 tickLine={true}
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickCount={3}
-                                                stroke="#21C45D"
+                                                stroke='#ffffff'
                                             />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
@@ -372,14 +372,14 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                stroke="#21C45D"
+                                                stroke='#ffffff'
                                             />
                                             <YAxis
                                                 tickLine={true}
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickCount={3}
-                                                stroke="#21C45D"
+                                                stroke='#ffffff'
                                             />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
@@ -397,14 +397,14 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                stroke="#21C45D"
+                                                stroke='#ffffff'
                                             />
                                             <YAxis
                                                 tickLine={true}
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickCount={3}
-                                                stroke="#21C45D"
+                                                stroke='#ffffff'
                                             />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
@@ -422,14 +422,14 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                stroke="#21C45D"
+                                                stroke='#ffffff'
                                             />
                                             <YAxis
                                                 tickLine={true}
                                                 axisLine={true}
                                                 tickMargin={8}
                                                 tickCount={3}
-                                                stroke="#21C45D"
+                                                stroke='#ffffff'
                                             />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />

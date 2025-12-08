@@ -106,21 +106,21 @@ const parterners = [
 export default function Page() {
   return (
     <div>
-      <div className='py-8 flex flex-col items-center justify-center'>
+      <div className='pt-8 pb-4 flex flex-col items-center justify-center'>
         <div className='flex flex-col gap-4 items-center justify-center md:px-4'>
-          <div className='p-4 max-w-7xl mx-auto z-10 w-full pt-8 md:pt-0'>
+          <div className='max-w-7xl mx-auto z-10 w-full pt-8'>
             <motion.h1 initial={{ opacity: 0.0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50 pb-2'>
               On-Chain Crypto Index Funds
             </motion.h1>
 
-            <div className='flex flex-col md:flex-row md:space-x-4 items-center justify-center py-6'>
+            <div className='flex flex-col md:flex-row md:space-x-4 items-center justify-center pt-6'>
               <div className='flex flex-col space-y-2 items-center'>
                 <motion.div initial={{ opacity: 0.0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, ease: 'easeInOut' }}>
                   <Image src={BIT10Img} alt='logo' width={85} height={85} className='border-2 w-16 md:w-16 lg:w-20 rounded-full' />
                 </motion.div>
                 <motion.div initial={{ opacity: 0.0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, ease: 'easeInOut' }} className='text-xl font-semibold text-primary'>BIT10.TOP</motion.div>
               </div>
-              <div className='text-6xl md:-mt-5 animate-fade-bottom-up'>=</div>
+              <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.8, ease: 'easeInOut' }} className='text-6xl md:-mt-5'>=</motion.div>
               <div className='flex flex-col space-y-2 items-start justify-center'>
                 <motion.div variants={containerVariants} initial='hidden' whileInView='visible' viewport={{ once: true }} className='flex flex-row items-center justify-center -space-x-3 w-full'>
                   {[BTCImg, ETHImg, XRPImg, BNBImg, SOLImg, TRXImg, DogeImg, ADAImg, BCHImg, AVAXImg].map((imgSrc, index) => (
@@ -138,7 +138,7 @@ export default function Page() {
         </div>
       </div>
 
-      <MaxWidthWrapper className='flex flex-col space-y-4 pb-8 pt-4'>
+      <MaxWidthWrapper className='flex flex-col space-y-4 md:space-y-16 py-8'>
         <BIT10Comparison />
 
         <div className='flex flex-col items-center space-y-2'>

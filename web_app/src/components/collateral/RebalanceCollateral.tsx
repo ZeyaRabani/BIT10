@@ -305,7 +305,7 @@ export default function RebalanceCollateral() {
                                         </div>
                                         <div className='flex flex-row items-end justify-start space-x-2'>
                                             <div className='text-4xl font-semibold'>${formatCompactPercentNumber(data.targetValue)}</div>
-                                            <div className={`${data.percentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                            <div className={`pb-px ${data.percentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
                                                 {data.percentChange > 0 ? '+' : ''}{data.percentChange.toFixed(2)}%
                                             </div>
                                         </div>
@@ -331,7 +331,7 @@ export default function RebalanceCollateral() {
                                         </div>
                                         <div className='flex flex-row items-end justify-start space-x-2'>
                                             <div className='text-4xl font-semibold'>110%</div>
-                                            <div className='text-green-500'>Over-collateralized</div>
+                                            <div className='text-green-500 pb-px'>Over-collateralized</div>
                                         </div>
                                     </Card>
                                 </div>

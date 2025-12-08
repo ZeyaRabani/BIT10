@@ -13,6 +13,8 @@ interface DataTableViewOptionsProps<TData> {
 const formatColumnName = (columnName: string): string => {
     if (columnName === 'tokenSwapId') {
         return 'Transaction ID';
+    } else if (columnName === 'dexTokenSwapId') {
+        return 'Swap ID';
     } else if (columnName === 'mode') {
         return 'Type';
     } else if (columnName === 'tickIn') {
