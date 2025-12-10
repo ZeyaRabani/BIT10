@@ -534,14 +534,14 @@ export const sellSolanaBIT10Token = async ({ tokenInAddress, tokenOutAddress, to
         toast.dismiss();
         toast.info('Transaction sent! Waiting for confirmation...');
 
-         // Wait for 10 seconds
-         await new Promise((resolve) => setTimeout(resolve, 10000));
+        // Wait for 10 seconds
+        await new Promise((resolve) => setTimeout(resolve, 10000));
 
-         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-         //  @ts-expect-error
-         const transfer = await actor.solana_sell(signature);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //  @ts-expect-error
+        const transfer = await actor.solana_sell(signature);
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/ban-ts-comment
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         if (transfer.Ok) {
             const formatTimestamp = (nanoseconds: string): string => {
@@ -647,7 +647,6 @@ export const sellSolanaBIT10Token = async ({ tokenInAddress, tokenOutAddress, to
             toast.error('An error occurred while processing your request. Please try again!');
         }
     } catch (error) {
-        console.error('Error in sellSolanaBIT10Token:', error);
         toast.error('An error occurred while processing your request. Please try again!');
         throw error;
     }

@@ -83,6 +83,8 @@ export const buyBSCBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenO
             token_out_amount: tokenOutAmount,
         });
 
+        console.log(create_transaction);
+
         const tx = {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
@@ -223,6 +225,7 @@ export const buyBSCBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenO
             toast.error('An error occurred while processing your request. Please try again!');
         }
     } catch (error) {
+        console.log(error);
         toast.error('An error occurred while processing your request. Please try again!');
         throw error;
     }
