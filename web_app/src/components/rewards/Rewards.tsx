@@ -347,7 +347,7 @@ export default function Rewards() {
 
     const totalBIT10Tokens = totalTokens();
 
-    const claimICPReward = async () => {
+    const claimReward = async () => {
         try {
             setClaimCashback(true);
             if (chain === 'icp' && icpAddress) {
@@ -383,20 +383,10 @@ export default function Rewards() {
         }
     };
 
-    // ToDo: temp.
-    const isClaimButtonDisabled = chain === 'base' || chain === 'solana' || chain === 'bsc' || !chain || isLoading || totalBIT10Tokens <= 0.9 || parseFloat(cashbackAmount) <= 0 || isLastCountdownPassed || !isAvailableCountdownPassed;
+    const isClaimButtonDisabled = !chain || isLoading || totalBIT10Tokens <= 0.9 || parseFloat(cashbackAmount) <= 0 || isLastCountdownPassed || !isAvailableCountdownPassed;
 
     const getClaimButtonText = () => {
         if (!chain) return 'Connect your wallet to continue';
-        // ToDo: temp.
-        if (chain === 'base' || chain === 'solana' || chain === 'bsc') {
-            const chainNames: Record<string, string> = {
-                base: 'Base',
-                solana: 'Solana',
-                bsc: 'Binance Smart Chain'
-            };
-            return `Selling coming soon on ${chainNames[chain]}`;
-        }
         if (isLoading) return 'Loading...';
         if (totalBIT10Tokens <= 0.9) return 'Not Eligible';
         if (isLastCountdownPassed) return 'Round Starting Soon';
@@ -460,7 +450,7 @@ export default function Rewards() {
                         <div className='text-lg md:text-xl'>Claim 5% Cashback</div>
                     </div>
                     <div className='flex items-center justify-center'>
-                        <Button disabled={isClaimButtonDisabled} onClick={claimICPReward}>
+                        <Button disabled={isClaimButtonDisabled} onClick={claimReward}>
                             {claimCashback && <Loader2Icon className='animate-spin mr-2' size={15} />}
                             {getClaimButtonText()}
                         </Button>

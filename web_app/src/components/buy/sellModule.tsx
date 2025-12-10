@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { useChain } from '@/context/ChainContext'
 import { useICPWallet } from '@/context/ICPWalletContext'
 import { useEVMWallet } from '@/context/EVMWalletContext'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
 import { whitelistedAddress } from '@/actions/dbActions'
 import { toast } from 'sonner'
@@ -12,6 +13,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { sellPayTokensICP, sellReceiveTokensICP, fetchICPTokenBalance, sellICPBIT10Token } from './icp/ICPBuyModule'
 import { sellPayTokensBase, sellReceiveTokensBase, fetchBaseTokenBalance, sellBaseBIT10Token } from './base/BaseBuyModule'
+import { sellPayTokensSolana, sellReceiveTokensSolana, fetchSolanaTokenBalance, sellSolanaBIT10Token } from './solana/SolanaBuyModule'
 import BIT10Img from '@/assets/tokens/bit10.svg'
 import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -69,6 +71,9 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const { icpAddress } = useICPWallet();
     const { evmAddress } = useEVMWallet();
 
+    const { publicKey } = useWallet();
+    const wallet = useWallet();
+
     const fetchWhitelistedAddress = async () => {
         try {
             const result = await whitelistedAddress();
@@ -99,11 +104,11 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         else if (chain == 'base' || chain == 'bsc') {
             return evmAddress;
         }
-        // else if (chain == 'solana') {
-        //     return wallet.publicKey?.toBase58();
-        // }
+        else if (chain == 'solana') {
+            return wallet.publicKey?.toBase58();
+        }
         return undefined;
-    }, [chain, icpAddress, evmAddress]);
+    }, [chain, icpAddress, evmAddress, wallet.publicKey]);
 
     const isApproved = (whitelistedPrincipal as WhitelistedPrincipal[]).some(
         (item) => item.userPrincipalId.toLocaleLowerCase() === userAddress?.toLocaleLowerCase()
@@ -161,11 +166,17 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                 queryFn: () => fetchRecievePrice('ETH'),
                 refetchInterval: 30000, // 30 sec.
             },
+            {
+                queryKey: ['solPrice'],
+                queryFn: () => fetchRecievePrice('SOL'),
+                refetchInterval: 30000, // 30 sec.
+            }
         ],
     });
 
     const icpAmount = useMemo(() => receivePriceQueries[0].data, [receivePriceQueries]);
     const ethAmount = useMemo(() => receivePriceQueries[1].data, [receivePriceQueries]);
+    const solAmount = useMemo(() => receivePriceQueries[2].data, [receivePriceQueries]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -208,15 +219,21 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         }
         // Base
         else if (chain === 'base') {
-            if (receiveToken === 'ETH') {
+            if (receiveToken === 'Ethereum') {
                 return ethAmount ?? 0;
+            }
+        }
+        // Solana
+        else if (chain === 'solana') {
+            if (receiveToken === 'Solana') {
+                return solAmount ?? 0;
             }
         }
         else {
             return 0;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chain, form.watch('to_token'), icpAmount, ethAmount]);
+    }, [chain, form.watch('to_token'), icpAmount, ethAmount, solAmount]);
 
     const fromBalanceQueries = useQueries({
         queries: [
@@ -248,6 +265,16 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                 },
                 enabled: !!evmAddress && chain === 'base' && !!payingTokenAddress,
                 refetchInterval: 30000, // 30 seconds
+            },
+            // For Solana
+            {
+                queryKey: ['paymentTokenBalanceSolanaTOP', publicKey, payingTokenAddress, chain],
+                queryFn: () => {
+                    if (!publicKey || chain !== 'solana' || !payingTokenAddress) return '0';
+                    return fetchSolanaTokenBalance({ tokenAddress: 'bity2aNuHSbQiKLYB7PziepJw2aYwiiZM287XQxuXE1', publicKey: publicKey });
+                },
+                enabled: !!publicKey && chain === 'solana' && !!payingTokenAddress,
+                refetchInterval: 30000, // 30 seconds
             }
         ],
     });
@@ -259,6 +286,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             return fromBalanceQueries[1].data;
         } else if (payingTokenAddress == '0x2d309c7c5FbBf74372EdfC25B10842a7237b92dE') {
             return fromBalanceQueries[2].data;
+        } else if (payingTokenAddress == 'bity2aNuHSbQiKLYB7PziepJw2aYwiiZM287XQxuXE1') {
+            return fromBalanceQueries[3].data;
         }
         return '0';
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -268,12 +297,12 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const balance = Number(payingTokenBalance);
 
     // ToDo: temp.
-    const sellDisabledConditions = chain === 'solana' || chain === 'bsc' || !chain || !isApproved || selling || fromAmount > balance || fromAmount <= 0 || balance <= 0;
+    const sellDisabledConditions = chain === 'bsc' || !chain || !isApproved || selling || fromAmount > balance || fromAmount <= 0 || balance <= 0;
 
     const getSellMessage = (): string => {
         if (!chain) return 'Connect your wallet to continue';
         // ToDo: temp.
-        if (chain === 'solana' || chain === 'bsc') return `Selling coming soon on ${chain === 'solana' ? 'Solana' : 'Binance Smart Chain'}`;
+        if (chain === 'bsc') return 'Selling coming soon on Binance Smart Chain';
         if (!isApproved) return 'Access Restricted';
         if (selling) return 'Selling...';
         if (fromAmount >= balance || fromAmount >= balance * 1.01 && !selling) return 'Your balance is too low for this transaction';
@@ -286,6 +315,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             return sellPayTokensICP;
         } else if (chain === 'base') {
             return sellPayTokensBase;
+        } else if (chain === 'solana') {
+            return sellPayTokensSolana;
         } else {
             return sellPayTokensICP;
         }
@@ -296,6 +327,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             return sellReceiveTokensICP;
         } else if (chain === 'base') {
             return sellReceiveTokensBase;
+        } else if (chain === 'solana') {
+            return sellReceiveTokensSolana;
         } else {
             return sellReceiveTokensICP;
         }
@@ -326,11 +359,15 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             if (chain === 'icp') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await sellICPBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenInAmount: tokenInAmount, icpAddress: icpAddress! });
+                await sellICPBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenInAmount: tokenInAmount.toString(), icpAddress: icpAddress! });
             } else if (chain === 'base') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await sellBaseBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenInAmount: tokenInAmount, tokenOutAmount: tokenOutAmount, baseAddress: evmAddress! });
+                await sellBaseBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenInAmount: tokenInAmount.toString(), tokenOutAmount: tokenOutAmount.toString(), baseAddress: evmAddress! });
+            } else if (chain === 'solana') {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                await sellSolanaBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenInAmount: tokenInAmount.toString(), tokenOutAmount: tokenOutAmount.toString(), solanaAddress: wallet.publicKey?.toBase58(), wallet: wallet });
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -502,7 +539,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                                 // <FormItem className='py-[1.5px] bg-blue-500'>
                                                                 <FormItem className='py-[1.5px]'>
                                                                     <FormControl>
-                                                                        <Input {...field} placeholder='BIT10 Tokens to sell' className='border-[#B4B3B3]' />
+                                                                        <Input {...field} placeholder='BIT10 Tokens to sell' className='border-[#B4B3B3] rounded-full' />
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>

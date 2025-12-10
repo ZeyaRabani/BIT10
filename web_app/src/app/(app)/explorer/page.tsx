@@ -51,7 +51,7 @@ export default function Page() {
                                     <FormItem>
                                         <FormLabel>Transaction ID</FormLabel>
                                         <FormControl>
-                                            <Input {...field} className='border-muted' placeholder='Transaction ID' />
+                                            <Input {...field} className='rounded-full' placeholder='Transaction ID' />
                                         </FormControl>
                                         <FormDescription>Please enter the Transaction ID associated with your transaction.</FormDescription>
                                         <FormMessage />

@@ -96,7 +96,7 @@ export default function Page() {
                                         <FormControl>
                                             <div className='flex'>
                                                 <div className='w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center'><User height={20} width={20} /></div>
-                                                <Input className='w-full -ml-10 pl-10 pr-3 py-2 border-muted' placeholder='Your Name' {...field} />
+                                                <Input className='w-full -ml-10 pl-10 pr-3 py-2 border-muted rounded-full' placeholder='Your Name' {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -113,7 +113,7 @@ export default function Page() {
                                         <FormControl>
                                             <div className='flex'>
                                                 <div className='w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center'><Mail height={20} width={20} /></div>
-                                                <Input className='w-full -ml-10 pl-10 pr-3 py-2 border-muted' placeholder='Your Email' {...field} />
+                                                <Input className='w-full -ml-10 pl-10 pr-3 py-2 border-muted rounded-full' placeholder='Your Email' {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -129,7 +129,7 @@ export default function Page() {
                                         <FormLabel>Your message</FormLabel>
                                         <FormControl>
                                             <div className='flex'>
-                                                <Textarea className='w-full min-h-[14rem] border-muted' placeholder='Your message'  {...field} />
+                                                <Textarea className='w-full min-h-[14rem] border-muted rounded-3xl' placeholder='Your message'  {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />

@@ -13,7 +13,6 @@ import WalletBtn from './WalletBtn'
 
 const links = {
     web: [
-        { title: 'About', link: '/' },
         { title: 'Investment Calculator', link: '/investment-calculator' },
         { title: 'GitBook', link: '/gitbook' }
     ],
@@ -25,6 +24,17 @@ const links = {
     ]
 };
 
+const externalRoutes = {
+    appMode: [
+        '/explorer'
+    ],
+    webMode: [
+        '/',
+        '/launch',
+        '/contact',
+    ]
+};
+
 export default function Navbar() {
     const [hidden, setHidden] = useState(false);
     const [activeLink, setActiveLink] = useState<string>('/');
@@ -33,7 +43,19 @@ export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
 
-    const appMode = links.app.some(link => pathname.startsWith(link.link));
+    const isAppMode = () => {
+        if (externalRoutes.appMode.includes(pathname)) {
+            return true;
+        }
+
+        if (externalRoutes.webMode.includes(pathname)) {
+            return false;
+        }
+
+        return links.app.some(link => pathname.startsWith(link.link));
+    };
+
+    const appMode = isAppMode();
 
     useEffect(() => {
         const active = links[appMode ? 'app' : 'web'].find(link => pathname === link.link);

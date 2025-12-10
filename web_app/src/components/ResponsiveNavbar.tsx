@@ -23,12 +23,36 @@ const links = {
     ]
 };
 
+const externalRoutes = {
+    appMode: [
+        '/explorer'
+    ],
+    webMode: [
+        '/',
+        '/launch',
+        '/contact',
+    ]
+};
+
 export default function ResponsiveNavbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isClosing, setIsClosing] = useState<boolean>(false);
 
     const pathname = usePathname();
-    const appMode = links.app.some(link => pathname.startsWith(link.link));
+
+    const isAppMode = () => {
+        if (externalRoutes.appMode.includes(pathname)) {
+            return true;
+        }
+
+        if (externalRoutes.webMode.includes(pathname)) {
+            return false;
+        }
+
+        return links.app.some(link => pathname.startsWith(link.link));
+    };
+
+    const appMode = isAppMode();
 
     const toggleMenu = () => {
         if (isOpen) {

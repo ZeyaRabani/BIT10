@@ -30,7 +30,7 @@ export const sellPayTokensBase = [
 ]
 
 export const sellReceiveTokensBase = [
-    { label: 'ETH', value: 'ETH', img: ETHImg as StaticImageData, address: '0x0000000000000000000000000000000000000000b', tokenType: 'ERC20', slug: ['ethereum'] },
+    { label: 'ETH', value: 'Ethereum', img: ETHImg as StaticImageData, address: '0x0000000000000000000000000000000000000000b', tokenType: 'ERC20', slug: ['ethereum'] },
 ]
 
 export const fetchBaseTokenBalance = async ({ tokenAddress, address }: { tokenAddress: string, address: string }): Promise<number> => {

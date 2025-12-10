@@ -114,7 +114,7 @@ export default function Footer() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
-                                                    <Input {...field} className='w-full' placeholder='Email Address' />
+                                                    <Input {...field} className='w-full rounded-full' placeholder='Email Address' />
                                                 </FormControl>
                                                 <FormDescription>
                                                     Don&apos;t worry we will not send you spam emails.
