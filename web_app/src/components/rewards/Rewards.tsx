@@ -652,7 +652,7 @@ export default function Rewards() {
                     <Card className='border-2 p-4 flex flex-col space-y-4'>
                         <div>
                             <h3 className='text-xl font-semibold'>Actions Required</h3>
-                            <ul className='list-disc pl-5 mt-1 space-y-1 text-sm'>
+                            <ul className='list-disc pl-5 mt-1 space-y-1'>
                                 {/* <li><b>Buy and Hold:</b> Keep ≥0.9 BIT10.TOP during round.</li>
                                 <li><b>Claim:</b> Do it within 24h after window opens.</li> */}
                                 <li><b>Buy & Hold (5% Cashback):</b> Hold at least 0.9 BIT10.TOP during the cashback round to earn 5% cashback. <br />
@@ -666,7 +666,7 @@ export default function Rewards() {
 
                         <div>
                             <h3 className='text-xl font-semibold'>Eligibility & Rules</h3>
-                            <ul className='list-disc pl-5 mt-1 space-y-1 text-sm'>
+                            <ul className='list-disc pl-5 mt-1 space-y-1'>
                                 {/* <li><b>Holding:</b> Min 0.9 BIT10.TOP required.</li>
                                 <li><b>Earnings:</b> Based on buys held-not sold.</li>
                                 <li><b>Claim Window:</b> After start and before end.</li>
@@ -680,7 +680,7 @@ export default function Rewards() {
 
                         <div>
                             <h3 className='text-xl font-semibold'>Example</h3>
-                            <ul className='list-disc pl-5 mt-1 text-sm'>
+                            <ul className='list-disc pl-5 mt-1'>
                                 {/* <li>Buy 1.5 BIT10.TOP → Hold → Get cashback.</li>
                                 <li>Sell part before claim? Only remainder earns.</li> */}
                                 <li>Buy 1.5 BIT10.TOP and hold through the cashback round → earn 5% cashback.</li>
@@ -730,7 +730,7 @@ export default function Rewards() {
                     <Card className='border-2 p-4 flex flex-col space-y-4'>
                         <div>
                             <h3 className='text-xl font-semibold'>Actions Required</h3>
-                            <ul className='list-disc pl-5 mt-1 space-y-1 text-sm'>
+                            <ul className='list-disc pl-5 mt-1 space-y-1'>
                                 {/* <li><b>Buy:</b> Purchase BIT10 tokens to receive raffle tickets.</li>
                                 <li><b>Auto-Entry:</b> Users are automatically entered into the raffle after purchase.</li>
                                 <li><b>Tickets:</b> Number of BIT10 tokens bought = number of raffle tickets.</li> */}
@@ -742,7 +742,7 @@ export default function Rewards() {
 
                         <div>
                             <h3 className='text-xl font-semibold'>Eligibility & Rules</h3>
-                            <ul className='list-disc pl-5 mt-1 space-y-1 text-sm'>
+                            <ul className='list-disc pl-5 mt-1 space-y-1'>
                                 {/* <li><b>Purchase Requirement:</b> Users must buy BIT10 tokens to be eligible.</li>
                                 <li><b>Ticket Allocation:</b> Tickets are awarded based on the number of tokens purchased.</li>
                                 <li><b>No Reduction on Sell:</b> Selling tokens does not reduce the number of raffle tickets earned.</li> */}
@@ -754,7 +754,7 @@ export default function Rewards() {
 
                         <div>
                             <h3 className='text-xl font-semibold'>Example</h3>
-                            <ul className='list-disc pl-5 mt-1 text-sm'>
+                            <ul className='list-disc pl-5 mt-1'>
                                 {/* <li>You earn tickets per qualified buy transaction.</li>
                                 <li>More transactions = more chances to win.</li> */}
                                 <li>Purchase 1 BIT10.TOP token = 1 Reward Pool ticket</li>

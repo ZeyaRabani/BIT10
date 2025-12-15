@@ -5,7 +5,7 @@ import { useICPWallet } from '@/context/ICPWalletContext'
 import { useEVMWallet } from '@/context/EVMWalletContext'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useQueries } from '@tanstack/react-query'
-import { whitelistedAddress } from '@/actions/dbActions'
+// import { whitelistedAddress } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { formatAddress, formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils'
 import { ChevronsUpDown, Loader2, Info, ArrowUpDown } from 'lucide-react'
@@ -17,7 +17,7 @@ import { buyPayTokensSolana, buyReceiveTokensSolana, fetchSolanaTokenBalance, bu
 import { buyPayTokensBSC, buyReceiveTokensBSC, fetchBSCTokenBalance, buyBSCBIT10Token } from './bsc/BSCBuyModule'
 import BIT10Img from '@/assets/tokens/bit10.svg'
 import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+// import { Skeleton } from '@/components/ui/skeleton'
 import TokenDetails from './tokenDetails'
 import { cn } from '@/lib/utils'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
@@ -33,9 +33,9 @@ interface BuyModuleProps {
     onSwitchToSell: () => void;
 }
 
-interface WhitelistedPrincipal {
-    userPrincipalId: string;
-}
+// interface WhitelistedPrincipal {
+//     userPrincipalId: string;
+// }
 
 interface BuyingTokenPriceResponse {
     data: {
@@ -76,28 +76,28 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const { publicKey } = useWallet();
     const wallet = useWallet();
 
-    const fetchWhitelistedAddress = async () => {
-        try {
-            const result = await whitelistedAddress();
-            return result;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {
-            toast.error('An error occurred while fetching whitelisted users. Please try again!');
-            return [];
-        }
-    };
+    // const fetchWhitelistedAddress = async () => {
+    //     try {
+    //         const result = await whitelistedAddress();
+    //         return result;
+    //         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //     } catch (error) {
+    //         toast.error('An error occurred while fetching whitelisted users. Please try again!');
+    //         return [];
+    //     }
+    // };
 
-    const gatedMainnetQueries = useQueries({
-        queries: [
-            {
-                queryKey: ['whitelistedUserPrincipalIds'],
-                queryFn: () => fetchWhitelistedAddress(),
-            }
-        ],
-    });
+    // const gatedMainnetQueries = useQueries({
+    //     queries: [
+    //         {
+    //             queryKey: ['whitelistedUserPrincipalIds'],
+    //             queryFn: () => fetchWhitelistedAddress(),
+    //         }
+    //     ],
+    // });
 
-    const isLoading = gatedMainnetQueries.some(query => query.isLoading);
-    const whitelistedPrincipal = gatedMainnetQueries[0]?.data ?? [];
+    // const isLoading = gatedMainnetQueries.some(query => query.isLoading);
+    // const whitelistedPrincipal = gatedMainnetQueries[0]?.data ?? [];
 
     const userAddress = useMemo(() => {
         if (chain == 'icp') {
@@ -110,9 +110,9 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         return undefined;
     }, [icpAddress, evmAddress, wallet, chain]);
 
-    const isApproved = (whitelistedPrincipal as WhitelistedPrincipal[]).some(
-        (item) => item.userPrincipalId.toLocaleLowerCase() === userAddress?.toLocaleLowerCase()
-    );
+    // const isApproved = (whitelistedPrincipal as WhitelistedPrincipal[]).some(
+    //     (item) => item.userPrincipalId.toLocaleLowerCase() === userAddress?.toLocaleLowerCase()
+    // );
 
     const fetchBIT10Price = useCallback(async (tokenPriceAPI: string) => {
         const response = await fetch(tokenPriceAPI);
@@ -354,11 +354,10 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const fromAmount = Number((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01);
     const balance = Number(payingTokenBalance);
 
-    const buyDisabledConditions = !chain || !isApproved || buying || fromAmount >= balance || fromAmount >= balance * 1.01 || balance <= 0 || fromAmount <= 0 || Number(form.watch('receive_amount')) <= 0;
+    const buyDisabledConditions = !chain || buying || fromAmount >= balance || fromAmount >= balance * 1.01 || balance <= 0 || fromAmount <= 0 || Number(form.watch('receive_amount')) <= 0;
 
     const getBuyMessage = (): string => {
         if (!chain) return 'Connect your wallet to continue';
-        if (!isApproved) return 'Access Restricted';
         if (buying) return 'Buying...';
         if (fromAmount >= balance || fromAmount >= balance * 1.01 && !buying) return 'Your balance is too low for this transaction';
         if (fromAmount <= 0 || Number(form.watch('receive_amount')) <= 0) return 'Amount too low';
@@ -509,8 +508,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
     return (
         <>
-            {isLoading ? (
-                <div className='flex flex-col-reverse space-y-2 md:space-y-0 lg:grid lg:grid-cols-5 gap-4'>
+            {/* {isLoading ? ( */}
+                {/* <div className='flex flex-col-reverse space-y-2 md:space-y-0 lg:grid lg:grid-cols-5 gap-4'>
                     <div className='flex flex-col space-y-2 lg:space-y-4 lg:col-span-3'>
                         <Card className='border-none animate-fade-left'>
                             <CardHeader>
@@ -551,7 +550,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                         </Card>
                     </div>
                 </div>
-            ) : (
+            ) : ( */}
                 <div className='flex flex-col-reverse space-y-2 md:space-y-0 lg:grid lg:grid-cols-5 gap-4'>
                     <div className='lg:col-span-3'>
                         <TokenDetails token_price={selectedBIT10TokenPrice} token_name={form.watch('receive_token')} token_list={selectedBIT10Tokens} />
@@ -908,12 +907,12 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                             </motion.div>
                                         </div>
 
-                                        {chain && !isApproved && (
+                                        {/* {chain && !isApproved && (
                                             <div className='border-muted border rounded-lg flex flex-col items-center space-y-2 px-2 py-4 text-center'>
                                                 <div>The Buy BIT10 page is gated for mainnet access. Your Wallet Address needs to be approved first to use the Buy BIT10 feature.</div>
                                                 <div>For access, please contact <a href='https://x.com/bit10startup' className='text-primary underline'>@bit10startup</a> on Twitter/X.</div>
                                             </div>
-                                        )}
+                                        )} */}
 
                                         <Button className='w-full' disabled={buyDisabledConditions}>
                                             {buying && <Loader2 className='animate-spin mr-2' size={15} />}
@@ -925,7 +924,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                         </Card>
                     </div>
                 </div>
-            )}
+            {/* )} */}
         </>
     )
 }
