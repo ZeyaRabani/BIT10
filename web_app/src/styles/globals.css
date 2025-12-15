@@ -89,6 +89,47 @@
         margin: 0;
     }
 
+    @keyframes moveGradient {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    @keyframes moveGradientX {
+
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+
+    .animate-gradient-bg {
+        background: linear-gradient(270deg, #FFEA00, #FFFFFF, #FFEA00);
+        background-size: 300% 300%;
+        animation: moveGradient 4s ease infinite;
+    }
+
+    .text-golden {
+        background: linear-gradient(270deg, #FFEA00, #FFFFFF, #FFEA00);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 300% 300%;
+        animation: moveGradient 4s ease infinite;
+    }
+
     :root {
         --background: 20 14.3% 4.1%;
         --foreground: 0 0% 95%;

@@ -26,7 +26,6 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import Image, { type StaticImageData } from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 
 interface SellModuleProps {
     onSwitchToBuy: () => void;
@@ -759,43 +758,40 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                             </div>
                                         </div>
 
-                                        <Accordion type='single' collapsible>
-                                            <AccordionItem value='item-1' className='rounded-lg border-2 my-2 border-none bg-muted/50 px-4'>
-                                                <AccordionTrigger className='hover:no-underline'><p>Summary</p></AccordionTrigger>
-                                                <AccordionContent className='flex flex-col space-y-1 border-t-2 pt-4 tracking-wide'>
-                                                    <div className='flex flex-row items-center justify-between space-x-2'>
-                                                        <div>Management Fee</div>
-                                                        <TooltipProvider>
-                                                            <Tooltip delayDuration={300}>
-                                                                <TooltipTrigger asChild>
-                                                                    <div className='flex flex-row space-x-1 items-center'>
-                                                                        <div>1%</div>
-                                                                        <div>
-                                                                            <Info className='size-3 align-middle relative bottom-[1px]' />
-                                                                        </div>
-                                                                    </div>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                                    The Management Fee covers the cost of managing and rebalancing the token
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
-                                                    </div>
-                                                    <div className='flex flex-row items-center justify-between space-x-2'>
-                                                        <div>Exchange Rate</div>
-                                                        1 {form.watch('from_bit10_token')} = {formatCompactNumber(exchangeRate)} {form.watch('to_token')}
-                                                    </div>
-                                                    <div className='flex flex-row items-center justify-between space-x-2'>
-                                                        <div>Expected Time</div>
-                                                        <div>1-2 min.</div>
-                                                    </div>
-                                                    <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
-                                                        <div>Expected Output</div>
-                                                        <div>{formatCompactNumber(receiveAmount)} {form.watch('to_token')}</div>
-                                                    </div>
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        </Accordion>
+                                        <div className='rounded-lg px-4 py-2 bg-muted flex flex-col space-y-1 text-sm'>
+                                            <div className='font-medium text-lg'>Summary</div>
+                                            <div className='h-0.5 w-full bg-muted-foreground'></div>
+                                            <div className='flex flex-row items-center justify-between space-x-2'>
+                                                <div>Management Fee</div>
+                                                <TooltipProvider>
+                                                    <Tooltip delayDuration={300}>
+                                                        <TooltipTrigger asChild>
+                                                            <div className='flex flex-row space-x-1 items-center'>
+                                                                <div>1%</div>
+                                                                <div>
+                                                                    <Info className='size-3 align-middle relative bottom-[1px] cursor-pointer' />
+                                                                </div>
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                            The Management Fee covers the cost of managing and rebalancing the token
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </div>
+                                            <div className='flex flex-row items-center justify-between space-x-2'>
+                                                <div>Exchange Rate</div>
+                                                1 {form.watch('from_bit10_token')} = {formatCompactNumber(exchangeRate)} {form.watch('to_token')}
+                                            </div>
+                                            <div className='flex flex-row items-center justify-between space-x-2'>
+                                                <div>Expected Time</div>
+                                                <div>1-2 min.</div>
+                                            </div>
+                                            <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
+                                                <div>Expected Output</div>
+                                                <div>{formatCompactNumber(receiveAmount)} {form.watch('to_token')}</div>
+                                            </div>
+                                        </div>
 
                                         {chain && !isApproved && (
                                             <div className='border-muted border rounded-lg flex flex-col items-center space-y-2 px-2 py-4 text-center'>

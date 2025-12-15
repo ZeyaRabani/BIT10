@@ -21,6 +21,20 @@ export const idlFactory = ({ IDL }) => {
         'Ok': CashbackResponseData,
         'Err': IDL.Text,
     });
+    const BuyHistoryRecord = IDL.Record({
+        'token_in_amount': IDL.Text,
+        'transaction_type': IDL.Text,
+        'token_in_address': IDL.Text,
+        'token_out_address': IDL.Text,
+        'token_in_tx_hash': IDL.Text,
+        'network': IDL.Text,
+        'swap_id': IDL.Text,
+        'token_out_tx_hash': IDL.Text,
+        'user_wallet_address': IDL.Text,
+        'transaction_timestamp': IDL.Text,
+        'token_in_usd_amount': IDL.Text,
+        'token_out_amount': IDL.Text,
+    });
     return IDL.Service({
         'associated_token_account': IDL.Func(
             [IDL.Text],
@@ -55,6 +69,11 @@ export const idlFactory = ({ IDL }) => {
             ['query'],
         ),
         'get_cashback_start_time': IDL.Func([], [IDL.Text], ['query']),
+        'get_eligible_raffle_entry': IDL.Func(
+            [],
+            [IDL.Variant({ 'Ok': IDL.Vec(BuyHistoryRecord), 'Err': IDL.Text })],
+            [],
+        ),
         'get_last_cashback_available_time': IDL.Func([], [IDL.Text], ['query']),
         'nonce_account': IDL.Func([], [IDL.Text], []),
         'solana_address': IDL.Func([], [IDL.Text], []),

@@ -20,7 +20,7 @@ type BIT10Entry = {
     sp500: string;
 };
 
-export default function Bit10Preformance() {
+export default function BIT10Preformance() {
     const [selectedPreformanceToken, setSelectedPreformanceToken] = useState('BIT10.TOP');
     const [activeTab, setActiveTab] = useState('30D');
 
@@ -30,9 +30,9 @@ export default function Bit10Preformance() {
         }
     }
 
-    const fetchBit10Preformance = async () => {
+    const fetchBIT103YPreformance = async () => {
         try {
-            const response = await fetch(`bit10-comparison-data-3`);
+            const response = await fetch('bit10-comparison-data-3');
 
             if (!response.ok) {
                 toast.error('Error fetching BIT10 Performance. Please try again!');
@@ -51,14 +51,14 @@ export default function Bit10Preformance() {
     const bit10Queries = useQueries({
         queries: [
             {
-                queryKey: ['bit10TOPTokenPreformance10Y'],
-                queryFn: () => fetchBit10Preformance()
+                queryKey: ['bit10TOPTokenPreformance3Y'],
+                queryFn: () => fetchBIT103YPreformance()
             }
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10TOPPreformance10Y = bit10Queries[0].data?.bit10_top ?? [];
+    const bit10TOPPreformance3Y = bit10Queries[0].data?.bit10_top ?? [];
 
     const getBIT10Performance = (data: BIT10Entry[], range: string) => {
         if (!data || data.length === 0) {
@@ -102,7 +102,7 @@ export default function Bit10Preformance() {
 
     const selectedBIT10Token30D = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBIT10Performance(bit10TOPPreformance10Y, '30D');
+            return getBIT10Performance(bit10TOPPreformance3Y, '30D');
         } else {
             return null;
         }
@@ -112,7 +112,7 @@ export default function Bit10Preformance() {
 
     const selectedBIT10Token60D = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBIT10Performance(bit10TOPPreformance10Y, '60D');
+            return getBIT10Performance(bit10TOPPreformance3Y, '60D');
         } else {
             return null;
         }
@@ -122,7 +122,7 @@ export default function Bit10Preformance() {
 
     const selectedBIT10Token1Y = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBIT10Performance(bit10TOPPreformance10Y, '1Y');
+            return getBIT10Performance(bit10TOPPreformance3Y, '1Y');
         } else {
             return null;
         }
@@ -132,7 +132,7 @@ export default function Bit10Preformance() {
 
     const selectedBIT10Token3Y = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
-            return getBIT10Performance(bit10TOPPreformance10Y, '3Y');
+            return getBIT10Performance(bit10TOPPreformance3Y, '3Y');
         } else {
             return null;
         }
@@ -140,23 +140,23 @@ export default function Bit10Preformance() {
 
     const tokens3Y = selectedBIT10Token3Y();
 
-    const selectedBit10TokenChange = () => {
+    const selectedBIT10TokenChange = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
-            return bit10TOPPreformance10Y;
+            return bit10TOPPreformance3Y;
         } else {
             return null;
         }
     };
 
-    const tokensChange = selectedBit10TokenChange();
+    const tokensChange = selectedBIT10TokenChange();
 
-    const getPercentageChange = (data: BIT10Entry[], range: string) => {
+    const getSimplePercentageChange = (data: BIT10Entry[], range: string) => {
         if (!data || data.length < 2) return 0;
 
         const lastEntry = data[data.length - 1];
         if (!lastEntry) return 0;
 
-        const currentPrice = lastEntry.bit10Top ?? 0;
+        const currentPrice = Number(lastEntry.bit10Top) ?? 0;
         const timestamp = lastEntry.date;
         if (!timestamp) return 0;
 
@@ -167,12 +167,6 @@ export default function Bit10Preformance() {
             targetDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
         } else if (range === '60D') {
             targetDate = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
-        } else if (range === '1Y') {
-            targetDate = new Date(now);
-            targetDate.setFullYear(targetDate.getFullYear() - 1);
-        } else if (range === '3Y') {
-            targetDate = new Date(now);
-            targetDate.setFullYear(targetDate.getFullYear() - 3);
         } else {
             return 0;
         }
@@ -195,13 +189,60 @@ export default function Bit10Preformance() {
         const previousPrice = Number(closestEntry.bit10Top) || 0;
 
         if (previousPrice === 0) return 0;
-        return ((Number(currentPrice) - previousPrice) / previousPrice) * 100;
+        return ((currentPrice - previousPrice) / previousPrice) * 100;
     };
 
-    const percentageChange30Days = getPercentageChange(tokensChange ?? [], '30D');
-    const percentageChange60Days = getPercentageChange(tokensChange ?? [], '60D');
-    const percentageChange1Year = getPercentageChange(tokensChange ?? [], '1Y');
-    const percentageChange3Year = getPercentageChange(tokensChange ?? [], '3Y');
+    const getAnnualizedReturn = (data: BIT10Entry[], range: string) => {
+        if (!data || data.length < 2) return 0;
+
+        const lastEntry = data[data.length - 1];
+        if (!lastEntry) return 0;
+
+        const finalValue = Number(lastEntry.bit10Top) ?? 0;
+        const timestamp = lastEntry.date;
+        if (!timestamp) return 0;
+
+        const now = new Date(timestamp);
+        let targetDate: Date;
+        let years: number;
+
+        if (range === '1Y') {
+            targetDate = new Date(now);
+            targetDate.setFullYear(targetDate.getFullYear() - 1);
+            years = 1;
+        } else if (range === '3Y') {
+            targetDate = new Date(now);
+            targetDate.setFullYear(targetDate.getFullYear() - 3);
+            years = 3;
+        } else {
+            return 0;
+        }
+
+        let closestEntry = data[0];
+        if (!closestEntry?.date) return 0;
+        let closestDiff = Math.abs(new Date(closestEntry.date).getTime() - targetDate.getTime());
+
+        for (let i = 1; i < data.length; i++) {
+            const entry = data[i];
+            if (!entry?.date) continue;
+            const diff = Math.abs(new Date(entry.date).getTime() - targetDate.getTime());
+            if (diff < closestDiff) {
+                closestDiff = diff;
+                closestEntry = entry;
+            }
+        }
+
+        if (!closestEntry) return 0;
+        const initialValue = Number(closestEntry.bit10Top) || 0;
+
+        if (initialValue === 0 || years <= 0) return 0;
+        return (Math.pow(finalValue / initialValue, 1 / years) - 1) * 100;
+    };
+
+    const percentageChange30Days = getSimplePercentageChange(tokensChange ?? [], '30D');
+    const percentageChange60Days = getSimplePercentageChange(tokensChange ?? [], '60D');
+    const percentageChange1Year = getAnnualizedReturn(tokensChange ?? [], '1Y');
+    const percentageChange3Year = getAnnualizedReturn(tokensChange ?? [], '3Y');
 
     const bit10PreformanceTokenDataName = () => {
         if (selectedPreformanceToken === 'BIT10.TOP') {
@@ -316,7 +357,7 @@ export default function Bit10Preformance() {
             ) : (
                 <Card className='border-muted md:col-span-2 animate-fade-right-slow'>
                     <CardHeader className='flex flex-col md:flex-row items-center justify-between'>
-                        <div className='text-2xl md:text-4xl w-full text-center'>BIT10 Performance</div>
+                        <div className='text-2xl md:text-4xl w-full text-center font-semibold'>BIT10 Performance</div>
                     </CardHeader>
                     <CardContent className='flex flex-col space-y-4'>
                         <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0 justify-end'>
@@ -333,22 +374,9 @@ export default function Bit10Preformance() {
                                 </SelectContent>
                             </Select>
                             <div className='relative flex flex-row space-x-2 items-center justify-center border border-muted rounded-md px-2 py-1.5'>
-                                <AnimatedBackground
-                                    defaultValue='30D'
-                                    className='rounded bg-primary'
-                                    transition={{
-                                        ease: 'easeInOut',
-                                        duration: 0.2,
-                                    }}
-                                    onValueChange={(newActiveId) => handleTabChange(newActiveId)}
-                                >
+                                <AnimatedBackground defaultValue='30D' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
                                     {tabs.map((label, index) => (
-                                        <button
-                                            key={index}
-                                            data-id={label}
-                                            type='button'
-                                            className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98]`}
-                                        >
+                                        <button key={index} data-id={label} type='button' className='inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98]'>
                                             {label}
                                         </button>
                                     ))}
@@ -381,7 +409,7 @@ export default function Bit10Preformance() {
                             <Card className='border-muted flex flex-col h-full w-full'>
                                 <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                     <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
-                                        1Y %
+                                        1Y AR
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className={`text-start text-3xl font-bold tracking-wider ${percentageChange1Year >= 0 ? 'text-primary' : 'text-red-500'}`}>
@@ -392,7 +420,7 @@ export default function Bit10Preformance() {
                             <Card className='border-muted flex flex-col h-full w-full'>
                                 <CardHeader className='flex flex-row items-center justify-between pb-2'>
                                     <CardTitle className='text-xl font-medium flex flex-1 flex-row items-center space-x-1 text-start'>
-                                        3Y %
+                                        3Y AR
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className={`text-start text-3xl font-bold tracking-wider ${percentageChange3Year >= 0 ? 'text-primary' : 'text-red-500'}`}>
@@ -406,21 +434,8 @@ export default function Bit10Preformance() {
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
                                     <LineChart accessibilityLayer data={bit10Preformance30DChartData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis
-                                            dataKey='day'
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke='#ffffff'
-                                        />
-                                        <YAxis
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickCount={3}
-                                            stroke='#ffffff'
-                                        />
+                                        <XAxis dataKey='day' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
+                                        <YAxis tickLine axisLine tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                         <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                     </LineChart>
@@ -431,21 +446,8 @@ export default function Bit10Preformance() {
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
                                     <LineChart accessibilityLayer data={bit10Preformance60DChartData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis
-                                            dataKey='day'
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke='#ffffff'
-                                        />
-                                        <YAxis
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickCount={3}
-                                            stroke='#ffffff'
-                                        />
+                                        <XAxis dataKey='day' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
+                                        <YAxis tickLine axisLine tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                         <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                     </LineChart>
@@ -456,21 +458,8 @@ export default function Bit10Preformance() {
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
                                     <LineChart accessibilityLayer data={bit10Preformance1YChartData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis
-                                            dataKey='day'
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke='#ffffff'
-                                        />
-                                        <YAxis
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickCount={3}
-                                            stroke='#ffffff'
-                                        />
+                                        <XAxis dataKey='day' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
+                                        <YAxis tickLine axisLine tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                         <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                     </LineChart>
@@ -481,21 +470,8 @@ export default function Bit10Preformance() {
                                 <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
                                     <LineChart accessibilityLayer data={bit10Preformance3YChartData}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis
-                                            dataKey='day'
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                            stroke='#ffffff'
-                                        />
-                                        <YAxis
-                                            tickLine={true}
-                                            axisLine={true}
-                                            tickMargin={8}
-                                            tickCount={3}
-                                            stroke='#ffffff'
-                                        />
+                                        <XAxis dataKey='day' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
+                                        <YAxis tickLine axisLine tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                         <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                     </LineChart>

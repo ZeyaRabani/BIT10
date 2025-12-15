@@ -27,7 +27,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import Image, { type StaticImageData } from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { motion } from 'framer-motion'
 
 interface BuyModuleProps {
     onSwitchToSell: () => void;
@@ -546,6 +546,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                 <Skeleton className='bg-muted rounded-md w-full h-32' />
                                 <Skeleton className='bg-muted rounded-md w-full h-14' />
                                 <Skeleton className='bg-muted rounded-md w-full h-12' />
+                                <Skeleton className='bg-muted rounded-md w-full h-12' />
                             </CardContent>
                         </Card>
                     </div>
@@ -732,7 +733,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                     <FormItem>
                                                                         <div className='flex items-center justify-between rounded-full gap-1 border-2 border-[#B4B3B3] bg-background! md:w-3/4'>
                                                                             <Button type='button' variant='ghost' onClick={handleDecrement} disabled={numericValue <= 1}>-</Button>
-                                                                            <Input type='number' min='1' max='8' step='1' value={numericValue} onChange={handleChange} onBlur={handleBlur} className='text-center focus-visible:ring-0 focus-visible:ring-offset-0' />
+                                                                            <Input type='number' min='1' max='8' step='1' value={numericValue} onChange={handleChange} onBlur={handleBlur} className='text-center focus-visible:ring-0 focus-visible:ring-offset-0 bg-accent' />
                                                                             <Button type='button' variant='ghost' onClick={handleIncrement} disabled={numericValue >= 8}>+</Button>
                                                                         </div>
                                                                         <FormMessage />
@@ -828,45 +829,84 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                             </div>
                                         </div>
 
-                                        <Accordion type='single' collapsible>
-                                            <AccordionItem value='item-1' className='rounded-lg border-2 my-2 border-none bg-muted/50 px-4'>
-                                                <AccordionTrigger className='hover:no-underline'><p>Summary</p></AccordionTrigger>
-                                                <AccordionContent className='flex flex-col space-y-1 border-t-2 pt-4 tracking-wide'>
-                                                    <div className='flex flex-row items-center justify-between space-x-2'>
-                                                        <div>Management Fee</div>
-                                                        <TooltipProvider>
-                                                            <Tooltip delayDuration={300}>
-                                                                <TooltipTrigger asChild>
-                                                                    <div className='flex flex-row space-x-1 items-center'>
-                                                                        <div>1%</div>
-                                                                        <div>
-                                                                            <Info className='size-3 align-middle relative bottom-[1px]' />
-                                                                        </div>
-                                                                    </div>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                                    The Management Fee covers the cost of managing and rebalancing the token
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
+                                        <div className='rounded-lg px-4 py-2 bg-muted flex flex-col space-y-1 text-sm'>
+                                            <div className='font-medium text-lg'>Summary</div>
+                                            <div className='h-0.5 w-full bg-muted-foreground'></div>
+                                            <div className='flex flex-row items-center justify-between space-x-2'>
+                                                <div>Management Fee</div>
+                                                <TooltipProvider>
+                                                    <Tooltip delayDuration={300}>
+                                                        <TooltipTrigger asChild>
+                                                            <div className='flex flex-row space-x-1 items-center'>
+                                                                <div>1%</div>
+                                                                <div>
+                                                                    <Info className='size-3 align-middle relative bottom-[1px] cursor-pointer' />
+                                                                </div>
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                            The Management Fee covers the cost of managing and rebalancing the token
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </div>
+                                            <div className='flex flex-row items-center justify-between space-x-2'>
+                                                <div>Exchange Rate</div>
+                                                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                                                {/* @ts-expect-error */}
+                                                <div>1 {form.watch('payment_token')} = {selectedBIT10TokenPrice > 0 ? formatCompactNumber(parseFloat(payingTokenPrice) / selectedBIT10TokenPrice) : '0'} {form.watch('receive_token')}</div>
+                                            </div>
+                                            <div className='flex flex-row items-center justify-between space-x-2'>
+                                                <div>Expected Time</div>
+                                                <div>1-2 min.</div>
+                                            </div>
+                                            <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
+                                                <div>Expected Output</div>
+                                                <div>{formatCompactNumber(form.watch('receive_amount'))} {form.watch('receive_token')}</div>
+                                            </div>
+                                        </div>
+
+                                        <div className='py-2'>
+                                            <motion.div className='p-[1.5px] rounded-lg' animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }} style={{ background: 'linear-gradient(270deg, #FFEA00, #FFFFFF, #FFEA00)', backgroundSize: '300% 300%' }} transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}>
+                                                <div className='relative rounded-lg px-4 py-2 bg-muted flex flex-col space-y-1'>
+                                                    <motion.div className='absolute -top-3 right-3 items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold text-black' style={{ background: 'linear-gradient(270deg, #FFEA00, #FFFFFF, #FFEA00)', backgroundSize: '300% 300%' }} animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }} transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}>
+                                                        Limited time
+                                                    </motion.div>
+                                                    <div className='flex flex-row items-center justify-between'>
+                                                        <div className='flex flex-row items-center space-x-1'>
+                                                            <div>Estimated 5% Cashback</div>
+                                                            <TooltipProvider>
+                                                                <Tooltip delayDuration={300}>
+                                                                    <TooltipTrigger asChild>
+                                                                        <Info className='size-3 align-middle relative cursor-pointer' />
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                                        Approximate {chain === 'icp' ? 'ckUSDC' : 'USDC'} you&apos;ll receive based on the amount of tokens purchased.
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+                                                        </div>
+                                                        <div>{selectedBIT10TokenPrice ? formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 0.05) : '0'} {chain === 'icp' ? 'ckUSDC' : 'USDC'}</div>
                                                     </div>
-                                                    <div className='flex flex-row items-center justify-between space-x-2'>
-                                                        <div>Exchange Rate</div>
-                                                        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                                                        {/* @ts-expect-error */}
-                                                        <div>1 {form.watch('payment_token')} = {selectedBIT10TokenPrice > 0 ? formatCompactNumber(parseFloat(payingTokenPrice) / selectedBIT10TokenPrice) : '0'} {form.watch('receive_token')}</div>
+                                                    <div className='flex flex-row items-center justify-between'>
+                                                        <div className='flex flex-row items-center space-x-1'>
+                                                            <div>Reward Pool Entries</div>
+                                                            <TooltipProvider>
+                                                                <Tooltip delayDuration={300}>
+                                                                    <TooltipTrigger asChild>
+                                                                        <Info className='size-3 align-middle relative cursor-pointer' />
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                                        Each token you buy counts as one entry into the Reward Pool raffle.
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+                                                        </div>
+                                                        <div>{form.watch('receive_amount')} {form.watch('receive_amount') > 1 ? 'Tickets' : 'Ticket'}</div>
                                                     </div>
-                                                    <div className='flex flex-row items-center justify-between space-x-2'>
-                                                        <div>Expected Time</div>
-                                                        <div>1-2 min.</div>
-                                                    </div>
-                                                    <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
-                                                        <div>Expected Output</div>
-                                                        <div>{formatCompactNumber(form.watch('receive_amount'))} {form.watch('receive_token')}</div>
-                                                    </div>
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        </Accordion>
+                                                </div>
+                                            </motion.div>
+                                        </div>
 
                                         {chain && !isApproved && (
                                             <div className='border-muted border rounded-lg flex flex-col items-center space-y-2 px-2 py-4 text-center'>

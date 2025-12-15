@@ -141,7 +141,7 @@ export default function NewBuyModule() {
         }
     };
 
-    const fetchBit10Preformance = async () => {
+    const fetchBIT10Preformance = async () => {
         try {
             const response = await fetch(`bit10-comparison-data-3`);
 
@@ -167,7 +167,7 @@ export default function NewBuyModule() {
             },
             {
                 queryKey: ['bit10TOPTokenPreformance10Y'],
-                queryFn: () => fetchBit10Preformance()
+                queryFn: () => fetchBIT10Preformance()
             }
         ],
     });

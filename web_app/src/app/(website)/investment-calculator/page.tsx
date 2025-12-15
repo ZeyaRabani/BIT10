@@ -304,10 +304,7 @@ export default function Page() {
                                 </div>
                             ) : (
                                 <div className='select-none -ml-4'>
-                                    <ChartContainer
-                                        config={investmentChartConfig}
-                                        className='max-h-[300px] lg:max-h-[600px] w-full'
-                                    >
+                                    <ChartContainer config={investmentChartConfig} className='max-h-[300px] lg:max-h-[600px] w-full'>
                                         <LineChart
                                             accessibilityLayer
                                             data={processInvestmentData(
@@ -320,48 +317,13 @@ export default function Page() {
                                             )}
                                         >
                                             <CartesianGrid vertical={false} />
-                                            <XAxis
-                                                dataKey='day'
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickFormatter={tickFormatter}
-                                                stroke='#ffffff'
-                                            />
-                                            <YAxis
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickCount={5}
-                                                stroke='#ffffff'
-                                                tickFormatter={yAxisFormatter}
-                                            />
+                                            <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#ffffff' interval='preserveStartEnd' />
+                                            <YAxis tickLine axisLine={true} tickMargin={8} tickCount={6} stroke='#ffffff' tickFormatter={yAxisFormatter} />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <ChartLegend content={<ChartLegendContent />} />
-                                            <Line
-                                                dataKey='bit10TopValue'
-                                                type='linear'
-                                                stroke='green'
-                                                name={investmentChartConfig.bit10TopValue.label}
-                                                strokeWidth={2}
-                                                dot={false}
-                                            />
-                                            <Line
-                                                dataKey='btcValue'
-                                                type='linear'
-                                                stroke='orange'
-                                                name={investmentChartConfig.btcValue.label}
-                                                strokeWidth={2}
-                                                dot={false}
-                                            />
-                                            <Line
-                                                dataKey='sp500Value'
-                                                type='linear'
-                                                stroke='blue'
-                                                name={investmentChartConfig.sp500Value.label}
-                                                strokeWidth={2}
-                                                dot={false}
-                                            />
+                                            <Line dataKey='bit10TopValue' type='linear' stroke='green' name={investmentChartConfig.bit10TopValue.label} strokeWidth={2} dot={false} />
+                                            <Line dataKey='btcValue' type='linear' stroke='orange' name={investmentChartConfig.btcValue.label} strokeWidth={2} dot={false} />
+                                            <Line dataKey='sp500Value' type='linear' stroke='blue' name={investmentChartConfig.sp500Value.label} strokeWidth={2} dot={false} />
                                         </LineChart>
                                     </ChartContainer>
                                 </div>
@@ -394,7 +356,7 @@ export default function Page() {
                                                 <FormItem>
                                                     <FormLabel>Initial Investment</FormLabel>
                                                     <FormControl>
-                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='border-muted' />
+                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='rounded-full' />
                                                     </FormControl>
                                                     <FormDescription>
                                                         Enter the amount (in USD) you want to invest
@@ -415,7 +377,7 @@ export default function Page() {
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <FormControl>
-                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                <Button variant='outline' className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
                                                                     {field.value ? (
                                                                         format(field.value, 'PPP')
                                                                     ) : (
@@ -448,7 +410,7 @@ export default function Page() {
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <FormControl>
-                                                                <Button variant='outline' className={cn('w-full border-muted pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                                <Button variant='outline' className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
                                                                     {field.value ? (
                                                                         format(field.value, 'PPP')
                                                                     ) : (
@@ -480,12 +442,12 @@ export default function Page() {
                                                     <FormLabel>Token</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger className='border-muted'>
+                                                            <SelectTrigger className='rounded-full'>
                                                                 <SelectValue placeholder='Select a investment token' />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value='BIT10.TOP'>BIT10.TOP</SelectItem>
+                                                        <SelectContent className='rounded-full'>
+                                                            <SelectItem className='rounded-full' value='BIT10.TOP'>BIT10.TOP</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormDescription>

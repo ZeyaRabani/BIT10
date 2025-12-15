@@ -64,8 +64,6 @@ export const claimICPCashback = async ({ walletAddress }: { walletAddress: strin
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             const claimResult = await actor.claim_icp_reward(walletAddress);
 
-            console.log('claimResult', claimResult);
-
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (claimResult.Ok) {
                 toast.success('Cashback claimed successfully!');

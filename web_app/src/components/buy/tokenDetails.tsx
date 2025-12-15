@@ -48,7 +48,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
         }
     }
 
-    const fetchBit10Preformance = async () => {
+    const fetchBIT10Preformance = async () => {
         try {
             const response = await fetch(`bit10-comparison-data-3`);
 
@@ -70,7 +70,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
         queries: [
             {
                 queryKey: ['bit10TOPTokenPreformance10Y'],
-                queryFn: () => fetchBit10Preformance()
+                queryFn: () => fetchBIT10Preformance()
             }
         ],
     });
@@ -311,22 +311,9 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                             <CardTitle className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:items-center md:justify-between'>
                                 <div className='md:text-3xl'>${(token_price).toFixed(2)}</div>
                                 <div className='relative flex flex-row space-x-2 items-center justify-center border border-muted rounded-md px-2 py-1.5'>
-                                    <AnimatedBackground
-                                        defaultValue='3Y'
-                                        className='rounded bg-primary'
-                                        transition={{
-                                            ease: 'easeInOut',
-                                            duration: 0.2,
-                                        }}
-                                        onValueChange={(newActiveId) => handleTabChange(newActiveId)}
-                                    >
+                                    <AnimatedBackground defaultValue='3Y' className='rounded bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={(newActiveId) => handleTabChange(newActiveId)}>
                                         {tabs.map((label, index) => (
-                                            <button
-                                                key={index}
-                                                data-id={label}
-                                                type='button'
-                                                className={`inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light`}
-                                            >
+                                            <button key={index} data-id={label} type='button' className='inline-flex px-2 items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
                                                 {label}
                                             </button>
                                         ))}
@@ -341,21 +328,8 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                     <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
                                         <LineChart accessibilityLayer data={bit10Preformance30DChartData}>
                                             <CartesianGrid vertical={false} />
-                                            <XAxis
-                                                dataKey='day'
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                stroke='#ffffff'
-                                            />
-                                            <YAxis
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickCount={3}
-                                                stroke='#ffffff'
-                                            />
+                                            <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' interval='preserveStartEnd' />
+                                            <YAxis tickLine axisLine={true} tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                         </LineChart>
@@ -366,21 +340,8 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                     <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
                                         <LineChart accessibilityLayer data={bit10Preformance60DChartData}>
                                             <CartesianGrid vertical={false} />
-                                            <XAxis
-                                                dataKey='day'
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                stroke='#ffffff'
-                                            />
-                                            <YAxis
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickCount={3}
-                                                stroke='#ffffff'
-                                            />
+                                            <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' interval='preserveStartEnd' />
+                                            <YAxis tickLine axisLine={true} tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                         </LineChart>
@@ -391,21 +352,8 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                     <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
                                         <LineChart accessibilityLayer data={bit10Preformance1YChartData}>
                                             <CartesianGrid vertical={false} />
-                                            <XAxis
-                                                dataKey='day'
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                stroke='#ffffff'
-                                            />
-                                            <YAxis
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickCount={3}
-                                                stroke='#ffffff'
-                                            />
+                                            <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={(value: string) => { const parts = value.split(' '); return parts.length >= 3 ? `${parts[0]} ${parts[2]}` : value; }} stroke='#ffffff' interval='preserveStartEnd' />
+                                            <YAxis tickLine axisLine={true} tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                         </LineChart>
@@ -416,21 +364,8 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                     <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
                                         <LineChart accessibilityLayer data={bit10Preformance3YChartData}>
                                             <CartesianGrid vertical={false} />
-                                            <XAxis
-                                                dataKey='day'
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickFormatter={(value: string) => value.slice(0, value.indexOf(','))}
-                                                stroke='#ffffff'
-                                            />
-                                            <YAxis
-                                                tickLine={true}
-                                                axisLine={true}
-                                                tickMargin={8}
-                                                tickCount={3}
-                                                stroke='#ffffff'
-                                            />
+                                            <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={(value: string) => { const parts = value.split(' '); return parts.length >= 3 ? `${parts[0]} ${parts[2]}` : value; }} stroke='#ffffff' interval='preserveStartEnd' />
+                                            <YAxis tickLine axisLine={true} tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                             <Line dataKey={tokenDataName} type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                         </LineChart>
@@ -449,50 +384,24 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                         <CardContent className='grid md:grid-cols-5 items-center'>
                             <div className='md:col-span-2'>
                                 <div className='flex-1'>
-                                    <ChartContainer
-                                        config={bit10AllocationChartConfig}
-                                        className='aspect-square max-h-[300px]'
-                                    >
+                                    <ChartContainer config={bit10AllocationChartConfig} className='aspect-square max-h-[300px]'>
                                         <PieChart>
-                                            <ChartTooltip
-                                                cursor={false}
-                                                content={<ChartTooltipContent hideLabel />}
-                                            />
-                                            <Pie
-                                                data={bit10AllocationPieChartData}
-                                                dataKey='value'
-                                                nameKey='name'
-                                                innerRadius={innerRadius}
-                                                strokeWidth={5}
-                                            >
-                                                <Label
-                                                    content={({ viewBox }) => {
-                                                        if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
-                                                            return (
-                                                                <text
-                                                                    x={viewBox.cx}
-                                                                    y={viewBox.cy}
-                                                                    textAnchor='middle'
-                                                                    dominantBaseline='middle'
-                                                                >
-                                                                    <tspan
-                                                                        x={viewBox.cx}
-                                                                        y={viewBox.cy}
-                                                                        className='fill-foreground text-xl font-bold'
-                                                                    >
-                                                                        {token_name}
-                                                                    </tspan>
-                                                                    <tspan
-                                                                        x={viewBox.cx}
-                                                                        y={(viewBox.cy ?? 0) + 24}
-                                                                        className='fill-muted-foreground'
-                                                                    >
-                                                                        Allocations
-                                                                    </tspan>
-                                                                </text>
-                                                            )
-                                                        }
-                                                    }}
+                                            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                                            <Pie data={bit10AllocationPieChartData} dataKey='value' nameKey='name' innerRadius={innerRadius} strokeWidth={5}>
+                                                <Label content={({ viewBox }) => {
+                                                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                        return (
+                                                            <text x={viewBox.cx} y={viewBox.cy} textAnchor='middle' dominantBaseline='middle'>
+                                                                <tspan x={viewBox.cx} y={viewBox.cy} className='fill-foreground text-xl font-bold'>
+                                                                    {token_name}
+                                                                </tspan>
+                                                                <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 24} className='fill-muted-foreground'>
+                                                                    Allocations
+                                                                </tspan>
+                                                            </text>
+                                                        )
+                                                    }
+                                                }}
                                                 />
                                             </Pie>
                                         </PieChart>
@@ -502,10 +411,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                             <div className='md:col-span-3'>
                                 <div className='grid md:gap-x-6'>
                                     {tokens?.sort((a, b) => b.marketCap - a.marketCap).map((token, index) => (
-                                        <div
-                                            key={index}
-                                            className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'
-                                        >
+                                        <div key={index} className='flex flex-row items-center justify-between space-x-8 hover:bg-accent p-1 rounded'>
                                             <div className='flex flex-row items-center space-x-1'>
                                                 <div
                                                     className='w-3 h-3 rounded'
