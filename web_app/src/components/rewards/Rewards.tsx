@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { Card } from '@/components/ui/card'
-import { DollarSignIcon, WalletIcon, ClockIcon, Loader2Icon, XIcon, TicketIcon } from 'lucide-react'
+import { DollarSignIcon, WalletIcon, ClockIcon, Loader2Icon, TicketIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory } from '@/lib/cashback.did'
@@ -639,10 +639,7 @@ export default function Rewards() {
 
                         <div className='text-center'>
                             {totalBIT10Tokens < 0.9 ? (
-                                <div className='flex flex-row items-center justify-center space-x-1 text-red-500'>
-                                    <XIcon size={18} />
-                                    <span>Need &gt; 0.9 BIT10.TOP for cashback.</span>
-                                </div>
+                                <div className='text-center text-red-500'>Need &gt; 0.9 BIT10.TOP for cashback.</div>
                             ) : (
                                 <p>{getClaimStatusText()}</p>
                             )}
@@ -655,7 +652,7 @@ export default function Rewards() {
                             <ul className='list-disc pl-5 mt-1 space-y-1'>
                                 {/* <li><b>Buy and Hold:</b> Keep ≥0.9 BIT10.TOP during round.</li>
                                 <li><b>Claim:</b> Do it within 24h after window opens.</li> */}
-                                <li><b>Buy & Hold (5% Cashback):</b> Hold at least 0.9 BIT10.TOP during the cashback round to earn 5% cashback. <br />
+                                <li><b>Buy & Hold:</b> Hold at least 0.9 BIT10.TOP during the cashback round to earn 5% cashback. <br />
                                     <span className='text-gray-400'>
                                         Example: Hold 2 BIT10.TOP → receive cashback equal to 5% of 2 BIT10.TOP.
                                     </span>
@@ -722,9 +719,15 @@ export default function Rewards() {
                             <Button variant='outline' className='bg-accent'>Win Chance: ~{formatCompactPercentNumber((raffleEntries && raffleEntries?.totalTickets > 0 ? raffleEntries?.userTickets / raffleEntries?.totalTickets : 0) * 100)}%</Button>
                         </div>
 
-                        <p className='text-center'>
+                        {/* <p className='text-center'>
                             No action needed - automatically entered!
-                        </p>
+                            Purchase BIT10.TOP tokens to receive Reward Pool tickets.
+                        </p> */}
+                        {raffleEntries && raffleEntries?.userTickets > 0 ? (
+                            <p className='text-center text-primary'>You are automatically entered into the Reward Pool raffle! </p>
+                        ) : (
+                            <p className='text-center'>Purchase BIT10.TOP tokens to receive Reward Pool tickets.</p>
+                        )}
                     </Card>
 
                     <Card className='border-2 p-4 flex flex-col space-y-4'>
