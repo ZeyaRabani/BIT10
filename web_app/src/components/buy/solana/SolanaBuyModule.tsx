@@ -10,6 +10,12 @@ import { Actor, HttpAgent } from '@dfinity/agent'
 import { idlFactory as buyidlFactory2 } from '@/lib/buy.did'
 import { newTokenSwap } from '@/actions/dbActions'
 
+interface SwapSuccessData {
+    cashbackAmount: string;
+    raffleTickets: string;
+    tokenOutName: string;
+}
+
 export const buyPayTokensSolana = [
     { label: 'SOL', value: 'Solana', img: SOLImg as StaticImageData, address: 'So11111111111111111111111111111111111111111', tokenType: 'SPL', slug: ['sol', 'solana'] },
 ]
@@ -110,7 +116,7 @@ export const fetchSolanaTokenBalance = async ({ tokenAddress, publicKey, decimal
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const buySolanaBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenOutAmount, tokenInAmount, solanaAddress, wallet }: { tokenInAddress: string, tokenOutAddress: string, tokenOutAmount: string, tokenInAmount: string, solanaAddress: string, wallet: any }) => {
+export const buySolanaBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenOutAmount, tokenInAmount, solanaAddress, wallet, onSuccess }: { tokenInAddress: string, tokenOutAddress: string, tokenOutAmount: string, tokenInAmount: string, solanaAddress: string, wallet: any, onSuccess?: (data: SwapSuccessData) => void; }) => {
     try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (!wallet.connected || !wallet.publicKey || !wallet.signTransaction) {
@@ -368,6 +374,30 @@ export const buySolanaBIT10Token = async ({ tokenInAddress, tokenOutAddress, tok
 
             if (result === 'Token swap successfully') {
                 toast.success('Token swap was successful!');
+
+                const tokenInUSDAmount = parseFloat(
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    transfer.Ok.token_in_usd_amount.toString()
+                );
+                const cashbackAmount = ((tokenInUSDAmount / 1.01) * 0.05).toFixed(2);
+
+                const successData: SwapSuccessData = {
+                    cashbackAmount,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    raffleTickets: transfer.Ok.token_out_amount.toString(),
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+                    tokenOutName: getTokenName(transfer.Ok.token_out_address),
+                };
+
+                if (onSuccess) {
+                    onSuccess(successData);
+                }
             } else {
                 toast.error('An error occurred while processing your request. Please try again!');
             }

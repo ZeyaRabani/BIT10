@@ -28,6 +28,7 @@ import { Input } from '@/components/ui/input'
 import Image, { type StaticImageData } from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 
 interface BuyModuleProps {
     onSwitchToSell: () => void;
@@ -44,6 +45,12 @@ interface BuyingTokenPriceResponse {
         currency: string;
     };
 };
+
+interface SwapSuccessData {
+    cashbackAmount: string;
+    raffleTickets: string;
+    tokenOutName: string;
+}
 
 const FormSchema = z.object({
     payment_token: z.string({
@@ -68,6 +75,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const [payingTokenAddress, setPayingTokenAddress] = useState<string>('');
     const [receiveTokenDialogOpen, setReceiveTokenDialogOpen] = useState(false);
     const [receiveTokenSearch, setReceiveTokenSearch] = useState('');
+    const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+    const [swapSuccessData, setSwapSuccessData] = useState<SwapSuccessData | null>(null);
 
     const { chain } = useChain();
     const { icpAddress } = useICPWallet();
@@ -414,23 +423,28 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
             const rawTokenInAmount = ((values.receive_amount * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01); // 1% Management fee
             const tokenInAmount = isNaN(rawTokenInAmount) ? 0 : Number(rawTokenInAmount);
 
+            const handleSuccess = (data: SwapSuccessData) => {
+                setSwapSuccessData(data);
+                setSuccessDialogOpen(true);
+            };
+
             if (chain === 'icp') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await buyICPBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount.toString(), tokenInAmount: tokenInAmount.toString(), icpAddress: icpAddress! });
+                await buyICPBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount.toString(), tokenInAmount: tokenInAmount.toString(), icpAddress: icpAddress!, onSuccess: handleSuccess });
             } else if (chain === 'base') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await buyBaseBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount.toString(), tokenInAmount: tokenInAmount.toString(), baseAddress: evmAddress! });
+                await buyBaseBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount.toString(), tokenInAmount: tokenInAmount.toString(), baseAddress: evmAddress!, onSuccess: handleSuccess });
             } else if (chain === 'solana') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                await buySolanaBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount.toString(), tokenInAmount: tokenInAmount.toString(), solanaAddress: wallet.publicKey?.toBase58(), wallet: wallet });
+                await buySolanaBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount.toString(), tokenInAmount: tokenInAmount.toString(), solanaAddress: wallet.publicKey?.toBase58(), wallet: wallet, onSuccess: handleSuccess });
             } else if (chain === 'bsc') {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                await buyBSCBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount.toString(), tokenInAmount: tokenInAmount.toString(), bscAddress: evmAddress! });
+                await buyBSCBIT10Token({ tokenInAddress: selectedPaymentToken?.address, tokenOutAddress: selectedReceiveToken?.address, tokenOutAmount: values.receive_amount.toString(), tokenInAmount: tokenInAmount.toString(), bscAddress: evmAddress!, onSuccess: handleSuccess });
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
@@ -509,7 +523,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     return (
         <>
             {/* {isLoading ? ( */}
-                {/* <div className='flex flex-col-reverse space-y-2 md:space-y-0 lg:grid lg:grid-cols-5 gap-4'>
+            {/* <div className='flex flex-col-reverse space-y-2 md:space-y-0 lg:grid lg:grid-cols-5 gap-4'>
                     <div className='flex flex-col space-y-2 lg:space-y-4 lg:col-span-3'>
                         <Card className='border-none animate-fade-left'>
                             <CardHeader>
@@ -551,379 +565,428 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                     </div>
                 </div>
             ) : ( */}
-                <div className='flex flex-col-reverse space-y-2 md:space-y-0 lg:grid lg:grid-cols-5 gap-4'>
-                    <div className='lg:col-span-3'>
-                        <TokenDetails token_price={selectedBIT10TokenPrice} token_name={form.watch('receive_token')} token_list={selectedBIT10Tokens} />
-                    </div>
+            <div className='flex flex-col-reverse space-y-2 md:space-y-0 lg:grid lg:grid-cols-5 gap-4'>
+                <div className='lg:col-span-3'>
+                    <TokenDetails token_price={selectedBIT10TokenPrice} token_name={form.watch('receive_token')} token_list={selectedBIT10Tokens} />
+                </div>
 
-                    <div className='md:col-span-2'>
-                        <Card className='border-none animate-fade-right'>
-                            <CardHeader>
-                                <CardTitle>Buy</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <Form {...form}>
-                                    <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off' className='flex flex-col space-y-2'>
-                                        <div className='relative flex flex-col items-center'>
-                                            <div className='bg-muted rounded-t-lg w-full px-4 py-2 flex flex-col space-y-2'>
-                                                <div className='flex flex-row space-x-2 justify-between items-center'>
-                                                    <div>You Pay</div>
-                                                    {
-                                                        chain &&
-                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
-                                                            <div className='font-light'>From</div>
-                                                            <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
-                                                        </Badge>
-                                                    }
-                                                </div>
-                                                {/* <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 bg-red-500'> */}
-                                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2'>
-                                                    <div className='flex flex-col space-y-0.5'>
-                                                        {/* <div className='text-4xl text-center md:text-start text-wrap pt-[3px] bg-blue-500'> */}
-                                                        <div className='text-4xl text-center md:text-start text-wrap pt-[3px]'>
-                                                            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                                                            {/* @ts-expect-error */}
-                                                            {selectedBIT10TokenPrice ? formatCompactNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01) : '0'}
-                                                        </div>
-                                                        {/* <div className='pt-[0.5px] text-center md:text-start bg-green-500'> */}
-                                                        <div className='pt-[0.5px] text-center md:text-start'>
-                                                            <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
-                                                                &asymp; ${selectedBIT10TokenPrice ? formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 1.01) : '0'}
-                                                                <TooltipProvider>
-                                                                    <Tooltip delayDuration={300}>
-                                                                        <TooltipTrigger asChild>
-                                                                            <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                                            Price of {form.watch('payment_token')} (in USD) + 1% Management fee <br />
-                                                                            $ {formatCompactPercentNumber(form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatCompactPercentNumber(0.01 * (form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0'))))}
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                </TooltipProvider>
-                                                            </div>
+                <div className='md:col-span-2'>
+                    <Card className='border-none animate-fade-right'>
+                        <CardHeader>
+                            <CardTitle>Buy</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} autoComplete='off' className='flex flex-col space-y-2'>
+                                    <div className='relative flex flex-col items-center'>
+                                        <div className='bg-muted rounded-t-lg w-full px-4 py-2 flex flex-col space-y-2'>
+                                            <div className='flex flex-row space-x-2 justify-between items-center'>
+                                                <div>You Pay</div>
+                                                {
+                                                    chain &&
+                                                    <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
+                                                        <div className='font-light'>From</div>
+                                                        <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
+                                                    </Badge>
+                                                }
+                                            </div>
+                                            {/* <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 bg-red-500'> */}
+                                            <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2'>
+                                                <div className='flex flex-col space-y-0.5'>
+                                                    {/* <div className='text-4xl text-center md:text-start text-wrap pt-[3px] bg-blue-500'> */}
+                                                    <div className='text-4xl text-center md:text-start text-wrap pt-[3px]'>
+                                                        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                                                        {/* @ts-expect-error */}
+                                                        {selectedBIT10TokenPrice ? formatCompactNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / parseFloat(payingTokenPrice) * 1.01) : '0'}
+                                                    </div>
+                                                    {/* <div className='pt-[0.5px] text-center md:text-start bg-green-500'> */}
+                                                    <div className='pt-[0.5px] text-center md:text-start'>
+                                                        <div className='flex flex-row space-x-1 text-sm items-center justify-center md:justify-start pt-0.5'>
+                                                            &asymp; ${selectedBIT10TokenPrice ? formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 1.01) : '0'}
+                                                            <TooltipProvider>
+                                                                <Tooltip delayDuration={300}>
+                                                                    <TooltipTrigger asChild>
+                                                                        <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                                        Price of {form.watch('payment_token')} (in USD) + 1% Management fee <br />
+                                                                        $ {formatCompactPercentNumber(form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? 'N/A'))} + $ {formatCompactPercentNumber(0.01 * (form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')))} = $ {formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0')) + (0.01 * (form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice?.toFixed(4) ?? '0'))))}
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
                                                         </div>
                                                     </div>
-                                                    <div className='flex flex-col space-y-0.5'>
-                                                        <FormField
-                                                            control={form.control}
-                                                            name='payment_token'
-                                                            render={({ field }) => (
-                                                                // <FormItem className='flex flex-row items-center justify-end bg-blue-500'>
-                                                                <FormItem className='flex flex-row items-center justify-end'>
-                                                                    <FormControl>
-                                                                        <div className='w-full md:w-3/4 md:ml-auto'>
-                                                                            <Button
-                                                                                type='button'
-                                                                                variant='outline'
-                                                                                className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
-                                                                                onClick={() => setPaymentTokenDialogOpen(true)}
-                                                                            >
-                                                                                {field.value
-                                                                                    ?
-                                                                                    <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
-                                                                                        <div className='border border-[#B4B3B3] rounded-full bg-black'>
-                                                                                            <Image src={payingTokenImg} alt={form.watch('payment_token')} width={35} height={35} className='z-20' />
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            {currentPaymentTokens.find((t) => t.value === field.value)?.label}
-                                                                                        </div>
+                                                </div>
+                                                <div className='flex flex-col space-y-0.5'>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name='payment_token'
+                                                        render={({ field }) => (
+                                                            // <FormItem className='flex flex-row items-center justify-end bg-blue-500'>
+                                                            <FormItem className='flex flex-row items-center justify-end'>
+                                                                <FormControl>
+                                                                    <div className='w-full md:w-3/4 md:ml-auto'>
+                                                                        <Button
+                                                                            type='button'
+                                                                            variant='outline'
+                                                                            className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
+                                                                            onClick={() => setPaymentTokenDialogOpen(true)}
+                                                                        >
+                                                                            {field.value
+                                                                                ?
+                                                                                <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
+                                                                                    <div className='border border-[#B4B3B3] rounded-full bg-black'>
+                                                                                        <Image src={payingTokenImg} alt={form.watch('payment_token')} width={35} height={35} className='z-20' />
                                                                                     </div>
-                                                                                    : 'Select token'}
-                                                                                <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
-                                                                            </Button>
-                                                                            <Dialog open={paymentTokenDialogOpen} onOpenChange={setPaymentTokenDialogOpen}>
-                                                                                <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
-                                                                                    <DialogHeader>
-                                                                                        <DialogTitle>Select Payment Token</DialogTitle>
-                                                                                    </DialogHeader>
-                                                                                    <Input
-                                                                                        placeholder='Search tokens'
-                                                                                        value={paymentTokenSearch}
-                                                                                        onChange={(e) => setPaymentTokenSearch(e.target.value)}
-                                                                                        className='border-[#B4B3B3]'
-                                                                                    />
-                                                                                    <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
-                                                                                        {filteredPaymentTokens.length === 0 ? (
-                                                                                            <div className='text-center text-gray-500 py-4'>No token found.</div>
-                                                                                        ) : (
-                                                                                            filteredPaymentTokens.map((token) => (
-                                                                                                <Button
-                                                                                                    key={token.value}
-                                                                                                    variant='ghost'
-                                                                                                    className='flex flex-row items-center justify-between py-6 px-2'
-                                                                                                    onClick={() => {
-                                                                                                        field.onChange(token.value);
-                                                                                                        setPaymentTokenDialogOpen(false);
-                                                                                                        setPaymentTokenSearch('');
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <div className='flex flex-row items-center justify-start space-x-1'>
-                                                                                                        <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-white'>
-                                                                                                            <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
-                                                                                                        </div>
-                                                                                                        <div className='flex flex-col items-start tracking-wide'>
-                                                                                                            <div>{token.label}</div>
-                                                                                                            <div>{formatAddress(token.address)}</div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    <div>
-                                                                                                        <Badge variant='outline' className='border-muted-foreground'>{token.tokenType}</Badge>
-                                                                                                    </div>
-                                                                                                </Button>
-                                                                                            ))
-                                                                                        )}
+                                                                                    <div>
+                                                                                        {currentPaymentTokens.find((t) => t.value === field.value)?.label}
                                                                                     </div>
-                                                                                </DialogContent>
-                                                                            </Dialog>
-                                                                        </div>
-                                                                    </FormControl>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                        {/* <div className='text-sm text-center md:text-end pt-0.5 bg-green-500'> */}
-                                                        <div className='text-sm text-center md:text-end pt-0.5'>
-                                                            {formatCompactNumber(Number(payingTokenBalance))}
-                                                        </div>
+                                                                                </div>
+                                                                                : 'Select token'}
+                                                                            <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                                        </Button>
+                                                                        <Dialog open={paymentTokenDialogOpen} onOpenChange={setPaymentTokenDialogOpen}>
+                                                                            <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
+                                                                                <DialogHeader>
+                                                                                    <DialogTitle>Select Payment Token</DialogTitle>
+                                                                                </DialogHeader>
+                                                                                <Input
+                                                                                    placeholder='Search tokens'
+                                                                                    value={paymentTokenSearch}
+                                                                                    onChange={(e) => setPaymentTokenSearch(e.target.value)}
+                                                                                    className='border-[#B4B3B3]'
+                                                                                />
+                                                                                <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
+                                                                                    {filteredPaymentTokens.length === 0 ? (
+                                                                                        <div className='text-center text-gray-500 py-4'>No token found.</div>
+                                                                                    ) : (
+                                                                                        filteredPaymentTokens.map((token) => (
+                                                                                            <Button
+                                                                                                key={token.value}
+                                                                                                variant='ghost'
+                                                                                                className='flex flex-row items-center justify-between py-6 px-2'
+                                                                                                onClick={() => {
+                                                                                                    field.onChange(token.value);
+                                                                                                    setPaymentTokenDialogOpen(false);
+                                                                                                    setPaymentTokenSearch('');
+                                                                                                }}
+                                                                                            >
+                                                                                                <div className='flex flex-row items-center justify-start space-x-1'>
+                                                                                                    <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-white'>
+                                                                                                        <Image src={token.img} alt={token.label} width={35} height={35} className='rounded-full bg-white' />
+                                                                                                    </div>
+                                                                                                    <div className='flex flex-col items-start tracking-wide'>
+                                                                                                        <div>{token.label}</div>
+                                                                                                        <div>{formatAddress(token.address)}</div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    <Badge variant='outline' className='border-muted-foreground'>{token.tokenType}</Badge>
+                                                                                                </div>
+                                                                                            </Button>
+                                                                                        ))
+                                                                                    )}
+                                                                                </div>
+                                                                            </DialogContent>
+                                                                        </Dialog>
+                                                                    </div>
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    {/* <div className='text-sm text-center md:text-end pt-0.5 bg-green-500'> */}
+                                                    <div className='text-sm text-center md:text-end pt-0.5'>
+                                                        {formatCompactNumber(Number(payingTokenBalance))}
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 rounded-full p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' onClick={onSwitchToSell} disabled={buying}>
-                                                <ArrowUpDown className='h-8 w-8 transition-transform duration-700 group-hover:rotate-[180deg]' />
-                                            </Button>
+                                        <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 rounded-full p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' onClick={onSwitchToSell} disabled={buying}>
+                                            <ArrowUpDown className='h-8 w-8 transition-transform duration-700 group-hover:rotate-[180deg]' />
+                                        </Button>
 
-                                            <div className='bg-muted rounded-b-lg w-full px-4 py-2 flex flex-col space-y-2 -mt-6 md:mt-2'>
-                                                <div className='flex flex-row space-x-2 justify-between items-center'>
-                                                    <div>You Receive</div>
-                                                    {
-                                                        chain &&
-                                                        <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
-                                                            <div className='font-light'>To</div>
-                                                            <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
-                                                        </Badge>
-                                                    }
-                                                </div>
-                                                {/* <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 bg-red-500'> */}
-                                                <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2'>
-                                                    <div className='flex flex-col space-y-0.5'>
-                                                        <FormField
-                                                            control={form.control}
-                                                            name='receive_amount'
-                                                            render={({ field }) => {
-                                                                const numericValue = field.value ?? 1;
-                                                                const handleIncrement = () => {
-                                                                    if (numericValue < 8) field.onChange(numericValue + 1);
-                                                                };
-                                                                const handleDecrement = () => {
-                                                                    if (numericValue > 1) field.onChange(numericValue - 1);
-                                                                };
-                                                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                                    const value = parseInt(e.target.value, 10) || 1;
-                                                                    const clampedValue = Math.min(Math.max(value, 1), 8);
-                                                                    field.onChange(clampedValue);
-                                                                };
-                                                                const handleBlur = () => {
-                                                                    const clampedValue = Math.max(1, Math.min(numericValue, 8));
-                                                                    field.onChange(clampedValue);
-                                                                };
-                                                                return (
-                                                                    // <FormItem className='bg-blue-500'>
-                                                                    <FormItem>
-                                                                        <div className='flex items-center justify-between rounded-full gap-1 border-2 border-[#B4B3B3] bg-background! md:w-3/4'>
-                                                                            <Button type='button' variant='ghost' onClick={handleDecrement} disabled={numericValue <= 1}>-</Button>
-                                                                            <Input type='number' min='1' max='8' step='1' value={numericValue} onChange={handleChange} onBlur={handleBlur} className='text-center focus-visible:ring-0 focus-visible:ring-offset-0 bg-accent' />
-                                                                            <Button type='button' variant='ghost' onClick={handleIncrement} disabled={numericValue >= 8}>+</Button>
-                                                                        </div>
-                                                                        <FormMessage />
-                                                                    </FormItem>
-                                                                );
-                                                            }}
-                                                        />
-                                                        {/* <div className='text-center md:text-start bg-green-500'> */}
-                                                        <div className='text-center md:text-start'>
-                                                            <div> &asymp; ${formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(4))))}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className='flex flex-col space-y-0.5'>
-                                                        <FormField
-                                                            control={form.control}
-                                                            name='receive_token'
-                                                            render={({ field }) => (
+                                        <div className='bg-muted rounded-b-lg w-full px-4 py-2 flex flex-col space-y-2 -mt-6 md:mt-2'>
+                                            <div className='flex flex-row space-x-2 justify-between items-center'>
+                                                <div>You Receive</div>
+                                                {
+                                                    chain &&
+                                                    <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row space-x-1 items-center justify-center border-muted-foreground'>
+                                                        <div className='font-light'>To</div>
+                                                        <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
+                                                    </Badge>
+                                                }
+                                            </div>
+                                            {/* <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 bg-red-500'> */}
+                                            <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2'>
+                                                <div className='flex flex-col space-y-0.5'>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name='receive_amount'
+                                                        render={({ field }) => {
+                                                            const numericValue = field.value ?? 1;
+                                                            const handleIncrement = () => {
+                                                                if (numericValue < 8) field.onChange(numericValue + 1);
+                                                            };
+                                                            const handleDecrement = () => {
+                                                                if (numericValue > 1) field.onChange(numericValue - 1);
+                                                            };
+                                                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                const value = parseInt(e.target.value, 10) || 1;
+                                                                const clampedValue = Math.min(Math.max(value, 1), 8);
+                                                                field.onChange(clampedValue);
+                                                            };
+                                                            const handleBlur = () => {
+                                                                const clampedValue = Math.max(1, Math.min(numericValue, 8));
+                                                                field.onChange(clampedValue);
+                                                            };
+                                                            return (
                                                                 // <FormItem className='bg-blue-500'>
                                                                 <FormItem>
-                                                                    <FormControl>
-                                                                        <div className='w-full md:w-3/4 md:ml-auto'>
-                                                                            <Button
-                                                                                type='button'
-                                                                                variant='outline'
-                                                                                className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
-                                                                                onClick={() => setReceiveTokenDialogOpen(true)}
-                                                                            >
-                                                                                {field.value
-                                                                                    ?
-                                                                                    <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
-                                                                                        <div className='border border-[#B4B3B3] rounded-full bg-black'>
-                                                                                            <Image src={BIT10Img as StaticImageData} alt='BIT10' width={35} height={35} className='z-20' />
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            {currentBIT10Tokens.find((t) => t.value === field.value)?.label}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    : 'Select token'}
-                                                                                <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
-                                                                            </Button>
-                                                                            <Dialog open={receiveTokenDialogOpen} onOpenChange={setReceiveTokenDialogOpen}>
-                                                                                <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
-                                                                                    <DialogHeader>
-                                                                                        <DialogTitle>Select Receive Token</DialogTitle>
-                                                                                    </DialogHeader>
-                                                                                    <Input
-                                                                                        placeholder='Search tokens'
-                                                                                        value={receiveTokenSearch}
-                                                                                        onChange={(e) => setReceiveTokenSearch(e.target.value)}
-                                                                                        className='border-[#B4B3B3]'
-                                                                                    />
-                                                                                    <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
-                                                                                        {filteredReceiveTokens.length === 0 ? (
-                                                                                            <div className='text-center text-gray-500 py-4'>No token found.</div>
-                                                                                        ) : (
-                                                                                            filteredReceiveTokens.map((token) => (
-                                                                                                <Button
-                                                                                                    key={token.value}
-                                                                                                    variant='ghost'
-                                                                                                    className='flex flex-row items-center justify-between py-6 px-2'
-                                                                                                    onClick={() => {
-                                                                                                        field.onChange(token.value);
-                                                                                                        setReceiveTokenDialogOpen(false);
-                                                                                                        setReceiveTokenSearch('');
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <div className='flex flex-row items-center justify-start space-x-1'>
-                                                                                                        <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-black p-0.5'>
-                                                                                                            <Image src={token.img} alt={token.label} width={35} height={35} />
-                                                                                                        </div>
-                                                                                                        <div className='flex flex-col items-start tracking-wide'>
-                                                                                                            <div>{token.label}</div>
-                                                                                                            <div>{formatAddress(token.address)}</div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    <div>
-                                                                                                        <Badge variant='outline' className='border-muted-foreground'>{token.tokenType}</Badge>
-                                                                                                    </div>
-                                                                                                </Button>
-                                                                                            ))
-                                                                                        )}
-                                                                                    </div>
-                                                                                </DialogContent>
-                                                                            </Dialog>
-                                                                        </div>
-                                                                    </FormControl>
+                                                                    <div className='flex items-center justify-between rounded-full gap-1 border-2 border-[#B4B3B3] bg-background! md:w-3/4'>
+                                                                        <Button type='button' variant='ghost' onClick={handleDecrement} disabled={numericValue <= 1}>-</Button>
+                                                                        <Input type='number' min='1' max='8' step='1' value={numericValue} onChange={handleChange} onBlur={handleBlur} className='text-center focus-visible:ring-0 focus-visible:ring-offset-0 bg-accent' />
+                                                                        <Button type='button' variant='ghost' onClick={handleIncrement} disabled={numericValue >= 8}>+</Button>
+                                                                    </div>
                                                                     <FormMessage />
                                                                 </FormItem>
-                                                            )}
-                                                        />
+                                                            );
+                                                        }}
+                                                    />
+                                                    {/* <div className='text-center md:text-start bg-green-500'> */}
+                                                    <div className='text-center md:text-start'>
+                                                        <div> &asymp; ${formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(4))))}</div>
                                                     </div>
+                                                </div>
+                                                <div className='flex flex-col space-y-0.5'>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name='receive_token'
+                                                        render={({ field }) => (
+                                                            // <FormItem className='bg-blue-500'>
+                                                            <FormItem>
+                                                                <FormControl>
+                                                                    <div className='w-full md:w-3/4 md:ml-auto'>
+                                                                        <Button
+                                                                            type='button'
+                                                                            variant='outline'
+                                                                            className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
+                                                                            onClick={() => setReceiveTokenDialogOpen(true)}
+                                                                        >
+                                                                            {field.value
+                                                                                ?
+                                                                                <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
+                                                                                    <div className='border border-[#B4B3B3] rounded-full bg-black'>
+                                                                                        <Image src={BIT10Img as StaticImageData} alt='BIT10' width={35} height={35} className='z-20' />
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        {currentBIT10Tokens.find((t) => t.value === field.value)?.label}
+                                                                                    </div>
+                                                                                </div>
+                                                                                : 'Select token'}
+                                                                            <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                                        </Button>
+                                                                        <Dialog open={receiveTokenDialogOpen} onOpenChange={setReceiveTokenDialogOpen}>
+                                                                            <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
+                                                                                <DialogHeader>
+                                                                                    <DialogTitle>Select Receive Token</DialogTitle>
+                                                                                </DialogHeader>
+                                                                                <Input
+                                                                                    placeholder='Search tokens'
+                                                                                    value={receiveTokenSearch}
+                                                                                    onChange={(e) => setReceiveTokenSearch(e.target.value)}
+                                                                                    className='border-[#B4B3B3]'
+                                                                                />
+                                                                                <div className='flex flex-col space-y-2 max-h-60 overflow-y-auto py-2'>
+                                                                                    {filteredReceiveTokens.length === 0 ? (
+                                                                                        <div className='text-center text-gray-500 py-4'>No token found.</div>
+                                                                                    ) : (
+                                                                                        filteredReceiveTokens.map((token) => (
+                                                                                            <Button
+                                                                                                key={token.value}
+                                                                                                variant='ghost'
+                                                                                                className='flex flex-row items-center justify-between py-6 px-2'
+                                                                                                onClick={() => {
+                                                                                                    field.onChange(token.value);
+                                                                                                    setReceiveTokenDialogOpen(false);
+                                                                                                    setReceiveTokenSearch('');
+                                                                                                }}
+                                                                                            >
+                                                                                                <div className='flex flex-row items-center justify-start space-x-1'>
+                                                                                                    <div className='hidden md:block border-2 border-[#B4B3B3] rounded-full bg-black p-0.5'>
+                                                                                                        <Image src={token.img} alt={token.label} width={35} height={35} />
+                                                                                                    </div>
+                                                                                                    <div className='flex flex-col items-start tracking-wide'>
+                                                                                                        <div>{token.label}</div>
+                                                                                                        <div>{formatAddress(token.address)}</div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    <Badge variant='outline' className='border-muted-foreground'>{token.tokenType}</Badge>
+                                                                                                </div>
+                                                                                            </Button>
+                                                                                        ))
+                                                                                    )}
+                                                                                </div>
+                                                                            </DialogContent>
+                                                                        </Dialog>
+                                                                    </div>
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div className='rounded-lg px-4 py-2 bg-muted flex flex-col space-y-1 text-sm'>
-                                            <div className='font-medium text-lg'>Summary</div>
-                                            <div className='h-0.5 w-full bg-muted-foreground'></div>
-                                            <div className='flex flex-row items-center justify-between space-x-2'>
-                                                <div>Management Fee</div>
-                                                <TooltipProvider>
-                                                    <Tooltip delayDuration={300}>
-                                                        <TooltipTrigger asChild>
-                                                            <div className='flex flex-row space-x-1 items-center'>
-                                                                <div>1%</div>
-                                                                <div>
-                                                                    <Info className='size-3 align-middle relative bottom-[1px] cursor-pointer' />
-                                                                </div>
+                                    <div className='rounded-lg px-4 py-2 bg-muted flex flex-col space-y-1 text-sm'>
+                                        <div className='font-medium text-lg'>Summary</div>
+                                        <div className='h-0.5 w-full bg-muted-foreground'></div>
+                                        <div className='flex flex-row items-center justify-between space-x-2'>
+                                            <div>Management Fee</div>
+                                            <TooltipProvider>
+                                                <Tooltip delayDuration={300}>
+                                                    <TooltipTrigger asChild>
+                                                        <div className='flex flex-row space-x-1 items-center'>
+                                                            <div>1%</div>
+                                                            <div>
+                                                                <Info className='size-3 align-middle relative bottom-[1px] cursor-pointer' />
                                                             </div>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                            The Management Fee covers the cost of managing and rebalancing the token
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                            </div>
-                                            <div className='flex flex-row items-center justify-between space-x-2'>
-                                                <div>Exchange Rate</div>
-                                                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                                                {/* @ts-expect-error */}
-                                                <div>1 {form.watch('payment_token')} = {selectedBIT10TokenPrice > 0 ? formatCompactNumber(parseFloat(payingTokenPrice) / selectedBIT10TokenPrice) : '0'} {form.watch('receive_token')}</div>
-                                            </div>
-                                            <div className='flex flex-row items-center justify-between space-x-2'>
-                                                <div>Expected Time</div>
-                                                <div>1-2 min.</div>
-                                            </div>
-                                            <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
-                                                <div>Expected Output</div>
-                                                <div>{formatCompactNumber(form.watch('receive_amount'))} {form.watch('receive_token')}</div>
-                                            </div>
+                                                        </div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                        The Management Fee covers the cost of managing and rebalancing the token
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         </div>
+                                        <div className='flex flex-row items-center justify-between space-x-2'>
+                                            <div>Exchange Rate</div>
+                                            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                                            {/* @ts-expect-error */}
+                                            <div>1 {form.watch('payment_token')} = {selectedBIT10TokenPrice > 0 ? formatCompactNumber(parseFloat(payingTokenPrice) / selectedBIT10TokenPrice) : '0'} {form.watch('receive_token')}</div>
+                                        </div>
+                                        <div className='flex flex-row items-center justify-between space-x-2'>
+                                            <div>Expected Time</div>
+                                            <div>1-2 min.</div>
+                                        </div>
+                                        <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
+                                            <div>Expected Output</div>
+                                            <div>{formatCompactNumber(form.watch('receive_amount'))} {form.watch('receive_token')}</div>
+                                        </div>
+                                    </div>
 
-                                        <div className='py-2'>
-                                            <motion.div className='p-[1.5px] rounded-lg' animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }} style={{ background: 'linear-gradient(270deg, #FFEA00, #FFFFFF, #FFEA00)', backgroundSize: '300% 300%' }} transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}>
-                                                <div className='relative rounded-lg px-4 py-2 bg-muted flex flex-col space-y-1'>
-                                                    <motion.div className='absolute -top-3 right-3 items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold text-black' style={{ background: 'linear-gradient(270deg, #FFEA00, #FFFFFF, #FFEA00)', backgroundSize: '300% 300%' }} animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }} transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}>
-                                                        Limited time
-                                                    </motion.div>
-                                                    <div className='flex flex-row items-center justify-between'>
-                                                        <div className='flex flex-row items-center space-x-1'>
-                                                            <div>Estimated 5% Cashback</div>
-                                                            <TooltipProvider>
-                                                                <Tooltip delayDuration={300}>
-                                                                    <TooltipTrigger asChild>
-                                                                        <Info className='size-3 align-middle relative cursor-pointer' />
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                                        Approximate {chain === 'icp' ? 'ckUSDC' : 'USDC'} you&apos;ll receive based on the amount of tokens purchased.
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                            </TooltipProvider>
-                                                        </div>
-                                                        <div>{selectedBIT10TokenPrice ? formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 0.05) : '0'} {chain === 'icp' ? 'ckUSDC' : 'USDC'}</div>
+                                    <div className='py-2'>
+                                        <motion.div className='p-[1.5px] rounded-lg' animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }} style={{ background: 'linear-gradient(270deg, #FFEA00, #FFFFFF, #FFEA00)', backgroundSize: '300% 300%' }} transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}>
+                                            <div className='relative rounded-lg px-4 py-2 bg-muted flex flex-col space-y-1'>
+                                                <motion.div className='absolute -top-3 right-3 items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold text-black' style={{ background: 'linear-gradient(270deg, #FFEA00, #FFFFFF, #FFEA00)', backgroundSize: '300% 300%' }} animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }} transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}>
+                                                    Limited time
+                                                </motion.div>
+                                                <div className='flex flex-row items-center justify-between'>
+                                                    <div className='flex flex-row items-center space-x-1'>
+                                                        <div>Estimated 5% Cashback</div>
+                                                        <TooltipProvider>
+                                                            <Tooltip delayDuration={300}>
+                                                                <TooltipTrigger asChild>
+                                                                    <Info className='size-3 align-middle relative cursor-pointer' />
+                                                                </TooltipTrigger>
+                                                                <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                                    Approximate {chain === 'icp' ? 'ckUSDC' : 'USDC'} you&apos;ll receive based on the amount of tokens purchased.
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
                                                     </div>
-                                                    <div className='flex flex-row items-center justify-between'>
-                                                        <div className='flex flex-row items-center space-x-1'>
-                                                            <div>Reward Pool Entries</div>
-                                                            <TooltipProvider>
-                                                                <Tooltip delayDuration={300}>
-                                                                    <TooltipTrigger asChild>
-                                                                        <Info className='size-3 align-middle relative cursor-pointer' />
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                                        Each token you buy counts as one entry into the Reward Pool raffle.
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                            </TooltipProvider>
-                                                        </div>
-                                                        <div>{form.watch('receive_amount')} {form.watch('receive_amount') > 1 ? 'Tickets' : 'Ticket'}</div>
-                                                    </div>
+                                                    <div>{selectedBIT10TokenPrice ? formatCompactPercentNumber((form.watch('receive_amount') * parseFloat(selectedBIT10TokenPrice.toFixed(4))) * 0.05) : '0'} {chain === 'icp' ? 'ckUSDC' : 'USDC'}</div>
                                                 </div>
-                                            </motion.div>
-                                        </div>
+                                                <div className='flex flex-row items-center justify-between'>
+                                                    <div className='flex flex-row items-center space-x-1'>
+                                                        <div>Reward Pool Entries</div>
+                                                        <TooltipProvider>
+                                                            <Tooltip delayDuration={300}>
+                                                                <TooltipTrigger asChild>
+                                                                    <Info className='size-3 align-middle relative cursor-pointer' />
+                                                                </TooltipTrigger>
+                                                                <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                                    Each token you buy counts as one entry into the Reward Pool raffle.
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    </div>
+                                                    <div>{form.watch('receive_amount')} {form.watch('receive_amount') > 1 ? 'Tickets' : 'Ticket'}</div>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    </div>
 
-                                        {/* {chain && !isApproved && (
+                                    {/* {chain && !isApproved && (
                                             <div className='border-muted border rounded-lg flex flex-col items-center space-y-2 px-2 py-4 text-center'>
                                                 <div>The Buy BIT10 page is gated for mainnet access. Your Wallet Address needs to be approved first to use the Buy BIT10 feature.</div>
                                                 <div>For access, please contact <a href='https://x.com/bit10startup' className='text-primary underline'>@bit10startup</a> on Twitter/X.</div>
                                             </div>
                                         )} */}
 
-                                        <Button className='w-full' disabled={buyDisabledConditions}>
-                                            {buying && <Loader2 className='animate-spin mr-2' size={15} />}
-                                            {getBuyMessage()}
-                                        </Button>
-                                    </form>
-                                </Form>
-                            </CardContent>
-                        </Card>
-                    </div>
+                                    <Button className='w-full' disabled={buyDisabledConditions}>
+                                        {buying && <Loader2 className='animate-spin mr-2' size={15} />}
+                                        {getBuyMessage()}
+                                    </Button>
+                                </form>
+                            </Form>
+                        </CardContent>
+                    </Card>
                 </div>
+
+                <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+                    <DialogContent className='sm:max-w-md max-w-[90vw] rounded-md'>
+                        <DialogHeader>
+                            <DialogTitle className='text-2xl text-center'>
+                                🎉 Congratulations! 🎉
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className='flex flex-col space-y-4 py-4'>
+                            <p className='text-center text-lg'>
+                                You have successfully purchased {swapSuccessData?.tokenOutName} tokens!
+                            </p>
+
+                            <div className='bg-muted rounded-lg p-4 space-y-3'>
+                                <div className='flex flex-col space-y-1'>
+                                    <div className='text-sm text-muted-foreground'>
+                                        Estimated Cashback
+                                    </div>
+                                    <div className='text-xl font-semibold'>
+                                        ${swapSuccessData?.cashbackAmount} USDC
+                                    </div>
+                                </div>
+
+                                <div className='h-px bg-border' />
+
+                                <div className='flex flex-col space-y-1'>
+                                    <div className='text-sm text-muted-foreground'>
+                                        Raffle Tickets
+                                    </div>
+                                    <div className='text-xl font-semibold'>
+                                        {swapSuccessData?.raffleTickets} {Number(swapSuccessData?.raffleTickets) === 1 ? 'Ticket' : 'Tickets'}
+                                    </div>
+                                    <p className='text-xs text-muted-foreground'>
+                                        You are automatically entered into the raffle
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className='text-sm text-center text-muted-foreground'>
+                                Visit the <Link href='/rewards' className='text-primary underline font-medium' onClick={() => setSuccessDialogOpen(false)}>Rewards</Link>{' '} page to learn more about your cashback and raffle entries.
+                            </p>
+
+                            <Button onClick={() => setSuccessDialogOpen(false)} className='w-full'>
+                                Got it!
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+            </div>
             {/* )} */}
         </>
     )

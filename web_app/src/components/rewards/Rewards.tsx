@@ -592,7 +592,7 @@ export default function Rewards() {
                             <DollarSignIcon strokeWidth={2.5} size='24' />
                             <span className='text-lg md:text-xl'>Current Reward Pool</span>
                         </div>
-                        <div className='text-4xl font-semibold'>100 {chain == 'icp' ? 'ckUSC' : 'USDC'}</div>
+                        <div className='text-4xl font-semibold'>100 {chain == 'icp' ? 'ckUSDC' : 'USDC'}</div>
                     </Card>
 
                     <Card className='border-2 p-4 flex flex-col space-y-2'>

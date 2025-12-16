@@ -26,6 +26,12 @@ type ICRC2ActorType = {
     }) => Promise<{ Ok?: number; Err?: { InsufficientFunds?: null } }>;
 };
 
+interface SwapSuccessData {
+    cashbackAmount: string;
+    raffleTickets: string;
+    tokenOutName: string;
+}
+
 export const buyPayTokensICP = [
     { label: 'ICP', value: 'ICP', img: ICPImg as StaticImageData, address: 'ryjl3-tyaaa-aaaaa-aaaba-cai', tokenType: 'ICRC', slug: ['internet computer'] },
     { label: 'ckBTC', value: 'ckBTC', img: CkBTCImg as StaticImageData, address: 'mxzaz-hqaaa-aaaar-qaada-cai', tokenType: 'ICRC', slug: ['bitcoin'] },
@@ -80,8 +86,7 @@ export const fetchICPTokenBalance = async ({ canisterId, principal }: { canister
     }
 };
 
-// ToDo: Update this and use this
-export const buyICPBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenOutAmount, tokenInAmount, icpAddress }: { tokenInAddress: string, tokenOutAddress: string, tokenOutAmount: string, tokenInAmount: number, icpAddress: string }) => {
+export const buyICPBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenOutAmount, tokenInAmount, icpAddress, onSuccess }: { tokenInAddress: string, tokenOutAddress: string, tokenOutAmount: string, tokenInAmount: number, icpAddress: string, onSuccess?: (data: SwapSuccessData) => void; }) => {
     try {
         const swapCanisterId = '6phs7-6yaaa-aaaap-qpvoq-cai';
 
@@ -192,6 +197,24 @@ export const buyICPBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenO
 
                     if (result === 'Token swap successfully') {
                         toast.success('Token swap was successful!');
+
+                        const tokenInUSDAmount = parseFloat(
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                            transfer.Ok.token_in_usd_amount.toString()
+                        );
+                        const cashbackAmount = ((tokenInUSDAmount / 1.01) * 0.05).toFixed(2);
+
+                        const successData: SwapSuccessData = {
+                            cashbackAmount,
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                            raffleTickets: transfer.Ok.token_out_amount.toString(),
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+                            tokenOutName: getTokenName(transfer.Ok.token_out_address),
+                        };
+
+                        if (onSuccess) {
+                            onSuccess(successData);
+                        }
                     } else {
                         toast.error('An error occurred while processing your request. Please try again!');
                     }

@@ -17,6 +17,12 @@ const baseClient = createPublicClient({
     transport: http(),
 });
 
+interface SwapSuccessData {
+    cashbackAmount: string;
+    raffleTickets: string;
+    tokenOutName: string;
+}
+
 export const buyPayTokensBase = [
     { label: 'ETH', value: 'Ethereum', img: ETHImg as StaticImageData, address: '0x0000000000000000000000000000000000000000b', tokenType: 'ERC20', slug: ['ethereum'] },
 ]
@@ -67,7 +73,7 @@ export const fetchBaseTokenBalance = async ({ tokenAddress, address }: { tokenAd
     }
 }
 
-export const buyBaseBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenOutAmount, tokenInAmount, baseAddress }: { tokenInAddress: string, tokenOutAddress: string, tokenOutAmount: string, tokenInAmount: string, baseAddress: string }) => {
+export const buyBaseBIT10Token = async ({ tokenInAddress, tokenOutAddress, tokenOutAmount, tokenInAmount, baseAddress, onSuccess }: { tokenInAddress: string, tokenOutAddress: string, tokenOutAmount: string, tokenInAmount: string, baseAddress: string, onSuccess?: (data: SwapSuccessData) => void; }) => {
     try {
         const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
         const canisterId = '6phs7-6yaaa-aaaap-qpvoq-cai';
@@ -208,6 +214,30 @@ export const buyBaseBIT10Token = async ({ tokenInAddress, tokenOutAddress, token
 
             if (result === 'Token swap successfully') {
                 toast.success('Token swap was successful!');
+
+                const tokenInUSDAmount = parseFloat(
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    transfer.Ok.token_in_usd_amount.toString()
+                );
+                const cashbackAmount = ((tokenInUSDAmount / 1.01) * 0.05).toFixed(2);
+
+                const successData: SwapSuccessData = {
+                    cashbackAmount,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    raffleTickets: transfer.Ok.token_out_amount.toString(),
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+                    tokenOutName: getTokenName(transfer.Ok.token_out_address),
+                };
+
+                if (onSuccess) {
+                    onSuccess(successData);
+                }
             } else {
                 toast.error('An error occurred while processing your request. Please try again!');
             }
