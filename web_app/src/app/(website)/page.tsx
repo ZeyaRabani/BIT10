@@ -141,7 +141,7 @@ export default function Page() {
       <MaxWidthWrapper className='flex flex-col space-y-4 md:space-y-16 py-8'>
         <BIT10Comparison />
 
-        <div className='flex flex-col items-center space-y-2'>
+        {/* <div className='flex flex-col items-center space-y-2'>
           <motion.h1 initial={{ opacity: 0.0, y: 80 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-semibold'>
             How BIT10 works?
           </motion.h1>
@@ -158,7 +158,7 @@ export default function Page() {
             allowFullScreen
             className='mx-auto rounded-2xl object-cover w-full md:w-3/4 h-56 md:h-[36rem] z-[2]'
           ></motion.iframe>
-        </div>
+        </div> */}
 
         <div className='flex flex-col items-center space-y-2'>
           <motion.h1 initial={{ opacity: 0.0, y: 80 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5, duration: 0.8, ease: 'easeInOut' }} className='text-4xl md:text-6xl font-semibold text-center'>
