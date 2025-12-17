@@ -281,7 +281,7 @@ export const sellBaseBIT10Token = async ({ tokenInAddress, tokenOutAddress, toke
             token_in_address: tokenInAddress,
             token_in_amount: tokenInAmount.toString(),
             token_out_address: tokenOutAddress,
-            token_out_amount: tokenOutAmount.toString(),
+            token_out_amount: tokenOutAmount.toString()
         });
 
         const tx = {
