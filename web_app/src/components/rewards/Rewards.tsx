@@ -658,8 +658,8 @@ export default function Rewards() {
                         <div>
                             <h3 className='text-xl font-semibold'>Actions Required</h3>
                             <ul className='list-disc pl-5 mt-1 space-y-1'>
-                                <li><b>Buy & Hold:</b> Hold at least {CONSTANTS.MIN_BIT10_TOKENS} BIT10.TOP during the cashback round to earn 5% cashback. <br />
-                                    <span className='text-gray-400'>Example: Hold 2 BIT10.TOP → receive cashback equal to 5% of 2 BIT10.TOP.</span>
+                                <li><b>Buy & Hold:</b> Buy and hold at least {CONSTANTS.MIN_BIT10_TOKENS} BIT10.TOP during the cashback round to earn 5% cashback. <br />
+                                    <span className='text-gray-400'>Example: Buy & hold 2 BIT10.TOP → receive cashback equal to 5% of 2 BIT10.TOP.</span>
                                 </li>
                                 <li><b>Claim on Time:</b> Cashback must be claimed within 24 hours after the claim window opens.</li>
                             </ul>
@@ -676,10 +676,10 @@ export default function Rewards() {
                         </div>
 
                         <div>
-                            <h3 className='text-xl font-semibold'>Example</h3>
+                            <h3 className='text-xl font-semibold'>Examples</h3>
                             <ul className='list-disc pl-5 mt-1'>
-                                <li>Buy 1.5 BIT10.TOP and hold through the cashback round → earn 5% cashback.</li>
-                                <li>Buy 2 BIT10.TOP but sell 0.8 before the cashback round ends → cashback is calculated only on 1.2 BIT10.TOP.</li>
+                                <li>Buy 2 BIT10.TOP and hold through the cashback round → earn 5% cashback.</li>
+                                <li>Buy 2 BIT10.TOP but sell 0.8 before the cashback round ends → 5% cashback is calculated only on 1.2 BIT10.TOP.</li>
                             </ul>
                         </div>
                     </Card>
@@ -742,7 +742,7 @@ export default function Rewards() {
                         </div>
 
                         <div>
-                            <h3 className='text-xl font-semibold'>Example</h3>
+                            <h3 className='text-xl font-semibold'>Examples</h3>
                             <ul className='list-disc pl-5 mt-1'>
                                 <li>Purchase 1 BIT10.TOP token = 1 Reward Pool ticket</li>
                                 <li>Purchase 5 BIT10.TOP tokens = 5 Reward Pool tickets</li>

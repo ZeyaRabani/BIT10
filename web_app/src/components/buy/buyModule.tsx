@@ -8,7 +8,7 @@ import { useQueries } from '@tanstack/react-query'
 // import { whitelistedAddress } from '@/actions/dbActions'
 import { toast } from 'sonner'
 import { formatAddress, formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils'
-import { ChevronsUpDown, Loader2, Info, ArrowUpDown } from 'lucide-react'
+import { ChevronsUpDownIcon, Loader2Icon, InfoIcon, ArrowUpDownIcon, WalletIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { buyPayTokensICP, buyReceiveTokensICP, fetchICPTokenBalance, buyICPBIT10Token } from './icp/ICPBuyModule'
@@ -606,7 +606,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                             <TooltipProvider>
                                                                 <Tooltip delayDuration={300}>
                                                                     <TooltipTrigger asChild>
-                                                                        <Info className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
+                                                                        <InfoIcon className='w-4 h-4 cursor-pointer ml-1 -mt-0.5' />
                                                                     </TooltipTrigger>
                                                                     <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                                                         Price of {form.watch('payment_token')} (in USD) + 1% Management fee <br />
@@ -643,7 +643,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                                     </div>
                                                                                 </div>
                                                                                 : 'Select token'}
-                                                                            <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                                            <ChevronsUpDownIcon className='h-4 w-4 shrink-0 opacity-50' />
                                                                         </Button>
                                                                         <Dialog open={paymentTokenDialogOpen} onOpenChange={setPaymentTokenDialogOpen}>
                                                                             <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
@@ -695,8 +695,9 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                             </FormItem>
                                                         )}
                                                     />
-                                                    {/* <div className='text-sm text-center md:text-end pt-0.5 bg-green-500'> */}
-                                                    <div className='text-sm text-center md:text-end pt-0.5'>
+                                                    {/* <div className='flex flex-row items-center justify-center md:justify-end text-sm pt-0.5 bg-green-500'> */}
+                                                    <div className='flex flex-row items-center justify-center md:justify-end text-sm pt-0.5'>
+                                                        <WalletIcon size='16' className='mr-1' />
                                                         {formatCompactNumber(Number(payingTokenBalance))}
                                                     </div>
                                                 </div>
@@ -704,7 +705,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                         </div>
 
                                         <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 rounded-full p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' onClick={onSwitchToSell} disabled={buying}>
-                                            <ArrowUpDown className='h-8 w-8 transition-transform duration-700 group-hover:rotate-[180deg]' />
+                                            <ArrowUpDownIcon className='h-8 w-8 transition-transform duration-700 group-hover:rotate-[180deg]' />
                                         </Button>
 
                                         <div className='bg-muted rounded-b-lg w-full px-4 py-2 flex flex-col space-y-2 -mt-6 md:mt-2'>
@@ -785,7 +786,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                                                     </div>
                                                                                 </div>
                                                                                 : 'Select token'}
-                                                                            <ChevronsUpDown className='h-4 w-4 shrink-0 opacity-50' />
+                                                                            <ChevronsUpDownIcon className='h-4 w-4 shrink-0 opacity-50' />
                                                                         </Button>
                                                                         <Dialog open={receiveTokenDialogOpen} onOpenChange={setReceiveTokenDialogOpen}>
                                                                             <DialogContent className='sm:max-w-lg max-w-[90vw] rounded-md'>
@@ -846,24 +847,6 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                         <div className='font-medium text-lg'>Summary</div>
                                         <div className='h-0.5 w-full bg-muted-foreground'></div>
                                         <div className='flex flex-row items-center justify-between space-x-2'>
-                                            <div>Management Fee</div>
-                                            <TooltipProvider>
-                                                <Tooltip delayDuration={300}>
-                                                    <TooltipTrigger asChild>
-                                                        <div className='flex flex-row space-x-1 items-center'>
-                                                            <div>1%</div>
-                                                            <div>
-                                                                <Info className='size-3 align-middle relative bottom-[1px] cursor-pointer' />
-                                                            </div>
-                                                        </div>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
-                                                        The Management Fee covers the cost of managing and rebalancing the token
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        </div>
-                                        <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Exchange Rate</div>
                                             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                                             {/* @ts-expect-error */}
@@ -872,6 +855,24 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Expected Time</div>
                                             <div>1-2 min.</div>
+                                        </div>
+                                        <div className='flex flex-row items-center justify-between space-x-2'>
+                                            <div>Management Fee</div>
+                                            <TooltipProvider>
+                                                <Tooltip delayDuration={300}>
+                                                    <TooltipTrigger asChild>
+                                                        <div className='flex flex-row space-x-1 items-center'>
+                                                            <div>1%</div>
+                                                            <div>
+                                                                <InfoIcon className='size-3 align-middle relative bottom-[1px] cursor-pointer' />
+                                                            </div>
+                                                        </div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
+                                                        The Management Fee covers the cost of managing and rebalancing the token
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         </div>
                                         <div className='flex flex-row items-center justify-between space-x-2 font-semibold tracking-wider'>
                                             <div>Expected Output</div>
@@ -891,7 +892,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                         <TooltipProvider>
                                                             <Tooltip delayDuration={300}>
                                                                 <TooltipTrigger asChild>
-                                                                    <Info className='size-3 align-middle relative cursor-pointer' />
+                                                                    <InfoIcon className='size-3 align-middle relative cursor-pointer' />
                                                                 </TooltipTrigger>
                                                                 <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                                                     Approximate {chain === 'icp' ? 'ckUSDC' : 'USDC'} you&apos;ll receive based on the amount of tokens purchased.
@@ -907,7 +908,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                         <TooltipProvider>
                                                             <Tooltip delayDuration={300}>
                                                                 <TooltipTrigger asChild>
-                                                                    <Info className='size-3 align-middle relative cursor-pointer' />
+                                                                    <InfoIcon className='size-3 align-middle relative cursor-pointer' />
                                                                 </TooltipTrigger>
                                                                 <TooltipContent className='max-w-[18rem] md:max-w-[26rem] text-center'>
                                                                     Each token you buy counts as one entry into the Reward Pool raffle.
@@ -929,7 +930,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                         )} */}
 
                                     <Button className='w-full' disabled={buyDisabledConditions}>
-                                        {buying && <Loader2 className='animate-spin mr-2' size={15} />}
+                                        {buying && <Loader2Icon className='animate-spin mr-2' size={15} />}
                                         {getBuyMessage()}
                                     </Button>
                                 </form>
