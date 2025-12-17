@@ -303,7 +303,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         // ToDo: temp.
         if (chain === 'bsc') return 'Selling coming soon on Binance Smart Chain';
         if (selling) return 'Selling...';
-        if (fromAmount >= balance || fromAmount >= balance * 1.01 && !selling) return 'Your balance is too low for this transaction';
+        if (fromAmount >= balance || fromAmount >= balance * 1.01 && !selling) return 'Balance too low to cover transfer and gas fees';
         if (fromAmount <= 0) return 'Amount too low';
         return 'Sell';
     };

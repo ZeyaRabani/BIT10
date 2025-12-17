@@ -368,7 +368,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const getBuyMessage = (): string => {
         if (!chain) return 'Connect your wallet to continue';
         if (buying) return 'Buying...';
-        if (fromAmount >= balance || fromAmount >= balance * 1.01 && !buying) return 'Your balance is too low for this transaction';
+        if (fromAmount >= balance || fromAmount >= balance * 1.01 && !buying) return 'Balance too low to cover transfer and gas fees';
         if (fromAmount <= 0 || Number(form.watch('receive_amount')) <= 0) return 'Amount too low';
         return 'Buy';
     };
