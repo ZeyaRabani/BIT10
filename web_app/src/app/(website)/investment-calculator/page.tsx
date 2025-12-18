@@ -356,7 +356,7 @@ export default function Page() {
                                                 <FormItem>
                                                     <FormLabel>Initial Investment</FormLabel>
                                                     <FormControl>
-                                                        <Input {...field} placeholder='Initial investment amount' type='number' className='rounded-full' />
+                                                        <Input {...field} placeholder='Initial investment amount' type='number' />
                                                     </FormControl>
                                                     <FormDescription>
                                                         Enter the amount (in USD) you want to invest
@@ -446,7 +446,7 @@ export default function Page() {
                                                                 <SelectValue placeholder='Select a investment token' />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent className='rounded-full'>
+                                                        <SelectContent className='rounded-2xl'>
                                                             <SelectItem className='rounded-full' value='BIT10.TOP'>BIT10.TOP</SelectItem>
                                                         </SelectContent>
                                                     </Select>

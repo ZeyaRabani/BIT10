@@ -567,7 +567,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                             // <FormItem className='py-[1.5px] bg-blue-500'>
                                                             <FormItem className='py-[1.5px]'>
                                                                 <FormControl>
-                                                                    <Input {...field} placeholder='BIT10 Tokens to sell' className='border-[#B4B3B3] rounded-full' />
+                                                                    <Input {...field} placeholder='BIT10 Tokens to sell' className='border-[#B4B3B3]' />
                                                                 </FormControl>
                                                                 <FormMessage />
                                                             </FormItem>
@@ -600,12 +600,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                             <FormItem className='flex flex-row items-center justify-end'>
                                                                 <FormControl>
                                                                     <div className='w-full md:w-3/4 md:ml-auto'>
-                                                                        <Button
-                                                                            type='button'
-                                                                            variant='outline'
-                                                                            className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
-                                                                            onClick={() => setPaymentTokenDialogOpen(true)}
-                                                                        >
+                                                                        <Button type='button' variant='outline' className={cn('border-2 border-[#B4B3B3] z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')} onClick={() => setPaymentTokenDialogOpen(true)}>
                                                                             {field.value
                                                                                 ?
                                                                                 <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
@@ -678,7 +673,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                             </div>
                                         </div>
 
-                                        <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 rounded-full p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' onClick={onSwitchToBuy} disabled={selling}>
+                                        <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' onClick={onSwitchToBuy} disabled={selling}>
                                             <ArrowUpDownIcon className='h-8 w-8 transition-transform duration-700 group-hover:rotate-[180deg]' />
                                         </Button>
 
@@ -714,12 +709,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                             <FormItem className='flex flex-row items-center justify-end'>
                                                                 <FormControl>
                                                                     <div className='w-full md:w-3/4 md:ml-auto'>
-                                                                        <Button
-                                                                            type='button'
-                                                                            variant='outline'
-                                                                            className={cn('border-2 border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
-                                                                            onClick={() => setReceiveTokenDialogOpen(true)}
-                                                                        >
+                                                                        <Button type='button' variant='outline' className={cn('border-2 border-[#B4B3B3] z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')} onClick={() => setReceiveTokenDialogOpen(true)}>
                                                                             {field.value
                                                                                 ?
                                                                                 <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
@@ -790,7 +780,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
 
                                     <div className='rounded-lg px-4 py-2 bg-muted flex flex-col space-y-1 text-sm'>
                                         <div className='font-medium text-lg'>Summary</div>
-                                        <div className='h-0.5 w-full bg-muted-foreground'></div>
+                                        <div className='h-0.5 w-full bg-muted-foreground rounded-full' />
                                         <div className='flex flex-row items-center justify-between space-x-2'>
                                             <div>Exchange Rate</div>
                                             1 {form.watch('from_bit10_token')} = {formatCompactNumber(exchangeRate)} {form.watch('to_token')}

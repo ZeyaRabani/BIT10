@@ -17,11 +17,11 @@ import BaseLogo from '@/assets/wallet/base-logo.svg'
 import SolanaLogo from '@/assets/wallet/solana-logo.svg'
 import BSCLogo from '@/assets/wallet/bsc-logo.svg'
 import MetamaskLogo from '@/assets/wallet/metamsak.svg'
-import CoinbaseLogo from '@/assets/wallet/coinbase.svg'
-import LedgerLogo from '@/assets/wallet/ledger.svg'
-import PhantomLogo from '@/assets/wallet/phantom.svg'
-import TrustWalletLogo from '@/assets/wallet/trust-wallet.svg'
-import TalismanLogo from '@/assets/wallet/talisman.svg'
+// import CoinbaseLogo from '@/assets/wallet/coinbase.svg'
+// import LedgerLogo from '@/assets/wallet/ledger.svg'
+// import PhantomLogo from '@/assets/wallet/phantom.svg'
+// import TrustWalletLogo from '@/assets/wallet/trust-wallet.svg'
+// import TalismanLogo from '@/assets/wallet/talisman.svg'
 import PlugImg from '@/assets/wallet/plug.svg'
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { motion } from 'framer-motion'
@@ -51,11 +51,11 @@ const icpWallets = [
 
 const evmWalletConfig = [
     { name: 'MetaMask', icon: MetamaskLogo, id: 'metaMask' },
-    { name: 'Coinbase Wallet', icon: CoinbaseLogo, id: 'coinbaseWallet' },
-    { name: 'Ledger', icon: LedgerLogo, id: 'ledger' },
-    { name: 'Phantom', icon: PhantomLogo, id: 'phantom' },
-    { name: 'Trust Wallet', icon: TrustWalletLogo, id: 'trust' },
-    { name: 'Talisman', icon: TalismanLogo, id: 'talisman' }
+    // { name: 'Coinbase Wallet', icon: CoinbaseLogo, id: 'coinbaseWallet' },
+    // { name: 'Ledger', icon: LedgerLogo, id: 'ledger' },
+    // { name: 'Phantom', icon: PhantomLogo, id: 'phantom' },
+    // { name: 'Trust Wallet', icon: TrustWalletLogo, id: 'trust' },
+    // { name: 'Talisman', icon: TalismanLogo, id: 'talisman' }
 ];
 
 export default function WalletBtn() {
@@ -391,34 +391,22 @@ export default function WalletBtn() {
             default:
                 return (
                     <motion.div initial='hidden' whileInView='visible' variants={containerVariants} className='flex flex-col space-y-2'>
-                        <motion.div variants={cardVariantsLeft}
-                            className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
-                            onClick={() => handleChainSelect('icp')}
-                        >
+                        <motion.div variants={cardVariantsLeft} className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer' onClick={() => handleChainSelect('icp')}>
                             <Image src={ICPLogo} alt='ICP' className='rounded' height='26' width='26' />
                             <div className='text-lg'>Internet Computer</div>
                         </motion.div>
 
-                        <motion.div variants={cardVariantsLeft}
-                            className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
-                            onClick={() => handleChainSelect('base')}
-                        >
+                        <motion.div variants={cardVariantsLeft} className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer' onClick={() => handleChainSelect('base')}>
                             <Image src={BaseLogo} alt='Base' className='rounded' height='30' width='30' />
                             <div className='text-lg'>Base</div>
                         </motion.div>
 
-                        <motion.div variants={cardVariantsLeft}
-                            className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
-                            onClick={() => handleChainSelect('solana')}
-                        >
+                        <motion.div variants={cardVariantsLeft} className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer' onClick={() => handleChainSelect('solana')}>
                             <Image src={SolanaLogo} alt='Solana' className='rounded' height='26' width='26' />
                             <div className='text-lg'>Solana</div>
                         </motion.div>
 
-                        <motion.div variants={cardVariantsLeft}
-                            className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer'
-                            onClick={() => handleChainSelect('bsc')}
-                        >
+                        <motion.div variants={cardVariantsLeft} className='border-2 border-muted hover:bg-muted rounded-full px-4 py-2.5 flex flex-row items-center space-x-2 cursor-pointer' onClick={() => handleChainSelect('bsc')}>
                             <Image src={BSCLogo} alt='BSC' className='rounded' height='30' width='30' />
                             <div className='text-lg'>Binance Smart Chain</div>
                         </motion.div>
@@ -430,11 +418,11 @@ export default function WalletBtn() {
     return (
         <div>
             {isICPConnected || isEVMConnected || isSolanaConnected ? (
-                <Button variant='destructive' onClick={handleDisconnect} className='w-full rounded-full'>Disconnect wallet</Button>
+                <Button variant='destructive' onClick={handleDisconnect} className='w-full'>Disconnect wallet</Button>
             ) : (
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <Button disabled={isConnecting} className='w-full rounded-full'>
+                        <Button disabled={isConnecting} className='w-full'>
                             {isConnecting && <Loader2 className='animate-spin' size={15} />}
                             {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                         </Button>

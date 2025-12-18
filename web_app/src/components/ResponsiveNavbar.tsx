@@ -90,7 +90,7 @@ export default function ResponsiveNavbar() {
                                 </div>
 
                                 <div className='grid justify-center'>
-                                    <div className='inline-flex w-64 h-1 bg-indigo-500 rounded-full'></div>
+                                    <div className='inline-flex w-64 h-1 bg-indigo-500 rounded-full' />
                                 </div>
 
                                 <div className='grid px-8 text-xl py-2 gap-2 w-full mb-4'>
@@ -109,7 +109,7 @@ export default function ResponsiveNavbar() {
                                     ) : (
                                         <div className='border-b-2 pb-2 cursor-pointer w-full'>
                                             <Link href='/launch' passHref>
-                                                <Button className='rounded-full w-full'>Launch App</Button>
+                                                <Button className='w-full'>Launch App</Button>
                                             </Link>
                                         </div>
                                     )}

@@ -90,7 +90,7 @@ export default function Navbar() {
                     </Link>
                 </div>
 
-                <div className='hidden lg:flex'>
+                <div className='hidden lg:flex lg:items-center'>
                     <AnimatedBackground defaultValue={activeLink || '/'} onValueChange={(newActiveLink: string | null) => { if (typeof newActiveLink === 'string' && newActiveLink !== '') { handleNavigation(newActiveLink); } }} transition={{ ease: 'easeInOut', duration: 0.2 }}>
                         {links[appMode ? 'app' : 'web'].map((label, index) => {
                             const isRewards = !!label.isRewards;
@@ -117,8 +117,8 @@ export default function Navbar() {
                         {appMode ? (
                             <WalletBtn />
                         ) : (
-                            <Link href='/launch' passHref legacyBehavior>
-                                <Button className='rounded-full font-semibold'>Launch App</Button>
+                            <Link href='/launch' passHref>
+                                <Button className='font-semibold'>Launch App</Button>
                             </Link>
                         )}
                     </div>

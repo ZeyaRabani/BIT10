@@ -1166,12 +1166,7 @@ export default function NewBuyModule() {
                                                                 <FormItem className='flex flex-row items-center justify-end'>
                                                                     <FormControl>
                                                                         <div className='w-full md:w-3/4 md:ml-auto'>
-                                                                            <Button
-                                                                                type='button'
-                                                                                variant='outline'
-                                                                                className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
-                                                                                onClick={() => setPaymentTokenDialogOpen(true)}
-                                                                            >
+                                                                            <Button type='button' variant='outline' className={cn('border-2 dark:border-[#B4B3B3] z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')} onClick={() => setPaymentTokenDialogOpen(true)}>
                                                                                 {field.value
                                                                                     ?
                                                                                     <div className='flex flex-row space-x-1 items-center justify-start text-lg'>
@@ -1244,7 +1239,7 @@ export default function NewBuyModule() {
                                             </div>
 
                                             {/* ToDo: Update this and add functionality for buy and sell */}
-                                            <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 rounded-full p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' disabled={buying}>
+                                            <Button type='button' variant='ghost' size='sm' className='md:absolute top-1/2 -translate-y-1/2 z-10 p-2 h-8 w-8 border-2 border-muted hover:bg-background group bg-background mt-2 md:mt-0' disabled={buying}>
                                                 <ArrowUpDown className='h-8 w-8 transition-transform duration-700 group-hover:rotate-[180deg]' />
                                             </Button>
 
@@ -1300,12 +1295,7 @@ export default function NewBuyModule() {
                                                                 <FormItem>
                                                                     <FormControl>
                                                                         <div className='w-full md:w-3/4 md:ml-auto'>
-                                                                            <Button
-                                                                                type='button'
-                                                                                variant='outline'
-                                                                                className={cn('border-2 dark:border-[#B4B3B3] rounded-full z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')}
-                                                                                onClick={() => setReceiveTokenDialogOpen(true)}
-                                                                            >
+                                                                            <Button type='button' variant='outline' className={cn('border-2 dark:border-[#B4B3B3] z-10 w-full flex justify-between py-5 pl-1 pr-1.5', !field.value && 'text-muted-foreground')} onClick={() => setReceiveTokenDialogOpen(true)}>
                                                                                 {field.value
                                                                                     ?
                                                                                     <div className='flex flex-row space-x-1 items-center justify-start text-lg'>

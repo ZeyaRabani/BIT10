@@ -24,13 +24,7 @@ export default function ScrollToTopBtn() {
     };
 
     return (
-        <motion.button
-            initial={{ opacity: 0, y: 40 }}
-            animate={showButton ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className='fixed bottom-4 right-4 md:bottom-20 md:right-14 z-[48] bg-accent border-2 border-primary rounded-full p-2 outline-none'
-            onClick={scrollToTop}
-        >
+        <motion.button initial={{ opacity: 0, y: 40 }} animate={showButton ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }} transition={{ duration: 0.2, ease: 'easeInOut' }} className='fixed bottom-4 right-4 md:bottom-20 md:right-14 z-[48] bg-accent border-2 border-primary rounded-full p-2 outline-none' onClick={scrollToTop}>
             <ChevronsUp />
         </motion.button>
     );
