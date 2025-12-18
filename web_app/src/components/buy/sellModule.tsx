@@ -567,7 +567,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                                             // <FormItem className='py-[1.5px] bg-blue-500'>
                                                             <FormItem className='py-[1.5px]'>
                                                                 <FormControl>
-                                                                    <Input {...field} placeholder='BIT10 Tokens to sell' className='border-[#B4B3B3]' />
+                                                                    <Input {...field} placeholder='BIT10 Tokens to sell' className='border-[#B4B3B3] md:w-3/4' />
                                                                 </FormControl>
                                                                 <FormMessage />
                                                             </FormItem>

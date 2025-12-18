@@ -218,7 +218,7 @@ export default function Rewards() {
             const allEntries = raffleEntriesResult.Ok;
             const validEntries = filterValidTransactions(allEntries);
 
-            const userEntries = validEntries.filter((tx) => tx.user_wallet_address === config.address.toLocaleLowerCase() && tx.network === config.chainName);
+            const userEntries = validEntries.filter((tx) => tx.user_wallet_address.toLocaleLowerCase() === config.address.toLocaleLowerCase() && tx.network === config.chainName);
 
             return {
                 userTickets: userEntries.length,
