@@ -29,6 +29,7 @@ import Image, { type StaticImageData } from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import VerifyTransaction from './verifyTransaction'
 
 interface BuyModuleProps {
     onSwitchToSell: () => void;
@@ -927,6 +928,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                             </Form>
                         </CardContent>
                     </Card>
+
+                    <VerifyTransaction mode='buy' />
                 </div>
 
                 <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>

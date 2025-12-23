@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import Image, { type StaticImageData } from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import VerifyTransaction from './verifyTransaction'
 
 interface SellModuleProps {
     onSwitchToBuy: () => void;
@@ -846,6 +847,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                             </Form>
                         </CardContent>
                     </Card>
+
+                    <VerifyTransaction mode='sell' />
                 </div>
             </div>
             {/* )} */}

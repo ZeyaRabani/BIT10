@@ -428,3 +428,141 @@ export const sellBaseBIT10Token = async ({ tokenInAddress, tokenOutAddress, toke
         throw error;
     }
 };
+
+export const verifyBaseTransaction = async ({ mode, trxHash }: { mode: string, trxHash: string }) => {
+    try {
+        const host = 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io';
+        const canisterId = '6phs7-6yaaa-aaaap-qpvoq-cai';
+
+        const agent = new HttpAgent({ host });
+        const actor = Actor.createActor(buyidlFactory2, {
+            agent,
+            canisterId,
+        });
+
+        let transfer;
+        if (mode === 'buy') {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            //  @ts-expect-error
+            transfer = await actor.base_buy(trxHash);
+        } else {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            //  @ts-expect-error
+            transfer = await actor.base_sell(trxHash);
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        if (transfer.Ok) {
+            const formatTimestamp = (nanoseconds: string): string => {
+                const milliseconds = BigInt(nanoseconds) / BigInt(1_000_000);
+                const date = new Date(Number(milliseconds));
+
+                return date.toISOString().replace('T', ' ').replace('Z', '+00');
+            };
+
+            const result = await newTokenSwap({
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                newTokenSwapId: transfer.Ok.swap_id,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                principalId: transfer.Ok.user_wallet_address,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInName: transfer.Ok.token_in_address,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInAmount: transfer.Ok.token_in_amount.toString(),
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInUSDAmount: transfer.Ok.token_in_usd_amount.toString(),
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickInTxBlock: transfer.Ok.token_in_tx_hash.toString(),
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickOutName: transfer.Ok.token_out_address,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickOutAmount: transfer.Ok.token_out_amount.toString(),
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                tickOutTxBlock: transfer.Ok.token_out_tx_hash.toString(),
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                transactionType: transfer.Ok.transaction_type,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                network: transfer.Ok.network,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
+                transactionTimestamp: formatTimestamp(transfer.Ok.transaction_timestamp)
+            });
+
+            await fetch('/bit10-token-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                    newTokenSwapId: transfer.Ok.swap_id,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
+                    principalId: transfer.Ok.user_wallet_address,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
+                    tickOutName: getTokenName(transfer.Ok.token_out_address),
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    tickOutAmount: transfer.Ok.token_out_amount.toString(),
+                    transactionTimestamp: new Date().toISOString(),
+                }),
+            });
+
+            if (result === 'Token swap successfully') {
+                toast.success('Token swap was successful!');
+            } else {
+                toast.error('An error occurred while processing your request. Please try again!');
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+        } else if (transfer.Err) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            const errorMessage = String(transfer.Err);
+            if (errorMessage.includes('Insufficient balance')) {
+                toast.error('Insufficient funds');
+            } else if (errorMessage.includes('less than available supply')) {
+                toast.error('The requested amount exceeds the available supply. Please enter a lower amount.');
+            } else if (errorMessage.includes('Transaction already processed')) {
+                toast.error('This transaction has already been processed.');
+            } else {
+                toast.error('An error occurred while processing your request. Please try again!');
+            }
+        } else {
+            toast.error('An error occurred while processing your request. Please try again!');
+        }
+    } catch (error) {
+        toast.error('An error occurred while processing your request. Please try again!');
+        throw error;
+    }
+};

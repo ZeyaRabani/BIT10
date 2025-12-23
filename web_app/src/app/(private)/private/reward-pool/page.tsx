@@ -60,6 +60,7 @@ export default function Page() {
     const raffleEntries = rewardsQueries[0]?.data as { Ok?: Transaction[] };
     const entries = raffleEntries?.Ok ?? [];
 
+    // ToDo: Show the wallet address the number of time the tick_out_amount is
     const walletList = entries.map((tx) => tx.user_wallet_address);
     const walletText = walletList.join('\n');
 
