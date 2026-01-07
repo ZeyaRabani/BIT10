@@ -249,4 +249,4 @@ export const fetchAndUpdateBIT10TOPRebalanceData = async () => {
 }
 
 // cron.schedule('*/30 * * * * *', fetchAndUpdateBIT10TOPRebalanceData); // 30 sec
-cron.schedule('0 10 * * 5', fetchAndUpdateBIT10TOPRebalanceData); // Every Friday at 3:30 PM IST
+cron.schedule('0 11 * * *', fetchAndUpdateBIT10TOPRebalanceData, { timezone: 'Etc/GMT' }); // Everyday at 11 AM GMT
