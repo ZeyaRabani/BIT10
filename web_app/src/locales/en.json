@@ -1,0 +1,26 @@
+{
+    "dataroom": {
+        "language": "Language",
+        "bit10Presentation": "BIT10 Presentation",
+        "presentationDeck": "Presentation Deck",
+        "testnetDemo": "BIT10 Testnet Demo",
+        "metrics": "Metrics",
+        "testnetLaunch": "Testnet launched on June 14, 2024.",
+        "volume": "Volume",
+        "revenue": "Testnet Revenue",
+        "total": "Total (in BTC)",
+        "platformFee": "Management Fee (in BTC)",
+        "transferFee": "Transfer Fee (in BTC)",
+        "links": "Links",
+        "twitter": "X/Twitter",
+        "website": "Website",
+        "gitbook": "GitBook",
+        "team": "Team",
+        "ceo": "Zeya Rabani (Chief Executive Officer | Co-Founder)",
+        "cto": "Harshal Raikwar (Chief Technology Officer | Co-Founder)",
+        "scheduleCall": "Schedule a call with Zeya",
+        "fundsRaised": "Funds Raised",
+        "icp": "ICP Developer Grant",
+        "icpAmount": "$55k"
+    }
+}
