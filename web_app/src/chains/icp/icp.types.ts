@@ -1,5 +1,11 @@
 import { type Principal } from '@dfinity/principal';
 
+export type StepUpdateCallback = (stepIndex: number, updates: { 
+    status?: 'pending' | 'processing' | 'success' | 'error', 
+    description?: string, 
+    error?: string 
+}) => void;
+
 export type ICRC2ActorType = {
     icrc2_approve: (args: {
         spender: { owner: Principal; subaccount: [] };

@@ -428,7 +428,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                             <div className='select-none -ml-12 md:-ml-8'>
                                 {
                                     activeTab === '30D' &&
-                                    <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                    <ChartContainer config={bit10PreformanceChartConfig} className='max-h-75 w-full'>
                                         <LineChart accessibilityLayer data={bit10Preformance30DChartData}>
                                             <CartesianGrid vertical={false} />
                                             <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' interval='preserveStartEnd' />
@@ -440,7 +440,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                 }
                                 {
                                     activeTab === '60D' &&
-                                    <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                    <ChartContainer config={bit10PreformanceChartConfig} className='max-h-75 w-full'>
                                         <LineChart accessibilityLayer data={bit10Preformance60DChartData}>
                                             <CartesianGrid vertical={false} />
                                             <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' interval='preserveStartEnd' />
@@ -452,7 +452,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                 }
                                 {
                                     activeTab === '1Y' &&
-                                    <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                    <ChartContainer config={bit10PreformanceChartConfig} className='max-h-75 w-full'>
                                         <LineChart accessibilityLayer data={bit10Preformance1YChartData}>
                                             <CartesianGrid vertical={false} />
                                             <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={(value: string) => { const parts = value.split(' '); return parts.length >= 3 ? `${parts[0]} ${parts[2]}` : value; }} stroke='#ffffff' interval='preserveStartEnd' />
@@ -464,7 +464,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                                 }
                                 {
                                     activeTab === '3Y' &&
-                                    <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                    <ChartContainer config={bit10PreformanceChartConfig} className='max-h-75 w-full'>
                                         <LineChart accessibilityLayer data={bit10Preformance3YChartData}>
                                             <CartesianGrid vertical={false} />
                                             <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={(value: string) => { const parts = value.split(' '); return parts.length >= 3 ? `${parts[0]} ${parts[2]}` : value; }} stroke='#ffffff' interval='preserveStartEnd' />
@@ -487,7 +487,7 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
                         <CardContent className='grid md:grid-cols-5 items-center'>
                             <div className='md:col-span-2'>
                                 <div className='flex-1'>
-                                    <ChartContainer config={bit10AllocationChartConfig} className='aspect-square max-h-[300px]'>
+                                    <ChartContainer config={bit10AllocationChartConfig} className='aspect-square max-h-75'>
                                         <PieChart>
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                                             <Pie data={bit10AllocationPieChartData} dataKey='value' nameKey='name' innerRadius={innerRadius} strokeWidth={5}>

@@ -362,7 +362,7 @@ export default function BIT10Preformance() {
                     <CardContent className='flex flex-col space-y-4'>
                         <div className='flex flex-col md:flex-row items-center space-y-2 md:space-x-4 md:space-y-0 justify-end'>
                             <Select onValueChange={setSelectedPreformanceToken} defaultValue={selectedPreformanceToken}>
-                                <SelectTrigger className='w-[180px]'>
+                                <SelectTrigger className='w-45'>
                                     <SelectValue placeholder='Select Token' />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -431,7 +431,7 @@ export default function BIT10Preformance() {
                         <div className='select-none -ml-12 md:-ml-8'>
                             {
                                 activeTab === '30D' &&
-                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-75 w-full'>
                                     <LineChart accessibilityLayer data={bit10Preformance30DChartData}>
                                         <CartesianGrid vertical={false} />
                                         <XAxis dataKey='day' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
@@ -443,7 +443,7 @@ export default function BIT10Preformance() {
                             }
                             {
                                 activeTab === '60D' &&
-                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-75 w-full'>
                                     <LineChart accessibilityLayer data={bit10Preformance60DChartData}>
                                         <CartesianGrid vertical={false} />
                                         <XAxis dataKey='day' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
@@ -455,7 +455,7 @@ export default function BIT10Preformance() {
                             }
                             {
                                 activeTab === '1Y' &&
-                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-75 w-full'>
                                     <LineChart accessibilityLayer data={bit10Preformance1YChartData}>
                                         <CartesianGrid vertical={false} />
                                         <XAxis dataKey='day' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
@@ -467,7 +467,7 @@ export default function BIT10Preformance() {
                             }
                             {
                                 activeTab === '3Y' &&
-                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-[300px] w-full'>
+                                <ChartContainer config={bit10PreformanceChartConfig} className='max-h-75 w-full'>
                                     <LineChart accessibilityLayer data={bit10Preformance3YChartData}>
                                         <CartesianGrid vertical={false} />
                                         <XAxis dataKey='day' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />

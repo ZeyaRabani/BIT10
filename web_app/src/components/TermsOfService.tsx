@@ -34,7 +34,7 @@ export default function TermsOfService() {
 
     if (isChecking) {
         return (
-            <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+            <div className='fixed inset-0 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50'>
                 <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-white' />
             </div>
         );
@@ -45,7 +45,7 @@ export default function TermsOfService() {
     }
 
     return (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
+        <div className='fixed inset-0 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50 p-4'>
             <div className='bg-card rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col'>
                 <div className='p-4 border-b'>
                     <h2 className='text-2xl font-bold'>Terms of Service</h2>

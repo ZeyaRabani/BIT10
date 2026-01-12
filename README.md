@@ -27,6 +27,62 @@ BIT10 offers a pre-selected, diversified basket of assets, significantly reducin
 - **Auto-Rebalancing**: Regularly updates asset allocations to optimize performance.
 - **Decentralized ETF**: Fully decentralized structure powered by the Internet Computer (ICP).
 
+<!-- ## Code Rules
+
+- The Line Charts should have these `tickMargin={8}` and for YAxis `tickCount={6}`
+- Image size: **110 × 110**, gap size: **80 × 80**.
+- While optimizing, rename functions with relevant and meaningful names.
+- All addresses (token address, token name, or user wallet address) must be in lowercase.
+- For **framer-motion** animations, always add:
+  `viewport={{ once: true }}`
+- Types and interfaces must:
+
+  - End with a semicolon (`;`)
+  - Be defined for all cases (including the last one)
+  - Use commas (`,`) to separate variables
+- Use double quotes (`"`) **only** for `"use client"` or `"use server"`, and always end them with a semicolon.
+- Use single quotes (`'`) for imports and all other strings.
+- End all import statements with semicolons.
+- If an `if` statement contains more than two lines, return directly without wrapping it in parentheses.
+- For `div`, `span`, or similar elements, if props or content are long, move them to the next line.
+- Use `rounded-2xl` consistently for border radius.
+- When using icons from `lucide-react`, import them as `X as XIcon` (always append `Icon`).
+- Use `cn` from `@/lib/utils` wherever required.
+- For form submission, use:
+
+  ```ts
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+  ```
+- If a `div` has no content, self-close it: `<div />`.
+- Use `useCallback` for query functions.
+- Use `useMemo` with `UseQueryOptions` for queries, and also use `useMemo` for query responses.
+
+## Project Structure
+
+- Folder names must use **kebab-case**.
+- File names must use **PascalCase**.
+
+### Folder Responsibilities
+
+- **assets**: Images and icons (SVG/TSX format).
+- **components**: Generic and reusable UI components.
+- **config**: Configuration files and ABIs.
+- **context**: Global application context.
+- **hooks**: Generic reusable hooks.
+- **layouts**: Layouts for different pages.
+- **locales**: Translation-related files (JSON or JS).
+- **types**: Types, models, interfaces, DTOs, etc.
+- **utils**: Generic utility functions.
+
+## Naming Conventions
+
+- **Chains**: Contains all chain-specific logic, including transactions and balances.
+- **Components**: Use PascalCase for component names and filenames.
+- **Hooks**: Use camelCase for hooks and their filenames.
+- **Files**: Use camelCase for filenames.
+- **Variables**: Use camelCase.
+- **Types & Interfaces**: Use PascalCase. -->
+
 ## 📂 Code Structure
 
 ### 🪴 Branches

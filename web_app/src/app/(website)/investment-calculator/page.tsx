@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
@@ -42,12 +43,14 @@ type AssetComparison = {
     currentValue: number;
     totalReturn: number;
     percentageReturn: number;
+    totalInvested?: number;
 };
 
 type ComparisonResult = {
     startDate: string;
     endDate: string;
     assets: AssetComparison[];
+    isDCA: boolean;
 };
 
 const FormSchema = z.object({
@@ -55,6 +58,11 @@ const FormSchema = z.object({
         .min(1, { message: 'Amount is required' })
         .transform((val) => Number(val))
         .refine((val) => !isNaN(val) && val > 0, { message: 'Must be a positive number' }),
+    enable_dca: z.boolean(),
+    dca_frequency: z.string().optional(),
+    dca_amount: z.string().optional()
+        .transform((val) => val ? Number(val) : undefined)
+        .refine((val) => val === undefined || (!isNaN(val) && val > 0), { message: 'Must be a positive number' }),
     initial_investment_start_date: z.date({
         message: 'Please choose a valid start date',
     }),
@@ -178,30 +186,118 @@ export default function Page() {
 
     const formDefaults = {
         initial_investment: '10',
+        enable_dca: false,
+        dca_frequency: 'monthly',
+        dca_amount: '100',
         initial_investment_start_date: new Date('2015-07-29'),
-        initial_investment_end_date: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000), // current date - 12 days
+        initial_investment_end_date: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
         initial_investment_token: 'BIT10.TOP'
     };
 
     const form = useForm({
         defaultValues: formDefaults,
         validators: {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
             onSubmit: FormSchema,
         },
         onSubmit: async ({ value }) => {
             const parsedValue = {
                 ...value,
-                initial_investment: Number(value.initial_investment)
+                initial_investment: Number(value.initial_investment),
+                dca_amount: value.dca_amount ? Number(value.dca_amount) : undefined
             };
             await onSubmit(parsedValue);
         },
     });
 
-    const calculateAllReturns = (
-        investmentAmount: number,
-        startDate: Date,
-        endDate: Date
-    ): ComparisonResult | null => {
+    const getNextDCADate = (currentDate: Date, frequency: string): Date => {
+        const next = new Date(currentDate);
+        switch (frequency) {
+            case 'weekly':
+                next.setDate(next.getDate() + 7);
+                break;
+            case 'monthly':
+                next.setMonth(next.getMonth() + 1);
+                break;
+            case 'yearly':
+                next.setFullYear(next.getFullYear() + 1);
+                break;
+        }
+        return next;
+    };
+
+    const calculateDCAReturns = (initialInvestment: number, dcaAmount: number, frequency: string, startDate: Date, endDate: Date): ComparisonResult | null => {
+        if (!bit10ComparisonCalculator || bit10ComparisonCalculator.length === 0) {
+            return null;
+        }
+
+        const findClosestEntry = (targetDate: Date) => {
+            return bit10ComparisonCalculator.reduce((closest, entry) => {
+                const entryDate = new Date(entry.date);
+                const diff = Math.abs(entryDate.getTime() - targetDate.getTime());
+                const closestDiff = Math.abs(
+                    new Date(closest.date).getTime() - targetDate.getTime()
+                );
+                return diff < closestDiff ? entry : closest;
+            });
+        };
+
+        const tokens: { key: keyof BIT10Entry; name: string }[] = [
+            { key: 'bit10Top', name: 'BIT10.TOP' },
+            { key: 'btc', name: 'Bitcoin' },
+            { key: 'sp500', name: 'S&P500' },
+        ];
+
+        const endEntry = findClosestEntry(endDate);
+
+        const assets: AssetComparison[] = tokens.map(({ key, name }) => {
+            let totalInvested = initialInvestment;
+            let totalUnits = 0;
+
+            // Initial investment
+            const startEntry = findClosestEntry(startDate);
+            const startPrice = safeParseFloat(startEntry[key]);
+            if (startPrice > 0) {
+                totalUnits += initialInvestment / startPrice;
+            }
+
+            // DCA investments
+            let currentDCADate = getNextDCADate(startDate, frequency);
+            while (currentDCADate <= endDate) {
+                const dcaEntry = findClosestEntry(currentDCADate);
+                const dcaPrice = safeParseFloat(dcaEntry[key]);
+                if (dcaPrice > 0) {
+                    totalUnits += dcaAmount / dcaPrice;
+                    totalInvested += dcaAmount;
+                }
+                currentDCADate = getNextDCADate(currentDCADate, frequency);
+            }
+
+            const endPrice = safeParseFloat(endEntry[key]);
+            const currentValue = totalUnits * endPrice;
+            const totalReturn = currentValue - totalInvested;
+            const percentageReturn = ((currentValue - totalInvested) / totalInvested) * 100;
+
+            return {
+                name,
+                initialInvestment,
+                totalInvested: parseFloat(totalInvested.toFixed(2)),
+                currentValue: parseFloat(currentValue.toFixed(2)),
+                totalReturn: parseFloat(totalReturn.toFixed(2)),
+                percentageReturn: parseFloat(percentageReturn.toFixed(2)),
+            };
+        });
+
+        return {
+            startDate: startDate.toISOString(),
+            endDate: endEntry.date,
+            assets,
+            isDCA: true,
+        };
+    };
+
+    const calculateAllReturns = (investmentAmount: number, startDate: Date, endDate: Date): ComparisonResult | null => {
         if (!bit10ComparisonCalculator || bit10ComparisonCalculator.length === 0) {
             return null;
         }
@@ -254,11 +350,7 @@ export default function Page() {
             };
         });
 
-        return {
-            startDate: startEntry.date,
-            endDate: endEntry.date,
-            assets,
-        };
+        return { startDate: startEntry.date, endDate: endEntry.date, assets, isDCA: false };
     };
 
     async function onSubmit(values: z.infer<typeof FormSchema>) {
@@ -266,11 +358,23 @@ export default function Page() {
             setProcessing(true);
             setCalculationResult(null);
 
-            const result = calculateAllReturns(
-                values.initial_investment,
-                values.initial_investment_start_date,
-                values.initial_investment_end_date
-            );
+            let result: ComparisonResult | null = null;
+
+            if (values.enable_dca && values.dca_amount && values.dca_frequency) {
+                result = calculateDCAReturns(
+                    values.initial_investment,
+                    values.dca_amount,
+                    values.dca_frequency,
+                    values.initial_investment_start_date,
+                    values.initial_investment_end_date
+                );
+            } else {
+                result = calculateAllReturns(
+                    values.initial_investment,
+                    values.initial_investment_start_date,
+                    values.initial_investment_end_date
+                );
+            }
 
             if (result) {
                 setCalculationResult(result);
@@ -286,7 +390,6 @@ export default function Page() {
         }
     }
 
-    // ToDo: Add an option for compounding for showing DCA
     return (
         <MaxWidthWrapper className='py-4'>
             <div className='grid lg:grid-cols-5 gap-3'>
@@ -301,7 +404,7 @@ export default function Page() {
                         <CardContent className='flex flex-col space-y-4'>
                             {isLoading ? (
                                 <div className='flex flex-col h-full space-y-2'>
-                                    <Skeleton className='h-[300px] lg:h-[400px] w-full' />
+                                    <Skeleton className='h-75 lg:h-100 w-full' />
                                 </div>
                             ) : (
                                 <div className='select-none -ml-4'>
@@ -312,7 +415,7 @@ export default function Page() {
                                         })}
                                     >
                                         {({ startDate, endDate }) => (
-                                            <ChartContainer config={investmentChartConfig} className='max-h-[300px] lg:max-h-[600px] w-full'>
+                                            <ChartContainer config={investmentChartConfig} className='max-h-75 lg:max-h-150 w-full'>
                                                 <LineChart
                                                     accessibilityLayer
                                                     data={processInvestmentData(
@@ -372,6 +475,82 @@ export default function Page() {
                                         );
                                     }}
                                 </form.Field>
+
+                                <form.Field name='enable_dca'>
+                                    {(field) => (
+                                        <Field>
+                                            <div className='flex items-center justify-between space-x-2'>
+                                                <div className='space-y-0.5'>
+                                                    <FieldLabel>Enable Dollar-Cost Averaging (DCA)</FieldLabel>
+                                                    <FieldDescription>
+                                                        Add regular contributions to your investment
+                                                    </FieldDescription>
+                                                </div>
+                                                <Switch
+                                                    checked={field.state.value}
+                                                    onCheckedChange={field.handleChange}
+                                                />
+                                            </div>
+                                        </Field>
+                                    )}
+                                </form.Field>
+
+                                <form.Subscribe selector={(state) => state.values.enable_dca}>
+                                    {(enableDCA) => enableDCA && (
+                                        <>
+                                            <form.Field name='dca_frequency'>
+                                                {(field) => {
+                                                    const isInvalid =
+                                                        field.state.meta.isTouched && !field.state.meta.isValid;
+                                                    return (
+                                                        <Field>
+                                                            <FieldLabel>DCA Frequency</FieldLabel>
+                                                            <Select
+                                                                onValueChange={field.handleChange}
+                                                                value={field.state.value}
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder='Select frequency' />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value='weekly'>Weekly</SelectItem>
+                                                                    <SelectItem value='monthly'>Monthly</SelectItem>
+                                                                    <SelectItem value='yearly'>Yearly</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FieldDescription>How often to add funds</FieldDescription>
+                                                            {isInvalid && (
+                                                                <FieldError errors={field.state.meta.errors} />
+                                                            )}
+                                                        </Field>
+                                                    );
+                                                }}
+                                            </form.Field>
+
+                                            <form.Field name='dca_amount'>
+                                                {(field) => {
+                                                    const isInvalid =
+                                                        field.state.meta.isTouched && !field.state.meta.isValid;
+                                                    return (
+                                                        <Field>
+                                                            <FieldLabel>DCA Amount</FieldLabel>
+                                                            <Input
+                                                                defaultValue={field.state.value}
+                                                                placeholder='DCA amount'
+                                                                type='number'
+                                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                            />
+                                                            <FieldDescription>Amount to invest at each interval (in USD)</FieldDescription>
+                                                            {isInvalid && (
+                                                                <FieldError errors={field.state.meta.errors} />
+                                                            )}
+                                                        </Field>
+                                                    );
+                                                }}
+                                            </form.Field>
+                                        </>
+                                    )}
+                                </form.Subscribe>
 
                                 <form.Field name='initial_investment_start_date'>
                                     {(field) => {
@@ -501,6 +680,9 @@ export default function Page() {
                                                     <tr className='border-b border-green-200 dark:border-green-800'>
                                                         <th className='text-left p-2'>Asset</th>
                                                         <th className='text-center p-2'>Initial Capital</th>
+                                                        {calculationResult.isDCA && (
+                                                            <th className='text-center p-2'>Total Invested</th>
+                                                        )}
                                                         <th className='text-center p-2'>Current Value</th>
                                                         <th className='text-center p-2'>Total Return</th>
                                                         <th className='text-center p-2'>% Return</th>
@@ -516,6 +698,11 @@ export default function Page() {
                                                             <td className='p-2 text-right'>
                                                                 ${asset.initialInvestment.toLocaleString()}
                                                             </td>
+                                                            {calculationResult.isDCA && (
+                                                                <td className='p-2 text-right'>
+                                                                    ${asset.totalInvested?.toLocaleString()}
+                                                                </td>
+                                                            )}
                                                             <td className='p-2 text-right text-green-600 dark:text-green-400'>
                                                                 ${asset.currentValue.toLocaleString()}
                                                             </td>

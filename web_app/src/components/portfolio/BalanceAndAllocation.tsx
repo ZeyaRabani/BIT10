@@ -303,7 +303,7 @@ export default function BalanceAndAllocation() {
                             <div className='flex-1 pb-0'>
                                 <ChartContainer
                                     config={bit10BalanceChartConfig}
-                                    className='aspect-square max-h-[300px]'
+                                    className='aspect-square max-h-75'
                                 >
                                     <PieChart>
                                         {Number(formatCompactNumber(Number(totalBIT10Tokens))) > 0 && (
@@ -379,7 +379,7 @@ export default function BalanceAndAllocation() {
                         <CardHeader className='flex flex-col md:flex-row items-center md:justify-between'>
                             <div className='text-2xl md:text-4xl text-center md:text-start'>BIT10 Allocations</div>
                             <Select onValueChange={setSelectedAllocationToken} defaultValue={selectedAllocationToken}>
-                                <SelectTrigger className='w-[180px]'>
+                                <SelectTrigger className='w-45'>
                                     <SelectValue placeholder='Select Token' />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -395,7 +395,7 @@ export default function BalanceAndAllocation() {
                             <div className='flex-1'>
                                 <ChartContainer
                                     config={bit10AllocationChartConfig}
-                                    className='aspect-square max-h-[300px]'
+                                    className='aspect-square max-h-75'
                                 >
                                     <PieChart>
                                         <ChartTooltip

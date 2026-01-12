@@ -305,7 +305,7 @@ export default function Collateral() {
                                     <div className='flex-1'>
                                         <ChartContainer
                                             config={data.chartConfig}
-                                            className='aspect-square max-h-[300px]'
+                                            className='aspect-square max-h-75'
                                         >
                                             <PieChart>
                                                 <ChartTooltip

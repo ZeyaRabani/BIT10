@@ -1,3 +1,9 @@
+export type StepUpdateCallback = (stepIndex: number, updates: { 
+    status?: 'pending' | 'processing' | 'success' | 'error', 
+    description?: string, 
+    error?: string 
+}) => void;
+
 export interface TransactionResponse {
     'to': string;
     'value': string;

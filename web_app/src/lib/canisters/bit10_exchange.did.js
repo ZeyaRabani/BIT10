@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error
 export const idlFactory = ({ IDL }) => {
     const SwapResponseData = IDL.Record({
         'token_in_amount': IDL.Text,
@@ -119,6 +119,11 @@ export const idlFactory = ({ IDL }) => {
             [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
             [],
         ),
+        'get_buy_and_sell_history_by_address_and_chain': IDL.Func(
+            [IDL.Text, IDL.Text],
+            [IDL.Vec(SwapResponseData)],
+            ['query'],
+        ),
         'get_buy_history': IDL.Func([], [IDL.Vec(SwapResponseData)], ['query']),
         'get_buy_history_by_address_and_chain': IDL.Func(
             [IDL.Text, IDL.Text],
@@ -154,5 +159,5 @@ export const idlFactory = ({ IDL }) => {
         'solana_sell': IDL.Func([IDL.Text], [SwapResponse], []),
     });
 };
-// @ts-ignore
+// @ts-expect-error
 export const init = ({ IDL }) => { return []; };

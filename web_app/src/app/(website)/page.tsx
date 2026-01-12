@@ -438,10 +438,10 @@ export default function Page() {
                         </CardHeader>
                         <CardContent>
                             {isLoading ? (
-                                <Skeleton className='h-[300px] lg:h-[400px] w-full' />
+                                <Skeleton className='h-75 lg:h-100 w-full' />
                             ) : (
                                 <div className='select-none -ml-4'>
-                                    <ChartContainer config={investmentChartConfig} className='max-h-[300px] lg:max-h-[380px] w-full'>
+                                    <ChartContainer config={investmentChartConfig} className='max-h-75 lg:max-h-95 w-full'>
                                         <LineChart accessibilityLayer data={activeChartData}>
                                             <CartesianGrid vertical={false} />
                                             <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#ffffff' interval='preserveStartEnd' />

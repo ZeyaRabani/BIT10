@@ -96,11 +96,9 @@ export default function RecentActivity() {
 
             const { address, label } = chainConfig;
 
-            const buyResponse = (await actor.get_buy_history_by_address_and_chain?.(address, label)) as PortfolioTableDataType[] ?? [];
+            const buyAndSellResponse = (await actor.get_buy_and_sell_history_by_address_and_chain?.(address, label)) as PortfolioTableDataType[] ?? [];
 
-            const sellResponse = (await actor.get_sell_history_by_address_and_chain?.(address, label)) as PortfolioTableDataType[] ?? [];
-
-            return [...buyResponse, ...sellResponse].map((tx) => ({ ...tx, _timestamp: Number(tx.transaction_timestamp) })).sort((a, b) => b._timestamp - a._timestamp);
+            return buyAndSellResponse.map((tx) => ({ ...tx, _timestamp: Number(tx.transaction_timestamp) })).sort((a, b) => b._timestamp - a._timestamp);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             toast.error('An error occurred while fetching user portfolio. Please try again!');

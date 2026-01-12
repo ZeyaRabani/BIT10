@@ -7,11 +7,12 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useQueries, type UseQueryOptions } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { formatAddress, formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils';
-import { ChevronsUpDownIcon, Loader2Icon, InfoIcon, ArrowUpDownIcon, WalletIcon } from 'lucide-react';
+import { ChevronsUpDownIcon, Loader2Icon, InfoIcon, ArrowUpDownIcon, WalletIcon, CheckCircle2Icon, XCircleIcon } from 'lucide-react';
 import { useForm, useStore } from '@tanstack/react-form';
 import { CHAIN_REGISTRY } from '@/chains/chain.registry';
 import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card';
 import TokenDetails from './TokenDetails';
+import { AnimatedBackground } from '@/components/ui/animated-background';
 import { cn } from '@/lib/utils';
 import { Field, FieldError } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,13 @@ interface TokenField {
     handleChange: (value: string) => void;
 };
 
+interface TransactionStep {
+    title: string;
+    status: 'pending' | 'processing' | 'success' | 'error';
+    description?: string;
+    error?: string;
+};
+
 const FormSchema = z.object({
     payment_amount: z.preprocess((value) => parseFloat(value as string), z.number({
         message: 'Please enter the number of tokens for payment',
@@ -71,6 +79,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const [paymentTokenSearch, setPaymentTokenSearch] = useState<string>('');
     const [receiveTokenSearch, setReceiveTokenSearch] = useState<string>('');
     const [lastEditedField, setLastEditedField] = useState<'payment' | 'receive'>('payment');
+    const [transactionDialogOpen, setTransactionDialogOpen] = useState<boolean>(false);
+    const [transactionSteps, setTransactionSteps] = useState<TransactionStep[]>([]);
 
     const { chain } = useChain();
     const { icpAddress } = useICPWallet();
@@ -549,17 +559,86 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         setLastEditedField('receive');
     };
 
+    const updateTransactionStep = (stepIndex: number, updates: Partial<TransactionStep>) => {
+        setTransactionSteps(prev => {
+            const newSteps = [...prev];
+            const existing = newSteps[stepIndex];
+            if (!existing) return newSteps;
+            newSteps[stepIndex] = {
+                title: updates.title ?? existing.title,
+                status: updates.status ?? existing.status,
+                description: updates.description ?? existing.description,
+                error: updates.error ?? existing.error,
+            };
+            return newSteps;
+        });
+    };
+
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
             setBuying(true);
+            setTransactionDialogOpen(true);
+
             if (chain === 'icp') {
-                await CHAIN_REGISTRY.icp.buyBIT10Token({ tokenInAmount: values.payment_amount.toString(), tokenInAddress: payingTokenAddress, tokenOutAmount: values.receive_amount.toString(), tokenOutAddress: receivingTokenAddress })
+                setTransactionSteps([
+                    { title: 'Allow Canisters', status: 'processing' },
+                    { title: 'Approve Token Spending', status: 'pending' },
+                    { title: 'Swap Tokens', status: 'pending' }
+                ]);
+
+                await CHAIN_REGISTRY.icp.buyBIT10Token({
+                    tokenInAmount: values.payment_amount.toString(),
+                    tokenInAddress: payingTokenAddress,
+                    tokenOutAmount: values.receive_amount.toString(),
+                    tokenOutAddress: receivingTokenAddress,
+                    onStepUpdate: updateTransactionStep
+                });
             } else if (chain === 'base') {
-                await CHAIN_REGISTRY.base.buyBIT10Token({ tokenInAmount: values.payment_amount.toString(), tokenInAddress: payingTokenAddress, tokenOutAmount: values.receive_amount.toString(), tokenOutAddress: receivingTokenAddress, walletAddress: evmAddress! })
+                setTransactionSteps([
+                    { title: 'Approve Transaction', status: 'processing' },
+                    { title: 'Confirm on Blockchain', status: 'pending' },
+                    { title: 'Finalize Swap', status: 'pending' }
+                ]);
+
+                await CHAIN_REGISTRY.base.buyBIT10Token({
+                    tokenInAmount: values.payment_amount.toString(),
+                    tokenInAddress: payingTokenAddress,
+                    tokenOutAmount: values.receive_amount.toString(),
+                    tokenOutAddress: receivingTokenAddress,
+                    walletAddress: evmAddress!,
+                    onStepUpdate: updateTransactionStep
+                });
             } else if (chain === 'solana') {
-                await CHAIN_REGISTRY.solana.buyBIT10Token({ tokenInAmount: values.payment_amount.toString(), tokenInAddress: payingTokenAddress, tokenOutAmount: values.receive_amount.toString(), tokenOutAddress: receivingTokenAddress, walletAddress: wallet.publicKey ? wallet.publicKey?.toBase58() : '', wallet: wallet })
+                setTransactionSteps([
+                    { title: 'Prepare Wallet & Approve Transaction', status: 'processing' },
+                    { title: 'Confirm on Solana', status: 'pending' },
+                    { title: 'Finalize Swap', status: 'pending' }
+                ]);
+
+                await CHAIN_REGISTRY.solana.buyBIT10Token({
+                    tokenInAmount: values.payment_amount.toString(),
+                    tokenInAddress: payingTokenAddress,
+                    tokenOutAmount: values.receive_amount.toString(),
+                    tokenOutAddress: receivingTokenAddress,
+                    walletAddress: wallet.publicKey ? wallet.publicKey?.toBase58() : '',
+                    wallet: wallet,
+                    onStepUpdate: updateTransactionStep
+                });
             } else if (chain === 'bsc') {
-                await CHAIN_REGISTRY.bsc.buyBIT10Token({ tokenInAmount: values.payment_amount.toString(), tokenInAddress: payingTokenAddress, tokenOutAmount: values.receive_amount.toString(), tokenOutAddress: receivingTokenAddress, walletAddress: evmAddress! })
+                setTransactionSteps([
+                    { title: 'Approve Transaction', status: 'processing' },
+                    { title: 'Confirm on Blockchain', status: 'pending' },
+                    { title: 'Finalize Swap', status: 'pending' }
+                ]);
+
+                await CHAIN_REGISTRY.bsc.buyBIT10Token({
+                    tokenInAmount: values.payment_amount.toString(),
+                    tokenInAddress: payingTokenAddress,
+                    tokenOutAmount: values.receive_amount.toString(),
+                    tokenOutAddress: receivingTokenAddress,
+                    walletAddress: evmAddress!,
+                    onStepUpdate: updateTransactionStep
+                });
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
@@ -600,6 +679,31 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         return 'Buy';
     };
 
+    const canCloseDialog = useMemo(() => {
+        if (transactionSteps.length === 0) return false;
+
+        const hasError = transactionSteps.some(step => step.status === 'error');
+        if (hasError) return true;
+
+        const allCompleted = transactionSteps.every(step => step.status === 'success');
+        if (allCompleted) return true;
+
+        return false;
+    }, [transactionSteps]);
+
+    const getStepIcon = (status: TransactionStep['status']) => {
+        switch (status) {
+            case 'processing':
+                return <Loader2Icon className='animate-spin text-blue-500' size={20} />;
+            case 'success':
+                return <CheckCircle2Icon className='text-green-500' size={20} />;
+            case 'error':
+                return <XCircleIcon className='text-red-500' size={20} />;
+            default:
+                return <div className='w-5 h-5 rounded-full border-2 border-muted-foreground' />;
+        }
+    };
+
     return (
         <div className='flex flex-col-reverse lg:grid lg:grid-cols-4 xl:grid-cols-5 gap-4'>
             <div className='lg:col-span-2 xl:col-span-3'>
@@ -608,8 +712,18 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
             <div className='lg:col-span-2 xl:col-span-2'>
                 <Card className='border-none animate-fade-right'>
-                    <CardHeader>
+                    <CardHeader className='flex flex-row items-center justify-between'>
                         <CardTitle>Buy</CardTitle>
+                        <div className='relative flex flex-row space-x-2 items-center justify-center border rounded-full px-2 py-1.5'>
+                            <AnimatedBackground defaultValue='Buy' className='rounded-full bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={onSwitchToSell}>
+                                <button type='button' data-id={'Buy'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
+                                    Buy
+                                </button>
+                                <button type='button' data-id={'Sell'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
+                                    Sell
+                                </button>
+                            </AnimatedBackground>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <form autoComplete='off' className='flex flex-col space-y-2'
@@ -897,7 +1011,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                 </div>
                                 <div className='flex flex-col md:flex-row items-start md:items-center justify-between space-x-2 font-semibold tracking-wider'>
                                     <div>Expected Output</div>
-                                    <div>{formatCompactNumber(formWatchReceiveAmount)} {formWatchReceiveToken}</div>
+                                    <div>{formatCompactNumber(formWatchReceiveAmount)} {selectedReceiveTokenData?.label}</div>
                                 </div>
                             </div>
 
@@ -956,6 +1070,49 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                     <VerifyTransaction mode='buy' />
                 </div>
             </div>
+
+            <Dialog open={transactionDialogOpen} onOpenChange={(open) => { if (canCloseDialog || !open) { setTransactionDialogOpen(open); } }}>
+                <DialogContent className='sm:max-w-md' onPointerDownOutside={(e) => {
+                    if (!canCloseDialog) e.preventDefault();
+                }} onEscapeKeyDown={(e) => {
+                    if (!canCloseDialog) e.preventDefault();
+                }}>
+                    <DialogHeader>
+                        <DialogTitle>Transaction Progress</DialogTitle>
+                    </DialogHeader>
+                    <div className='flex flex-col space-y-4 py-4'>
+                        {transactionSteps.map((step, index) => (
+                            <div key={index} className='flex flex-col space-y-2'>
+                                <div className='flex flex-row items-start space-x-3'>
+                                    <div className='pt-0.5'>
+                                        {getStepIcon(step.status)}
+                                    </div>
+                                    <div className='flex-1'>
+                                        <div className='font-medium'>{step.title}</div>
+                                        {step.description && (
+                                            <div className='text-sm text-muted-foreground mt-1'>
+                                                {step.description}
+                                            </div>
+                                        )}
+                                        {step.error && (
+                                            <div className='text-sm text-red-500 mt-1'>
+                                                {step.error}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {canCloseDialog && (
+                        <div className='flex justify-end'>
+                            <Button onClick={() => setTransactionDialogOpen(false)}>
+                                Close
+                            </Button>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
