@@ -348,6 +348,13 @@ export const dex = pgTable('dex', {
 	check('check_positive_amounts', sql`((amount_in)::numeric >= (0)::numeric) AND ((amount_out)::numeric >= (0)::numeric)`),
 ]);
 
+export const walletAllocations = pgTable('wallet_allocations', {
+	walletAddress: text('wallet_address').primaryKey().notNull(),
+	explorerAddress: text('explorer_address').notNull(),
+	bit10: text().array().notNull(),
+	tokenId: text('token_id').array(),
+});
+
 export const teLend = pgTable('te_lend', {
 	lenderAddress: text('lender_address').notNull(),
 	tokenChain: text('token_chain').notNull(),

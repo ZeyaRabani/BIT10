@@ -185,7 +185,7 @@ export default function Page() {
     }, [bit10ComparisonCalculator]);
 
     const formDefaults = {
-        initial_investment: '10',
+        initial_investment: '100',
         enable_dca: false,
         dca_frequency: 'monthly',
         dca_amount: '100',
@@ -394,7 +394,7 @@ export default function Page() {
         <MaxWidthWrapper className='py-4'>
             <div className='grid lg:grid-cols-5 gap-3'>
                 <div className='lg:col-span-3'>
-                    <Card className='animate-fade-left-slow'>
+                    <Card className='animate-fade-left-slow bg-background'>
                         <CardHeader>
                             <CardTitle>Investment Growth Over Selected Period</CardTitle>
                             <CardDescription>
@@ -443,7 +443,7 @@ export default function Page() {
                     </Card>
                 </div>
                 <div className='lg:col-span-2'>
-                    <Card className='animate-fade-right-slow h-full flex flex-col'>
+                    <Card className='animate-fade-right-slow h-full flex flex-col bg-background'>
                         <CardHeader>
                             <CardTitle>
                                 BIT10 Investment Calculator
@@ -670,14 +670,14 @@ export default function Page() {
                                 </Button>
 
                                 {calculationResult && (
-                                    <div className='w-full p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-900/20'>
-                                        <h3 className='font-semibold text-green-800 dark:text-green-200 mb-3'>
+                                    <div className='w-full p-4 border border-green-800 rounded-lg bg-green-900/20'>
+                                        <h3 className='font-semibold text-green-200 mb-3'>
                                             Investment Comparison
                                         </h3>
                                         <ScrollArea className='max-w-[75vw] whitespace-nowrap'>
                                             <table className='w-full text-sm border-collapse '>
                                                 <thead>
-                                                    <tr className='border-b border-green-200 dark:border-green-800'>
+                                                    <tr className='border-b border-green-800'>
                                                         <th className='text-left p-2'>Asset</th>
                                                         <th className='text-center p-2'>Initial Capital</th>
                                                         {calculationResult.isDCA && (
@@ -692,7 +692,7 @@ export default function Page() {
                                                     {calculationResult.assets.map((asset) => (
                                                         <tr
                                                             key={asset.name}
-                                                            className='border-b border-green-200 dark:border-green-800 last:border-0'
+                                                            className='border-b border-green-200 last:border-0'
                                                         >
                                                             <td className='p-2'>{asset.name}</td>
                                                             <td className='p-2 text-right'>
@@ -700,24 +700,24 @@ export default function Page() {
                                                             </td>
                                                             {calculationResult.isDCA && (
                                                                 <td className='p-2 text-right'>
-                                                                    ${asset.totalInvested?.toLocaleString()}
+                                                                    ${asset.totalInvested?.toFixed(0).toLocaleString()}
                                                                 </td>
                                                             )}
-                                                            <td className='p-2 text-right text-green-600 dark:text-green-400'>
-                                                                ${asset.currentValue.toLocaleString()}
+                                                            <td className='p-2 text-right text-green-400'>
+                                                                ${asset.currentValue.toFixed(0).toLocaleString()}
                                                             </td>
                                                             <td
                                                                 className={`p-2 text-right ${asset.totalReturn >= 0
-                                                                    ? 'text-green-600 dark:text-green-400'
-                                                                    : 'text-red-600 dark:text-red-400'
+                                                                    ? 'text-green-400'
+                                                                    : 'text-red-400'
                                                                     }`}
                                                             >
-                                                                ${asset.totalReturn.toLocaleString()}
+                                                                ${asset.totalReturn.toFixed(0).toLocaleString()}
                                                             </td>
                                                             <td
                                                                 className={`p-2 text-right ${asset.percentageReturn >= 0
-                                                                    ? 'text-green-600 dark:text-green-400'
-                                                                    : 'text-red-600 dark:text-red-400'
+                                                                    ? 'text-green-400'
+                                                                    : 'text-red-400'
                                                                     }`}
                                                             >
                                                                 {asset.percentageReturn >= 0 ? '+' : ''}
@@ -729,7 +729,7 @@ export default function Page() {
                                             </table>
                                             <ScrollBar orientation='horizontal' />
                                         </ScrollArea>
-                                        <div className='pt-2 text-xs text-gray-500 dark:text-gray-400'>
+                                        <div className='pt-2 text-xs text-muted-foreground'>
                                             Period: From {new Date(calculationResult.startDate).toLocaleDateString()} to{' '}
                                             {new Date(calculationResult.endDate).toLocaleDateString()}
                                         </div>

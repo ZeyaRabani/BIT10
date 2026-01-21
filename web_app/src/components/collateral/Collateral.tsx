@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react'
-import { useQueries } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { Label, Pie, PieChart } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { HistoryIcon, DollarSignIcon, CoinsIcon, TrendingUpIcon, ShieldIcon, ExternalLinkIcon } from 'lucide-react'
-import { formatCompactPercentNumber, formatAddress } from '@/lib/utils'
+import { useState, useEffect } from 'react';
+import { useQueries } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
+import { bit10WalletAllocation } from '@/actions/dbActions';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { Label, Pie, PieChart } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { HistoryIcon, DollarSignIcon, CoinsIcon, TrendingUpIcon, ShieldIcon, ExternalLinkIcon } from 'lucide-react';
+import { formatCompactPercentNumber, formatAddress } from '@/lib/utils';
 
-// ToDo: temp
 interface WalletDataType {
     walletAddress: string;
     explorerAddress: string;
@@ -55,20 +55,6 @@ interface RebalanceData {
     bit10Data: CoinData[];
 }
 
-// ToDo: (temp. placeholder, put this on db)
-const bit10Allocation: WalletDataType[] = [
-    { walletAddress: 'bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', explorerAddress: 'https://fractal.unisat.io/swap/assets/bc1pkjd3hjwmc20vm3hu7z2xl5rfpxs0fzfp463fdjg7jsn34vn4nsaqgc55hy', bit10: ['BIT10.TOP'] },
-
-    { walletAddress: '0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1', bit10: ['BIT10.TOP'], tokenId: ['ethereum', 'chainlink', 'leo-token'] },
-    { walletAddress: 'bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', explorerAddress: 'https://mempool.space/address/bc1qfqh8ca6a48k2phn4ctqutetapydm5t79edlnqh', bit10: ['BIT10.TOP'], tokenId: ['bitcoin'] },
-    { walletAddress: '0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', explorerAddress: 'https://bscscan.com/address/0x7F7307d895f1242E969a58893ac8594EfC8Ce6E2', bit10: ['BIT10.TOP'], tokenId: ['ripple', 'binancecoin', 'dogecoin', 'cardano', 'zcash', 'bitcoin-cash'] },
-    { walletAddress: 'KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', explorerAddress: 'https://explorer.solana.com/address/KHTRyohhTPK69EjYapKSZGTNGvv5EnwxAAgJ7CN1STn', bit10: ['BIT10.TOP'], tokenId: ['solana'] },
-    { walletAddress: 'TXHicWyMh8pBryemgawayVztrxVx75dtzb', explorerAddress: 'https://tronscan.org/#/address/TXHicWyMh8pBryemgawayVztrxVx75dtzb', bit10: ['BIT10.TOP'], tokenId: ['tron'] },
-    { walletAddress: '0x545a402305d54bf34b588c169b51c24f8d1b4c01', explorerAddress: 'https://app.hyperliquid.xyz/explorer/address/0x545a402305d54bf34b588c169b51c24f8d1b4c01', bit10: ['BIT10.TOP'], tokenId: ['hyperliquid'] },
-    { walletAddress: '0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', explorerAddress: 'https://suiscan.xyz/mainnet/account/0x50a478a78d2534b0845c8407e48e8cef743ef100c454471c3142744f06811324', bit10: ['BIT10.TOP'], tokenId: ['sui'] },
-    { walletAddress: 'GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', explorerAddress: 'https://stellar.expert/explorer/public/account/GDPIOLDAMS6FEVXXITYJR2UQEKN7Y27QUATSMYN5PPM6NJLB7RVOIMFP', bit10: ['BIT10.TOP'], tokenId: ['stellar'] },
-];
-
 const DEFAULT_WALLET = {
     walletAddress: '0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1',
     explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1'
@@ -111,6 +97,21 @@ export default function Collateral() {
         }
     };
 
+    const fetchBIT10Wallets = async () => {
+        try {
+            const response = await bit10WalletAllocation();
+
+            if (response === 'Error fetching wallet allocations') {
+                toast.info('Error fetching wallet allocations. Please try again!');
+            }
+
+            return response;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            toast.error('An error occured processing your request. Please try again later!')
+        }
+    };
+
     const bit10Queries = useQueries({
         queries: [
             {
@@ -121,13 +122,18 @@ export default function Collateral() {
                 queryKey: ['bit10TOPTokenPrice'],
                 queryFn: () => fetchBIT10Price('top'),
                 refetchInterval: 180000, // 30 min.
-            }
+            },
+            {
+                queryKey: ['bit10WalletAllocations'],
+                queryFn: () => fetchBIT10Wallets()
+            },
         ],
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     const bit10TOPRebalanceData = bit10Queries[0].data;
     const bit10TOPCurrentPrice = bit10Queries[1].data;
+    const bit10Allocation = bit10Queries[2].data as WalletDataType[] || [];
 
     useEffect(() => {
         const handleResize = () => {

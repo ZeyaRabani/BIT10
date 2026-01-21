@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import { Menu, X, Coins, BriefcaseBusiness, Home, BookText, Calculator, Landmark, GiftIcon } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, SettingsIcon, LandmarkIcon, Coins, BriefcaseBusiness, BookText, CalculatorIcon, Landmark, GiftIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -10,8 +10,9 @@ import WalletBtn from './WalletBtn';
 
 const links = {
     web: [
-        { title: 'About', link: '/', icon: Home },
-        { title: 'Investment Calculator', link: '/investment-calculator', icon: Calculator },
+        { title: 'How It Works', link: '?id=how-it-works', icon: SettingsIcon },
+        { title: 'Proof-of-Reserves', link: '?id=reserves', icon: LandmarkIcon },
+        { title: 'Investment Calculator', link: '/investment-calculator', icon: CalculatorIcon },
         { title: 'GitBook', link: '/gitbook', icon: BookText }
     ],
     app: [
@@ -32,6 +33,7 @@ export default function ResponsiveNavbar() {
     const [isClosing, setIsClosing] = useState<boolean>(false);
 
     const pathname = usePathname();
+    const router = useRouter();
 
     const isAppMode = () => {
         if (externalRoutes.appMode.includes(pathname)) {
@@ -58,6 +60,40 @@ export default function ResponsiveNavbar() {
             setIsOpen(true);
         }
     };
+
+    const handleLinkClick = (link: string) => {
+        // Check if it's a section link (starts with ?id=)
+        if (link.startsWith('?id=')) {
+            const sectionId = link.replace('?id=', '');
+
+            // Close the menu first
+            toggleMenu();
+
+            // If we're already on the home page, just scroll
+            if (pathname === '/') {
+                setTimeout(() => {
+                    const element = document.getElementById(sectionId);
+                    if (element) {
+                        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                        const offsetPosition = elementPosition - 30;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 350); // Wait for menu close animation
+            } else {
+                // Navigate to home page with the section id
+                router.push(`/${link}`);
+            }
+        } else if (pathname === link) {
+            // If clicking on current page, just close menu
+            toggleMenu();
+        }
+        // For other links, let the Link component handle navigation normally
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { if (isOpen) toggleMenu(); }, [pathname]);
 
@@ -88,7 +124,18 @@ export default function ResponsiveNavbar() {
 
                                 <div className='grid px-8 text-xl py-2 gap-2 w-full mb-4'>
                                     {links[appMode ? 'app' : 'web'].map(({ title, link, icon: Icon }) => (
-                                        <Link key={link} href={link} onClick={() => pathname === link && toggleMenu()}>
+                                        <Link
+                                            key={link}
+                                            href={link}
+                                            onClick={(e) => {
+                                                if (link.startsWith('?id=')) {
+                                                    e.preventDefault();
+                                                    handleLinkClick(link);
+                                                } else {
+                                                    handleLinkClick(link);
+                                                }
+                                            }}
+                                        >
                                             <div className='border-b-2 pt-0.5 pb-2 px-2 cursor-pointer w-full flex flex-row justify-between items-center'>
                                                 {title}
                                                 <Icon />

@@ -22,20 +22,19 @@ import ICPImg from '@/assets/home/ICP.svg';
 import EasyAImg from '@/assets/home/EasyA.png';
 import { useQueries } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Card, CardTitle, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedBackground } from '@/components/ui/animated-background';
 import { CartesianGrid, XAxis, YAxis, LineChart, Line } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
 import ICPChainImg from '@/assets/wallet/icp-logo.svg';
 import BaseChainImg from '@/assets/wallet/base-logo.svg';
 import SolChainImg from '@/assets/wallet/solana-logo.svg';
 import BSCChainImg from '@/assets/wallet/bsc-logo.svg';
-import { cn } from '@/lib/utils';
+import { cn, formatPreciseDecimal } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { TrendingUpIcon, ShieldIcon, ZapIcon, NetworkIcon, CheckIcon, XIcon } from 'lucide-react';
+import { TrendingUpIcon, TrendingDownIcon, AlertCircleIcon, ClockIcon, DollarSignIcon, RefreshCwIcon, MinusIcon, ShieldIcon, ZapIcon, CheckIcon, XIcon, EyeIcon, ArrowRightIcon, ExternalLinkIcon, WalletIcon, ArrowDownUpIcon, PieChartIcon } from 'lucide-react';
 
 const containerVariants = {
     visible: {
@@ -65,7 +64,9 @@ const imageVariants = {
     },
 };
 
-const tabs = ['1Y', '3Y', '5Y', '10Y'] as const;
+const initialInvestment = ['$100', '$1,000', '$10,000'] as const;
+
+const timeframe = ['1Y', '3Y', '5Y', '10Y'] as const;
 
 type BIT10Entry = {
     date: string;
@@ -74,72 +75,327 @@ type BIT10Entry = {
     sp500: string;
 };
 
-const chains = [
-    { name: 'Internet Computer', logo: ICPChainImg as StaticImageData },
-    { name: 'Base', logo: BaseChainImg as StaticImageData },
-    { name: 'Solana', logo: SolChainImg as StaticImageData },
-    { name: 'Binance Smart Chain', logo: BSCChainImg as StaticImageData },
+type TokenPriceData = {
+    timestmpz: string;
+    tokenPrice: number;
+    data: {
+        id: string;
+        symbol: string;
+        name: string;
+        image: string;
+        price: number;
+        marketCap: number;
+    }[];
+};
+
+type FeatureStatus = 'yes' | 'no' | 'partial';
+
+interface ComparisonRow {
+    feature: string;
+    tradfi: FeatureStatus;
+    onchain: FeatureStatus;
+    bit10: FeatureStatus;
+};
+
+interface Chain {
+    id: string;
+    name: string;
+    logo: StaticImageData;
+    status: 'live' | 'coming';
+    color: string;
+    description: string;
+};
+
+type CoinData = {
+    id: string;
+    name: string;
+    symbol: string;
+    image: string;
+    tokenAddress?: string;
+    noOfTokens?: number;
+    chain?: string;
+    marketCap?: number;
+    price: number;
+};
+
+type BIT10RebalanceEntry = {
+    timestmpz: string;
+    indexValue: number;
+    priceOfTokenToBuy: number;
+    newTokens: CoinData[];
+    added: CoinData[];
+    removed: CoinData[];
+    retained: CoinData[];
+};
+
+interface FundCard {
+    id: string;
+    name: string;
+    description: string;
+    status: 'live' | 'coming';
+    icon: string;
+};
+
+const painPoints = [
+    {
+        icon: AlertCircleIcon,
+        title: 'Pick the winners',
+        description: 'Which of the 30M+ tokens will make it?',
+    },
+    {
+        icon: ClockIcon,
+        title: 'Time the market',
+        description: 'Buy low, sell high - easier said than done.',
+    },
+    {
+        icon: DollarSignIcon,
+        title: 'Death by fees',
+        description: 'Gas, swaps, bridges... costs add up fast.',
+    },
+    {
+        icon: RefreshCwIcon,
+        title: 'Manual rebalancing',
+        description: `Markets move 24/7. Your portfolio doesn't.`,
+    },
 ];
 
-const pricingItems = [
+const comparisonData: ComparisonRow[] = [
     {
-        title: 'Basic',
-        tagline: 'Perfect for getting started with BIT10.',
-        price: 'Free',
-        features: [
-            { text: 'Instant Top 10 Crypto Exposure', negative: false },
-            { text: '110% Over-Collateralized', negative: false },
-            { text: 'Weekly Auto-Rebalancing', negative: false },
-            { text: '0.5% Management Fee', negative: false },
-            { text: '5% Cashback', negative: true },
-            { text: '3 Reward Pool Tickets', negative: true },
-            { text: 'AI Portfolio Manager', negative: true },
-        ],
+        feature: 'Diversified exposure',
+        tradfi: 'yes',
+        onchain: 'yes',
+        bit10: 'yes'
     },
     {
-        title: 'Pro',
-        tagline: 'Advanced tools and reduced fees for committed investors.',
-        price: '9.99 USDC',
-        features: [
-            { text: 'Instant Top 10 Crypto Exposure', negative: false },
-            { text: '110% Over-Collateralized', negative: false },
-            { text: 'Weekly Auto-Rebalancing', negative: false },
-            { text: '0.5% Management Fee', negative: false },
-            { text: '5% Cashback', negative: false },
-            { text: '3 Reward Pool Tickets', negative: false },
-            { text: 'AI Portfolio Manager', negative: false },
-        ],
+        feature: 'Native asset custody',
+        tradfi: 'no',
+        onchain: 'no',
+        bit10: 'yes'
     },
     {
-        title: 'Institutional',
-        tagline: 'High-performance solutions for institutions.',
-        price: 'Custom',
-        features: [],
+        feature: 'On-chain verifiable',
+        tradfi: 'no',
+        onchain: 'partial',
+        bit10: 'yes'
+    },
+    {
+        feature: '24/7 liquidity',
+        tradfi: 'no',
+        onchain: 'yes',
+        bit10: 'yes'
+    },
+    {
+        feature: 'Non-custodial',
+        tradfi: 'no',
+        onchain: 'partial',
+        bit10: 'yes'
+    },
+    {
+        feature: 'Daily auto-rebalancing',
+        tradfi: 'no',
+        onchain: 'no',
+        bit10: 'yes'
+    },
+    {
+        feature: 'Low management fees',
+        tradfi: 'partial',
+        onchain: 'yes',
+        bit10: 'yes'
+    },
+    {
+        feature: 'Over-collateralized',
+        tradfi: 'no',
+        onchain: 'no',
+        bit10: 'yes'
+    }
+];
+
+const StatusIcon = ({ status }: { status: FeatureStatus }) => {
+    switch (status) {
+        case 'yes':
+            return <div className='w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center'>
+                <CheckIcon className='w-4 h-4 text-primary' />
+            </div>;
+        case 'no':
+            return <div className='w-6 h-6 rounded-full bg-destructive/20 flex items-center justify-center'>
+                <XIcon className='w-4 h-4 text-destructive' />
+            </div>;
+        case 'partial':
+            return <div className='w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center'>
+                <MinusIcon className='w-4 h-4 text-yellow-500' />
+            </div>;
+    }
+};
+
+const features = [
+    {
+        icon: ShieldIcon,
+        title: 'Native Assets Only',
+        description: 'No wrapped tokens. You own the actual BTC, ETH, SOL - not IOUs.',
+    },
+    {
+        icon: EyeIcon,
+        title: 'Verifiable Reserves',
+        description: 'Every asset backing your investment is visible on-chain, 24/7.',
+    },
+    {
+        icon: RefreshCwIcon,
+        title: 'Daily Rebalancing',
+        description: 'Daily rebalancing keeps your portfolio aligned with market cap weights.',
+    },
+    {
+        icon: ZapIcon,
+        title: 'One Transaction',
+        description: 'No swapping 10 tokens. Buy BIT10, own the top 10.',
     },
 ];
 
-const whyChooseUs = [
+const stats = [
+    { value: '110%', label: 'Over-collateralized' },
+    { value: '0.5%', label: 'Management Fee' },
+    { value: 'Daily', label: 'Rebalancing' },
+    { value: '4+', label: 'Chains Supported' },
+];
+
+// const pricingItems = [
+//     {
+//         title: 'Basic',
+//         tagline: 'Perfect for getting started with BIT10.',
+//         price: 'Free',
+//         features: [
+//             { text: 'Instant Top 10 Crypto Exposure', negative: false },
+//             { text: '110% Over-Collateralized', negative: false },
+//             { text: 'Daily Auto-Rebalancing', negative: false },
+//             { text: '0.5% Management Fee', negative: false },
+//             { text: '5% Cashback', negative: true },
+//             { text: '3 Reward Pool Tickets', negative: true },
+//             { text: 'AI Portfolio Manager', negative: true },
+//         ],
+//     },
+//     {
+//         title: 'Pro',
+//         tagline: 'Advanced tools and reduced fees for committed investors.',
+//         price: '9.99 USDC',
+//         features: [
+//             { text: 'Instant Top 10 Crypto Exposure', negative: false },
+//             { text: '110% Over-Collateralized', negative: false },
+//             { text: 'Daily Auto-Rebalancing', negative: false },
+//             { text: '0.3% Management Fee', negative: false },
+//             { text: '5% Cashback', negative: false },
+//             { text: '3 Reward Pool Tickets', negative: false },
+//             { text: 'AI Portfolio Manager', negative: false },
+//         ],
+//     },
+//     {
+//         title: 'Institutional',
+//         tagline: 'High-performance solutions for institutions.',
+//         price: 'Custom',
+//         features: [],
+//     },
+// ];
+
+const chains: Chain[] = [
     {
-        title: 'Low Cost',
-        desc: 'Pay 1 transaction fee instead of 10',
-        icon: NetworkIcon
+        id: 'solana',
+        name: 'Solana',
+        logo: SolChainImg as StaticImageData,
+        status: 'live',
+        color: 'from-purple-500 to-purple-600',
+        description: `Fast, low-cost transactions on Solana's high- performance blockchain.`,
     },
     {
-        title: 'Auto-Rebalanced',
-        desc: 'Weekly rebalancing to stay up-to-date',
-        icon: ZapIcon
+        id: 'base',
+        name: 'Base',
+        logo: BaseChainImg as StaticImageData,
+        status: 'live',
+        color: 'from-blue-500 to-blue-600',
+        description: 'Secure, low-cost L2 built by Coinbase for the onchain economy.',
     },
     {
-        title: 'Diversified',
-        desc: 'Instant exposure to Top 10 cryptocurrencies',
-        icon: TrendingUpIcon
+        id: 'icp',
+        name: 'Internet Computer',
+        logo: ICPChainImg as StaticImageData,
+        status: 'live',
+        color: 'from-indigo-500 to-purple-500',
+        description: '100% on-chain smart contracts with web-speed finality.',
     },
     {
-        title: 'Secure',
-        desc: '110% over-collateralized for your protection',
-        icon: ShieldIcon
+        id: 'bsc',
+        name: 'BNB Chain',
+        logo: BSCChainImg as StaticImageData,
+        status: 'live',
+        color: 'from-yellow-500 to-orange-500',
+        description: `High throughput and low fees on Binance's ecosystem.`,
     },
-]
+    {
+        id: 'ethereum',
+        name: 'Ethereum',
+        logo: ETHImg as StaticImageData,
+        status: 'coming',
+        color: 'from-gray-500 to-gray-600',
+        description: 'The most decentralized smart contract platform.',
+    },
+    {
+        id: 'avalanche',
+        name: 'Avalanche',
+        logo: AVAXImg as StaticImageData,
+        status: 'coming',
+        color: 'from-gray-500 to-gray-600',
+        description: 'Sub-second finality with horizontal scaling.',
+    },
+];
+
+const steps = [
+    {
+        icon: WalletIcon,
+        step: '01',
+        title: 'Deposit Stablecoins',
+        description: 'Connect your wallet and deposit USDC, USDT, or other supported stablecoins.',
+    },
+    {
+        icon: ArrowDownUpIcon,
+        step: '02',
+        title: 'BIT10 Does the Rest',
+        description: 'Your deposit is automatically converted to a balanced portfolio of the top 10 cryptos.',
+    },
+    {
+        icon: PieChartIcon,
+        step: '03',
+        title: 'Own Diversified Crypto',
+        description: 'Receive BIT10 tokens representing your share. Hold, trade, or redeem anytime.',
+    },
+];
+
+const funds: FundCard[] = [
+    {
+        id: 'top10',
+        name: 'BIT10.TOP',
+        description: 'Top 10 cryptocurrencies by market cap.',
+        status: 'live',
+        icon: '🏆',
+    },
+    {
+        id: 'sol',
+        name: 'BIT10.SOL',
+        description: 'Top 10 cryptocurrencies on Solana.',
+        status: 'coming',
+        icon: '🟣',
+    },
+    {
+        id: 'base',
+        name: 'BIT10.BASE',
+        description: 'Top 10 cryptocurrencies on Base.',
+        status: 'coming',
+        icon: '🔵',
+    },
+    {
+        id: 'rwa',
+        name: 'BIT10.RWA',
+        description: 'Top 10 cryptocurrencies in RWA.',
+        status: 'coming',
+        icon: '🏛️',
+    },
+];
 
 const testimonials = [
     {
@@ -175,7 +431,7 @@ const fetchBIT10Tokens = async (tokenPriceAPI: string) => {
         if (!response.ok) throw new Error('Failed to fetch tokens');
 
         const data = (await response.json()) as { data?: unknown };
-        return Array.isArray(data?.data) ? (data.data as { id: string; name: string; symbol: string; marketCap: number; price: number }[]) : [];
+        return data;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         toast.error('Error fetching BIT10 price. Please try again!');
@@ -197,8 +453,28 @@ const fetchBIT1010YPerformance = async (): Promise<{ bit10_top: BIT10Entry[] } |
     }
 };
 
+const fetchBIT10RebalanceHistory = async (tokenRebalanceAPI: string) => {
+    try {
+        const response = await fetch(`/bit10-rebalance-history-${tokenRebalanceAPI}`);
+
+        if (!response.ok) {
+            return [];
+        }
+
+        const data = await response.json() as BIT10RebalanceEntry[];
+        return data[0];
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+        toast.error('An error occured processing your request. Please try again later!')
+    }
+};
+
 export default function Page() {
-    const [activeTab, setActiveTab] = useState<'10Y' | '5Y' | '3Y' | '1Y'>('10Y');
+    const [activeTab, setActiveTab] = useState('10Y');
+    const [activeInitialInvestmentTab, setActiveInitialInvestmentTab] = useState('$100');
+    const [selectedChain, setSelectedChain] = useState<string>('solana');
+
+    const activeChain = chains.find(c => c.id === selectedChain)!;
 
     const { data: queryData, isLoading } = useQueries({
         queries: [
@@ -212,12 +488,21 @@ export default function Page() {
                 queryFn: () => fetchBIT1010YPerformance(),
                 staleTime: 900000, // 15 minutes
             },
+            {
+                queryKey: ['bit10TOPTokenTotalSupply'],
+                queryFn: () => fetchBIT10RebalanceHistory('top')
+            }
         ],
         combine: (results) => ({
             data: results.map((r) => r.data),
             isLoading: results.some((r) => r.isLoading),
         }),
     });
+
+    const bit10TOPCurrentPrice = useMemo(() => {
+        const tokenPrice = queryData?.[0] as TokenPriceData | undefined;
+        return tokenPrice?.tokenPrice?.toFixed(2) ?? '0.00';
+    }, [queryData]);
 
     const bit10TOPData = useMemo(() => {
         const performanceData = queryData?.[1];
@@ -226,6 +511,62 @@ export default function Page() {
         }
         return [];
     }, [queryData]);
+
+    const bit10TOPAllocations = useMemo(() => {
+        const tokenAllocations = queryData?.[2] as BIT10RebalanceEntry ?? [];
+        return tokenAllocations;
+    }, [queryData]);
+
+    const bit10TOPTotalCollateral = bit10TOPAllocations.priceOfTokenToBuy ?? 0;
+    const bit10TOPSupply = bit10TOPAllocations.priceOfTokenToBuy / bit10TOPAllocations.indexValue || 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const bit10TOPTokenData = bit10TOPAllocations.newTokens || [];
+
+    const bit10WithPercentages = useMemo(() => {
+        if (!bit10TOPTokenData?.length) return [];
+
+        const totalMarketCap = bit10TOPTokenData.reduce(
+            (sum, token) => sum + (token.marketCap ?? 0),
+            0
+        );
+
+        return bit10TOPTokenData.map((token) => ({
+            ...token,
+            percentage: Number(
+                (totalMarketCap > 0 ? (((token.marketCap ?? 0) / totalMarketCap) * 100) : 0).toFixed(2)
+            ),
+        }));
+    }, [bit10TOPTokenData]);
+
+    const bit10PreviousDayPrice = useMemo(() => {
+        if (!bit10TOPData.length) return null;
+
+        const last = bit10TOPData[bit10TOPData.length - 1];
+        const prev = bit10TOPData[bit10TOPData.length - 2];
+
+        if (!last || !prev) return null;
+
+        return {
+            last: parseFloat(last.bit10Top),
+            prev: parseFloat(prev.bit10Top),
+        };
+    }, [bit10TOPData]);
+
+    const bit10DailyChange = useMemo(() => {
+        if (!bit10PreviousDayPrice) return null;
+
+        const { last, prev } = bit10PreviousDayPrice;
+        if (!prev || prev === 0) return null;
+
+        const diff = last - prev;
+        const percent = (diff / prev) * 100;
+
+        return {
+            diff,
+            percent,
+            isUp: diff > 0,
+        };
+    }, [bit10PreviousDayPrice]);
 
     const dateFormatter = useMemo(
         () =>
@@ -256,49 +597,14 @@ export default function Page() {
     const performance5Y = useMemo(() => getPerformanceRange(bit10TOPData, 5), [bit10TOPData, getPerformanceRange]);
     const performance10Y = useMemo(() => getPerformanceRange(bit10TOPData, 10), [bit10TOPData, getPerformanceRange]);
 
-    // const calculateAnnualizedReturn = useCallback((data: BIT10Entry[], years: number): number => {
-    //     if (!data.length || years <= 0) return 0;
-
-    //     const end = data[data.length - 1];
-    //     if (!end) return 0;
-    //     const endDate = new Date(end.date);
-    //     const targetDate = new Date(endDate);
-    //     targetDate.setFullYear(targetDate.getFullYear() - years);
-
-    //     let closest = data[0];
-    //     if (!closest) return 0;
-    //     let minDiff = Math.abs(new Date(closest.date).getTime() - targetDate.getTime());
-
-    //     for (let i = 1; i < data.length; i++) {
-    //         const entry = data[i];
-    //         if (!entry) continue;
-    //         const diff = Math.abs(new Date(entry.date).getTime() - targetDate.getTime());
-    //         if (diff < minDiff) {
-    //             minDiff = diff;
-    //             closest = entry;
-    //         }
-    //     }
-
-    //     const finalValue = parseFloat(end.bit10Top) || 0;
-    //     const initialValue = parseFloat(closest.bit10Top) || 0;
-    //     if (initialValue === 0) return 0;
-
-    //     return (Math.pow(finalValue / initialValue, 1 / years) - 1) * 100;
-    // }, []);
-
-    // const arData = useMemo(
-    //     () => [
-    //         { label: '1Y AR', value: calculateAnnualizedReturn(performance1Y, 1) },
-    //         { label: '5Y AR', value: calculateAnnualizedReturn(performance5Y, 5) },
-    //         { label: '10Y AR', value: calculateAnnualizedReturn(performance10Y, 10) },
-    //     ],
-    //     [calculateAnnualizedReturn, performance1Y, performance5Y, performance10Y]
-    // );
-
     const tickFormatter = useCallback((value: string) => {
         const match = /\d{4}/.exec(value);
         return match ? match[0] : value;
     }, []);
+
+    const initialInvestmentValue = useMemo(() => {
+        return Number(activeInitialInvestmentTab.replace(/[$,]/g, ''));
+    }, [activeInitialInvestmentTab]);
 
     const formatChartData = useCallback(
         (rawData: BIT10Entry[]) => {
@@ -306,18 +612,25 @@ export default function Page() {
 
             const first = rawData[0];
             if (!first) return [];
+
             const initialBIT10Top = parseFloat(first.bit10Top) || 1;
             const initialBTC = parseFloat(first.btc) || 1;
             const initialSP500 = parseFloat(first.sp500) || 1;
 
             return rawData.map((entry) => ({
                 day: dateFormatter.format(new Date(entry.date)),
-                bit10TopValue: (parseFloat(entry.bit10Top) / initialBIT10Top) * 100,
-                btcValue: (parseFloat(entry.btc) / initialBTC) * 100,
-                sp500Value: (parseFloat(entry.sp500) / initialSP500) * 100,
+
+                bit10TopValue:
+                    (parseFloat(entry.bit10Top) / initialBIT10Top) * initialInvestmentValue,
+
+                btcValue:
+                    (parseFloat(entry.btc) / initialBTC) * initialInvestmentValue,
+
+                sp500Value:
+                    (parseFloat(entry.sp500) / initialSP500) * initialInvestmentValue,
             }));
         },
-        [dateFormatter]
+        [dateFormatter, initialInvestmentValue]
     );
 
     const chartData1Y = useMemo(() => formatChartData(performance1Y), [formatChartData, performance1Y]);
@@ -340,34 +653,90 @@ export default function Page() {
         }
     }, [activeTab, chartData1Y, chartData3Y, chartData5Y, chartData10Y]);
 
+    const bit10FinalValue = useMemo(
+        () => activeChartData[activeChartData.length - 1]?.bit10TopValue ?? initialInvestmentValue,
+        [activeChartData, initialInvestmentValue]
+    );
+
+    const bit10FinalAmount = useMemo(() => {
+        if (!activeChartData.length) return initialInvestmentValue;
+        return bit10FinalValue;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [bit10FinalValue, initialInvestmentValue]);
+
+    const bit10ReturnPercent = useMemo(() => {
+        if (initialInvestmentValue === 0) return 0;
+        return ((bit10FinalAmount - initialInvestmentValue) / initialInvestmentValue) * 100;
+    }, [initialInvestmentValue, bit10FinalAmount]);
+
     const handleTabChange = useCallback((label: string | null) => {
-        if (label && (tabs as readonly string[]).includes(label)) {
+        if (label && (timeframe as readonly string[]).includes(label)) {
             setActiveTab(label as '10Y' | '5Y' | '3Y' | '1Y');
+        }
+    }, []);
+
+    const handleInitialInvestmentTabChange = useCallback((label: string | null) => {
+        if (label && (initialInvestment as readonly string[]).includes(label)) {
+            setActiveInitialInvestmentTab(label);
         }
     }, []);
 
     const investmentChartConfig = {
         bit10TopValue: {
-            label: 'BIT10.TOP Investment',
+            label: 'BIT10.TOP',
         },
         btcValue: {
-            label: 'Bitcoin Investment',
+            label: 'Bitcoin',
         },
         sp500Value: {
-            label: 'S&P500 Investment',
+            label: 'S&P500',
         },
     } satisfies ChartConfig;
 
     return (
         <div className='flex flex-col space-y-4'>
-            <div className='max-w-7xl mx-auto z-10 w-full pt-8 md:pt-18'>
+            <div className='relative flex flex-col space-y-2 md:space-y-8 items-center max-w-7xl mx-auto z-10 w-full pt-8 md:py-18'>
+                <div className='hidden md:block absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl z-[-1]' />
+                <div className='hidden md:block absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/5 rounded-full blur-3xl z-[-1]' />
+
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2, duration: 0.8 }}
+                    className='inline-flex items-center gap-3 px-4 py-2 mb-8 rounded-full border'>
+                    {isLoading && bit10TOPCurrentPrice && bit10DailyChange ?
+                        <Skeleton className='h-5 md:h-10 w-20 md:w-56 rounded-full' /> :
+                        <>
+                            <span className='animate-pulse size-2 rounded-full bg-primary' />
+                            <span className='text-sm text-muted-foreground'>BIT10.TOP</span>
+                            <span className='text-lg font-semibold text-foreground'>${bit10TOPCurrentPrice}</span>
+                            <span
+                                className={cn(
+                                    'flex items-center gap-1 text-sm font-medium',
+                                    (bit10DailyChange?.isUp ?? false) ? 'text-green-600' : 'text-red-600'
+                                )}
+                            >
+                                {(bit10DailyChange?.isUp ?? false) ? (
+                                    <TrendingUpIcon className='w-4 h-4' />
+                                ) : (
+                                    <TrendingDownIcon className='w-4 h-4' />
+                                )}
+                                {(bit10DailyChange?.percent ?? 0) > 0 ? '+' : ''}
+                                {(bit10DailyChange?.percent ?? 0).toFixed(2)}%
+                            </span>
+                        </>
+                    }
+                </motion.div>
+
                 <motion.div
                     initial={{ opacity: 0.0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }}
-                    className='text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent bg-linear-to-b from-neutral-50 to-neutral-400 bg-opacity-50 pb-2'>
-                    On-Chain Crypto Index Funds
+                    // className='text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent bg-linear-to-b from-neutral-50 to-neutral-400 bg-opacity-50 pb-2'>
+                    className='text-4xl md:text-6xl lg:text-7xl font-bold text-center pb-2'>
+                    <span className='text-primary'>Redefining</span> Crypto Index Funds
                 </motion.div>
 
                 <div className='flex flex-col md:flex-row md:space-x-4 items-center justify-center pt-6 px-4'>
@@ -379,21 +748,21 @@ export default function Page() {
                             transition={{ duration: 0.5, ease: 'easeInOut' }}>
                             <Image src={BIT10Img as StaticImageData} alt='logo' width={85} height={85} className='border-2 w-16 md:w-16 lg:w-20 rounded-full' />
                         </motion.div>
-                        <motion.div
+                        {/* <motion.div
                             initial={{ opacity: 0.0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8, ease: 'easeInOut' }}
                             className='text-xl font-semibold text-primary'>
                             BIT10.TOP
-                        </motion.div>
+                        </motion.div> */}
                     </div>
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.3, duration: 0.8, ease: 'easeInOut' }}
-                        className='text-6xl md:-mt-5'>
+                        className='text-6xl md:-mt-3'>
                         =
                     </motion.div>
                     <div className='flex flex-col space-y-2 items-start justify-center'>
@@ -409,69 +778,395 @@ export default function Page() {
                                 </motion.div>
                             ))}
                         </motion.div>
-                        <motion.div
+                        {/* <motion.div
                             initial={{ opacity: 0.0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8, ease: 'easeInOut' }}
                             className='text-xl font-semibold text-center'>
                             Top 10 cryptocurrencies in a single, secure, over-collateralized token.
+                        </motion.div> */}
+                    </div>
+                </div>
+
+                <motion.p
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2, duration: 0.8 }}
+                    className='text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto' style={{ animationDelay: '0.2s' }}>
+                    Own the market in one click.
+                </motion.p>
+
+                <motion.div
+                    initial='hidden'
+                    whileInView='visible'
+                    viewport={{ once: true }}
+                    variants={containerVariants}
+                    className='mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground' style={{ animationDelay: '0.5s' }}>
+                    <motion.div variants={cardVariants} className='flex items-center gap-2'>
+                        <div className='w-2 h-2 rounded-full bg-primary' />
+                        <span>Non-custodial</span>
+                    </motion.div>
+                    <motion.div variants={cardVariants} className='flex items-center gap-2'>
+                        <div className='w-2 h-2 rounded-full bg-primary' />
+                        <span>Native assets only</span>
+                    </motion.div>
+                    <motion.div variants={cardVariants} className='flex items-center gap-2'>
+                        <div className='w-2 h-2 rounded-full bg-primary' />
+                        <span>110% over-collateralized</span>
+                    </motion.div>
+                </motion.div>
+            </div>
+
+            <MaxWidthWrapper className='flex flex-col space-y-4 md:space-y-16 lg:space-y-20 py-8 lg:px-36'>
+                <div className='container relative z-10 px-4'>
+                    <div className='mx-auto text-center mb-16'>
+                        <motion.span
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='inline-block px-4 py-1.5 mb-6 text-sm font-medium rounded-full bg-destructive/10 text-destructive border border-destructive/20'>
+                            The Problem
+                        </motion.span>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='text-3xl md:text-6xl font-bold mb-6'>
+                            Crypto has grown up - <span className='text-muted-foreground'>investing in it hasn&apos;t.</span>
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='text-lg text-muted-foreground max-w-2xl mx-auto'>
+                            Most investors spend hours picking tokens, timing trades, and paying fees - only to underperform the market.
+                        </motion.p>
+                    </div>
+
+                    <motion.div
+                        initial='hidden'
+                        whileInView='visible'
+                        viewport={{ once: true }}
+                        variants={containerVariants} className='grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 w-full'>
+                        {painPoints.map((point, index) => (
+                            <motion.div key={point.title} variants={cardVariants}>
+                                <Card className='group p-6 bg-background hover:border-destructive/30 transition-all duration-300 flex flex-col gap-0' style={{ animationDelay: `${index * 0.1}s` }}>
+                                    <div className='w-12 h-12 mb-4 rounded-xl bg-destructive/10 flex items-center justify-center group-hover:bg-destructive/20 transition-colors'>
+                                        <point.icon className='w-6 h-6 text-destructive' />
+                                    </div>
+                                    <h3 className='text-lg font-semibold mb-2'>{point.title}</h3>
+                                    <p className='text-sm text-muted-foreground'>{point.description}</p>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2, duration: 0.8 }}>
+                        <Card className='mt-16 max-w-3xl mx-auto text-center bg-background flex flex-col gap-0 text-lg md:text-xl'>
+                            <div>In traditional finance, they solved this decades ago with index funds.</div>
+                            <div><span className='text-yellow-500 font-medium'> Why hasn&apos;t crypto caught up?</span></div>
+                        </Card>
+                    </motion.div>
+                </div>
+
+                <div className='container px-4'>
+                    <div className='max-w-4xl mx-auto text-center mb-16'>
+                        <motion.span
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='inline-block border-yellow-500/20 px-4 py-1.5 mb-6 text-sm font-medium rounded-full bg-yellow-500/10 text-yellow-500 border'>
+                            Why Existing Solutions Fall Short
+                        </motion.span>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='text-3xl md:text-5xl font-bold mb-6'>
+                            Not all index funds are{' '}
+                            <span className='text-yellow-500'>created equal</span>
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='text-lg text-yellow-500-foreground'>
+                            TradFi ETFs are off-chain. On-chain indexes use wrapped assets. BIT10 is different.
+                        </motion.p>
+
+                    </div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2, duration: 0.8 }}
+                        className='max-w-5xl mx-auto overflow-x-auto'>
+                        <table className='w-full'>
+                            <thead>
+                                <tr className='border-b border-border'>
+                                    <th className='text-left py-4 px-4 text-sm font-medium text-yellow-500-foreground'>Feature</th>
+                                    <th className='text-center py-4 px-4 min-w-35'>
+                                        <div className='text-sm text-yellow-500-foreground font-normal'>Traditional</div>
+                                        <div className='font-semibold'>TradFi ETFs</div>
+                                    </th>
+                                    <th className='text-center py-4 px-4 min-w-35'>
+                                        <div className='text-sm text-yellow-500-foreground font-normal'>Existing</div>
+                                        <div className='font-semibold'>On-Chain</div>
+                                    </th>
+                                    <th className='text-center py-4 px-4 min-w-35 bg-primary/5 rounded-t-xl'>
+                                        <div className='text-sm text-primary font-normal'>The Future</div>
+                                        <div className='font-bold text-primary'>BIT10</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {comparisonData.map((row) => <tr key={row.feature} className='border-b border-border/50 hover:bg-accent/30 transition-colors'>
+                                    <td className='py-4 px-4 text-sm font-medium'>{row.feature}</td>
+                                    <td className='py-4 px-4'>
+                                        <div className='flex justify-center'>
+                                            <StatusIcon status={row.tradfi} />
+                                        </div>
+                                    </td>
+                                    <td className='py-4 px-4'>
+                                        <div className='flex justify-center'>
+                                            <StatusIcon status={row.onchain} />
+                                        </div>
+                                    </td>
+                                    <td className='py-4 px-4 bg-primary/5'>
+                                        <div className='flex justify-center'>
+                                            <StatusIcon status={row.bit10} />
+                                        </div>
+                                    </td>
+                                </tr>)}
+                            </tbody>
+                        </table>
+                    </motion.div>
+                </div>
+
+                <div className='relative overflow-hidden'>
+                    <div className='hidden md:block absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl' />
+
+                    <div className='container relative z-10 px-4'>
+                        <div className='max-w-4xl mx-auto text-center mb-16'>
+                            <motion.span
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='inline-block px-4 py-1.5 mb-6 text-sm font-medium rounded-full bg-primary/10 text-primary border border-primary/20'>
+                                The Solution
+                            </motion.span>
+                            <motion.h2
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='text-3xl md:text-5xl font-bold mb-6'>
+                                BIT10.TOP -{' '}
+                                <span className='text-primary'>The Future of Index Investing</span>
+                            </motion.h2>
+                            <motion.p
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='text-lg text-muted-foreground max-w-2xl mx-auto'>
+                                One index. One transaction. Full exposure.
+                            </motion.p>
+                        </div>
+
+                        <motion.div
+                            initial='hidden'
+                            whileInView='visible'
+                            viewport={{ once: true }}
+                            variants={containerVariants}
+                            className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-8'>
+                            {stats.map((stat) => (
+                                <motion.div
+                                    key={stat.label}
+                                    variants={cardVariants}
+                                >
+                                    <Card className='bg-background rounded-2xl text-center flex flex-col gap-1'>
+                                        <div className='text-3xl md:text-4xl font-bold text-primary mb-2'>{stat.value}</div>
+                                        <div className='text-sm text-muted-foreground'>{stat.label}</div>
+                                    </Card>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+
+                        <motion.div
+                            initial='hidden'
+                            whileInView='visible'
+                            viewport={{ once: true }}
+                            variants={containerVariants}
+                            className='grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 w-full'>
+                            {features.map((features, index) => (
+                                <motion.div
+                                    variants={cardVariants}
+                                    key={index}
+                                >
+                                    <Card className='group p-6 bg-background hover:border-primary/30 transition-all duration-300 flex flex-col gap-0' style={{ animationDelay: `${index * 0.1}s` }}>
+                                        <div className='w-12 h-12 mb-4 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors'>
+                                            <features.icon className='w-6 h-6 text-primary' />
+                                        </div>
+                                        <h3 className='text-lg font-semibold mb-2'>{features.title}</h3>
+                                        <p className='text-sm text-muted-foreground'>{features.description}</p>
+                                    </Card>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='text-center py-8'>
+                            <Button
+                                size='lg'
+                                className='text-lg px-8 py-6 font-medium'
+                                onClick={() => window.open('/buy', '_blank')}
+                            >
+                                Start Investing Now
+                                <ArrowRightIcon className='ml-2 w-5 h-5' />
+                            </Button>
                         </motion.div>
                     </div>
                 </div>
-            </div>
 
-            <MaxWidthWrapper className='flex flex-col space-y-4 md:space-y-16 py-8'>
-                <div className='flex justify-center w-full'>
-                    <Card className='animate-fade-right-slow h-full w-full lg:w-3/4'>
-                        <CardHeader className='flex flex-col lg:flex-row items-start lg:items-center justify-center lg:justify-between gap-3'>
-                            <CardTitle className='text-center lg:text-start'>$100 Investment Growth Comparison</CardTitle>
-                            <div className='relative flex flex-row space-x-2 bg-muted border rounded-full px-2 py-1.5 self-center'>
-                                <AnimatedBackground defaultValue={activeTab} className='rounded-full bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={handleTabChange}>
-                                    {tabs.map((label) => (
-                                        <button key={label} data-id={label} type='button' className={`inline-flex cursor-pointer px-2 text-sm items-center transition-transform active:scale-95 ${activeTab === label ? 'text-white' : 'text-foreground'}`}>
-                                            {label}
-                                        </button>
-                                    ))}
-                                </AnimatedBackground>
+                <div className='flex flex-col space-y-4 items-center justify-center w-full'>
+                    <div className='max-w-4xl mx-auto text-center mb-12'>
+                        <motion.span
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='inline-block px-4 py-1.5 mb-6 text-sm font-medium rounded-full bg-primary/10 text-primary border border-primary/20'>
+                            Investment Calculator
+                        </motion.span>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='text-3xl md:text-5xl font-bold mb-6'>
+                            See your potential{' '}
+                            <span className='text-primary'>growth</span>
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='text-lg text-muted-foreground'>
+                            Compare BIT10&apos;s projected performance against Bitcoin and traditional markets.
+                        </motion.p>
+                    </div>
+
+                    <Card className='animate-fade-right-slow h-full w-full lg:w-3/4 bg-background'>
+                        <CardHeader className='flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-3 w-full'>
+                            <div className='flex flex-col lg:flex-row items-center md:space-x-1.5'>
+                                <div>Initial Investment:</div>
+                                <div className='relative flex flex-row space-x-2 bg-muted border rounded-full px-2 py-1.5 self-center'>
+                                    <AnimatedBackground defaultValue={activeInitialInvestmentTab} className='rounded-full bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={handleInitialInvestmentTabChange}>
+                                        {initialInvestment.map((label) => (
+                                            <button key={label} data-id={label} type='button' className={`inline-flex cursor-pointer px-2 text-sm items-center transition-transform active:scale-95 ${activeTab === label ? 'text-white' : 'text-foreground'}`}>
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </AnimatedBackground>
+                                </div>
+                            </div>
+                            <div className='flex flex-col lg:flex-row items-center md:space-x-1.5'>
+                                <div>Timeframe:</div>
+                                <div className='relative flex flex-row space-x-2 bg-muted border rounded-full px-2 py-1.5 self-center'>
+                                    <AnimatedBackground defaultValue={activeTab} className='rounded-full bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={handleTabChange}>
+                                        {timeframe.map((label) => (
+                                            <button key={label} data-id={label} type='button' className={`inline-flex cursor-pointer px-2 text-sm items-center transition-transform active:scale-95 ${activeTab === label ? 'text-white' : 'text-foreground'}`}>
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </AnimatedBackground>
+                                </div>
                             </div>
                         </CardHeader>
                         <CardContent>
                             {isLoading ? (
-                                <Skeleton className='h-75 lg:h-100 w-full' />
+                                <Skeleton className='h-75 lg:h-120 w-full' />
                             ) : (
                                 <div className='select-none -ml-4'>
                                     <ChartContainer config={investmentChartConfig} className='max-h-75 lg:max-h-95 w-full'>
                                         <LineChart accessibilityLayer data={activeChartData}>
                                             <CartesianGrid vertical={false} />
                                             <XAxis dataKey='day' tickLine axisLine={true} tickMargin={8} tickFormatter={tickFormatter} stroke='#ffffff' interval='preserveStartEnd' />
-                                            <YAxis tickLine axisLine={true} tickMargin={8} tickCount={6} stroke='#ffffff' tickFormatter={(value) => `$${(value as number).toFixed(0)}`} />
+                                            <YAxis tickLine axisLine={true} tickMargin={8} tickCount={6} stroke='#ffffff' tickFormatter={(value) => `$${(value as number).toLocaleString()}`} domain={[(dataMin: number) => Math.floor(dataMin * 0.95), (dataMax: number) => {
+                                                if (dataMax < 1000) {
+                                                    const rounded = Math.ceil(dataMax / 50) * 50;
+                                                    const difference = rounded - dataMax;
+                                                    if (difference < 10) {
+                                                        return rounded;
+                                                    }
+                                                    return rounded;
+                                                }
+                                                const rounded = Math.ceil(dataMax / 5000) * 5000;
+                                                const difference = rounded - dataMax;
+                                                if (difference < 2000) {
+                                                    return rounded + 5000;
+                                                }
+                                                return rounded;
+                                            }]} />
                                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                            <ChartLegend content={<ChartLegendContent />} />
-                                            <Line dataKey='bit10TopValue' type='monotone' stroke='green' strokeWidth={2} dot={false} name='BIT10.TOP Investment' />
-                                            <Line dataKey='btcValue' type='monotone' stroke='orange' strokeWidth={2} dot={false} name='Bitcoin Investment' />
-                                            <Line dataKey='sp500Value' type='monotone' stroke='blue' strokeWidth={2} dot={false} name='S&P500 Investment' />
+                                            <Line dataKey='bit10TopValue' type='monotone' stroke='green' strokeWidth={2} dot={false} name='BIT10.TOP' />
+                                            <Line dataKey='btcValue' type='monotone' stroke='orange' strokeWidth={2} dot={false} name='Bitcoin' />
+                                            <Line dataKey='sp500Value' type='monotone' stroke='blue' strokeWidth={2} dot={false} name='S&P500' />
                                         </LineChart>
                                     </ChartContainer>
                                 </div>
                             )}
                         </CardContent>
                     </Card>
+
+                    {activeChartData.length > 0 && (
+                        <Card className='flex flex-col gap-2 md:gap-4 w-full lg:w-3/4 bg-primary/10 border-primary/20 p-4 md:px-8'>
+                            <div className='flex flex-col md:flex-row items-center justify-between gap-4'>
+                                <div>
+                                    <div className='text-sm text-muted-foreground mb-1'>
+                                        {activeInitialInvestmentTab} invested in BIT10 over {activeTab}
+                                    </div>
+                                    <div className='text-3xl font-bold text-primary'>
+                                        ${bit10FinalAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                    </div>
+                                </div>
+                                <div className='text-right'>
+                                    <div className='text-sm text-muted-foreground mb-1'>Projected return</div>
+                                    <div className={cn(
+                                        'text-2xl font-bold',
+                                        bit10ReturnPercent > 0 ? 'text-green-600' : 'text-red-600'
+                                    )}>
+                                        {bit10ReturnPercent > 0 ? '+' : ''}
+                                        {bit10ReturnPercent.toFixed(2)}%
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='text-sm text-muted-foreground'>* Based on historical crypto market data. Past performance does not guarantee future results. Investment in crypto assets involves risk.</div>
+                        </Card>
+                    )}
                 </div>
 
-                {/* ToDo: Work on this */}
                 {/* <div className='flex flex-col space-y-4 items-center w-full'>
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2, duration: 0.8 }}
-                        className='text-4xl md:text-6xl font-semibold text-center'>
-                        How BIT10 works?
-                    </motion.div>
-                </div> */}
-
-                <div className='flex flex-col space-y-4 items-center w-full'>
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -529,66 +1224,393 @@ export default function Page() {
                             );
                         })}
                     </div>
-                </div>
+                </div> */}
 
-                <div className='flex flex-col space-y-4 items-center w-full'>
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2, duration: 0.8 }}
-                        className='text-4xl md:text-6xl font-semibold text-center'>
-                        Why Choose BIT10.TOP?
-                    </motion.div>
+                <div className='relative overflow-hidden'>
+                    <div className='container relative z-10 px-4'>
+                        <div className='max-w-4xl mx-auto text-center mb-12'>
+                            <motion.span
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='inline-block px-4 py-1.5 mb-6 text-sm font-medium rounded-full bg-primary/10 text-primary border border-primary/20'>
+                                Multi-Chain
+                            </motion.span>
+                            <motion.h2
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='text-3xl md:text-5xl font-bold mb-6'>
+                                Available on{' '}
+                                <span className='text-primary'>your favorite chain</span>
+                            </motion.h2>
+                            <motion.p
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='text-lg text-muted-foreground'>
+                                Invest from Solana, Base, Internet Computer, or BNB Chain - more chains coming soon.
+                            </motion.p>
+                        </div>
 
-                    <motion.div initial='hidden' whileInView='visible' variants={containerVariants} viewport={{ once: true }} className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full h-full py-4'>
-                        {whyChooseUs.map((item, index) => (
-                            <motion.div variants={cardVariants} viewport={{ once: true }} key={index} className='flex flex-col space-y-2 items-center justify-start py-6 px-2 border-2 bg-card rounded-2xl w-full min-w-0 h-full'>
-                                <div className='flex flex-col items-center justify-start h-full w-full'>
-                                    <div className='mb-2 flex justify-center'>{item.icon && <item.icon className='h-12 w-12 text-primary' />}</div>
-                                    <div className='text-2xl font-semibold text-center'>{item.title}</div>
-                                    <div className='text-lg text-center max-w-56'>{item.desc}</div>
+                        <div className='w-full'>
+                            <motion.div
+                                initial='hidden'
+                                whileInView='visible'
+                                viewport={{ once: true }}
+                                variants={containerVariants}
+                                className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 mb-8'>
+                                {chains.map((chain) => (
+                                    <motion.button
+                                        key={chain.id}
+                                        variants={cardVariants}
+                                        onClick={() => chain.status === 'live' && setSelectedChain(chain.id)}
+                                        className={`group relative p-4 rounded-2xl border transition-all duration-300 bg-background ${selectedChain === chain.id
+                                            ? 'border-primary bg-primary/10'
+                                            : chain.status === 'live'
+                                                ? 'border-border hover:border-primary/50 bg-card/50'
+                                                : 'border-border/50 bg-card/30 opacity-60 cursor-not-allowed'
+                                            }`}
+                                    >
+                                        <Image src={chain.logo} alt={chain.name} width={48} height={48} className='w-12 h-12 mx-auto mb-2 rounded-xl bg-background/50 p-2' />
+                                        <div className='text-sm font-medium text-center'>{chain.name}</div>
+                                        {chain.status === 'live' && selectedChain === chain.id && (
+                                            <div className='absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center'>
+                                                <CheckIcon className='w-3 h-3 text-primary-foreground' />
+                                            </div>
+                                        )}
+                                        {chain.status === 'coming' && (
+                                            <div className='absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-muted text-[10px] font-medium'>
+                                                Soon
+                                            </div>
+                                        )}
+                                    </motion.button>
+                                ))}
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='p-6 rounded-2xl border'>
+                                <div className='flex flex-col md:flex-row items-center justify-between gap-6'>
+                                    <div className='flex items-center gap-4'>
+                                        <Image src={activeChain.logo} alt={activeChain.name} width={64} height={64} className='w-16 h-16 rounded-2xl bg-background/50 p-2' />
+                                        <div>
+                                            <h3 className='text-xl font-bold mb-1'>{activeChain.name}</h3>
+                                            <p className='text-muted-foreground max-w-md'>{activeChain.description}</p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        className='shrink-0 font-medium rounded-full'
+                                        onClick={() => window.open('/buy', '_blank')}
+                                    >
+                                        Invest on {activeChain.name}
+                                        <ExternalLinkIcon className='ml-2 w-4 h-4' />
+                                    </Button>
                                 </div>
                             </motion.div>
-                        ))}
-                    </motion.div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className='flex flex-col space-y-4 items-center w-full'>
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2, duration: 0.8 }}
-                        className='text-4xl md:text-6xl font-semibold text-center'>
-                        Supported Chains
-                    </motion.div>
+                <div className='relative overflow-hidden' id='reserves'>
+                    <div className='container px-4'>
+                        <div className='max-w-4xl mx-auto text-center mb-12'>
+                            <motion.span
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='inline-block px-4 py-1.5 mb-6 text-sm font-medium rounded-full bg-primary/10 text-primary border border-primary/20'>
+                                Transparency
+                            </motion.span>
+                            <motion.h2
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='text-3xl md:text-5xl font-bold mb-6'>
+                                If it exists,{' '}
+                                <span className='text-primary'>you can see it</span>
+                            </motion.h2>
+                            <motion.p
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='text-lg text-muted-foreground max-w-2xl mx-auto'>
+                                Every asset backing your BIT10 tokens is verifiable on-chain. <br />
+                                No trust required - just verify.
+                            </motion.p>
+                        </div>
+
+                        <div className='max-w-5xl mx-auto'>
+                            <motion.div
+                                initial='hidden'
+                                whileInView='visible'
+                                viewport={{ once: true }}
+                                variants={containerVariants}
+                                className='grid md:grid-cols-3 gap-4 mb-8'>
+                                <motion.div variants={cardVariants} className='p-6 rounded-2xl border text-center'>
+                                    <ShieldIcon className='w-8 h-8 text-primary mx-auto mb-3' />
+                                    <div className='text-sm text-muted-foreground mb-1'>Total Reserves</div>
+                                    <div className='text-2xl font-bold'>${bit10TOPTotalCollateral.toFixed(2)}</div>
+                                </motion.div>
+                                <motion.div variants={cardVariants} className='p-6 rounded-2xl border text-center border-primary/30'>
+                                    <div className='w-8 h-8 mx-auto mb-3 rounded-full bg-primary/20 flex items-center justify-center'>
+                                        <CheckIcon className='w-5 h-5 text-primary' />
+                                    </div>
+                                    <div className='text-sm text-muted-foreground mb-1'>Collateralization</div>
+                                    <div className='text-2xl font-bold text-primary'>110%</div>
+                                </motion.div>
+                                <motion.div variants={cardVariants} className='p-6 rounded-2xl border text-center'>
+                                    <TrendingUpIcon className='w-8 h-8 text-primary mx-auto mb-3' />
+                                    <div className='text-sm text-muted-foreground mb-1'>Total Supply</div>
+                                    <div className='text-2xl font-bold'>{bit10TOPSupply.toFixed(2)}</div>
+                                </motion.div>
+                            </motion.div>
+
+                            <div className='rounded-3xl border overflow-hidden'>
+                                <div className='p-6 border-b border-border'>
+                                    <motion.h3
+                                        initial={{ opacity: 0, y: 40 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: 0.2, duration: 0.8 }}
+                                        className='text-lg font-semibold'>BIT10.TOP Reserve Holdings</motion.h3>
+                                    <motion.p
+                                        initial={{ opacity: 0, y: 40 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: 0.2, duration: 0.8 }}
+                                        className='text-sm text-muted-foreground'>Native assets held across all supported chains</motion.p>
+                                </div>
+
+                                <motion.div
+                                    initial={{ opacity: 0, y: 40 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.2, duration: 0.8 }}
+                                    className='overflow-x-auto'>
+                                    <table className='w-full'>
+                                        <thead>
+                                            <tr className='border-b border-border/50 text-sm text-muted-foreground'>
+                                                <th className='text-left py-2 px-6 font-medium'>Asset</th>
+                                                <th className='text-right py-2 px-6 font-medium'>Amount</th>
+                                                <th className='text-right py-2 px-6 font-medium'>Value</th>
+                                                <th className='text-right py-2 px-6 font-medium'>Weight</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {bit10WithPercentages.map((reserve, index) => (
+                                                <tr
+                                                    key={index}
+                                                    className='border-b border-border/30 hover:bg-muted/30 transition-colors'
+                                                >
+                                                    <td className='py-2 px-6'>
+                                                        <div className='flex items-center gap-3'>
+                                                            <div className='w-10 h-10 rounded-full overflow-hidden bg-white flex items-center justify-center'>
+                                                                <Image src={reserve.image} alt={reserve.name} width={40} height={40} className='object-contain' />
+                                                            </div>
+                                                            <div>
+                                                                <div className='font-medium uppercase'>{reserve.symbol}</div>
+                                                                <div className='text-sm text-muted-foreground'>{reserve.name}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className='py-2 px-6 text-right font-mono'>{formatPreciseDecimal(reserve.noOfTokens)}</td>
+                                                    <td className='py-2 px-6 text-right font-medium'>${formatPreciseDecimal(reserve.price)}</td>
+                                                    <td className='py-2 px-6 text-right'>
+                                                        <div className='flex items-center justify-end gap-3'>
+                                                            <div className='w-24 h-2 rounded-full bg-muted overflow-hidden'>
+                                                                <div
+                                                                    className='h-full rounded-full bg-linear-to-r from-primary to-primary/60'
+                                                                    style={{ width: `${reserve.percentage * 3}%` }}
+                                                                />
+                                                            </div>
+                                                            <span className='text-sm text-muted-foreground w-12 text-right'>
+                                                                {reserve.percentage}%
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </motion.div>
+
+                                <motion.div
+                                    initial={{ opacity: 0, y: 40 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.2, duration: 0.8 }}
+                                    className='p-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4'>
+                                    <p className='text-sm text-muted-foreground'>
+                                        All holdings verified via on-chain proof. Click to verify on-chain.
+                                    </p>
+                                    <Button variant='outline' size='sm' onClick={() => window.open('/collateral', '_blank')}>
+                                        Verify On-Chain
+                                        <ExternalLinkIcon className='ml-2 w-4 h-4' />
+                                    </Button>
+                                </motion.div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='relative' id='how-it-works'>
+                    <div className='container px-4'>
+                        <div className='max-w-4xl mx-auto text-center mb-16'>
+                            <motion.span
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='inline-block px-4 py-1.5 mb-6 text-sm font-medium rounded-full bg-primary/10 text-primary border border-primary/20'>
+                                Simple Process
+                            </motion.span>
+                            <motion.h2
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='text-3xl md:text-5xl font-bold mb-6'>
+                                How it{' '}
+                                <span className='text-primary'>works</span>
+                            </motion.h2>
+                            <motion.p
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8 }}
+                                className='text-lg text-muted-foreground'>
+                                From zero to diversified in under 2 minutes.
+                            </motion.p>
+                        </div>
+
+                        <div className='max-w-5xl mx-auto'>
+                            <div className='relative'>
+                                <div className='hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-border to-transparent -translate-y-1/2' />
+
+                                <motion.div
+                                    initial='hidden'
+                                    whileInView='visible'
+                                    viewport={{ once: true }}
+                                    variants={containerVariants}
+                                    className='grid md:grid-cols-3 gap-8'>
+                                    {steps.map((step, index) => (
+                                        <motion.div
+                                            variants={cardVariants}
+                                            key={step.step}
+                                            className='relative group'
+                                        >
+                                            <div className='p-8 rounded-3xl bg-background border hover:border-primary/30 transition-all duration-300 text-center'>
+                                                <div className='absolute -top-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-sm font-bold'>
+                                                    {step.step}
+                                                </div>
+
+                                                <div className='w-16 h-16 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors'>
+                                                    <step.icon className='w-8 h-8 text-primary' />
+                                                </div>
+
+                                                <h3 className='text-xl font-semibold mb-3'>{step.title}</h3>
+                                                <p className='text-muted-foreground'>{step.description}</p>
+                                            </div>
+
+                                            {index < steps.length - 1 && (
+                                                <div className='md:hidden flex justify-center my-4'>
+                                                    <div className='w-8 h-8 rounded-full border border-border flex items-center justify-center'>
+                                                        <svg className='w-4 h-4 text-muted-foreground rotate-90' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                                                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='container relative z-10 px-4'>
+                    <div className='max-w-4xl mx-auto text-center mb-16'>
+                        <motion.span
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='inline-block px-4 py-1.5 mb-6 text-sm font-medium rounded-full bg-primary/10 text-primary border border-primary/20'>
+                            The Vision
+                        </motion.span>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='text-3xl md:text-5xl font-bold mb-6'>
+                            This is just the{' '}
+                            <span className='text-primary'>beginning</span>
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className='text-lg text-muted-foreground max-w-2xl mx-auto'>
+                            BIT10.TOP is our flagship index. But we&apos;re building a complete suite of
+                            on-chain index funds for every investment thesis.
+                        </motion.p>
+                    </div>
 
                     <motion.div
                         initial='hidden'
                         whileInView='visible'
                         viewport={{ once: true }}
                         variants={containerVariants}
-                        className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-6 w-full py-4'>
-                        {chains.map((chain, index) => (
+                        className='grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto'>
+                        {funds.map((fund) => (
                             <motion.div
-                                key={index}
                                 variants={cardVariants}
-                                className='flex flex-col space-y-2 items-center justify-start py-6 px-2 border-2 bg-card rounded-2xl'>
-                                <Image src={chain.logo} height={80} width={80} alt={chain.name} className='object-contain' />
-                                <div className='font-semibold text-center'>{chain.name}</div>
+                                key={fund.id}
+                                className={`group relative p-6 rounded-2xl border transition-all duration-300 ${fund.status === 'live'
+                                    ? 'glass-card border-primary/30 hover:glow-bit10'
+                                    : 'glass-card border-dashed hover:border-primary/30'
+                                    }`}
+                            >
+                                <div className={`absolute -top-3 right-4 px-3 py-1 rounded-full text-xs font-medium ${fund.status === 'live'
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'bg-muted text-muted-foreground'
+                                    }`}>
+                                    {fund.status === 'live' ? 'Live' : 'Coming Soon'}
+                                </div>
+
+                                <div className='text-4xl mb-4'>{fund.icon}</div>
+
+                                <h3 className={`text-xl font-bold mb-2 ${fund.status === 'live' ? 'text-primary' : 'text-foreground'
+                                    }`}>
+                                    {fund.name}
+                                </h3>
+                                <p className='text-sm text-muted-foreground mb-4'>{fund.description}</p>
+
+                                {fund.status === 'live' ? (
+                                    <button
+                                        className='flex items-center gap-2 text-sm font-medium text-primary hover:gap-3 transition-all'
+                                        onClick={() => window.open('/buy', '_blank')}
+                                    >
+                                        Invest Now <ArrowRightIcon className='w-4 h-4' />
+                                    </button>
+                                ) : (
+                                    <span className='text-sm text-muted-foreground'>Stay tuned</span>
+                                )}
                             </motion.div>
                         ))}
-
-                        <motion.div
-                            variants={cardVariants}
-                            className='flex flex-col space-y-2 items-center justify-start py-6 px-2 border-2 bg-card rounded-2xl col-span-2 lg:col-span-1'>
-                            <div className='flex flex-row items-center justify-center -space-x-3 w-full'>
-                                <Image src={ETHImg as StaticImageData} alt='Ethereum' height={80} width={80} className='rounded-full bg-gray-200' />
-                                <Image src={AVAXImg as StaticImageData} alt='Avalanche' height={80} width={80} className='rounded-full bg-gray-200' />
-                            </div>
-                            <div className='font-semibold text-center'>More coming soon...</div>
-                        </motion.div>
                     </motion.div>
                 </div>
 
@@ -615,10 +1637,7 @@ export default function Page() {
                         variants={containerVariants}
                         className='flex flex-col md:flex-row items-center justify-evenly w-full space-y-3 md:space-y-0'>
                         {parterners.map((partner, index) => (
-                            <motion.div
-                                variants={cardVariants}
-                                key={index}
-                                className='p-2 border-2 border-accent rounded-2xl bg-white'>
+                            <motion.div variants={cardVariants} key={index} className='p-2 border-2 border-accent rounded-2xl bg-white'>
                                 <Image src={partner.logo} height={50} width={400} alt={partner.name} />
                             </motion.div>
                         ))}

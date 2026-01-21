@@ -23,6 +23,7 @@ export const idlFactory = ({ IDL }) => {
     'token_out_address': IDL.Text,
     'user_wallet_address': IDL.Text,
     'token_out_amount': IDL.Text,
+    'referral': IDL.Opt(IDL.Text),
   });
   const TransactionResponse = IDL.Record({
     'to': IDL.Text,
@@ -117,6 +118,21 @@ export const idlFactory = ({ IDL }) => {
       [],
       [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
       [],
+    ),
+    'edit_buy_history_by_swap_id': IDL.Func(
+      [IDL.Text, SwapResponseData],
+      [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+      [],
+    ),
+    'edit_sell_history_by_swap_id': IDL.Func(
+      [IDL.Text, SwapResponseData],
+      [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+      [],
+    ),
+    'get_buy_and_sell_history_by_address_and_chain': IDL.Func(
+      [IDL.Text, IDL.Text],
+      [IDL.Vec(SwapResponseData)],
+      ['query'],
     ),
     'get_buy_history': IDL.Func([], [IDL.Vec(SwapResponseData)], ['query']),
     'get_buy_history_by_address_and_chain': IDL.Func(

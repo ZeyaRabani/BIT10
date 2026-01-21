@@ -23,7 +23,7 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
             return;
         }
 
-        onStepUpdate?.(0, { status: 'success', description: 'Canister access granted.!' });
+        onStepUpdate?.(0, { status: 'success', description: 'Canister access granted!' });
         onStepUpdate?.(1, { status: 'processing', description: 'Waiting for token approval in your wallet...' });
 
         toast.info('Allow the transaction on your wallet to proceed.');

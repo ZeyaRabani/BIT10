@@ -1,35 +1,22 @@
-"use client"
+"use client";
 
-import React from 'react'
-import { motion } from 'framer-motion'
-import { addUserSignUps } from '@/actions/dbActions'
-import MaxWidthWrapper from './MaxWidthWrapper'
-import { useForm } from '@tanstack/react-form'
-import * as z from 'zod'
-import { toast } from 'sonner'
-import { Field, FieldDescription, FieldError } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import Image, { type StaticImageData } from 'next/image'
-import XImg from '@/assets/footer/x.svg'
-import TelegramImg from '@/assets/footer/telegram.svg'
+import { motion } from 'framer-motion';
+import { addUserSignUps } from '@/actions/dbActions';
+import MaxWidthWrapper from './MaxWidthWrapper';
+import { useForm } from '@tanstack/react-form';
+import * as z from 'zod';
+import { toast } from 'sonner';
+import { Field, FieldDescription, FieldError } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 interface FooterLinkType {
     title: string;
     link: string;
 }
 
-interface SocialLinkType {
-    link: string;
-    imageName: StaticImageData;
-}
-
 const forCompany: FooterLinkType[] = [
-    {
-        title: 'About Us',
-        link: '/'
-    },
     {
         title: 'Contact Us',
         link: '/contact-us'
@@ -44,21 +31,21 @@ const forLegal: FooterLinkType[] = [
     {
         title: 'Privacy Policy',
         link: 'privacy'
-    },
-    {
-        title: 'Audit',
-        link: 'audit'
     }
 ]
 
-const companySocial: SocialLinkType[] = [
+const companySocial: FooterLinkType[] = [
     {
-        link: 'https://x.com/bit10startup',
-        imageName: XImg as StaticImageData,
+        title: 'X (Twitter)',
+        link: 'https://x.com/bit10startup'
     },
     {
-        link: 'https://t.me/zr00083',
-        imageName: TelegramImg as StaticImageData,
+        title: 'Telegram',
+        link: 'https://t.me/zr00083'
+    },
+    {
+        title: 'LinkedIn',
+        link: 'https://www.linkedin.com/company/bit10'
     }
 ]
 
@@ -104,12 +91,13 @@ export default function Footer() {
 
     return (
         <MaxWidthWrapper>
+            <hr className='h-0.5 bg-accent w-full mt-5' />
             <motion.footer initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8, ease: 'easeInOut' }} className='my-2.5 md:mt-6 md:mb-2.5'>
                 <div className='container p-6 mx-auto'>
 
-                    <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4'>
+                    <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:justify-between'>
                         <div className='sm:col-span-2'>
-                            <h1 className='max-w-lg text-xl font-semibold tracking-wide'>Subscribe to Our Newsletter to Get Updates:</h1>
+                            <h1 className='max-w-lg text-xl font-semibold tracking-wide'>Subscribe to get updates from BIT10</h1>
                             <form autoComplete='off' className='flex flex-col mx-auto mt-6 md:space-x-2 space-y-3 md:space-y-0 md:flex-row'
                                 onSubmit={async (e) => {
                                     e.preventDefault()
@@ -138,47 +126,43 @@ export default function Footer() {
                             </form>
                         </div>
 
-                        <div>
-                            <p className='font-semibold tracking-wide'>Platform</p>
-
-                            <div className='flex flex-col items-start mt-5 space-y-2'>
-                                {forCompany.map((link, index) => (
-                                    <Link href={link.link} key={index} passHref>
-                                        <p className='transition-colors duration-300 hover:text-primary hover:cursor-pointer'>{link.title}</p>
-                                    </Link>
-                                ))}
+                        <div className='col-span-1 grid grid-cols-1 sm:grid-cols-3 gap-8'>
+                            <div>
+                                <p className='font-semibold tracking-wide'>Platform</p>
+                                <div className='flex flex-col items-start mt-5 space-y-2'>
+                                    {forCompany.map((link, index) => (
+                                        <Link href={link.link} key={index} passHref>
+                                            <p className='transition-colors duration-300 hover:text-primary hover:cursor-pointer'>{link.title}</p>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
 
-                        <div>
-                            <p className='font-semibold tracking-wide'>Legal</p>
-
-                            <div className='flex flex-col items-start mt-5 space-y-2'>
-                                {forLegal.map((link, index) => (
-                                    <Link href={link.link} key={index} passHref>
-                                        <p className='transition-colors duration-300 hover:text-primary hover:cursor-pointer'>{link.title}</p>
-                                    </Link>
-                                ))}
+                            <div>
+                                <p className='font-semibold tracking-wide'>Socials</p>
+                                <div className='flex flex-col items-start mt-5 space-y-2'>
+                                    {companySocial.map((link, index) => (
+                                        <Link href={link.link} key={index} passHref>
+                                            <p className='transition-colors duration-300 hover:text-primary hover:cursor-pointer'>{link.title}</p>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <hr className='my-6 border-gray-700 h-2' />
-
-                    <div className='sm:flex sm:items-center sm:justify-between'>
-                        <div className='flex flex-col space-y-2'>
-                            <h1 className='text-lg'>Connect with us on:</h1>
-                            <div className='flex gap-2 hover:cursor-pointer items-center'>
-                                {companySocial.map((social, index) => (
-                                    <a href={social.link} target='_blank' rel='noopener noreferrer' key={index} className='p-2 flex items-center justify-center rounded-full bg-gray-100 border-2 border-primary'>
-                                        <Image src={social.imageName} height={20} width={20} alt={social.link} />
-                                    </a>
-                                ))}
+                            <div>
+                                <p className='font-semibold tracking-wide'>Legal</p>
+                                <div className='flex flex-col items-start mt-5 space-y-2'>
+                                    {forLegal.map((link, index) => (
+                                        <Link href={link.link} key={index} passHref>
+                                            <p className='transition-colors duration-300 hover:text-primary hover:cursor-pointer'>{link.title}</p>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <p className='flex flex-wrap justify-center items-center py-2 text-center text-xl w-full mx-auto'>&copy; {currentYear} BIT10, Inc. All rights reserved.</p>
+                    <p className='flex flex-wrap justify-center items-center pt-8 pb-2 text-center text-xl w-full mx-auto'>&copy; {currentYear} BIT10, Inc. All rights reserved.</p>
                 </div>
             </motion.footer>
         </MaxWidthWrapper>
