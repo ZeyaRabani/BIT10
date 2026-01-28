@@ -41,7 +41,7 @@ const companySocial: FooterLinkType[] = [
     },
     {
         title: 'Telegram',
-        link: 'https://t.me/zr00083'
+        link: 'https://t.me/+7LRp1ZtAlt45ZjY0'
     },
     {
         title: 'LinkedIn',

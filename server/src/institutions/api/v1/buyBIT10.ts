@@ -273,7 +273,7 @@ export const handleBuyBIT10 = async (req: http.IncomingMessage, res: http.Server
                     token_in_amount: token_in_amount,
                     token_out_address: token_out_address,
                     token_out_amount: token_out_amount,
-                    referral : 'OVZA8WKN' // Referral code for EagleAI Labs
+                    referral : ['OVZA8WKN'] // Referral code for EagleAI Labs
                 });
 
                 const enhancedResponse = {

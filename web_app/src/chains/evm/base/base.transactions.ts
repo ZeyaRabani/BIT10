@@ -17,7 +17,8 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
                 token_in_address: tokenInAddress,
                 token_in_amount: tokenInAmount,
                 token_out_address: tokenOutAddress,
-                token_out_amount: tokenOutAmount
+                token_out_amount: tokenOutAmount,
+                referral: []
             }) as TransactionResponse;
 
             const tx = {
