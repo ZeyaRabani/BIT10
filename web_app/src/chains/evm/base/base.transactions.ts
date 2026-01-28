@@ -47,9 +47,6 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
             toast.info('Transaction sent! Waiting for confirmation...');
 
 
-            // Wait for 10 seconds
-            await new Promise((resolve) => setTimeout(resolve, 10000));
-
             onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on the blockchain.' });
             onStepUpdate?.(2, { status: 'processing', description: 'Verifying transaction and executing swap...' });
 
