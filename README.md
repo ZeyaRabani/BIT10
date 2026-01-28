@@ -1,4 +1,4 @@
-# BIT10 
+## BIT10 
 !
 BIT10 pioneers the concept of an "S&P 500 for crypto assets." It provides users with a streamlined way to diversify their exposure to DeFi assets by tracking major crypto tokens. BIT10 is an All-In-One Decentralized Cross-Chain Asset Manager. Starting with index funds, then to DEX's and then lending. All Cross-Chain!!!
 
