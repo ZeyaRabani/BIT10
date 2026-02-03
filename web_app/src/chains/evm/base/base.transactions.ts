@@ -2,7 +2,7 @@ import { createICPActor } from './base.client';
 import { toast } from 'sonner';
 import { idlFactory as exchangeIDLFactory } from '@/lib/canisters/bit10_exchange.did';
 import { idlFactory as rewardsIDLFactory } from '@/lib/canisters/rewards.did';
-import { BIT10_EXCHANGE_CANISTER_ID, BIT10_REWARDS_CANISTER_ID } from './base.constants';
+import { BIT10_EXCHANGE_CANISTER_ID, BIT10_REWARDS_CANISTER_ID, delay } from './base.constants';
 import type { StepUpdateCallback, TransactionResponse, SwapResponse, CashbackResponse } from './base.types';
 import { ethers } from 'ethers';
 
@@ -46,14 +46,22 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
 
             toast.info('Transaction sent! Waiting for confirmation...');
 
-
             onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on the blockchain.' });
-            onStepUpdate?.(2, { status: 'processing', description: 'Verifying transaction and executing swap...' });
+            onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
 
             const transfer = await actor.base_buy(txResponse.hash) as SwapResponse;
 
+            await delay(5000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+            await delay(5000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and executing swap...' });
+
             if ('Ok' in transfer) {
-                onStepUpdate?.(2, { status: 'success', description: 'Token swap completed successfully!' });
+                onStepUpdate?.(4, { status: 'success', description: 'Token swap completed successfully!' });
                 toast.success('Token swap was successful!');
             } else if (transfer.Err) {
                 const errorMessage = transfer.Err;
@@ -65,10 +73,10 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
                     error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
                 }
 
-                onStepUpdate?.(2, { status: 'error', error });
+                onStepUpdate?.(4, { status: 'error', error });
                 toast.error(error);
             } else {
-                onStepUpdate?.(2, { status: 'error', error: 'Token swap failed. Please try again.' });
+                onStepUpdate?.(4, { status: 'error', error: 'Token swap failed. Please try again.' });
                 toast.error('An error occurred while processing your request. Please try again!');
             }
         } else {
@@ -94,7 +102,8 @@ export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAm
                 token_in_address: tokenInAddress,
                 token_in_amount: tokenInAmount,
                 token_out_address: tokenOutAddress,
-                token_out_amount: tokenOutAmount
+                token_out_amount: tokenOutAmount,
+                referral: []
             }) as TransactionResponse;
 
             const tx = {
@@ -122,16 +131,22 @@ export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAm
 
             toast.info('Transaction sent! Waiting for confirmation...');
 
-            // Wait for 10 seconds
-            await new Promise((resolve) => setTimeout(resolve, 10000));
-
             onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on the blockchain.' });
-            onStepUpdate?.(2, { status: 'processing', description: 'Verifying transaction and completing token sale...' });
+            onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
 
             const transfer = await actor.base_sell(txResponse.hash) as SwapResponse;
 
+            await delay(5000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+            await delay(5000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and completing token sale...' });
+
             if ('Ok' in transfer) {
-                onStepUpdate?.(2, { status: 'success', description: 'Token sale completed successfully!' });
+                onStepUpdate?.(4, { status: 'success', description: 'Token sale completed successfully!' });
                 toast.success('Token swap was successful!');
             } else if (transfer.Err) {
                 const errorMessage = transfer.Err;
@@ -143,10 +158,10 @@ export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAm
                     error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
                 }
 
-                onStepUpdate?.(2, { status: 'error', error });
+                onStepUpdate?.(4, { status: 'error', error });
                 toast.error(error);
             } else {
-                onStepUpdate?.(2, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
+                onStepUpdate?.(4, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
                 toast.error('An error occurred while processing your request. Please try again!');
             }
         } else {

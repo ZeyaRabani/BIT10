@@ -7,6 +7,8 @@ import { formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { InfoIcon } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type CoinSetData = {
     id: string;
@@ -419,7 +421,19 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             ) : (
                 <Card className='bg-transparent'>
                     <CardContent className='flex flex-col space-y-4'>
-                        <h1 className='text-xl md:text-2xl font-semibold uppercase'>BIT10.{index_fund}</h1>
+                        <h1 className='flex flex-row space-x-1 items-center'>
+                            <div className='text-xl md:text-2xl font-semibold uppercase'>BIT10.{index_fund}</div>
+                            <TooltipProvider>
+                                <Tooltip delayDuration={300}>
+                                    <TooltipTrigger asChild>
+                                        <InfoIcon className='size-4 cursor-pointer' />
+                                    </TooltipTrigger>
+                                    <TooltipContent className='max-w-[18rem] md:max-w-104 text-center border'>
+                                        Swaps are skipped if gas fees exceed transfer value or if allocation exceeds <span className='font-semibold'>110%</span> collateralization.
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </h1>
                         <div className='space-y-8'>
                             {selectedBIT10Token.map((entry, index) => {
                                 if (index === selectedBIT10Token.length - 1) {
@@ -564,52 +578,56 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                             </Table>
                                         </div>
 
-                                        <div className='mt-6'>
-                                            <h3 className='font-medium mb-3'>
-                                                {rebalanceResult.needsExternalLiquidity ? 'Internal Swaps' : 'Rebalance Trades'}
-                                            </h3>
-                                            {rebalanceResult.internalSwaps.length > 0 ? (
-                                                <Table className='border-collapse border text-[16px]'>
-                                                    <TableHeader>
-                                                        <TableRow>
-                                                            <TableHead>Sell Token</TableHead>
-                                                            <TableHead>Sell Amount</TableHead>
-                                                            <TableHead className='text-center'>→</TableHead>
-                                                            <TableHead>Buy Token</TableHead>
-                                                            <TableHead>Buy Amount</TableHead>
-                                                            <TableHead>Value (USD)</TableHead>
-                                                        </TableRow>
-                                                    </TableHeader>
-                                                    <TableBody>
-                                                        {rebalanceResult.internalSwaps.map((trade, tradeIndex) => (
-                                                            <TableRow key={tradeIndex}>
-                                                                <TableCell className='font-medium uppercase text-red-400'>{trade.sellToken}</TableCell>
-                                                                <TableCell>{formatCompactNumber(trade.sellAmount)}</TableCell>
-                                                                <TableCell className='text-center text-gray-500'>→</TableCell>
-                                                                <TableCell className='font-medium uppercase text-green-400'>{trade.buyToken}</TableCell>
-                                                                <TableCell>{formatCompactNumber(trade.buyAmount)}</TableCell>
-                                                                <TableCell>${formatCompactNumber(trade.valueUSD)}</TableCell>
+                                        {isDebugMode && (
+                                            <div className='mt-6'>
+                                                <h3 className='font-medium mb-3'>
+                                                    {rebalanceResult.needsExternalLiquidity ? 'Internal Swaps' : 'Rebalance Trades'}
+                                                </h3>
+                                                {rebalanceResult.internalSwaps.length > 0 ? (
+                                                    <Table className='border-collapse border text-[16px]'>
+                                                        <TableHeader>
+                                                            <TableRow>
+                                                                <TableHead>Sell Token</TableHead>
+                                                                <TableHead>Sell Amount</TableHead>
+                                                                <TableHead className='text-center'>→</TableHead>
+                                                                <TableHead>Buy Token</TableHead>
+                                                                <TableHead>Buy Amount</TableHead>
+                                                                <TableHead>Value (USD)</TableHead>
                                                             </TableRow>
-                                                        ))}
-                                                    </TableBody>
-                                                </Table>
-                                            ) : (
-                                                <div className={`border rounded-lg p-4 ${rebalanceAnalysis.type === 'rebalance'
-                                                    ? 'bg-yellow-900/20 border-yellow-800'
-                                                    : 'bg-gray-800 border-gray-700'
-                                                    }`}>
-                                                    <p className={`text-center ${rebalanceAnalysis.type === 'rebalance'
-                                                        ? 'text-yellow-300'
-                                                        : 'text-gray-400'
+                                                        </TableHeader>
+                                                        <TableBody>
+                                                            {rebalanceResult.internalSwaps.map(
+                                                                (trade, tradeIndex) => (
+                                                                    <TableRow key={tradeIndex}>
+                                                                        <TableCell className='font-medium uppercase text-red-400'>{trade.sellToken}</TableCell>
+                                                                        <TableCell>{formatCompactNumber(trade.sellAmount)}</TableCell>
+                                                                        <TableCell className='text-center text-gray-500'>→</TableCell>
+                                                                        <TableCell className='font-medium uppercase text-green-400'>{trade.buyToken}</TableCell>
+                                                                        <TableCell>{formatCompactNumber(trade.buyAmount)}</TableCell>
+                                                                        <TableCell>${formatCompactNumber(trade.valueUSD)}</TableCell>
+                                                                    </TableRow>
+                                                                )
+                                                            )}
+                                                        </TableBody>
+                                                    </Table>
+                                                ) : (
+                                                    <div className={`border rounded-lg p-4 ${rebalanceAnalysis.type === 'rebalance'
+                                                        ? 'bg-yellow-900/20 border-yellow-800'
+                                                        : 'bg-gray-800 border-gray-700'
                                                         }`}>
-                                                        {rebalanceAnalysis.type === 'rebalance'
-                                                            ? `⚠️ ${rebalanceAnalysis.reason} - but no significant trades calculated (amounts too small)`
-                                                            : `No trades required - ${rebalanceAnalysis.reason.toLowerCase()}`
-                                                        }
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
+                                                        <p className={`text-center ${rebalanceAnalysis.type === 'rebalance'
+                                                            ? 'text-yellow-300'
+                                                            : 'text-gray-400'
+                                                            }`}>
+                                                            {rebalanceAnalysis.type === 'rebalance'
+                                                                ? `⚠️ ${rebalanceAnalysis.reason} - but no significant trades calculated (amounts too small)`
+                                                                : `No trades required - ${rebalanceAnalysis.reason.toLowerCase()}`
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
 
                                         {isDebugMode && <>
                                             {rebalanceResult.needsExternalLiquidity && rebalanceResult.externalTokens.length > 0 && (

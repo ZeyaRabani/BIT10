@@ -593,7 +593,9 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                 setTransactionSteps([
                     { title: 'Approve Transaction', status: 'processing' },
                     { title: 'Confirm on Blockchain', status: 'pending' },
-                    { title: 'Complete Token Sale', status: 'pending' }
+                    { title: 'Execute Token Sale', status: 'pending' },
+                    { title: 'Confirming Transaction', status: 'pending' },
+                    { title: 'Validating Transaction', status: 'pending' }
                 ]);
 
                 await CHAIN_REGISTRY.base.sellBIT10Token({
@@ -608,7 +610,9 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                 setTransactionSteps([
                     { title: 'Approve Transaction', status: 'processing' },
                     { title: 'Confirm on Solana', status: 'pending' },
-                    { title: 'Complete Token Sale', status: 'pending' }
+                    { title: 'Execute Token Sale', status: 'pending' },
+                    { title: 'Confirming Transaction', status: 'pending' },
+                    { title: 'Validating Transaction', status: 'pending' }
                 ]);
 
                 await CHAIN_REGISTRY.solana.sellBIT10Token({
@@ -624,7 +628,9 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                 setTransactionSteps([
                     { title: 'Approve Transaction', status: 'processing' },
                     { title: 'Confirm on BSC', status: 'pending' },
-                    { title: 'Complete Token Sale', status: 'pending' }
+                    { title: 'Execute Token Sale', status: 'pending' },
+                    { title: 'Confirming Transaction', status: 'pending' },
+                    { title: 'Validating Transaction', status: 'pending' }
                 ]);
 
                 await CHAIN_REGISTRY.bsc.sellBIT10Token({

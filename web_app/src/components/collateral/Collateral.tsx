@@ -56,8 +56,8 @@ interface RebalanceData {
 }
 
 const DEFAULT_WALLET = {
-    walletAddress: '0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1',
-    explorerAddress: 'https://etherscan.io/address/0x8b78d7ecf27c8799f19ed4ecbee75cde66f925f1'
+    walletAddress: '0x7f7307d895f1242e969a58893ac8594efc8ce6e2',
+    explorerAddress: 'https://bscscan.com/address/0x7f7307d895f1242e969a58893ac8594efc8ce6e2#asset-tokens'
 };
 
 const color = ['#F7931A', '#3C3C3D', '#006097', '#F3BA2F', '#00FFA3', '#B51D06', '#C2A633', '#0033AD', '#29B6F6', '#ff0066'];

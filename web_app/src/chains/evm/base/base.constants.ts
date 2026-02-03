@@ -22,3 +22,5 @@ export const sellTokens = [
 export const sellReceiveTokens = [
     { label: 'ETH', value: 'Ethereum', img: ETHImg as StaticImageData, address: '0x0000000000000000000000000000000000000000b', tokenType: 'ERC20', gasFee: 0.0001, slug: ['ethereum'] }
 ]
+
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

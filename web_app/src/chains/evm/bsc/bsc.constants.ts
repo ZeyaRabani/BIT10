@@ -23,3 +23,5 @@ export const sellTokens = [
 export const sellReceiveTokens = [
     { label: 'BNB', value: 'BNB', img: BNBImg as StaticImageData, address: '0x0000000000000000000000000000000000000000bnb', tokenType: 'BEP20', gasFee: 0.0001, slug: ['bnb'] }
 ]
+
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

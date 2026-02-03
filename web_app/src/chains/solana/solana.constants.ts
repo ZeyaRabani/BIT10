@@ -21,3 +21,5 @@ export const sellTokens = [
 export const sellReceiveTokens = [
     { label: 'SOL', value: 'Solana', img: SOLImg as StaticImageData, address: 'So11111111111111111111111111111111111111111', tokenType: 'SPL', gasFee: 0.0001, slug: ['sol', 'solana'] }
 ]
+
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
