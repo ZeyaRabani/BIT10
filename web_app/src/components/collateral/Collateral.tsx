@@ -303,7 +303,7 @@ export default function Collateral() {
                                         </div>
                                         <div className='-mt-4 flex flex-row items-end justify-start space-x-2'>
                                             <div className='text-4xl font-semibold'>110%</div>
-                                            <div className='pb-0.5 text-green-500'>Over-collateralized</div>
+                                            <div className='pb-0.5 text-sm md:text-base text-green-500'>Over-collateralized</div>
                                         </div>
                                     </Card>
                                 </div>
@@ -358,7 +358,7 @@ export default function Collateral() {
                                             </PieChart>
                                         </ChartContainer>
                                     </div>
-                                    <div className='flex w-full flex-col space-y-3 col-span-2'>
+                                    <div className='flex w-full flex-col space-y-3 col-span-2 overflow-x-auto'>
                                         <table className='w-full table-auto text-lg'>
                                             <thead>
                                                 <tr className='p-1 rounded'>

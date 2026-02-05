@@ -597,9 +597,9 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                 setTransactionSteps([
                     { title: 'Approve Transaction', status: 'processing' },
                     { title: 'Confirm on Blockchain', status: 'pending' },
-                    { title: 'Execute Swap', status: 'pending' },
                     { title: 'Confirming Transaction', status: 'pending' },
-                    { title: 'Validating Transaction', status: 'pending' }
+                    { title: 'Validating Transaction', status: 'pending' },
+                    { title: 'Execute Swap', status: 'pending' }
                 ]);
 
                 await CHAIN_REGISTRY.base.buyBIT10Token({
@@ -614,9 +614,9 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                 setTransactionSteps([
                     { title: 'Prepare Wallet & Approve Transaction', status: 'processing' },
                     { title: 'Confirm on Solana', status: 'pending' },
-                    { title: 'Execute Swap', status: 'pending' },
                     { title: 'Confirming Transaction', status: 'pending' },
-                    { title: 'Validating Transaction', status: 'pending' }
+                    { title: 'Validating Transaction', status: 'pending' },
+                    { title: 'Execute Swap', status: 'pending' }
                 ]);
 
                 await CHAIN_REGISTRY.solana.buyBIT10Token({
@@ -632,9 +632,9 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                 setTransactionSteps([
                     { title: 'Approve Transaction', status: 'processing' },
                     { title: 'Confirm on Blockchain', status: 'pending' },
-                    { title: 'Execute Swap', status: 'pending' },
                     { title: 'Confirming Transaction', status: 'pending' },
-                    { title: 'Validating Transaction', status: 'pending' }
+                    { title: 'Validating Transaction', status: 'pending' },
+                    { title: 'Execute Swap', status: 'pending' }
                 ]);
 
                 await CHAIN_REGISTRY.bsc.buyBIT10Token({

@@ -9,80 +9,96 @@ import { ethers } from 'ethers';
 export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmount, tokenOutAddress, walletAddress, onStepUpdate }: { tokenInAmount: string, tokenInAddress: string, tokenOutAmount: string, tokenOutAddress: string, walletAddress: string, onStepUpdate?: StepUpdateCallback }) => {
     try {
         onStepUpdate?.(0, { status: 'processing', description: 'Preparing transaction details...' });
-
         const actor = createICPActor(exchangeIDLFactory, BIT10_EXCHANGE_CANISTER_ID);
 
-        if (actor.bsc_create_transaction && actor.bsc_buy) {
-            const create_transaction = await actor.bsc_create_transaction({
-                user_wallet_address: walletAddress,
-                token_in_address: tokenInAddress,
-                token_in_amount: tokenInAmount,
-                token_out_address: tokenOutAddress,
-                token_out_amount: tokenOutAmount,
-                referral: []
-            }) as TransactionResponse;
+        if (!actor.bsc_create_transaction || !actor.bsc_buy) throw new Error('Exchange methods not available');
 
-            const tx = {
-                to: create_transaction.to,
-                value: create_transaction.value,
-                data: create_transaction.data,
-                from: create_transaction.from
-            };
+        const create_transaction = await actor.bsc_create_transaction({
+            user_wallet_address: walletAddress,
+            token_in_address: tokenInAddress,
+            token_in_amount: tokenInAmount,
+            token_out_address: tokenOutAddress,
+            token_out_amount: tokenOutAmount,
+            referral: []
+        }) as TransactionResponse;
 
-            const ethereumProvider = window.ethereum as ethers.Eip1193Provider | undefined;
-            if (!ethereumProvider) {
-                onStepUpdate?.(0, { status: 'error', error: 'Ethereum provider not found. Please install MetaMask or another wallet.' });
-                throw new Error('Ethereum provider not found. Please install MetaMask or another wallet.');
-            }
+        const tx = {
+            to: create_transaction.to,
+            value: create_transaction.value,
+            data: create_transaction.data,
+            from: create_transaction.from
+        };
 
-            onStepUpdate?.(0, { status: 'processing', description: 'Please approve the transaction in your wallet...' });
+        const ethereumProvider = window.ethereum as ethers.Eip1193Provider | undefined;
 
-            const provider = new ethers.BrowserProvider(ethereumProvider);
-            const signer = await provider.getSigner();
+        if (!ethereumProvider) {
+            onStepUpdate?.(0, { status: 'error', error: 'Ethereum provider not found. Please install MetaMask or another wallet.' });
+            throw new Error('Ethereum provider not found. Please install MetaMask or another wallet.');
+        }
 
-            const txResponse = await signer.sendTransaction(tx);
+        onStepUpdate?.(0, { status: 'processing', description: 'Please approve the transaction in your wallet...' });
 
-            toast.info('Transaction sent! Waiting for confirmation...');
+        const provider = new ethers.BrowserProvider(ethereumProvider);
+        const signer = await provider.getSigner();
 
-            onStepUpdate?.(0, { status: 'success', description: 'Transaction submitted successfully.' });
-            onStepUpdate?.(1, { status: 'processing', description: 'Waiting for blockchain confirmation...' });
+        const txResponse = await signer.sendTransaction(tx);
 
-            onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on the blockchain.' });
-            onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
+        onStepUpdate?.(0, { status: 'success', description: 'Transaction submitted successfully.' });
+        onStepUpdate?.(1, { status: 'processing', description: 'Waiting for blockchain confirmation...' });
 
-            const transfer = await actor.bsc_buy(txResponse.hash) as SwapResponse;
+        toast.info('Transaction sent! Waiting for confirmation...');
 
-            await delay(5000);
+        onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on the blockchain.' });
+        onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
+
+        const transferPromise = actor.bsc_buy(txResponse.hash) as Promise<SwapResponse>;
+        const transfer = await transferPromise;
+
+        if ('Ok' in transfer) {
+            await delay(2000);
             onStepUpdate?.(2, { status: 'success' });
 
             onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
-            await delay(5000);
+
+            await delay(2000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and executing swap...' });
+            onStepUpdate?.(4, { status: 'success', description: 'Token swap completed successfully!' });
+            toast.success('Token swap was successful!');
+        } else if ('Err' in transfer) {
+            await delay(8000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+
+            await delay(8000);
             onStepUpdate?.(3, { status: 'success' });
 
             onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and executing swap...' });
 
-            if ('Ok' in transfer) {
-                onStepUpdate?.(4, { status: 'success', description: 'Token swap completed successfully!' });
-                toast.success('Token swap was successful!');
-            } else if (transfer.Err) {
-                const errorMessage = transfer.Err;
-                let error = 'An error occurred while processing your request. Please try again!';
+            let error = 'An error occurred while processing your request. Please try again!';
 
-                if (errorMessage.includes('Insufficient balance')) {
-                    error = 'Insufficient funds';
-                } else if (errorMessage.includes('less than available supply')) {
-                    error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
-                }
-
-                onStepUpdate?.(4, { status: 'error', error });
-                toast.error(error);
-            } else {
-                onStepUpdate?.(4, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
-                toast.error('An error occurred while processing your request. Please try again!');
+            if (transfer.Err.includes('Insufficient balance')) {
+                error = 'Insufficient funds';
+            } else if (transfer.Err.includes('less than available supply')) {
+                error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
             }
+
+            onStepUpdate?.(4, { status: 'error', error });
+            toast.error(error);
         } else {
-            onStepUpdate?.(0, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
-            toast.error('An error occurred while processing your request. Please try again!');
+            await delay(8000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+
+            await delay(8000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and executing swap...' });
+            onStepUpdate?.(4, { status: 'error', error: 'Token swap failed. Please try again.' });
+            toast.error('Token swap failed. Please try again.');
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -94,80 +110,95 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
 export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmount, tokenOutAddress, walletAddress, onStepUpdate }: { tokenInAmount: string, tokenInAddress: string, tokenOutAmount: string, tokenOutAddress: string, walletAddress: string, onStepUpdate?: StepUpdateCallback }) => {
     try {
         onStepUpdate?.(0, { status: 'processing', description: 'Preparing sell transaction...' });
-
         const actor = createICPActor(exchangeIDLFactory, BIT10_EXCHANGE_CANISTER_ID);
 
-        if (actor.bsc_create_sell_transaction && actor.bsc_sell) {
-            const create_transaction = await actor.bsc_create_sell_transaction({
-                user_wallet_address: walletAddress,
-                token_in_address: tokenInAddress,
-                token_in_amount: tokenInAmount,
-                token_out_address: tokenOutAddress,
-                token_out_amount: tokenOutAmount,
-                referral: []
-            }) as TransactionResponse;
+        if (!actor.bsc_create_sell_transaction || !actor.bsc_sell) { throw new Error('Exchange methods not available'); }
 
-            const tx = {
-                to: create_transaction.to,
-                value: create_transaction.value,
-                data: create_transaction.data,
-                from: create_transaction.from
-            };
+        const create_transaction = await actor.bsc_create_sell_transaction({
+            user_wallet_address: walletAddress,
+            token_in_address: tokenInAddress,
+            token_in_amount: tokenInAmount,
+            token_out_address: tokenOutAddress,
+            token_out_amount: tokenOutAmount,
+            referral: []
+        }) as TransactionResponse;
 
-            const ethereumProvider = window.ethereum as ethers.Eip1193Provider | undefined;
-            if (!ethereumProvider) {
-                onStepUpdate?.(0, { status: 'error', error: 'Ethereum provider not found. Please install MetaMask or another wallet.' });
-                throw new Error('Ethereum provider not found. Please install MetaMask or another wallet.');
-            }
+        const tx = {
+            to: create_transaction.to,
+            value: create_transaction.value,
+            data: create_transaction.data,
+            from: create_transaction.from
+        };
 
-            onStepUpdate?.(0, { status: 'processing', description: 'Please approve the sell transaction in your wallet...' });
+        const ethereumProvider = window.ethereum as ethers.Eip1193Provider | undefined;
 
-            const provider = new ethers.BrowserProvider(ethereumProvider);
-            const signer = await provider.getSigner();
+        if (!ethereumProvider) {
+            onStepUpdate?.(0, { status: 'error', error: 'Ethereum provider not found. Please install MetaMask or another wallet.' });
+            throw new Error('Ethereum provider not found. Please install MetaMask or another wallet.');
+        }
 
-            const txResponse = await signer.sendTransaction(tx);
+        onStepUpdate?.(0, { status: 'processing', description: 'Please approve the sell transaction in your wallet...' });
 
-            toast.info('Transaction sent! Waiting for confirmation...');
+        const provider = new ethers.BrowserProvider(ethereumProvider);
+        const signer = await provider.getSigner();
+        const txResponse = await signer.sendTransaction(tx);
 
-            onStepUpdate?.(0, { status: 'success', description: 'Transaction submitted successfully.' });
-            onStepUpdate?.(1, { status: 'processing', description: 'Waiting for confirmation on BSC...' });
+        onStepUpdate?.(0, { status: 'success', description: 'Transaction submitted successfully.' });
+        onStepUpdate?.(1, { status: 'processing', description: 'Waiting for blockchain confirmation...' });
 
-            onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on BSC.' });
-            onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
+        toast.info('Transaction sent! Waiting for confirmation...');
 
-            const transfer = await actor.bsc_sell(txResponse.hash) as SwapResponse;
+        onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on the blockchain.' });
+        onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
 
-            await delay(5000);
+        const transferPromise = actor.bsc_sell(txResponse.hash) as Promise<SwapResponse>;
+        const transfer = await transferPromise;
+
+        if ('Ok' in transfer) {
+            await delay(2000);
             onStepUpdate?.(2, { status: 'success' });
 
             onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
-            await delay(5000);
+
+            await delay(2000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and completing token sale...' });
+            onStepUpdate?.(4, { status: 'success', description: 'Token sale completed successfully!' });
+            toast.success('Token swap was successful!');
+        } else if ('Err' in transfer) {
+            await delay(8000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+
+            await delay(8000);
             onStepUpdate?.(3, { status: 'success' });
 
             onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and completing token sale...' });
 
-            if ('Ok' in transfer) {
-                onStepUpdate?.(4, { status: 'success', description: 'Token sale completed successfully!' });
-                toast.success('Token swap was successful!');
-            } else if (transfer.Err) {
-                const errorMessage = transfer.Err;
-                let error = 'An error occurred while processing your request. Please try again!';
+            let error = 'An error occurred while processing your request. Please try again!';
 
-                if (errorMessage.includes('Insufficient balance')) {
-                    error = 'Insufficient funds';
-                } else if (errorMessage.includes('less than available supply')) {
-                    error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
-                }
-
-                onStepUpdate?.(4, { status: 'error', error });
-                toast.error(error);
-            } else {
-                onStepUpdate?.(4, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
-                toast.error('An error occurred while processing your request. Please try again!');
+            if (transfer.Err.includes('Insufficient balance')) {
+                error = 'Insufficient funds';
+            } else if (transfer.Err.includes('less than available supply')) {
+                error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
             }
+
+            onStepUpdate?.(4, { status: 'error', error });
+            toast.error(error);
         } else {
-            onStepUpdate?.(0, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
-            toast.error('An error occurred while processing your request. Please try again!');
+            await delay(8000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+
+            await delay(8000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and completing token sale...' });
+            onStepUpdate?.(4, { status: 'error', error: 'Token sale failed. Please try again.' });
+            toast.error('Token sale failed. Please try again.');
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {

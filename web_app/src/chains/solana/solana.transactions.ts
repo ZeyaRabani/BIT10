@@ -46,11 +46,15 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
 
         const isToken2022 = mintInfo.owner.equals(TOKEN_2022_PROGRAM_ID);
         const tokenProgramId = isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID;
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const fromPubkey = wallet.publicKey;
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const ata = await getAssociatedTokenAddress(TOKEN_MINT, fromPubkey, false, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
+
         const accountInfo = await connection.getAccountInfo(ata);
+
         const ataExists = accountInfo !== null;
 
         if (!ataExists) {
@@ -58,165 +62,171 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
 
             toast.loading('Creating Associated Token Account');
 
-            try {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                const createATAInstruction = createAssociatedTokenAccountInstruction(fromPubkey, ata, fromPubkey, TOKEN_MINT, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
-                const { blockhash } = await connection.getLatestBlockhash('finalized');
-
-                const messageV0 = new TransactionMessage({
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    payerKey: fromPubkey,
-                    recentBlockhash: blockhash,
-                    instructions: [
-                        ComputeBudgetProgram.setComputeUnitLimit({ units: 200000 }),
-                        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 }),
-                        createATAInstruction
-                    ],
-                }).compileToV0Message();
-
-                const ataTransaction = new VersionedTransaction(messageV0);
-
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                const ataSignature = await wallet.sendTransaction(ataTransaction, connection, {
-                    skipPreflight: false,
-                    preflightCommitment: 'confirmed',
-                });
-
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                await connection.confirmTransaction(ataSignature, 'confirmed');
-
-                onStepUpdate?.(0, { status: 'success', description: 'Associated Token Account created successfully!' });
-
-                toast.dismiss();
-                toast.success('Associated Token Account created successfully!');
-            } catch (ataError) {
-                onStepUpdate?.(0, { status: 'error', error: 'Failed to create Associated Token Account' });
-
-                toast.dismiss();
-                toast.error('Failed to create Associated Token Account');
-                throw ataError;
-            }
-        } else {
-            onStepUpdate?.(0, { status: 'success', description: 'Wallet connected and ready!' });
-
-            toast.dismiss();
-        }
-
-        if (actor.solana_create_transaction && actor.solana_buy) {
-            onStepUpdate?.(0, { status: 'processing', description: 'Preparing transaction details...' });
-
-            const create_transaction = await actor.solana_create_transaction({
-                user_wallet_address: walletAddress,
-                token_in_address: tokenInAddress,
-                token_in_amount: tokenInAmount,
-                token_out_address: tokenOutAddress,
-                token_out_amount: tokenOutAmount,
-                referral: []
-            }) as TransactionResponse;
-
-            const toPubkey = new PublicKey(create_transaction.to);
-            const amount = Number(create_transaction.value);
-            const memoData = decodeHexData(create_transaction.data);
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            const balance = await connection.getBalance(fromPubkey);
-
-            if (balance < amount) {
-                onStepUpdate?.(0, { status: 'error', error: `Insufficient balance. Have: ${balance / 1e9} SOL, Need: ${amount / 1e9} SOL` });
-
-                toast.dismiss();
-                toast.error(`Insufficient balance. Have: ${balance / 1e9} SOL, Need: ${amount / 1e9} SOL`);
-                return null;
-            }
-
-            const instructions = [
-                ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 }),
-                ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 }),
-                new TransactionInstruction({
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    keys: [{ pubkey: fromPubkey, isSigner: true, isWritable: false }],
-                    programId: MEMO_PROGRAM_ID,
-                    data: Buffer.from(memoData, 'utf-8'),
-                }),
-                SystemProgram.transfer({
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    fromPubkey,
-                    toPubkey,
-                    lamports: amount,
-                })
-            ];
-
-            const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+            const createATAInstruction = createAssociatedTokenAccountInstruction(fromPubkey, ata, fromPubkey, TOKEN_MINT, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
+            const { blockhash } = await connection.getLatestBlockhash('finalized');
 
             const messageV0 = new TransactionMessage({
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 payerKey: fromPubkey,
                 recentBlockhash: blockhash,
-                instructions,
+                instructions: [
+                    ComputeBudgetProgram.setComputeUnitLimit({ units: 200000 }),
+                    ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 }),
+                    createATAInstruction
+                ]
             }).compileToV0Message();
 
-            const transaction = new VersionedTransaction(messageV0);
-
-            onStepUpdate?.(0, { status: 'processing', description: 'Please approve the transaction in your wallet...' });
+            const ataTransaction = new VersionedTransaction(messageV0);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            const signature = await wallet.sendTransaction(transaction, connection, {
+            const ataSignature = await wallet.sendTransaction(ataTransaction, connection, {
                 skipPreflight: false,
-                preflightCommitment: 'confirmed',
+                preflightCommitment: 'confirmed'
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const confirmation = await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            await connection.confirmTransaction(ataSignature, 'confirmed');
 
-            if (confirmation.value.err) {
-                onStepUpdate?.(0, { status: 'error', error: `Transaction failed: ${JSON.stringify(confirmation.value.err)}` });
-
-                toast.dismiss();
-                toast.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
-                return null;
-            }
 
             toast.dismiss();
-            toast.info('Transaction sent! Waiting for confirmation...');
+            toast.success('Associated Token Account created successfully!');
 
-            onStepUpdate?.(0, { status: 'success', description: 'Transaction submitted successfully.' });
-            onStepUpdate?.(1, { status: 'processing', description: 'Waiting for Solana network confirmation...' });
+        }
 
-            onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on Solana.' });
-            onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
+        onStepUpdate?.(0, { status: 'success', description: 'Wallet connected and ready!' });
 
-            const transfer = await actor.solana_buy(signature) as SwapResponse;
+        onStepUpdate?.(0, { status: 'processing', description: 'Preparing transaction details...' });
 
-            await delay(5000);
+        if (!actor.solana_create_transaction || !actor.solana_buy) throw new Error('Exchange methods not available');
+
+        const create_transaction = (await actor.solana_create_transaction({
+            user_wallet_address: walletAddress,
+            token_in_address: tokenInAddress,
+            token_in_amount: tokenInAmount,
+            token_out_address: tokenOutAddress,
+            token_out_amount: tokenOutAmount,
+            referral: []
+        })) as TransactionResponse;
+
+        const toPubkey = new PublicKey(create_transaction.to);
+        const amount = Number(create_transaction.value);
+        const memoData = decodeHexData(create_transaction.data);
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        const balance = await connection.getBalance(fromPubkey);
+
+        if (balance < amount) {
+            onStepUpdate?.(0, { status: 'error', error: `Insufficient balance. Have: ${balance / 1e9} SOL, Need: ${amount / 1e9} SOL` });
+
+            toast.dismiss();
+            toast.error(`Insufficient balance. Have: ${balance / 1e9} SOL, Need: ${amount / 1e9} SOL`);
+            return null;
+        }
+
+        const instructions = [
+            ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 }),
+            ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 }),
+            new TransactionInstruction({
+                keys: [],
+                programId: MEMO_PROGRAM_ID,
+                data: Buffer.from(memoData, 'utf-8')
+            }),
+            SystemProgram.transfer({
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                fromPubkey,
+                toPubkey,
+                lamports: amount
+            })
+        ];
+
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+
+        const messageV0 = new TransactionMessage({
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            payerKey: fromPubkey,
+            recentBlockhash: blockhash,
+            instructions
+        }).compileToV0Message();
+
+        const transaction = new VersionedTransaction(messageV0);
+
+        onStepUpdate?.(0, { status: 'processing', description: 'Please approve the transaction in your wallet...' });
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const signature = await wallet.sendTransaction(transaction, connection, {
+            skipPreflight: false,
+            preflightCommitment: 'confirmed'
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const confirmation = await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+
+        if (confirmation.value.err) {
+            onStepUpdate?.(0, { status: 'error', error: `Transaction failed: ${JSON.stringify(confirmation.value.err)}` });
+
+            toast.dismiss();
+            toast.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+            return null;
+        }
+
+        onStepUpdate?.(0, { status: 'success', description: 'Transaction submitted successfully.' });
+        onStepUpdate?.(1, { status: 'processing', description: 'Waiting for Solana network confirmation...' });
+
+        toast.dismiss();
+        toast.info('Transaction sent! Waiting for confirmation...');
+
+        onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on the blockchain.' });
+        onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
+
+        const transferPromise = actor.solana_buy(signature) as Promise<SwapResponse>;
+        const transfer = await transferPromise;
+
+        if ('Ok' in transfer) {
+            await delay(2000);
             onStepUpdate?.(2, { status: 'success' });
 
             onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
-            await delay(5000);
+
+            await delay(2000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and executing swap...' });
+            onStepUpdate?.(4, { status: 'success', description: 'Token swap completed successfully!' });
+            toast.success('Token swap was successful!');
+        } else if ('Err' in transfer) {
+            await delay(8000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+
+            await delay(8000);
             onStepUpdate?.(3, { status: 'success' });
 
             onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and executing swap...' });
 
-            if ('Ok' in transfer) {
-                onStepUpdate?.(4, { status: 'success', description: 'Token swap completed successfully!' });
-                toast.success('Token swap was successful!');
-            } else if (transfer.Err) {
-                const errorMessage = transfer.Err;
-                let error = 'An error occurred while processing your request. Please try again!';
+            let error = 'An error occurred while processing your request. Please try again!';
 
-                if (errorMessage.includes('Insufficient balance')) {
-                    error = 'Insufficient funds';
-                } else if (errorMessage.includes('less than available supply')) {
-                    error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
-                }
-
-                onStepUpdate?.(4, { status: 'error', error });
-                toast.error(error);
-            } else {
-                onStepUpdate?.(4, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
-                toast.error('An error occurred while processing your request. Please try again!');
+            if (transfer.Err.includes('Insufficient balance')) {
+                error = 'Insufficient funds';
+            } else if (transfer.Err.includes('less than available supply')) {
+                error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
             }
+
+            onStepUpdate?.(4, { status: 'error', error });
+            toast.error(error);
         } else {
-            onStepUpdate?.(0, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
-            toast.error('An error occurred while processing your request. Please try again!');
+            await delay(8000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+
+            await delay(8000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and executing swap...' });
+            onStepUpdate?.(4, { status: 'error', error: 'Token swap failed. Please try again.' });
+            toast.error('Token swap failed. Please try again.');
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -238,7 +248,9 @@ export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAm
         }
 
         const MEMO_PROGRAM_ID = new PublicKey('Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo');
+
         const actor = createICPActor(exchangeIDLFactory, BIT10_EXCHANGE_CANISTER_ID);
+
         const TOKEN_MINT = new PublicKey(tokenInAddress);
         const connection = getCustomConnection();
         const mintInfo = await connection.getAccountInfo(TOKEN_MINT);
@@ -253,111 +265,143 @@ export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAm
         const isToken2022 = mintInfo.owner.equals(TOKEN_2022_PROGRAM_ID);
         const tokenProgramId = isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID;
 
-        if (actor.solana_create_sell_transaction && actor.solana_sell) {
-            onStepUpdate?.(0, { status: 'processing', description: 'Preparing transaction details...' });
+        if (!actor.solana_create_sell_transaction || !actor.solana_sell) throw new Error('Exchange methods not available');
 
-            const create_transaction = await actor.solana_create_sell_transaction({
-                user_wallet_address: walletAddress,
-                token_in_address: tokenInAddress,
-                token_in_amount: tokenInAmount,
-                token_out_address: tokenOutAddress,
-                token_out_amount: tokenOutAmount,
-                referral: []
-            }) as TransactionResponse;
+        onStepUpdate?.(0, { status: 'processing', description: 'Preparing transaction details...' });
 
-            const fromPubkey = new PublicKey(create_transaction.from);
-            const toPubkey = new PublicKey(create_transaction.to);
-            const amount = Number(create_transaction.value);
-            const fromATA = await getAssociatedTokenAddress(TOKEN_MINT, fromPubkey, false, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
-            const toATA = await getAssociatedTokenAddress(TOKEN_MINT, toPubkey, false, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
-            const mint = await getMint(connection, TOKEN_MINT, undefined, tokenProgramId);
-            const decimals = mint.decimals;
+        const create_transaction = (await actor.solana_create_sell_transaction({
+            user_wallet_address: walletAddress,
+            token_in_address: tokenInAddress,
+            token_in_amount: tokenInAmount,
+            token_out_address: tokenOutAddress,
+            token_out_amount: tokenOutAmount,
+            referral: []
+        })) as TransactionResponse;
 
-            const instructions = [
-                ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 }),
-                ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 }),
-            ];
+        const fromPubkey = new PublicKey(create_transaction.from);
+        const toPubkey = new PublicKey(create_transaction.to);
+        const amount = Number(create_transaction.value);
 
-            const transferInstruction = createTransferCheckedInstruction(fromATA, TOKEN_MINT, toATA, fromPubkey, amount, decimals, [], tokenProgramId);
+        const fromATA = await getAssociatedTokenAddress(TOKEN_MINT, fromPubkey, false, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
 
-            instructions.push(transferInstruction);
+        const toATA = await getAssociatedTokenAddress(TOKEN_MINT, toPubkey, false, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
 
-            const memoData = decodeHexData(create_transaction.data);
+        const mint = await getMint(connection, TOKEN_MINT, undefined, tokenProgramId);
 
-            const memoInstruction = new TransactionInstruction({
-                keys: [
-                    { pubkey: fromPubkey, isSigner: true, isWritable: false }
-                ],
-                programId: MEMO_PROGRAM_ID,
-                data: Buffer.from(memoData, 'utf-8'),
-            });
+        const decimals = mint.decimals;
 
-            instructions.push(memoInstruction);
+        const instructions = [
+            ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 }),
+            ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 })
+        ];
 
-            const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
-            const messageV0 = new TransactionMessage({ payerKey: fromPubkey, recentBlockhash: blockhash, instructions }).compileToV0Message();
-            const transaction = new VersionedTransaction(messageV0);
+        const memoData = decodeHexData(create_transaction.data);
 
-            onStepUpdate?.(0, { status: 'processing', description: 'Please approve the sell transaction in your wallet...' });
+        const memoInstruction = new TransactionInstruction({
+            keys: [],
+            programId: MEMO_PROGRAM_ID,
+            data: Buffer.from(memoData, 'utf-8')
+        });
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            const signature = await wallet.sendTransaction(transaction, connection, {
-                skipPreflight: false,
-                preflightCommitment: 'confirmed',
-                maxRetries: 5
-            });
+        instructions.push(memoInstruction);
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const confirmation = await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+        const transferInstruction = createTransferCheckedInstruction(
+            fromATA,
+            TOKEN_MINT,
+            toATA,
+            fromPubkey,
+            amount,
+            decimals,
+            [],
+            tokenProgramId
+        );
 
-            if (confirmation.value.err) {
-                toast.dismiss();
-                toast.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
-                return null;
-            }
+        instructions.push(transferInstruction);
 
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+
+        const messageV0 = new TransactionMessage({
+            payerKey: fromPubkey,
+            recentBlockhash: blockhash,
+            instructions
+        }).compileToV0Message();
+
+        const transaction = new VersionedTransaction(messageV0);
+
+        onStepUpdate?.(0, { status: 'processing', description: 'Please approve the sell transaction in your wallet...' });
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const signature = await wallet.sendTransaction(transaction, connection, {
+            skipPreflight: false,
+            preflightCommitment: 'confirmed',
+            maxRetries: 5
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const confirmation = await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+
+        if (confirmation.value.err) {
             toast.dismiss();
-            toast.info('Transaction sent! Waiting for confirmation...');
+            toast.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+            return null;
+        }
 
-            onStepUpdate?.(0, { status: 'success', description: 'Transaction submitted successfully.' });
-            onStepUpdate?.(1, { status: 'processing', description: 'Waiting for confirmation on Solana...' });
+        onStepUpdate?.(0, { status: 'success', description: 'Transaction submitted successfully.' });
+        onStepUpdate?.(1, { status: 'processing', description: 'Waiting for blockchain confirmation...' });
 
-            onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on Solana.' });
-            onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
+        toast.info('Transaction sent! Waiting for confirmation...');
 
-            const transfer = await actor.solana_sell(signature) as SwapResponse;
+        onStepUpdate?.(1, { status: 'success', description: 'Transaction confirmed on the blockchain.' });
+        onStepUpdate?.(2, { status: 'processing', description: 'Confirming your transaction across the network. This may take a few moments.' });
 
-            await delay(5000);
+        const transferPromise = actor.solana_sell(signature) as Promise<SwapResponse>;
+        const transfer = await transferPromise;
+
+        if ('Ok' in transfer) {
+            await delay(2000);
             onStepUpdate?.(2, { status: 'success' });
 
             onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
-            await delay(5000);
+
+            await delay(2000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and completing token sale...' });
+            onStepUpdate?.(4, { status: 'success', description: 'Token sale completed successfully!' });
+            toast.success('Token swap was successful!');
+        } else if ('Err' in transfer) {
+            await delay(8000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+
+            await delay(8000);
             onStepUpdate?.(3, { status: 'success' });
 
             onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and completing token sale...' });
 
-            if ('Ok' in transfer) {
-                onStepUpdate?.(4, { status: 'success', description: 'Token sale completed successfully!' });
-                toast.success('Token swap was successful!');
-            } else if (transfer.Err) {
-                const errorMessage = transfer.Err;
-                let error = 'An error occurred while processing your request. Please try again!';
+            let error = 'An error occurred while processing your request. Please try again!';
 
-                if (errorMessage.includes('Insufficient balance')) {
-                    error = 'Insufficient funds';
-                } else if (errorMessage.includes('less than available supply')) {
-                    error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
-                }
-
-                onStepUpdate?.(4, { status: 'error', error });
-                toast.error(error);
-            } else {
-                onStepUpdate?.(4, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
-                toast.error('An error occurred while processing your request. Please try again!');
+            if (transfer.Err.includes('Insufficient balance')) {
+                error = 'Insufficient funds';
+            } else if (transfer.Err.includes('less than available supply')) {
+                error = 'The requested amount exceeds the available supply. Please enter a lower amount.';
             }
+
+            onStepUpdate?.(4, { status: 'error', error });
+            toast.error(error);
         } else {
-            onStepUpdate?.(0, { status: 'error', error: 'An error occurred while processing your request. Please try again!' });
-            toast.error('An error occurred while processing your request. Please try again!');
+            await delay(8000);
+            onStepUpdate?.(2, { status: 'success' });
+
+            onStepUpdate?.(3, { status: 'processing', description: 'Validating transaction integrity and preparing final execution.' });
+
+            await delay(8000);
+            onStepUpdate?.(3, { status: 'success' });
+
+            onStepUpdate?.(4, { status: 'processing', description: 'Verifying transaction and completing token sale...' });
+            onStepUpdate?.(4, { status: 'error', error: 'Token sale failed. Please try again.' });
+            toast.error('Token sale failed. Please try again.');
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
