@@ -20,11 +20,11 @@ export const idlFactory = ({ IDL }) => {
     });
     const SwapArgs = IDL.Record({
         'token_in_amount': IDL.Text,
+        'referral': IDL.Opt(IDL.Text),
         'token_in_address': IDL.Text,
         'token_out_address': IDL.Text,
         'user_wallet_address': IDL.Text,
         'token_out_amount': IDL.Text,
-        'referral': IDL.Opt(IDL.Text),
     });
     const TransactionResponse = IDL.Record({
         'to': IDL.Text,
@@ -38,6 +38,7 @@ export const idlFactory = ({ IDL }) => {
         'chain': IDL.Text,
         'token_address': IDL.Text,
         'total_chain_supply': IDL.Text,
+        'surplus_token': IDL.Text,
     });
     const TokenDetails = IDL.Record({
         'name': IDL.Text,
@@ -55,6 +56,7 @@ export const idlFactory = ({ IDL }) => {
         'chain': IDL.Text,
         'token_address': IDL.Text,
         'total_chain_supply': IDL.Text,
+        'surplus_token': IDL.Text,
     });
     const Result_TokenAvailability = IDL.Variant({
         'Ok': TokenAvailability,
@@ -69,6 +71,20 @@ export const idlFactory = ({ IDL }) => {
         'token_in_amount': IDL.Text,
         'token_in_address': IDL.Text,
         'token_out_address': IDL.Text,
+    });
+    const MintAndSendBIT10Args = IDL.Record({
+        'receiver_address': IDL.Text,
+        'token_address': IDL.Text,
+        'amount': IDL.Text,
+    });
+    const MintAndSendBIT10ICPArgs = IDL.Record({
+        'token_address': IDL.Text,
+        'amount': IDL.Text,
+        'receiver': IDL.Principal,
+    });
+    const UpdateSurplusArgs = IDL.Record({
+        'token_address': IDL.Text,
+        'surplus': IDL.Text,
     });
     return IDL.Service({
         'add_data_to_buy_history': IDL.Func(
@@ -110,6 +126,8 @@ export const idlFactory = ({ IDL }) => {
         ),
         'bsc_create_transaction': IDL.Func([SwapArgs], [TransactionResponse], []),
         'bsc_sell': IDL.Func([IDL.Text], [SwapResponse], []),
+        'clear_performance_logs': IDL.Func([], [], []),
+        'clear_token_program_cache': IDL.Func([], [], []),
         'create_associated_token_account': IDL.Func(
             [IDL.Text],
             [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
@@ -130,6 +148,11 @@ export const idlFactory = ({ IDL }) => {
             [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
             [],
         ),
+        'get_bsc_transaction_count_for_address': IDL.Func(
+            [IDL.Text],
+            [IDL.Variant({ 'Ok': IDL.Nat, 'Err': IDL.Text })],
+            [],
+        ),
         'get_buy_and_sell_history_by_address_and_chain': IDL.Func(
             [IDL.Text, IDL.Text],
             [IDL.Vec(SwapResponseData)],
@@ -141,6 +164,7 @@ export const idlFactory = ({ IDL }) => {
             [IDL.Vec(SwapResponseData)],
             ['query'],
         ),
+        'get_performance_logs': IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
         'get_sell_history': IDL.Func([], [IDL.Vec(SwapResponseData)], ['query']),
         'get_sell_history_by_address_and_chain': IDL.Func(
             [IDL.Text, IDL.Text],
@@ -152,9 +176,36 @@ export const idlFactory = ({ IDL }) => {
             [IDL.Vec(SwapResponseData)],
             ['query'],
         ),
+        'get_transaction_count_for_address': IDL.Func([IDL.Text], [IDL.Nat], []),
         'icp_buy': IDL.Func([ICPBuyArgs], [SwapResponse], []),
         'icp_sell': IDL.Func([ICPSellArgs], [SwapResponse], []),
+        'is_paused': IDL.Func([], [IDL.Bool], ['query']),
+        'mint_and_send_bit10_token_base': IDL.Func(
+            [MintAndSendBIT10Args],
+            [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+            [],
+        ),
+        'mint_and_send_bit10_token_bsc': IDL.Func(
+            [MintAndSendBIT10Args],
+            [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+            [],
+        ),
+        'mint_and_send_bit10_token_icp': IDL.Func(
+            [MintAndSendBIT10ICPArgs],
+            [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+            [],
+        ),
+        'mint_and_send_bit10_token_solana': IDL.Func(
+            [MintAndSendBIT10Args],
+            [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+            [],
+        ),
         'nonce_account': IDL.Func([], [IDL.Text], []),
+        'pause_canister': IDL.Func(
+            [],
+            [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+            [],
+        ),
         'solana_address': IDL.Func([], [IDL.Text], []),
         'solana_buy': IDL.Func([IDL.Text], [SwapResponse], []),
         'solana_create_sell_transaction': IDL.Func(
@@ -168,6 +219,16 @@ export const idlFactory = ({ IDL }) => {
             [],
         ),
         'solana_sell': IDL.Func([IDL.Text], [SwapResponse], []),
+        'unpause_canister': IDL.Func(
+            [],
+            [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+            [],
+        ),
+        'update_bit10_surplus': IDL.Func(
+            [UpdateSurplusArgs],
+            [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
+            [],
+        ),
     });
 };
 // @ts-expect-error

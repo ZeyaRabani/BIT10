@@ -400,7 +400,7 @@ const funds: FundCard[] = [
 const testimonials = [
     {
         x_link: 'https://x.com/DFINITYDev/status/1808724918177312925',
-        tweet: '@bit10startup is bringing the #Bitcoin ecosystem together for a pool party this #ChainFusionSummer⛱️ BIT10 is a #DeFi asset manager built using #ICP that offers an index tracking major #tokens, #ordinals, and #BRC20s on:🟧 ICP @dfinity, 🟧 @Stacks, 🟧 @MapProtocol, 🟧 @SovrynBTC, 🟧 @BadgerDAO, 🟧 @ALEXLabBTC, and more!',
+        tweet: '@bit10app is bringing the #Bitcoin ecosystem together for a pool party this #ChainFusionSummer⛱️ BIT10 is a #DeFi asset manager built using #ICP that offers an index tracking major #tokens, #ordinals, and #BRC20s on:🟧 ICP @dfinity, 🟧 @Stacks, 🟧 @MapProtocol, 🟧 @SovrynBTC, 🟧 @BadgerDAO, 🟧 @ALEXLabBTC, and more!',
         profile_pic: DefinityDevImg,
         name: 'DFINITY Developers',
         username: 'DFINITYDev'
@@ -1038,7 +1038,7 @@ export default function Page() {
                             <Button
                                 size='lg'
                                 className='text-lg px-8 py-6 font-medium'
-                                onClick={() => window.open('/buy', '_blank')}
+                                onClick={() => window.open('/mint', '_blank')}
                             >
                                 Start Investing Now
                                 <ArrowRightIcon className='ml-2 w-5 h-5' />
@@ -1192,7 +1192,7 @@ export default function Page() {
                                     <div className='flex w-full justify-center'>
                                         {isFree ? (
                                             <Button className='w-full lg:w-1/2' asChild>
-                                                <Link href='/buy'>Buy BIT10.TOP</Link>
+                                                <Link href='/mint'>Mint BIT10.TOP</Link>
                                             </Button>
                                         ) : isPro ? (
                                             <Button variant='outline' className='w-full lg:w-1/2' disabled>
@@ -1307,7 +1307,7 @@ export default function Page() {
                                     </div>
                                     <Button
                                         className='shrink-0 font-medium rounded-full'
-                                        onClick={() => window.open('/buy', '_blank')}
+                                        onClick={() => window.open('/mint', '_blank')}
                                     >
                                         Invest on {activeChain.name}
                                         <ExternalLinkIcon className='ml-2 w-4 h-4' />
@@ -1602,7 +1602,7 @@ export default function Page() {
                                 {fund.status === 'live' ? (
                                     <button
                                         className='flex items-center gap-2 text-sm font-medium text-primary hover:gap-3 transition-all'
-                                        onClick={() => window.open('/buy', '_blank')}
+                                        onClick={() => window.open('/mint', '_blank')}
                                     >
                                         Invest Now <ArrowRightIcon className='w-4 h-4' />
                                     </button>

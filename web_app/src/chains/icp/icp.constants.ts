@@ -1,7 +1,5 @@
 import { type StaticImageData } from 'next/image';
-import ICPImg from '@/assets/tokens/icp.svg';
-import CkBTCImg from '@/assets/tokens/ckbtc.svg';
-import CkETHImg from '@/assets/tokens/cketh.svg';
+import CkUSDCImg from '@/assets/tokens/ckusdc.svg'
 import BIT10Img from '@/assets/tokens/bit10.svg';
 
 export const ICP_HOST = 'https://icp-api.io';
@@ -9,9 +7,7 @@ export const BIT10_EXCHANGE_CANISTER_ID = '6phs7-6yaaa-aaaap-qpvoq-cai';
 export const BIT10_REWARDS_CANISTER_ID = '5fll2-liaaa-aaaap-qqlwa-cai';
 
 export const buyPayTokens = [
-    { label: 'ICP', value: 'ICP', img: ICPImg as StaticImageData, address: 'ryjl3-tyaaa-aaaaa-aaaba-cai', tokenType: 'ICRC', gasFee: 0.0001, slug: ['internet computer'] },
-    { label: 'ckBTC', value: 'ckBTC', img: CkBTCImg as StaticImageData, address: 'mxzaz-hqaaa-aaaar-qaada-cai', tokenType: 'ICRC', gasFee: 0.00000001, slug: ['bitcoin'] },
-    { label: 'ckETH', value: 'ckETH', img: CkETHImg as StaticImageData, address: 'ss2fx-dyaaa-aaaar-qacoq-cai', tokenType: 'ICRC', gasFee: 0.000002, slug: ['ethereum'] }
+    { label: 'ckUSDC', value: 'ckUSDC', img: CkUSDCImg as StaticImageData, address: 'xevnm-gaaaa-aaaar-qafnq-cai', tokenType: 'ICRC', gasFee: 0.01, slug: ['usdc', 'stable', 'stable-coin', 'stable coin', 'stablecoin'] },
 ]
 
 export const buyReceiveTokens = [
@@ -24,5 +20,5 @@ export const sellTokens = [
 ]
 
 export const sellReceiveTokens = [
-    { label: 'ICP', value: 'ICP', img: ICPImg as StaticImageData, address: 'ryjl3-tyaaa-aaaaa-aaaba-cai', tokenType: 'ICRC', gasFee: 0.0001, slug: ['internet computer'] }
+    { label: 'ckUSDC', value: 'ckUSDC', img: CkUSDCImg as StaticImageData, address: 'xevnm-gaaaa-aaaar-qafnq-cai', tokenType: 'ICRC', gasFee: 0.01, slug: ['usdc', 'stable', 'stable-coin', 'stable coin', 'stablecoin'] },
 ]

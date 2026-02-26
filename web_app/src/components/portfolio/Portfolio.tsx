@@ -38,7 +38,7 @@ export default function Portfolio() {
                     Welcome back {userAddress ? formatAddress(userAddress) : 'Guest'}
                 </h1>
                 <Button className='animate-fade-right-slow' asChild>
-                    <Link href='/buy'>Buy BIT10.TOP</Link>
+                    <Link href='/mint'>Mint BIT10.TOP</Link>
                 </Button>
             </div>
             <BalanceAndAllocation />

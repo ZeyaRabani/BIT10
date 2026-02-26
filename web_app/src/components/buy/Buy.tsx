@@ -4,7 +4,7 @@ import BuyModule from './BuyModule';
 import SellModule from './SellModule';
 
 export default function Buy() {
-    const [activeTab, setActiveTab] = useState('buy');
+    const [activeTab, setActiveTab] = useState('mint');
 
     const router = useRouter();
     const pathname = usePathname();
@@ -30,8 +30,8 @@ export default function Buy() {
 
     return (
         <div className='pb-4 md:pb-6'>
-            {activeTab === 'buy' && <BuyModule onSwitchToSell={() => handleTabChange('sell')} />}
-            {activeTab === 'sell' && <SellModule onSwitchToBuy={() => handleTabChange('buy')} />}
+            {activeTab === 'mint' && <BuyModule onSwitchToSell={() => handleTabChange('sell')} />}
+            {activeTab === 'sell' && <SellModule onSwitchToBuy={() => handleTabChange('mint')} />}
         </div>
     )
 }

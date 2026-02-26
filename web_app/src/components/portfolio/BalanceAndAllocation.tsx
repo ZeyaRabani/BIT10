@@ -85,7 +85,7 @@ export default function BalanceAndAllocation() {
             queries.push(
                 {
                     queryKey: ['bit10TOPBalanceBase'],
-                    queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0x2d309c7c5fbbf74372edfc25b10842a7237b92de', address: evmAddress })
+                    queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa', address: evmAddress })
                 }
             );
         }
@@ -94,7 +94,7 @@ export default function BalanceAndAllocation() {
             queries.push(
                 {
                     queryKey: ['bit10TOPBalanceSolana'],
-                    queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'bity2aNuHSbQiKLYB7PziepJw2aYwiiZM287XQxuXE1', publicKey: publicKey, decimals: 9 })
+                    queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9', publicKey: publicKey, decimals: 9 })
                 }
             );
         }
@@ -103,7 +103,7 @@ export default function BalanceAndAllocation() {
             queries.push(
                 {
                     queryKey: ['bit10TOPBalanceBSC'],
-                    queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x2ab6998575EFcDe422D0A7dbc63e0105BbcAA7c9', address: evmAddress })
+                    queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x9782d2af62cd502ce2c823d58276e17dc23ebc21', address: evmAddress })
                 }
             );
         }

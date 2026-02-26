@@ -160,18 +160,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         if (chain === 'icp') {
             queries.push(
                 {
-                    queryKey: ['icpPrice'],
-                    queryFn: () => fetchPayWithPrice('ICP'),
-                    refetchInterval: 30000, // 30 sec.
-                },
-                {
-                    queryKey: ['btcPrice'],
-                    queryFn: () => fetchPayWithPrice('BTC'),
-                    refetchInterval: 30000, // 30 sec.
-                },
-                {
-                    queryKey: ['ethPrice'],
-                    queryFn: () => fetchPayWithPrice('ETH'),
+                    queryKey: ['usdcPrice'],
+                    queryFn: () => fetchPayWithPrice('USDC'),
                     refetchInterval: 30000, // 30 sec.
                 }
             )
@@ -180,8 +170,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         if (chain === 'base' || chain === undefined) {
             queries.push(
                 {
-                    queryKey: ['ethPrice'],
-                    queryFn: () => fetchPayWithPrice('ETH'),
+                    queryKey: ['usdcPrice'],
+                    queryFn: () => fetchPayWithPrice('USDC'),
                     refetchInterval: 30000, // 30 sec.
                 }
             )
@@ -190,8 +180,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         if (chain === 'solana') {
             queries.push(
                 {
-                    queryKey: ['solPrice'],
-                    queryFn: () => fetchPayWithPrice('SOL'),
+                    queryKey: ['usdcPrice'],
+                    queryFn: () => fetchPayWithPrice('USDC'),
                     refetchInterval: 30000, // 30 sec.
                 }
             )
@@ -199,11 +189,6 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
         if (chain === 'bsc') {
             queries.push(
-                {
-                    queryKey: ['bnbPrice'],
-                    queryFn: () => fetchPayWithPrice('BNB'),
-                    refetchInterval: 30000, // 30 sec.
-                },
                 {
                     queryKey: ['usdcPrice'],
                     queryFn: () => fetchPayWithPrice('USDC'),
@@ -218,9 +203,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const payQueries = useQueries({ queries: payWithPriceQueries });
     let currentIndex = 0;
 
-    // As ICP has 3 queries
     const icpPayWithQueryIndex = chain === 'icp' ? currentIndex : -1;
-    if (chain === 'icp') currentIndex += 3;
+    if (chain === 'icp') currentIndex += 1;
 
     const basePayWithQueryIndex = (chain === 'base' || chain === undefined) ? currentIndex : -1;
     if (chain === 'base' || chain === undefined) currentIndex += 1;
@@ -229,27 +213,24 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     if (chain === 'solana') currentIndex += 1;
 
     const bscPayWithQueryIndex = chain === 'bsc' ? currentIndex : -1;
-    if (chain === 'bsc') currentIndex += 2;
+    if (chain === 'bsc') currentIndex += 1;
 
-    const icpICPAmount = useMemo(() => payQueries[icpPayWithQueryIndex]?.data, [icpPayWithQueryIndex, payQueries]);
-    const icpCKBTCAmount = useMemo(() => payQueries[icpPayWithQueryIndex + 1]?.data, [icpPayWithQueryIndex, payQueries]);
-    const icpCKETHAmount = useMemo(() => payQueries[icpPayWithQueryIndex + 2]?.data, [icpPayWithQueryIndex, payQueries]);
-    const baseETHAmount = useMemo(() => payQueries[basePayWithQueryIndex]?.data, [basePayWithQueryIndex, payQueries]);
-    const solanaSOLAmount = useMemo(() => payQueries[solanaPayWithQueryIndex]?.data, [solanaPayWithQueryIndex, payQueries]);
-    const bscBNBAmount = useMemo(() => payQueries[bscPayWithQueryIndex]?.data, [bscPayWithQueryIndex, payQueries]);
-    const bscUSDCAmount = useMemo(() => payQueries[bscPayWithQueryIndex + 1]?.data, [bscPayWithQueryIndex, payQueries]);
+    const icpCkUSDCAmount = useMemo(() => payQueries[icpPayWithQueryIndex]?.data, [icpPayWithQueryIndex, payQueries]);
+    const baseUSDCAmount = useMemo(() => payQueries[basePayWithQueryIndex]?.data, [basePayWithQueryIndex, payQueries]);
+    const solanaUSDCAmount = useMemo(() => payQueries[solanaPayWithQueryIndex]?.data, [solanaPayWithQueryIndex, payQueries]);
+    const bscUSDCAmount = useMemo(() => payQueries[bscPayWithQueryIndex]?.data, [bscPayWithQueryIndex, payQueries]);
 
     const defaultPaymentToken = useMemo(() => {
         if (chain === 'icp') {
-            return 'ICP';
+            return 'ckUSDC';
         } else if (chain === 'base') {
-            return 'Ethereum';
+            return 'USD Coin';
         } else if (chain === 'solana') {
-            return 'Solana';
+            return 'USD Coin';
         } else if (chain === 'bsc') {
-            return 'BNB';
+            return 'USD Coin';
         }
-        return 'Ethereum';
+        return 'USD Coin';
     }, [chain]);
 
     const form = useForm({
@@ -306,18 +287,8 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
         if (chain === 'icp' && icpAddress) {
             queries.push(
                 {
-                    queryKey: ['paymentTokenBalanceICPICP', icpAddress, chain],
-                    queryFn: () => CHAIN_REGISTRY.icp.fetchTokenBalance({ canisterId: 'ryjl3-tyaaa-aaaaa-aaaba-cai', address: icpAddress }),
-                    refetchInterval: 30000,
-                },
-                {
-                    queryKey: ['paymentTokenBalanceICPCKBTC', icpAddress, chain],
-                    queryFn: () => CHAIN_REGISTRY.icp.fetchTokenBalance({ canisterId: 'mxzaz-hqaaa-aaaar-qaada-cai', address: icpAddress }),
-                    refetchInterval: 30000,
-                },
-                {
-                    queryKey: ['paymentTokenBalanceICPCKETH', icpAddress, chain],
-                    queryFn: () => CHAIN_REGISTRY.icp.fetchTokenBalance({ canisterId: 'ss2fx-dyaaa-aaaar-qacoq-cai', address: icpAddress }),
+                    queryKey: ['paymentTokenBalanceICPCkUSDC', icpAddress, chain],
+                    queryFn: () => CHAIN_REGISTRY.icp.fetchTokenBalance({ canisterId: 'xevnm-gaaaa-aaaar-qafnq-cai', address: icpAddress }),
                     refetchInterval: 30000,
                 }
             );
@@ -325,27 +296,22 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
         if (chain === 'base' && evmAddress) {
             queries.push({
-                queryKey: ['paymentTokenBalanceBaseETH', evmAddress, chain],
-                queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0x0000000000000000000000000000000000000000b', address: evmAddress }),
+                queryKey: ['paymentTokenBalanceBaseUSDC', evmAddress, chain],
+                queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', address: evmAddress }),
                 refetchInterval: 30000,
             });
         }
 
         if (chain === 'solana' && publicKey) {
             queries.push({
-                queryKey: ['paymentTokenBalanceSolanaSOL', publicKey, chain],
-                queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'So11111111111111111111111111111111111111111', publicKey: publicKey }),
+                queryKey: ['paymentTokenBalanceSolanaUSDC', publicKey, chain],
+                queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', publicKey: publicKey }),
                 refetchInterval: 30000,
             });
         }
 
         if (chain === 'bsc' && evmAddress) {
             queries.push(
-                {
-                    queryKey: ['paymentTokenBalanceBSCBNB', evmAddress, chain],
-                    queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x0000000000000000000000000000000000000000bnb', address: evmAddress }),
-                    refetchInterval: 30000,
-                },
                 {
                     queryKey: ['paymentTokenBalanceBSCUSDC', evmAddress, chain],
                     queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d', address: evmAddress }),
@@ -364,15 +330,12 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const balanceIndices: Record<string, number> = {};
 
     if (chain === 'icp') {
-        balanceIndices.icpICP = currentBalanceIndex++;
-        balanceIndices.icpCKBTC = currentBalanceIndex++;
-        balanceIndices.icpCKETH = currentBalanceIndex++;
+        balanceIndices.icpCkUSDC = currentBalanceIndex++;
     } else if (chain === 'base') {
-        balanceIndices.baseETH = currentBalanceIndex++;
+        balanceIndices.baseUSDC = currentBalanceIndex++;
     } else if (chain === 'solana') {
-        balanceIndices.solanaSOL = currentBalanceIndex++;
+        balanceIndices.solanaUSDC = currentBalanceIndex++;
     } else if (chain === 'bsc') {
-        balanceIndices.bscBNB = currentBalanceIndex++;
         balanceIndices.bscUSDC = currentBalanceIndex++;
     }
 
@@ -397,46 +360,34 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
     const payingTokenPrice = useMemo(() => {
         if (chain === 'icp') {
-            if (payingTokenAddress === 'ryjl3-tyaaa-aaaaa-aaaba-cai') return Number(icpICPAmount) || 0;
-            if (payingTokenAddress === 'mxzaz-hqaaa-aaaar-qaada-cai') return Number(icpCKBTCAmount) || 0;
-            if (payingTokenAddress === 'ss2fx-dyaaa-aaaar-qacoq-cai') return Number(icpCKETHAmount) || 0;
+            if (payingTokenAddress === 'xevnm-gaaaa-aaaar-qafnq-cai') return Number(icpCkUSDCAmount) || 0;
         }
         if (chain === 'base' || chain === undefined) {
-            if (payingTokenAddress === '0x0000000000000000000000000000000000000000b') return Number(baseETHAmount) || 0;
+            if (payingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913') return Number(baseUSDCAmount) || 0;
         }
         if (chain === 'solana') {
-            if (payingTokenAddress === 'So11111111111111111111111111111111111111111') return Number(solanaSOLAmount) || 0;
+            if (payingTokenAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v') return Number(solanaUSDCAmount) || 0;
         }
         if (chain === 'bsc') {
-            if (payingTokenAddress === '0x0000000000000000000000000000000000000000bnb') return Number(bscBNBAmount) || 0;
             if (payingTokenAddress === '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d') return Number(bscUSDCAmount) || 0;
         }
         return 0;
-    }, [baseETHAmount, bscBNBAmount, bscUSDCAmount, chain, icpCKBTCAmount, icpCKETHAmount, icpICPAmount, payingTokenAddress, solanaSOLAmount]);
+    }, [baseUSDCAmount, bscUSDCAmount, chain, icpCkUSDCAmount, payingTokenAddress, solanaUSDCAmount]);
 
     const payingTokenBalance = useMemo(() => {
         if (chain === 'icp') {
-            if (payingTokenAddress === 'ryjl3-tyaaa-aaaaa-aaaba-cai' && balanceIndices.icpICP !== undefined) {
-                return allBalanceQueries[balanceIndices.icpICP]?.data ?? 0;
-            }
-            if (payingTokenAddress === 'mxzaz-hqaaa-aaaar-qaada-cai' && balanceIndices.icpCKBTC !== undefined) {
-                return allBalanceQueries[balanceIndices.icpCKBTC]?.data ?? 0;
-            }
-            if (payingTokenAddress === 'ss2fx-dyaaa-aaaar-qacoq-cai' && balanceIndices.icpCKETH !== undefined) {
-                return allBalanceQueries[balanceIndices.icpCKETH]?.data ?? 0;
+            if (payingTokenAddress === 'xevnm-gaaaa-aaaar-qafnq-cai' && balanceIndices.icpCkUSDC !== undefined) {
+                return allBalanceQueries[balanceIndices.icpCkUSDC]?.data ?? 0;
             }
         } else if (chain === 'base') {
-            if (payingTokenAddress === '0x0000000000000000000000000000000000000000b' && balanceIndices.baseETH !== undefined) {
-                return allBalanceQueries[balanceIndices.baseETH]?.data ?? 0;
+            if (payingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913' && balanceIndices.baseUSDC !== undefined) {
+                return allBalanceQueries[balanceIndices.baseUSDC]?.data ?? 0;
             }
         } else if (chain === 'solana') {
-            if (payingTokenAddress === 'So11111111111111111111111111111111111111111' && balanceIndices.solanaSOL !== undefined) {
-                return allBalanceQueries[balanceIndices.solanaSOL]?.data ?? 0;
+            if (payingTokenAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' && balanceIndices.solanaUSDC !== undefined) {
+                return allBalanceQueries[balanceIndices.solanaUSDC]?.data ?? 0;
             }
         } else if (chain === 'bsc') {
-            if (payingTokenAddress === '0x0000000000000000000000000000000000000000bnb' && balanceIndices.bscBNB !== undefined) {
-                return allBalanceQueries[balanceIndices.bscBNB]?.data ?? 0;
-            }
             if (payingTokenAddress === '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d' && balanceIndices.bscUSDC !== undefined) {
                 return allBalanceQueries[balanceIndices.bscUSDC]?.data ?? 0;
             }
@@ -679,10 +630,10 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
     const getBuyMessage = (): string => {
         if (!chain) return 'Connect your wallet to continue';
-        if (buying) return 'Buying...';
+        if (buying) return 'Minting...';
         if (fromAmount >= balance || fromAmount >= balance * PLATFORM_FEE && !buying) return 'Balance too low to cover transfer and gas fees';
         if (fromAmount <= 0 || Number(formWatchReceiveAmount) <= 0) return 'Amount too low';
-        return 'Buy';
+        return 'Mint';
     };
 
     const canCloseDialog = useMemo(() => {
@@ -719,11 +670,11 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
             <div className='lg:col-span-2 xl:col-span-2'>
                 <Card className='border-none animate-fade-right'>
                     <CardHeader className='flex flex-row items-center justify-between'>
-                        <CardTitle>Buy</CardTitle>
+                        <CardTitle>Mint</CardTitle>
                         <div className='relative flex flex-row space-x-2 items-center justify-center border rounded-full px-2 py-1.5'>
-                            <AnimatedBackground defaultValue='Buy' className='rounded-full bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={onSwitchToSell}>
-                                <button type='button' data-id={'Buy'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
-                                    Buy
+                            <AnimatedBackground defaultValue='Mint' className='rounded-full bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={onSwitchToSell}>
+                                <button type='button' data-id={'Mint'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
+                                    Mint
                                 </button>
                                 <button type='button' data-id={'Sell'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
                                     Sell

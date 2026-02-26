@@ -16,7 +16,7 @@ const links = {
         { title: 'GitBook', link: '/gitbook', icon: BookText }
     ],
     app: [
-        { title: 'Buy BIT10.TOP', link: '/buy', icon: Coins },
+        { title: 'Mint BIT10.TOP', link: '/mint', icon: Coins },
         { title: 'Portfolio', link: '/portfolio', icon: BriefcaseBusiness },
         { title: 'Collateral', link: '/collateral', icon: Landmark },
         { title: 'Rewards', link: '/rewards', icon: GiftIcon }
@@ -24,7 +24,7 @@ const links = {
 };
 
 const externalRoutes = {
-    appMode: ['/explorer', '/explorer/', '/buy'],
+    appMode: ['/explorer', '/explorer/', '/mint'],
     webMode: ['/', '/contact'],
 };
 
@@ -148,7 +148,7 @@ export default function ResponsiveNavbar() {
                                         </div>
                                     ) : (
                                         <div className='border-b-2 pb-2 cursor-pointer w-full'>
-                                            <Link href='/buy' passHref>
+                                            <Link href='/mint' passHref>
                                                 <Button className='w-full'>Launch App</Button>
                                             </Link>
                                         </div>

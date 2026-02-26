@@ -26,7 +26,7 @@ export function constructMetadata({
       title, description,
       // images: [{url: image}]
     },
-    twitter: { card: 'summary_large_image', title, description, creator: '@bit10startup' },
+    twitter: { card: 'summary_large_image', title, description, creator: '@bit10app' },
     icons,
     metadataBase: new URL('https://www.bit10.app'),
     ...(noIndex && { robots: { index: false, follow: false } }),
@@ -177,26 +177,20 @@ export const getTokenName = (tokenAddress: string): string => {
     case 'bin4j-cyaaa-aaaap-qh7tq-cai'.toLocaleLowerCase():
       return 'BIT10.DEFI';
     case 'g37b3-lqaaa-aaaap-qp4hq-cai'.toLocaleLowerCase():
-    case '0x2d309c7c5fbbf74372edfc25b10842a7237b92de'.toLocaleLowerCase():
-    case 'bity2anuhsbqiklyb7pziepjw2aywiizm287xqxuxe1'.toLocaleLowerCase():
-    case '0x2ab6998575efcde422d0a7dbc63e0105bbcaa7c9'.toLocaleLowerCase():
+    case '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa'.toLocaleLowerCase():
+    case 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9'.toLocaleLowerCase():
+    case '0x9782d2af62cd502ce2c823d58276e17dc23ebc21'.toLocaleLowerCase():
       return 'BIT10.TOP';
-    case 'ryjl3-tyaaa-aaaaa-aaaba-cai'.toLocaleLowerCase():
-      return 'ICP';
-    case 'mxzaz-hqaaa-aaaar-qaada-cai'.toLocaleLowerCase():
-      return 'ckBTC';
-    case 'ss2fx-dyaaa-aaaar-qacoq-cai'.toLocaleLowerCase():
-      return 'ckETH';
     case 'xevnm-gaaaa-aaaar-qafnq-cai'.toLocaleLowerCase():
       return 'ckUSDC';
-    case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
+    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913'.toLocaleLowerCase():
       return 'ETH';
-    case 'so11111111111111111111111111111111111111111'.toLocaleLowerCase():
+    case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
       return 'SOL';
     case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
     case '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d'.toLocaleLowerCase():
       return 'USDC';
-    case '0x0000000000000000000000000000000000000000bnb'.toLocaleLowerCase():
+    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913nb'.toLocaleLowerCase():
       return 'BNB';
     default:
       return tokenAddress;
@@ -207,27 +201,25 @@ export const getTokenExplorer = (tokenAddress: string): string => {
   const normalizedAddress = tokenAddress.toLowerCase();
 
   switch (normalizedAddress) {
-    case 'ryjl3-tyaaa-aaaaa-aaaba-cai'.toLocaleLowerCase():
-    case 'mxzaz-hqaaa-aaaar-qaada-cai'.toLocaleLowerCase():
-    case 'ss2fx-dyaaa-aaaar-qacoq-cai'.toLocaleLowerCase():
+    case 'xevnm-gaaaa-aaaar-qafnq-cai'.toLocaleLowerCase():
     case 'bin4j-cyaaa-aaaap-qh7tq-cai'.toLocaleLowerCase():
     case 'g37b3-lqaaa-aaaap-qp4hq-cai'.toLocaleLowerCase():
       return '/explorer/';
 
-    case '0x0000000000000000000000000000000000000000b'.toLocaleLowerCase():
-    case '0x0000000000000000000000000000000000000000base'.toLocaleLowerCase():
     case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913'.toLocaleLowerCase():
-    case '0x2d309c7c5fbbf74372edfc25b10842a7237b92de'.toLocaleLowerCase():
+    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913ase'.toLocaleLowerCase():
+    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913'.toLocaleLowerCase():
+    case '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa'.toLocaleLowerCase():
       return 'https://basescan.org/tx/';
 
-    case 'So11111111111111111111111111111111111111111'.toLocaleLowerCase():
     case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
-    case 'bity2anuhsbqiklyb7pziepjw2aywiizm287xqxuxe1'.toLocaleLowerCase():
+    case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
+    case 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9'.toLocaleLowerCase():
       return 'https://explorer.solana.com/tx/';
 
-    case '0x0000000000000000000000000000000000000000bnb'.toLocaleLowerCase():
+    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913nb'.toLocaleLowerCase():
     case '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d'.toLocaleLowerCase():
-    case '0x2ab6998575efcde422d0a7dbc63e0105bbcaa7c9'.toLocaleLowerCase():
+    case '0x9782d2af62cd502ce2c823d58276e17dc23ebc21'.toLocaleLowerCase():
       return 'https://bscscan.com/tx/';
 
     default:

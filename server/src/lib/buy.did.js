@@ -19,11 +19,11 @@ export const idlFactory = ({ IDL }) => {
   });
   const SwapArgs = IDL.Record({
     'token_in_amount': IDL.Text,
+    'referral': IDL.Opt(IDL.Text),
     'token_in_address': IDL.Text,
     'token_out_address': IDL.Text,
     'user_wallet_address': IDL.Text,
     'token_out_amount': IDL.Text,
-    'referral': IDL.Opt(IDL.Text),
   });
   const TransactionResponse = IDL.Record({
     'to': IDL.Text,
@@ -109,6 +109,7 @@ export const idlFactory = ({ IDL }) => {
     ),
     'bsc_create_transaction': IDL.Func([SwapArgs], [TransactionResponse], []),
     'bsc_sell': IDL.Func([IDL.Text], [SwapResponse], []),
+    'clear_performance_logs': IDL.Func([], [], []),
     'create_associated_token_account': IDL.Func(
       [IDL.Text],
       [IDL.Variant({ 'Ok': IDL.Text, 'Err': IDL.Text })],
@@ -140,6 +141,7 @@ export const idlFactory = ({ IDL }) => {
       [IDL.Vec(SwapResponseData)],
       ['query'],
     ),
+    'get_performance_logs': IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'get_sell_history': IDL.Func([], [IDL.Vec(SwapResponseData)], ['query']),
     'get_sell_history_by_address_and_chain': IDL.Func(
       [IDL.Text, IDL.Text],
@@ -153,7 +155,9 @@ export const idlFactory = ({ IDL }) => {
     ),
     'icp_buy': IDL.Func([ICPBuyArgs], [SwapResponse], []),
     'icp_sell': IDL.Func([ICPSellArgs], [SwapResponse], []),
+    'is_paused': IDL.Func([], [IDL.Bool], ['query']),
     'nonce_account': IDL.Func([], [IDL.Text], []),
+    'pause_canister': IDL.Func([], [], []),
     'solana_address': IDL.Func([], [IDL.Text], []),
     'solana_buy': IDL.Func([IDL.Text], [SwapResponse], []),
     'solana_create_sell_transaction': IDL.Func(
@@ -167,6 +171,7 @@ export const idlFactory = ({ IDL }) => {
       [],
     ),
     'solana_sell': IDL.Func([IDL.Text], [SwapResponse], []),
+    'unpause_canister': IDL.Func([], [], []),
   });
 };
 export const init = ({ IDL }) => { return []; };

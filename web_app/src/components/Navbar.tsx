@@ -25,7 +25,7 @@ const links = {
     ] as NavLink[],
 
     app: [
-        { title: 'Buy BIT10.TOP', link: '/buy' },
+        { title: 'Mint BIT10.TOP', link: '/mint' },
         { title: 'Portfolio', link: '/portfolio' },
         { title: 'Collateral', link: '/collateral' },
         { title: 'Rewards ✨', link: '/rewards', isRewards: true }
@@ -33,7 +33,7 @@ const links = {
 };
 
 const externalRoutes = {
-    appMode: ['/explorer', '/buy'],
+    appMode: ['/explorer', '/mint'],
     webMode: ['/', '/contact'],
 };
 
@@ -182,7 +182,7 @@ function NavbarContent() {
                         {appMode ? (
                             <WalletBtn />
                         ) : (
-                            <Link href='/buy' passHref>
+                            <Link href='/mint' passHref>
                                 <Button className='font-semibold'>Launch App</Button>
                             </Link>
                         )}

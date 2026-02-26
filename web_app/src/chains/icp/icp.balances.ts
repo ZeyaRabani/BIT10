@@ -19,7 +19,7 @@ export const fetchTokenBalance = async ({ canisterId, address }: { canisterId: s
             if (actor && actor.icrc1_balance_of) {
                 try {
                     const balance = await actor.icrc1_balance_of(account);
-                    const value = Number(balance) / (canisterId == 'ss2fx-dyaaa-aaaar-qacoq-cai' ? 1000000000000000000 : 100000000);
+                    const value = Number(balance) / (canisterId == 'xevnm-gaaaa-aaaar-qafnq-cai' ? 1000000 : 100000000);
                     return Number(value);
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error) {

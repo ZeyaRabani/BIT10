@@ -4,8 +4,8 @@ import { idlFactory as exchangeIDLFactory } from '@/lib/canisters/bit10_exchange
 import { idlFactory as rewardsIDLFactory } from '@/lib/canisters/rewards.did';
 import { BIT10_EXCHANGE_CANISTER_ID, BIT10_REWARDS_CANISTER_ID, delay } from './solana.constants';
 import type { StepUpdateCallback, TransactionResponse, SwapResponse, CashbackResponse } from './solana.types';
-import { PublicKey, SystemProgram, TransactionMessage, VersionedTransaction, ComputeBudgetProgram, TransactionInstruction } from '@solana/web3.js';
-import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferCheckedInstruction, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, getMint } from '@solana/spl-token';
+import { PublicKey, TransactionMessage, VersionedTransaction, ComputeBudgetProgram, TransactionInstruction } from '@solana/web3.js';
+import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferCheckedInstruction, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, getMint, createBurnCheckedInstruction } from '@solana/spl-token';
 
 const decodeHexData = (hex: string): string => {
     if (hex.startsWith('0x')) {
@@ -32,38 +32,55 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
         }
 
         const MEMO_PROGRAM_ID = new PublicKey('Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo');
+        // const USDC_MINT = new PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
+        const USDC_MINT = new PublicKey(tokenInAddress);
+
         const actor = createICPActor(exchangeIDLFactory, BIT10_EXCHANGE_CANISTER_ID);
-        const TOKEN_MINT = new PublicKey(tokenOutAddress);
         const connection = getCustomConnection();
-        const mintInfo = await connection.getAccountInfo(TOKEN_MINT);
-
-        if (!mintInfo) {
-            onStepUpdate?.(0, { status: 'error', error: 'Token mint does not exist on this network' });
-            toast.dismiss();
-            toast.error('Token mint does not exist on this network');
-            return null;
-        }
-
-        const isToken2022 = mintInfo.owner.equals(TOKEN_2022_PROGRAM_ID);
-        const tokenProgramId = isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID;
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const fromPubkey = wallet.publicKey;
 
+        if (tokenInAddress !== USDC_MINT.toBase58()) {
+            onStepUpdate?.(0, { status: 'error', error: 'Only USDC is accepted as payment token' });
+            toast.error('Only USDC is accepted as payment token');
+            return null;
+        }
+
+        const usdcMintInfo = await connection.getAccountInfo(USDC_MINT);
+        if (!usdcMintInfo) {
+            onStepUpdate?.(0, { status: 'error', error: 'USDC mint does not exist on this network' });
+            toast.dismiss();
+            toast.error('USDC mint does not exist on this network');
+            return null;
+        }
+
+        const isToken2022 = usdcMintInfo.owner.equals(TOKEN_2022_PROGRAM_ID);
+        const usdcTokenProgramId = isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID;
+
+        const BIT10_MINT = new PublicKey(tokenOutAddress);
+        const bit10MintInfo = await connection.getAccountInfo(BIT10_MINT);
+
+        if (!bit10MintInfo) {
+            onStepUpdate?.(0, { status: 'error', error: 'BIT10 token mint does not exist on this network' });
+            toast.dismiss();
+            toast.error('BIT10 token mint does not exist on this network');
+            return null;
+        }
+
+        const isBit10Token2022 = bit10MintInfo.owner.equals(TOKEN_2022_PROGRAM_ID);
+        const bit10TokenProgramId = isBit10Token2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID;
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        const ata = await getAssociatedTokenAddress(TOKEN_MINT, fromPubkey, false, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
+        const bit10ATA = await getAssociatedTokenAddress(BIT10_MINT, fromPubkey, false, bit10TokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
+        const bit10AccountInfo = await connection.getAccountInfo(bit10ATA);
 
-        const accountInfo = await connection.getAccountInfo(ata);
-
-        const ataExists = accountInfo !== null;
-
-        if (!ataExists) {
-            onStepUpdate?.(0, { status: 'processing', description: 'Preparing your wallet to receive tokens...' });
-
-            toast.loading('Creating Associated Token Account');
+        if (!bit10AccountInfo) {
+            onStepUpdate?.(0, { status: 'processing', description: 'Preparing your wallet to receive BIT10 tokens...' });
+            toast.loading('Creating Associated Token Account for BIT10 token');
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            const createATAInstruction = createAssociatedTokenAccountInstruction(fromPubkey, ata, fromPubkey, TOKEN_MINT, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
+            const createATAInstruction = createAssociatedTokenAccountInstruction(fromPubkey, bit10ATA, fromPubkey, BIT10_MINT, bit10TokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
             const { blockhash } = await connection.getLatestBlockhash('finalized');
 
             const messageV0 = new TransactionMessage({
@@ -88,14 +105,11 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             await connection.confirmTransaction(ataSignature, 'confirmed');
 
-
             toast.dismiss();
             toast.success('Associated Token Account created successfully!');
-
         }
 
         onStepUpdate?.(0, { status: 'success', description: 'Wallet connected and ready!' });
-
         onStepUpdate?.(0, { status: 'processing', description: 'Preparing transaction details...' });
 
         if (!actor.solana_create_transaction || !actor.solana_buy) throw new Error('Exchange methods not available');
@@ -114,15 +128,23 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
         const memoData = decodeHexData(create_transaction.data);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        const balance = await connection.getBalance(fromPubkey);
+        const fromUsdcATA = await getAssociatedTokenAddress(USDC_MINT, fromPubkey, false, usdcTokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
+        const toUsdcATA = await getAssociatedTokenAddress(USDC_MINT, toPubkey, false, usdcTokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
 
-        if (balance < amount) {
-            onStepUpdate?.(0, { status: 'error', error: `Insufficient balance. Have: ${balance / 1e9} SOL, Need: ${amount / 1e9} SOL` });
+        const usdcAccountInfo = await connection.getTokenAccountBalance(fromUsdcATA);
+        const usdcBalance = usdcAccountInfo.value.amount;
 
+        if (Number(usdcBalance) < amount) {
+            onStepUpdate?.(0, {
+                status: 'error',
+                error: `Insufficient USDC balance. Have: ${usdcAccountInfo.value.uiAmountString} USDC, Need: ${amount / 10 ** usdcAccountInfo.value.decimals} USDC`
+            });
             toast.dismiss();
-            toast.error(`Insufficient balance. Have: ${balance / 1e9} SOL, Need: ${amount / 1e9} SOL`);
+            toast.error(`Insufficient USDC balance`);
             return null;
         }
+
+        const usdcMint = await getMint(connection, USDC_MINT, undefined, usdcTokenProgramId);
 
         const instructions = [
             ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 }),
@@ -132,12 +154,18 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
                 programId: MEMO_PROGRAM_ID,
                 data: Buffer.from(memoData, 'utf-8')
             }),
-            SystemProgram.transfer({
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            // Transfer USDC from user's ATA to canister's USDC ATA
+            createTransferCheckedInstruction(
+                fromUsdcATA,
+                USDC_MINT,
+                toUsdcATA,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 fromPubkey,
-                toPubkey,
-                lamports: amount
-            })
+                amount,
+                usdcMint.decimals,
+                [],
+                usdcTokenProgramId
+            )
         ];
 
         const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
@@ -279,15 +307,17 @@ export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAm
         })) as TransactionResponse;
 
         const fromPubkey = new PublicKey(create_transaction.from);
-        const toPubkey = new PublicKey(create_transaction.to);
         const amount = Number(create_transaction.value);
 
-        const fromATA = await getAssociatedTokenAddress(TOKEN_MINT, fromPubkey, false, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
-
-        const toATA = await getAssociatedTokenAddress(TOKEN_MINT, toPubkey, false, tokenProgramId, ASSOCIATED_TOKEN_PROGRAM_ID);
+        const fromATA = await getAssociatedTokenAddress(
+            TOKEN_MINT,
+            fromPubkey,
+            false,
+            tokenProgramId,
+            ASSOCIATED_TOKEN_PROGRAM_ID
+        );
 
         const mint = await getMint(connection, TOKEN_MINT, undefined, tokenProgramId);
-
         const decimals = mint.decimals;
 
         const instructions = [
@@ -296,7 +326,6 @@ export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAm
         ];
 
         const memoData = decodeHexData(create_transaction.data);
-
         const memoInstruction = new TransactionInstruction({
             keys: [],
             programId: MEMO_PROGRAM_ID,
@@ -305,10 +334,9 @@ export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAm
 
         instructions.push(memoInstruction);
 
-        const transferInstruction = createTransferCheckedInstruction(
+        const burnInstruction = createBurnCheckedInstruction(
             fromATA,
             TOKEN_MINT,
-            toATA,
             fromPubkey,
             amount,
             decimals,
@@ -316,7 +344,7 @@ export const sellBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAm
             tokenProgramId
         );
 
-        instructions.push(transferInstruction);
+        instructions.push(burnInstruction);
 
         const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
 

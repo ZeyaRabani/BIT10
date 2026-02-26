@@ -10,7 +10,7 @@ import type { StepUpdateCallback, ICRC2ActorType, SwapResponse, CashbackResponse
 export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmount, tokenOutAddress, onStepUpdate }: { tokenInAmount: string, tokenInAddress: string, tokenOutAmount: string, tokenOutAddress: string, onStepUpdate?: StepUpdateCallback }) => {
     try {
         onStepUpdate?.(0, { status: 'processing', description: 'Requesting canister access...' });
-
+        
         const hasAllowed = await window.ic.plug.requestConnect({
             whitelist: [BIT10_EXCHANGE_CANISTER_ID, tokenInAddress]
         });

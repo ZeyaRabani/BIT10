@@ -178,8 +178,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         if (chain === 'icp') {
             queries.push(
                 {
-                    queryKey: ['icpPrice'],
-                    queryFn: () => fetchRecievePrice('ICP'),
+                    queryKey: ['usdcPrice'],
+                    queryFn: () => fetchRecievePrice('USDC'),
                     refetchInterval: 30000, // 30 sec.
                 }
             )
@@ -188,8 +188,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         if (chain === 'base' || chain === undefined) {
             queries.push(
                 {
-                    queryKey: ['ethPrice'],
-                    queryFn: () => fetchRecievePrice('ETH'),
+                    queryKey: ['usdcPrice'],
+                    queryFn: () => fetchRecievePrice('USDC'),
                     refetchInterval: 30000, // 30 sec.
                 }
             )
@@ -198,8 +198,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         if (chain === 'solana') {
             queries.push(
                 {
-                    queryKey: ['solPrice'],
-                    queryFn: () => fetchRecievePrice('SOL'),
+                    queryKey: ['usdcPrice'],
+                    queryFn: () => fetchRecievePrice('USDC'),
                     refetchInterval: 30000, // 30 sec.
                 }
             )
@@ -208,8 +208,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         if (chain === 'bsc') {
             queries.push(
                 {
-                    queryKey: ['bnbPrice'],
-                    queryFn: () => fetchRecievePrice('BNB'),
+                    queryKey: ['usdcPrice'],
+                    queryFn: () => fetchRecievePrice('USDC'),
                     refetchInterval: 30000, // 30 sec.
                 }
             )
@@ -233,22 +233,22 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const bscReceiveWithQueryIndex = chain === 'bsc' ? currentIndex : -1;
     if (chain === 'bsc') currentIndex += 1;
 
-    const icpICPAmount = useMemo(() => receiveQueries[icpReceiveWithQueryIndex]?.data, [icpReceiveWithQueryIndex, receiveQueries]);
-    const baseETHAmount = useMemo(() => receiveQueries[baseReceiveWithQueryIndex]?.data, [baseReceiveWithQueryIndex, receiveQueries]);
-    const solanaSOLAmount = useMemo(() => receiveQueries[solanaReceiveWithQueryIndex]?.data, [solanaReceiveWithQueryIndex, receiveQueries]);
-    const bscBNBAmount = useMemo(() => receiveQueries[bscReceiveWithQueryIndex]?.data, [bscReceiveWithQueryIndex, receiveQueries]);
+    const icpCkUSDCAmount = useMemo(() => receiveQueries[icpReceiveWithQueryIndex]?.data, [icpReceiveWithQueryIndex, receiveQueries]);
+    const baseUSDCAmount = useMemo(() => receiveQueries[baseReceiveWithQueryIndex]?.data, [baseReceiveWithQueryIndex, receiveQueries]);
+    const solanaUSDCAmount = useMemo(() => receiveQueries[solanaReceiveWithQueryIndex]?.data, [solanaReceiveWithQueryIndex, receiveQueries]);
+    const bscUSDCAmount = useMemo(() => receiveQueries[bscReceiveWithQueryIndex]?.data, [bscReceiveWithQueryIndex, receiveQueries]);
 
     const defaultReceivingToken = useMemo(() => {
         if (chain === 'icp') {
-            return 'ICP';
+            return 'ckUSDC';
         } else if (chain === 'base') {
-            return 'Ethereum';
+            return 'USD Coin';
         } else if (chain === 'solana') {
-            return 'Solana';
+            return 'USD Coin';
         } else if (chain === 'bsc') {
-            return 'BNB';
+            return 'USD Coin';
         }
-        return 'Ethereum';
+        return 'USD Coin';
     }, [chain]);
 
     const form = useForm({
@@ -324,7 +324,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         if (chain === 'base' && evmAddress) {
             queries.push({
                 queryKey: ['sellingTokenBalanceBaseTOP', evmAddress, chain],
-                queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0x2d309c7c5fbbf74372edfc25b10842a7237b92de', address: evmAddress }),
+                queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa', address: evmAddress }),
                 refetchInterval: 30000,
             });
         }
@@ -332,7 +332,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         if (chain === 'solana' && publicKey) {
             queries.push({
                 queryKey: ['sellingTokenBalanceSolanaTOP', publicKey, chain],
-                queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'bity2aNuHSbQiKLYB7PziepJw2aYwiiZM287XQxuXE1', publicKey: publicKey }),
+                queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9', publicKey: publicKey }),
                 refetchInterval: 30000,
             });
         }
@@ -340,7 +340,7 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         if (chain === 'bsc' && evmAddress) {
             queries.push({
                 queryKey: ['sellingTokenBalanceBSCTOP', evmAddress, chain],
-                queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x2ab6998575efcde422d0a7dbc63e0105bbcaa7c9', address: evmAddress }),
+                queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x9782d2af62cd502ce2c823d58276e17dc23ebc21', address: evmAddress }),
                 refetchInterval: 30000,
             });
         }
@@ -390,13 +390,13 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             if (sellingTokenAddress === 'g37b3-lqaaa-aaaap-qp4hq-cai') return Number(bit10TOPPrice) || 0;
         }
         if (chain === 'base' || chain === undefined) {
-            if (sellingTokenAddress === '0x2d309c7c5fbbf74372edfc25b10842a7237b92de') return Number(bit10TOPPrice) || 0;
+            if (sellingTokenAddress === '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa') return Number(bit10TOPPrice) || 0;
         }
         if (chain === 'solana') {
-            if (sellingTokenAddress === 'bity2aNuHSbQiKLYB7PziepJw2aYwiiZM287XQxuXE1') return Number(bit10TOPPrice) || 0;
+            if (sellingTokenAddress === 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9') return Number(bit10TOPPrice) || 0;
         }
         if (chain === 'bsc') {
-            if (sellingTokenAddress === '0x2ab6998575efcde422d0a7dbc63e0105bbcaa7c9') return Number(bit10TOPPrice) || 0;
+            if (sellingTokenAddress === '0x9782d2af62cd502ce2c823d58276e17dc23ebc21') return Number(bit10TOPPrice) || 0;
         }
         return 0;
     }, [bit10DEFIPrice, bit10TOPPrice, chain, sellingTokenAddress]);
@@ -410,15 +410,15 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                 return allBalanceQueries[balanceIndices.icpTOP]?.data ?? 0;
             }
         } else if (chain === 'base') {
-            if (sellingTokenAddress === '0x2d309c7c5fbbf74372edfc25b10842a7237b92de' && balanceIndices.baseTOP !== undefined) {
+            if (sellingTokenAddress === '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa' && balanceIndices.baseTOP !== undefined) {
                 return allBalanceQueries[balanceIndices.baseTOP]?.data ?? 0;
             }
         } else if (chain === 'solana') {
-            if (sellingTokenAddress === 'bity2aNuHSbQiKLYB7PziepJw2aYwiiZM287XQxuXE1' && balanceIndices.solanaTOP !== undefined) {
+            if (sellingTokenAddress === 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9' && balanceIndices.solanaTOP !== undefined) {
                 return allBalanceQueries[balanceIndices.solanaTOP]?.data ?? 0;
             }
         } else if (chain === 'bsc') {
-            if (sellingTokenAddress === '0x2ab6998575efcde422d0a7dbc63e0105bbcaa7c9' && balanceIndices.bscTOP !== undefined) {
+            if (sellingTokenAddress === '0x9782d2af62cd502ce2c823d58276e17dc23ebc21' && balanceIndices.bscTOP !== undefined) {
                 return allBalanceQueries[balanceIndices.bscTOP]?.data ?? 0;
             }
         }
@@ -455,19 +455,19 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
 
     const receivingTokenPrice = useMemo(() => {
         if (chain === 'icp') {
-            if (receivingTokenAddress === 'ryjl3-tyaaa-aaaaa-aaaba-cai') return Number(icpICPAmount) || 0;
+            if (receivingTokenAddress === 'xevnm-gaaaa-aaaar-qafnq-cai') return Number(icpCkUSDCAmount) || 0;
         }
         if (chain === 'base' || chain === undefined) {
-            if (receivingTokenAddress === '0x0000000000000000000000000000000000000000b') return Number(baseETHAmount) || 0;
+            if (receivingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913') return Number(baseUSDCAmount) || 0;
         }
         if (chain === 'solana') {
-            if (receivingTokenAddress === 'So11111111111111111111111111111111111111111') return Number(solanaSOLAmount) || 0;
+            if (receivingTokenAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v') return Number(solanaUSDCAmount) || 0;
         }
         if (chain === 'bsc') {
-            if (receivingTokenAddress === '0x0000000000000000000000000000000000000000bnb') return Number(bscBNBAmount) || 0;
+            if (receivingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913nb') return Number(bscUSDCAmount) || 0;
         }
         return 0;
-    }, [baseETHAmount, bscBNBAmount, chain, icpICPAmount, receivingTokenAddress, solanaSOLAmount]);
+    }, [baseUSDCAmount, bscUSDCAmount, chain, icpCkUSDCAmount, receivingTokenAddress, solanaUSDCAmount]);
 
     const filteredSellingTokens = useMemo(() => {
         if (!sellingTokenSearch.trim()) {
@@ -718,8 +718,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                         <CardTitle>Sell</CardTitle>
                         <div className='relative flex flex-row space-x-2 items-center justify-center border rounded-full px-2 py-1.5'>
                             <AnimatedBackground defaultValue='Sell' className='rounded-full bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={onSwitchToBuy}>
-                                <button type='button' data-id={'Buy'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
-                                    Buy
+                                <button type='button' data-id={'Mint'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
+                                    Mint
                                 </button>
                                 <button type='button' data-id={'Sell'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
                                     Sell

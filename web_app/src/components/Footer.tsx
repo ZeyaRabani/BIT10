@@ -37,7 +37,7 @@ const forLegal: FooterLinkType[] = [
 const companySocial: FooterLinkType[] = [
     {
         title: 'X (Twitter)',
-        link: 'https://x.com/bit10startup'
+        link: 'https://x.com/bit10app'
     },
     {
         title: 'Telegram',

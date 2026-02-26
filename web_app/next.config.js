@@ -20,13 +20,18 @@ const config = {
     async redirects() {
         return [
             {
+                source: '/buy',
+                destination: '/mint',
+                permanent: true,
+            },
+            {
                 source: '/gitbook',
                 destination: 'https://gitbook.bit10.app',
                 permanent: true,
             },
             {
                 source: '/twitter',
-                destination: 'https://twitter.com/bit10startup',
+                destination: 'https://twitter.com/bit10app',
                 permanent: true,
             },
             {
