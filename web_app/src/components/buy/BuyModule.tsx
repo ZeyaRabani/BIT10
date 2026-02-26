@@ -157,68 +157,82 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
     const payWithPriceQueries = useMemo((): UseQueryOptions[] => {
         const queries: UseQueryOptions[] = [];
 
-        if (chain === 'icp') {
-            queries.push(
-                {
-                    queryKey: ['usdcPrice'],
-                    queryFn: () => fetchPayWithPrice('USDC'),
-                    refetchInterval: 30000, // 30 sec.
-                }
-            )
-        }
+        queries.push(
+            {
+                queryKey: ['buyingUSDCPrice'],
+                queryFn: () => fetchPayWithPrice('USDC'),
+                refetchInterval: 30000, // 30 sec.
+            }
+        )
 
-        if (chain === 'base' || chain === undefined) {
-            queries.push(
-                {
-                    queryKey: ['usdcPrice'],
-                    queryFn: () => fetchPayWithPrice('USDC'),
-                    refetchInterval: 30000, // 30 sec.
-                }
-            )
-        }
+        // if (chain === 'icp') {
+        //     queries.push(
+        //         {
+        //             queryKey: ['icpUSDCPrice'],
+        //             queryFn: () => fetchPayWithPrice('USDC'),
+        //             refetchInterval: 30000, // 30 sec.
+        //         }
+        //     )
+        // }
 
-        if (chain === 'solana') {
-            queries.push(
-                {
-                    queryKey: ['usdcPrice'],
-                    queryFn: () => fetchPayWithPrice('USDC'),
-                    refetchInterval: 30000, // 30 sec.
-                }
-            )
-        }
+        // if (chain === 'base' || chain === undefined) {
+        //     queries.push(
+        //         {
+        //             queryKey: ['baseUSDCPrice'],
+        //             queryFn: () => fetchPayWithPrice('USDC'),
+        //             refetchInterval: 30000, // 30 sec.
+        //         }
+        //     )
+        // }
 
-        if (chain === 'bsc') {
-            queries.push(
-                {
-                    queryKey: ['usdcPrice'],
-                    queryFn: () => fetchPayWithPrice('USDC'),
-                    refetchInterval: 30000, // 30 sec.
-                }
-            )
-        }
+        // if (chain === 'solana') {
+        //     queries.push(
+        //         {
+        //             queryKey: ['solanaUSDCPrice'],
+        //             queryFn: () => fetchPayWithPrice('USDC'),
+        //             refetchInterval: 30000, // 30 sec.
+        //         }
+        //     )
+        // }
+
+        // if (chain === 'bsc') {
+        //     queries.push(
+        //         {
+        //             queryKey: ['bscUSDCPrice'],
+        //             queryFn: () => fetchPayWithPrice('USDC'),
+        //             refetchInterval: 30000, // 30 sec.
+        //         }
+        //     )
+        // }
 
         return queries;
-    }, [chain, fetchPayWithPrice]);
+    }, [fetchPayWithPrice]);
 
     const payQueries = useQueries({ queries: payWithPriceQueries });
-    let currentIndex = 0;
+    // let currentIndex = 0;
 
-    const icpPayWithQueryIndex = chain === 'icp' ? currentIndex : -1;
-    if (chain === 'icp') currentIndex += 1;
+    // const icpPayWithQueryIndex = chain === 'icp' ? currentIndex : -1;
+    // if (chain === 'icp') currentIndex += 1;
 
-    const basePayWithQueryIndex = (chain === 'base' || chain === undefined) ? currentIndex : -1;
-    if (chain === 'base' || chain === undefined) currentIndex += 1;
+    // const basePayWithQueryIndex = (chain === 'base' || chain === undefined) ? currentIndex : -1;
+    // if (chain === 'base' || chain === undefined) currentIndex += 1;
 
-    const solanaPayWithQueryIndex = chain === 'solana' ? currentIndex : -1;
-    if (chain === 'solana') currentIndex += 1;
+    // const solanaPayWithQueryIndex = chain === 'solana' ? currentIndex : -1;
+    // if (chain === 'solana') currentIndex += 1;
 
-    const bscPayWithQueryIndex = chain === 'bsc' ? currentIndex : -1;
-    if (chain === 'bsc') currentIndex += 1;
+    // const bscPayWithQueryIndex = chain === 'bsc' ? currentIndex : -1;
+    // if (chain === 'bsc') currentIndex += 1;
 
-    const icpCkUSDCAmount = useMemo(() => payQueries[icpPayWithQueryIndex]?.data, [icpPayWithQueryIndex, payQueries]);
-    const baseUSDCAmount = useMemo(() => payQueries[basePayWithQueryIndex]?.data, [basePayWithQueryIndex, payQueries]);
-    const solanaUSDCAmount = useMemo(() => payQueries[solanaPayWithQueryIndex]?.data, [solanaPayWithQueryIndex, payQueries]);
-    const bscUSDCAmount = useMemo(() => payQueries[bscPayWithQueryIndex]?.data, [bscPayWithQueryIndex, payQueries]);
+    // const icpCkUSDCAmount = useMemo(() => payQueries[icpPayWithQueryIndex]?.data, [icpPayWithQueryIndex, payQueries]);
+    // const baseUSDCAmount = useMemo(() => payQueries[basePayWithQueryIndex]?.data, [basePayWithQueryIndex, payQueries]);
+    // const solanaUSDCAmount = useMemo(() => payQueries[solanaPayWithQueryIndex]?.data, [solanaPayWithQueryIndex, payQueries]);
+    // const bscUSDCAmount = useMemo(() => payQueries[bscPayWithQueryIndex]?.data, [bscPayWithQueryIndex, payQueries]);
+    const usdcAmount = useMemo(() =>
+        payQueries.find((_, i) =>
+            payWithPriceQueries[i]?.queryKey?.[0] === 'sellingUSDCPrice'
+        )?.data,
+        [payQueries, payWithPriceQueries]
+    );
 
     const defaultPaymentToken = useMemo(() => {
         if (chain === 'icp') {
@@ -235,7 +249,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
     const form = useForm({
         defaultValues: {
-            payment_amount: 0.001,
+            payment_amount: 5,
             payment_token: defaultPaymentToken,
             receive_amount: 1,
             receive_token: 'BIT10.TOP'
@@ -252,7 +266,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
     useEffect(() => {
         form.reset();
-        form.setFieldValue('payment_amount', 0.001);
+        form.setFieldValue('payment_amount', 5);
         form.setFieldValue('payment_token', defaultPaymentToken);
         form.setFieldValue('receive_amount', 1);
         form.setFieldValue('receive_token', 'BIT10.TOP');
@@ -360,19 +374,19 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
 
     const payingTokenPrice = useMemo(() => {
         if (chain === 'icp') {
-            if (payingTokenAddress === 'xevnm-gaaaa-aaaar-qafnq-cai') return Number(icpCkUSDCAmount) || 0;
+            if (payingTokenAddress === 'xevnm-gaaaa-aaaar-qafnq-cai') return Number(usdcAmount) || 0;
         }
         if (chain === 'base' || chain === undefined) {
-            if (payingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913') return Number(baseUSDCAmount) || 0;
+            if (payingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913') return Number(usdcAmount) || 0;
         }
         if (chain === 'solana') {
-            if (payingTokenAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v') return Number(solanaUSDCAmount) || 0;
+            if (payingTokenAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v') return Number(usdcAmount) || 0;
         }
         if (chain === 'bsc') {
-            if (payingTokenAddress === '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d') return Number(bscUSDCAmount) || 0;
+            if (payingTokenAddress === '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d') return Number(usdcAmount) || 0;
         }
         return 0;
-    }, [baseUSDCAmount, bscUSDCAmount, chain, icpCkUSDCAmount, payingTokenAddress, solanaUSDCAmount]);
+    }, [chain, payingTokenAddress, usdcAmount]);
 
     const payingTokenBalance = useMemo(() => {
         if (chain === 'icp') {

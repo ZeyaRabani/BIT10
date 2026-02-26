@@ -213,7 +213,7 @@ export const verifyTransaction = async ({ mode, trxHash }: { mode: string, trxHa
 
         if (actor.base_buy && actor.base_sell) {
             let transfer;
-            if (mode === 'buy') {
+            if (mode === 'mint') {
                 transfer = await actor.base_buy(trxHash) as SwapResponse;
             } else {
                 transfer = await actor.base_sell(trxHash) as SwapResponse;

@@ -158,7 +158,7 @@ export default function VerifyTransaction({ mode }: { mode: string }) {
                         <SelectValue placeholder='Mode' />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value='buy'>Buy</SelectItem>
+                        <SelectItem value='mint'>Mint</SelectItem>
                         <SelectItem value='sell'>Sell</SelectItem>
                       </SelectContent>
                     </Select>

@@ -175,68 +175,25 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const receivePriceQueries = useMemo((): UseQueryOptions[] => {
         const queries: UseQueryOptions[] = [];
 
-        if (chain === 'icp') {
-            queries.push(
-                {
-                    queryKey: ['usdcPrice'],
-                    queryFn: () => fetchRecievePrice('USDC'),
-                    refetchInterval: 30000, // 30 sec.
-                }
-            )
-        }
-
-        if (chain === 'base' || chain === undefined) {
-            queries.push(
-                {
-                    queryKey: ['usdcPrice'],
-                    queryFn: () => fetchRecievePrice('USDC'),
-                    refetchInterval: 30000, // 30 sec.
-                }
-            )
-        }
-
-        if (chain === 'solana') {
-            queries.push(
-                {
-                    queryKey: ['usdcPrice'],
-                    queryFn: () => fetchRecievePrice('USDC'),
-                    refetchInterval: 30000, // 30 sec.
-                }
-            )
-        }
-
-        if (chain === 'bsc') {
-            queries.push(
-                {
-                    queryKey: ['usdcPrice'],
-                    queryFn: () => fetchRecievePrice('USDC'),
-                    refetchInterval: 30000, // 30 sec.
-                }
-            )
-        }
+        queries.push(
+            {
+                queryKey: ['sellingUSDCPrice'],
+                queryFn: () => fetchRecievePrice('USDC'),
+                refetchInterval: 30000, // 30 sec.
+            }
+        )
 
         return queries;
-    }, [chain, fetchRecievePrice]);
+    }, [fetchRecievePrice]);
 
     const receiveQueries = useQueries({ queries: receivePriceQueries });
-    let currentIndex = 0;
 
-    const icpReceiveWithQueryIndex = chain === 'icp' ? currentIndex : -1;
-    if (chain === 'icp') currentIndex += 1;
-
-    const baseReceiveWithQueryIndex = (chain === 'base' || chain === undefined) ? currentIndex : -1;
-    if (chain === 'base' || chain === undefined) currentIndex += 1;
-
-    const solanaReceiveWithQueryIndex = chain === 'solana' ? currentIndex : -1;
-    if (chain === 'solana') currentIndex += 1;
-
-    const bscReceiveWithQueryIndex = chain === 'bsc' ? currentIndex : -1;
-    if (chain === 'bsc') currentIndex += 1;
-
-    const icpCkUSDCAmount = useMemo(() => receiveQueries[icpReceiveWithQueryIndex]?.data, [icpReceiveWithQueryIndex, receiveQueries]);
-    const baseUSDCAmount = useMemo(() => receiveQueries[baseReceiveWithQueryIndex]?.data, [baseReceiveWithQueryIndex, receiveQueries]);
-    const solanaUSDCAmount = useMemo(() => receiveQueries[solanaReceiveWithQueryIndex]?.data, [solanaReceiveWithQueryIndex, receiveQueries]);
-    const bscUSDCAmount = useMemo(() => receiveQueries[bscReceiveWithQueryIndex]?.data, [bscReceiveWithQueryIndex, receiveQueries]);
+    const usdcAmount = useMemo(() =>
+        receiveQueries.find((_, i) =>
+            receivePriceQueries[i]?.queryKey?.[0] === 'sellingUSDCPrice'
+        )?.data,
+        [receiveQueries, receivePriceQueries]
+    );
 
     const defaultReceivingToken = useMemo(() => {
         if (chain === 'icp') {
@@ -455,19 +412,19 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
 
     const receivingTokenPrice = useMemo(() => {
         if (chain === 'icp') {
-            if (receivingTokenAddress === 'xevnm-gaaaa-aaaar-qafnq-cai') return Number(icpCkUSDCAmount) || 0;
+            if (receivingTokenAddress === 'xevnm-gaaaa-aaaar-qafnq-cai') return Number(usdcAmount) || 0;
         }
         if (chain === 'base' || chain === undefined) {
-            if (receivingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913') return Number(baseUSDCAmount) || 0;
+            if (receivingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913') return Number(usdcAmount) || 0;
         }
         if (chain === 'solana') {
-            if (receivingTokenAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v') return Number(solanaUSDCAmount) || 0;
+            if (receivingTokenAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v') return Number(usdcAmount) || 0;
         }
         if (chain === 'bsc') {
-            if (receivingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913nb') return Number(bscUSDCAmount) || 0;
+            if (receivingTokenAddress === '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d') return Number(usdcAmount) || 0;
         }
         return 0;
-    }, [baseUSDCAmount, bscUSDCAmount, chain, icpCkUSDCAmount, receivingTokenAddress, solanaUSDCAmount]);
+    }, [chain, receivingTokenAddress, usdcAmount]);
 
     const filteredSellingTokens = useMemo(() => {
         if (!sellingTokenSearch.trim()) {
@@ -718,8 +675,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                         <CardTitle>Sell</CardTitle>
                         <div className='relative flex flex-row space-x-2 items-center justify-center border rounded-full px-2 py-1.5'>
                             <AnimatedBackground defaultValue='Sell' className='rounded-full bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={onSwitchToBuy}>
-                                <button type='button' data-id={'Mint'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
-                                    Mint
+                                <button type='button' data-id={'Buy'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
+                                    Buy
                                 </button>
                                 <button type='button' data-id={'Sell'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
                                     Sell

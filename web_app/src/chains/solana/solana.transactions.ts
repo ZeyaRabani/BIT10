@@ -444,7 +444,7 @@ export const verifyTransaction = async ({ mode, trxHash }: { mode: string, trxHa
 
         if (actor.solana_buy && actor.solana_sell) {
             let transfer;
-            if (mode === 'buy') {
+            if (mode === 'mint') {
                 transfer = await actor.solana_buy(trxHash) as SwapResponse;
             } else {
                 transfer = await actor.solana_sell(trxHash) as SwapResponse;
