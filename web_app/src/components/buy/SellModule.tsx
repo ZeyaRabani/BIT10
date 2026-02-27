@@ -675,8 +675,8 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                         <CardTitle>Sell</CardTitle>
                         <div className='relative flex flex-row space-x-2 items-center justify-center border rounded-full px-2 py-1.5'>
                             <AnimatedBackground defaultValue='Sell' className='rounded-full bg-primary' transition={{ ease: 'easeInOut', duration: 0.2 }} onValueChange={onSwitchToBuy}>
-                                <button type='button' data-id={'Buy'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
-                                    Buy
+                                <button type='button' data-id={'Mint'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
+                                    Mint
                                 </button>
                                 <button type='button' data-id={'Sell'} className='inline-flex px-2 cursor-pointer items-center justify-center text-center transition-transform active:scale-[0.98] text-sm font-light'>
                                     Sell

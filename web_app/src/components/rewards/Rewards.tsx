@@ -482,8 +482,8 @@ export default function Rewards() {
                         <div>
                             <h3 className='text-xl font-semibold'>Actions Required</h3>
                             <ul className='list-disc pl-5 mt-1 space-y-1'>
-                                <li><b>Buy & Hold:</b> Buy and hold at least 0.9 BIT10.TOP during the cashback round to earn 5% cashback. <br />
-                                    <span className='text-gray-400'>Example: Buy & hold 2 BIT10.TOP → receive cashback equal to 5% of 2 BIT10.TOP.</span>
+                                <li><b>Mint & Hold:</b> Mint and hold at least 0.9 BIT10.TOP during the cashback round to earn 5% cashback. <br />
+                                    <span className='text-gray-400'>Example: Mint & hold 2 BIT10.TOP → receive cashback equal to 5% of 2 BIT10.TOP.</span>
                                 </li>
                                 <li><b>Claim on Time:</b> Cashback must be claimed within 24 hours after the claim window opens.</li>
                             </ul>
@@ -502,8 +502,8 @@ export default function Rewards() {
                         <div>
                             <h3 className='text-xl font-semibold'>Examples</h3>
                             <ul className='list-disc pl-5 mt-1'>
-                                <li>Buy 2 BIT10.TOP and hold through the cashback round → earn 5% cashback.</li>
-                                <li>Buy 2 BIT10.TOP but sell 0.8 before the cashback round ends → 5% cashback is calculated only on 1.2 BIT10.TOP.</li>
+                                <li>Mint 2 BIT10.TOP and hold through the cashback round → earn 5% cashback.</li>
+                                <li>Mint 2 BIT10.TOP but sell 0.8 before the cashback round ends → 5% cashback is calculated only on 1.2 BIT10.TOP.</li>
                             </ul>
                         </div>
                     </Card>
@@ -550,7 +550,7 @@ export default function Rewards() {
                         <div>
                             <h3 className='text-xl font-semibold'>Actions Required</h3>
                             <ul className='list-disc pl-5 mt-1 space-y-1'>
-                                <li><b>Buy:</b> Purchase BIT10.TOP tokens to receive Reward Pool tickets.</li>
+                                <li><b>Mint:</b> Purchase BIT10.TOP tokens to receive Reward Pool tickets.</li>
                                 <li><b>Auto-Entry:</b> Users are automatically entered into the Reward Pool raffle after purchase of BIT10.TOP tokens.</li>
                                 <li><b>Tickets:</b> Amount of BIT10.TOP tokens purchased = amount of Reward Pool tickets.</li>
                             </ul>

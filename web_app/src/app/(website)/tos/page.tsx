@@ -62,7 +62,7 @@ const termsContent: TermSectionProps[] = [
     {
         title: '7 Limit Order',
         content: [
-            'You can buy or sell digital tokens at a specified price within a specified timeframe. BIT10 makes no guarantee that a limit order will be matched or executed.'
+            'You can mint or sell digital tokens at a specified price within a specified timeframe. BIT10 makes no guarantee that a limit order will be matched or executed.'
         ]
     },
     {

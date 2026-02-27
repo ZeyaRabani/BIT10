@@ -83,7 +83,7 @@ export default function TrxDetails({ swapId }: { swapId: string }) {
                                             <div className='font-semibold tracking-wide'>Transaction Type</div>
                                             <div>
                                                 <Badge className={activity.transaction_type === 'Buy' ? 'bg-primary' : 'bg-[#FF0066] hover:bg-[#f64189]'}>
-                                                    {activity.transaction_type}
+                                                    {activity.transaction_type === 'Buy' ? 'Mint' : activity.transaction_type}
                                                 </Badge>
                                             </div>
                                         </div>

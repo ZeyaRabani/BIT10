@@ -62,7 +62,7 @@ const FormSchema = z.object({
         required_error: 'Please select a payment token',
     }),
     receive_amount: z.preprocess((value) => parseFloat(value as string), z.number({
-        message: 'Please enter the number of BIT10 tokens you wish to buy',
+        message: 'Please enter the number of BIT10 tokens you wish to mint',
     })
         .positive('The amount must be a positive number')
         .min(0.001, 'Minimum amount should be 0.001')
@@ -165,71 +165,14 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
             }
         )
 
-        // if (chain === 'icp') {
-        //     queries.push(
-        //         {
-        //             queryKey: ['icpUSDCPrice'],
-        //             queryFn: () => fetchPayWithPrice('USDC'),
-        //             refetchInterval: 30000, // 30 sec.
-        //         }
-        //     )
-        // }
-
-        // if (chain === 'base' || chain === undefined) {
-        //     queries.push(
-        //         {
-        //             queryKey: ['baseUSDCPrice'],
-        //             queryFn: () => fetchPayWithPrice('USDC'),
-        //             refetchInterval: 30000, // 30 sec.
-        //         }
-        //     )
-        // }
-
-        // if (chain === 'solana') {
-        //     queries.push(
-        //         {
-        //             queryKey: ['solanaUSDCPrice'],
-        //             queryFn: () => fetchPayWithPrice('USDC'),
-        //             refetchInterval: 30000, // 30 sec.
-        //         }
-        //     )
-        // }
-
-        // if (chain === 'bsc') {
-        //     queries.push(
-        //         {
-        //             queryKey: ['bscUSDCPrice'],
-        //             queryFn: () => fetchPayWithPrice('USDC'),
-        //             refetchInterval: 30000, // 30 sec.
-        //         }
-        //     )
-        // }
-
         return queries;
     }, [fetchPayWithPrice]);
 
     const payQueries = useQueries({ queries: payWithPriceQueries });
-    // let currentIndex = 0;
 
-    // const icpPayWithQueryIndex = chain === 'icp' ? currentIndex : -1;
-    // if (chain === 'icp') currentIndex += 1;
-
-    // const basePayWithQueryIndex = (chain === 'base' || chain === undefined) ? currentIndex : -1;
-    // if (chain === 'base' || chain === undefined) currentIndex += 1;
-
-    // const solanaPayWithQueryIndex = chain === 'solana' ? currentIndex : -1;
-    // if (chain === 'solana') currentIndex += 1;
-
-    // const bscPayWithQueryIndex = chain === 'bsc' ? currentIndex : -1;
-    // if (chain === 'bsc') currentIndex += 1;
-
-    // const icpCkUSDCAmount = useMemo(() => payQueries[icpPayWithQueryIndex]?.data, [icpPayWithQueryIndex, payQueries]);
-    // const baseUSDCAmount = useMemo(() => payQueries[basePayWithQueryIndex]?.data, [basePayWithQueryIndex, payQueries]);
-    // const solanaUSDCAmount = useMemo(() => payQueries[solanaPayWithQueryIndex]?.data, [solanaPayWithQueryIndex, payQueries]);
-    // const bscUSDCAmount = useMemo(() => payQueries[bscPayWithQueryIndex]?.data, [bscPayWithQueryIndex, payQueries]);
     const usdcAmount = useMemo(() =>
         payQueries.find((_, i) =>
-            payWithPriceQueries[i]?.queryKey?.[0] === 'sellingUSDCPrice'
+            payWithPriceQueries[i]?.queryKey?.[0] === 'buyingUSDCPrice'
         )?.data,
         [payQueries, payWithPriceQueries]
     );
@@ -1018,7 +961,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                                                             <InfoIcon className='size-3 align-middle relative cursor-pointer' />
                                                         </TooltipTrigger>
                                                         <TooltipContent className='max-w-[18rem] md:max-w-104 text-center'>
-                                                            Each token you buy counts as one entry into the Reward Pool raffle.
+                                                            Each token you mint counts as one entry into the Reward Pool raffle.
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
@@ -1038,7 +981,7 @@ export default function BuyModule({ onSwitchToSell }: BuyModuleProps) {
                 </Card>
 
                 <div className='w-fit animate-fade-right'>
-                    <VerifyTransaction mode='buy' />
+                    <VerifyTransaction mode='mint' />
                 </div>
             </div>
 

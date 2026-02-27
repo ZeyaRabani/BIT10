@@ -246,7 +246,7 @@ const features = [
     {
         icon: ZapIcon,
         title: 'One Transaction',
-        description: 'No swapping 10 tokens. Buy BIT10, own the top 10.',
+        description: 'No swapping 10 tokens. Mint BIT10, own the top 10.',
     },
 ];
 
@@ -1424,7 +1424,7 @@ export default function Page() {
                                                         </div>
                                                     </td>
                                                     <td className='py-2 px-6 text-right font-mono'>{formatPreciseDecimal(reserve.noOfTokens)}</td>
-                                                    <td className='py-2 px-6 text-right font-medium'>${formatPreciseDecimal(reserve.price)}</td>
+                                                    <td className='py-2 px-6 text-right font-medium'>${formatPreciseDecimal(reserve.price * (reserve.noOfTokens ?? 0))}</td>
                                                     <td className='py-2 px-6 text-right'>
                                                         <div className='flex items-center justify-end gap-3'>
                                                             <div className='w-24 h-2 rounded-full bg-muted overflow-hidden'>

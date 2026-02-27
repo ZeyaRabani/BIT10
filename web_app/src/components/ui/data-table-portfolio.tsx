@@ -88,7 +88,7 @@ export function DataTable<TData, TValue>({ columns, data, userSearchColumn, inpu
                 )
             case 'mode':
                 return (
-                    <Badge className={row.original.transaction_type === 'Buy' ? 'bg-primary' : 'bg-[#FF0066] hover:bg-[#f64189]'}>{row.original.transaction_type}</Badge>
+                    <Badge className={row.original.transaction_type === 'Buy' ? 'bg-primary' : 'bg-[#FF0066] hover:bg-[#f64189]'}>{row.original.transaction_type === 'Buy' ? 'Mint' : 'Sell'}</Badge>
                 );
             case 'tickIn':
                 return (
