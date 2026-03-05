@@ -293,7 +293,7 @@ export default function Collateral() {
                                             <div className='text-4xl font-semibold'>{formatCompactPercentNumber(data.tokenSupply)}</div>
                                             {data.supplyPercentChange !== 0 &&
                                                 <div className={`pb-0.5 ${data.supplyPercentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                                    {data.supplyPercentChange > 0 ? '+' : ''} {data.supplyPercentChange.toFixed(2)}%
+                                                    {data.supplyPercentChange > 0 ? '+' : ''}{data.supplyPercentChange.toFixed(2)}%
                                                 </div>
                                             }
                                         </div>

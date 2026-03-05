@@ -4,6 +4,7 @@ import { useChain } from '@/context/ChainContext';
 import { useICPWallet } from '@/context/ICPWalletContext';
 import { useEVMWallet } from '@/context/EVMWalletContext';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
 import { useQueries, type UseQueryOptions } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { formatAddress, formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils';
@@ -266,6 +267,11 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         if (chain === 'icp' && icpAddress) {
             queries.push(
                 {
+                    queryKey: ['canisterTokenBalanceICPCkUSDC', chain],
+                    queryFn: () => CHAIN_REGISTRY.icp.fetchTokenBalance({ canisterId: 'xevnm-gaaaa-aaaar-qafnq-cai', address: '6phs7-6yaaa-aaaap-qpvoq-cai' }),
+                    refetchInterval: 30000,
+                },
+                {
                     queryKey: ['sellingTokenBalanceICPBIT10DEFI', icpAddress, chain],
                     queryFn: () => CHAIN_REGISTRY.icp.fetchTokenBalance({ canisterId: 'bin4j-cyaaa-aaaap-qh7tq-cai', address: icpAddress }),
                     refetchInterval: 30000,
@@ -279,27 +285,48 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         }
 
         if (chain === 'base' && evmAddress) {
-            queries.push({
-                queryKey: ['sellingTokenBalanceBaseTOP', evmAddress, chain],
-                queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa', address: evmAddress }),
-                refetchInterval: 30000,
-            });
+            queries.push(
+                {
+                    queryKey: ['canisterTokenBalanceBaseUSDC', chain],
+                    queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', address: '0x5d4aaa5d914ccd92b74f3e4f36538f351d0c1ac9' }),
+                    refetchInterval: 30000,
+                },
+                {
+                    queryKey: ['sellingTokenBalanceBaseTOP', evmAddress, chain],
+                    queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa', address: evmAddress }),
+                    refetchInterval: 30000,
+                }
+            );
         }
 
         if (chain === 'solana' && publicKey) {
-            queries.push({
-                queryKey: ['sellingTokenBalanceSolanaTOP', publicKey, chain],
-                queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9', publicKey: publicKey }),
-                refetchInterval: 30000,
-            });
+            queries.push(
+                {
+                    queryKey: ['canisterTokenBalanceSolanaUSDC', chain],
+                    queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', publicKey: new PublicKey('JDxbWD3JuZTjc2H8oHMomskcvJYHXj5QwhuLy31qSr28') }),
+                    refetchInterval: 30000,
+                },
+                {
+                    queryKey: ['sellingTokenBalanceSolanaTOP', publicKey, chain],
+                    queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9', publicKey: publicKey }),
+                    refetchInterval: 30000,
+                }
+            );
         }
 
         if (chain === 'bsc' && evmAddress) {
-            queries.push({
-                queryKey: ['sellingTokenBalanceBSCTOP', evmAddress, chain],
-                queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x9782d2af62cd502ce2c823d58276e17dc23ebc21', address: evmAddress }),
-                refetchInterval: 30000,
-            });
+            queries.push(
+                {
+                    queryKey: ['canisterTokenBalanceBSCUSDC', chain],
+                    queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d', address: '0x5d4aaa5d914ccd92b74f3e4f36538f351d0c1ac9' }),
+                    refetchInterval: 30000,
+                },
+                {
+                    queryKey: ['sellingTokenBalanceBSCTOP', evmAddress, chain],
+                    queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x9782d2af62cd502ce2c823d58276e17dc23ebc21', address: evmAddress }),
+                    refetchInterval: 30000,
+                }
+            );
         }
 
         return queries;
@@ -312,13 +339,17 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const balanceIndices: Record<string, number> = {};
 
     if (chain === 'icp') {
+        balanceIndices.icpCanisterCkUSDC = currentBalanceIndex++;
         balanceIndices.icpDEFI = currentBalanceIndex++;
         balanceIndices.icpTOP = currentBalanceIndex++;
     } else if (chain === 'base') {
+        balanceIndices.baseCanisterUSDC = currentBalanceIndex++;
         balanceIndices.baseTOP = currentBalanceIndex++;
     } else if (chain === 'solana') {
+        balanceIndices.solanaCanisterUSDC = currentBalanceIndex++;
         balanceIndices.solanaTOP = currentBalanceIndex++;
     } else if (chain === 'bsc') {
+        balanceIndices.bscCanisterUSDC = currentBalanceIndex++;
         balanceIndices.bscTOP = currentBalanceIndex++;
     }
 
@@ -425,6 +456,27 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         }
         return 0;
     }, [chain, receivingTokenAddress, usdcAmount]);
+
+    const canisterTokenBalance = useMemo(() => {
+        if (chain === 'icp') {
+            if (receivingTokenAddress === 'xevnm-gaaaa-aaaar-qafnq-cai' && balanceIndices.icpCanisterCkUSDC !== undefined) {
+                return allBalanceQueries[balanceIndices.icpCanisterCkUSDC]?.data ?? 0;
+            }
+        } else if (chain === 'base') {
+            if (receivingTokenAddress === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913' && balanceIndices.baseCanisterUSDC !== undefined) {
+                return allBalanceQueries[balanceIndices.baseCanisterUSDC]?.data ?? 0;
+            }
+        } else if (chain === 'solana') {
+            if (receivingTokenAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' && balanceIndices.solanaCanisterUSDC !== undefined) {
+                return allBalanceQueries[balanceIndices.solanaCanisterUSDC]?.data ?? 0;
+            }
+        } else if (chain === 'bsc') {
+            if (receivingTokenAddress === '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d' && balanceIndices.bscCanisterUSDC !== undefined) {
+                return allBalanceQueries[balanceIndices.bscCanisterUSDC]?.data ?? 0;
+            }
+        }
+        return 0;
+    }, [allBalanceQueries, balanceIndices, chain, receivingTokenAddress]);
 
     const filteredSellingTokens = useMemo(() => {
         if (!sellingTokenSearch.trim()) {
@@ -625,16 +677,17 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
             });
     };
 
-    const fromAmount = Number((formWatchReceiveAmount * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / Number(sellingTokenPrice) * PLATFORM_FEE);
+    const fromAmount = Number((formWatchSellingAmount * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / Number(sellingTokenPrice) * PLATFORM_FEE);
     const balance = Number(sellingTokenBalance);
 
-    const sellDisabledConditions = !chain || selling || fromAmount >= balance || fromAmount >= balance * PLATFORM_FEE || balance <= 0 || fromAmount <= 0 || Number(formWatchReceiveAmount) <= 0;
+    const sellDisabledConditions = !chain || selling || fromAmount >= balance || fromAmount >= balance * PLATFORM_FEE || balance <= 0 || fromAmount <= 0 || Number(formWatchSellingAmount) <= 0 || Number(formWatchReceiveAmount) > Number(canisterTokenBalance);
 
     const getSellMessage = (): string => {
         if (!chain) return 'Connect your wallet to continue';
         if (selling) return 'Selling...';
         if (fromAmount >= balance || fromAmount >= balance * PLATFORM_FEE && !selling) return 'Balance too low to cover transfer and gas fees';
-        if (fromAmount <= 0 || Number(formWatchReceiveAmount) <= 0) return 'Amount too low';
+        if (fromAmount <= 0 || Number(formWatchSellingAmount) <= 0) return 'Amount too low';
+        if (Number(formWatchReceiveAmount) > Number(canisterTokenBalance)) return 'Amount too large. Please wait for confirmation';
         return 'Sell';
     };
 

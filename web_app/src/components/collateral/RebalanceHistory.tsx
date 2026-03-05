@@ -449,7 +449,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                     <CardContent className='flex flex-col space-y-4'>
                         <div className='border-2 rounded-lg p-2 flex flex-row items-center space-x-1'>
                             <InfoIcon className='size-4' />
-                            <div>Swaps are skipped if gas fees exceed transfer value or if allocation exceeds <span className='font-semibold'> 110% </span> collateralization.</div>
+                            <div>Daily auto-rebalancing is skipped if gas fees exceed transfer value or if allocation exceeds <span className='font-semibold'> 110% </span> collateralization.</div>
                         </div>
                         <h1 className='flex flex-row space-x-1 items-center'>
                             <div className='text-xl md:text-2xl font-semibold uppercase'>
