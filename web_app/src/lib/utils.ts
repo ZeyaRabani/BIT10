@@ -36,7 +36,7 @@ export function constructMetadata({
 export const formatAddress = (id: string) => {
   if (!id) return '';
   if (id.length <= 7) return id;
-  return `${id.slice(0, 9)}.....${id.slice(-9)}`;
+  return `${id.slice(0, 8)}.....${id.slice(-8)}`;
 };
 
 export const formatCompactNumber = (value: number | string | null | undefined): string => {

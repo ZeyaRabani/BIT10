@@ -6,9 +6,10 @@ import { useQueries } from '@tanstack/react-query';
 import { formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { InfoIcon } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type CoinSetData = {
     id: string;
@@ -36,6 +37,22 @@ type RebalanceTrade = {
     buyToken: string;
     buyAmount: number;
     valueUSD: number;
+};
+
+const CHART_START_DATE = new Date('2026-03-02T11:00:00.855Z');
+
+const collateralChartConfig = {
+    totalCollateral: {
+        label: 'Total Collateral (USD)',
+        color: '#F7931A'
+    }
+};
+
+const supplyChartConfig = {
+    totalSupply: {
+        label: 'Total Supply',
+        color: '#29B6F6'
+    }
 };
 
 export default function RebalanceHistory({ index_fund }: { index_fund: string }) {
@@ -77,8 +94,19 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
 
     const selectedBIT10Token = bit10Token();
 
-    const calculateTotalCollateral = (tokens: CoinSetData[]) =>
-        tokens?.reduce((sum, t) => sum + t.price * t.noOfTokens, 0) ?? 0;
+    const calculateTotalCollateral = (tokens: CoinSetData[]) => tokens?.reduce((sum, t) => sum + t.price * t.noOfTokens, 0) ?? 0;
+
+    const chartEntries = [...selectedBIT10Token].filter((entry) => new Date(entry.timestmpz) >= CHART_START_DATE).reverse();
+
+    const collateralChartData = chartEntries.map((entry) => ({
+        date: new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        totalCollateral: parseFloat(calculateTotalCollateral(entry.newTokens).toFixed(4))
+    }));
+
+    const supplyChartData = chartEntries.map((entry) => ({
+        date: new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        totalSupply: entry.indexValue > 0 ? parseFloat((calculateTotalCollateral(entry.newTokens) / entry.indexValue).toFixed(6)) : 0,
+    }));
 
     const calculateRebalanceTrades = (prevTokens: CoinSetData[], newTokens: CoinSetData[]): {
         trades: RebalanceTrade[];
@@ -148,8 +176,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         });
 
         const MIN_TRADE_VALUE = 0.0000001; // $0.0000001 USD minimum
-        const tokensToBuy: Array<{ symbol: string; valueNeeded: number; price: number; tokensNeeded: number }> = [];
-        const tokensToSell: Array<{ symbol: string; valueToSell: number; price: number; tokensToSell: number }> = [];
+        const tokensToBuy: Array<{ symbol: string; valueNeeded: number; price: number; tokensNeeded: number; }> = [];
+        const tokensToSell: Array<{ symbol: string; valueToSell: number; price: number; tokensToSell: number; }> = [];
 
         tokenValueChanges.forEach((data) => {
             const absValueChange = Math.abs(data.valueChange);
@@ -228,9 +256,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                 continue;
             }
 
-            // Ensure sellToken and buyToken are defined and have valid price properties
             if (!sellToken || !buyToken || typeof sellToken.price !== 'number' || typeof buyToken.price !== 'number') {
-                // Skip this iteration if any value is invalid
                 if (remainingSellValue < remainingBuyValue) {
                     sellIndex++;
                     remainingSellValue = sellList[sellIndex]?.valueToSell ?? 0;
@@ -326,7 +352,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         const isIdentical = newTokens.every(newToken => {
             const prevToken = prevMap.get(newToken.symbol);
             if (!prevToken) return false;
-            return Math.abs(newToken.noOfTokens - prevToken.noOfTokens) < IDENTICAL_TOLERANCE;
+            return (Math.abs(newToken.noOfTokens - prevToken.noOfTokens) < IDENTICAL_TOLERANCE);
         });
 
         if (isIdentical) {
@@ -410,7 +436,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                 <Card>
                     <CardContent className='w-full animate-fade-left-slow'>
                         <div className='flex flex-col h-full space-y-2'>
-                            {['h-12 w-28', 'h-72'].map((classes, index) => (
+                            {['h-56 w-full', 'h-12 w-28', 'h-72'].map((classes, index) => (
                                 <Skeleton key={index} className={classes} />
                             ))}
                         </div>
@@ -421,19 +447,50 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             ) : (
                 <Card className='bg-transparent'>
                     <CardContent className='flex flex-col space-y-4'>
+                        <div className='border-2 rounded-lg p-2 flex flex-row items-center space-x-1'>
+                            <InfoIcon className='size-4' />
+                            <div>Swaps are skipped if gas fees exceed transfer value or if allocation exceeds <span className='font-semibold'> 110% </span> collateralization.</div>
+                        </div>
                         <h1 className='flex flex-row space-x-1 items-center'>
-                            <div className='text-xl md:text-2xl font-semibold uppercase'>BIT10.{index_fund}</div>
-                            <TooltipProvider>
-                                <Tooltip delayDuration={300}>
-                                    <TooltipTrigger asChild>
-                                        <InfoIcon className='size-4 cursor-pointer' />
-                                    </TooltipTrigger>
-                                    <TooltipContent className='max-w-[18rem] md:max-w-104 text-center border'>
-                                        Swaps are skipped if gas fees exceed transfer value or if allocation exceeds <span className='font-semibold'>110%</span> collateralization.
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                            <div className='text-xl md:text-2xl font-semibold uppercase'>
+                                BIT10.{index_fund}
+                            </div>
                         </h1>
+
+                        {chartEntries.length >= 2 && (
+                            <div className='grid lg:grid-cols-2 gap-6'>
+                                <div className='border rounded-lg p-4 space-y-2'>
+                                    <p className='font-semibold text-base'>Total Collateral (USD)</p>
+                                    <div className='flex select-none -ml-8'>
+                                        <ChartContainer config={collateralChartConfig} className='max-h-52 w-full'>
+                                            <LineChart accessibilityLayer data={collateralChartData}>
+                                                <CartesianGrid vertical={false} />
+                                                <XAxis dataKey='date' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
+                                                <YAxis tickLine axisLine tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
+                                                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                                <Line dataKey='totalCollateral' type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
+                                            </LineChart>
+                                        </ChartContainer>
+                                    </div>
+                                </div>
+
+                                <div className='border rounded-lg p-4 space-y-2'>
+                                    <p className='font-semibold text-base'>Total Supply</p>
+                                    <div className='flex select-none -ml-8'>
+                                        <ChartContainer config={supplyChartConfig} className='max-h-52 w-full'>
+                                            <LineChart accessibilityLayer data={supplyChartData}>
+                                                <CartesianGrid vertical={false} />
+                                                <XAxis dataKey='date' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
+                                                <YAxis tickLine axisLine tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
+                                                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                                <Line dataKey='totalSupply' type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
+                                            </LineChart>
+                                        </ChartContainer>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <div className='space-y-8'>
                             {selectedBIT10Token.map((entry, index) => {
                                 if (index === selectedBIT10Token.length - 1) {
@@ -480,19 +537,13 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                         <p className='text-lg'>Index Value: {formatCompactPercentNumber(entry.indexValue)} USD</p>
                                         <p className='text-lg'>Total Collateral: {formatCompactPercentNumber(calculateTotalCollateral(entry.newTokens))} USD</p>
 
-                                        {isDebugMode &&
+                                        {isDebugMode && (
                                             <>
                                                 {rebalanceResult.collateralChange !== 'same' && (
-                                                    <div className={`rounded-lg p-3 my-3 ${rebalanceResult.collateralChange === 'increase'
-                                                        ? 'bg-green-900/20 border border-green-800'
-                                                        : 'bg-blue-900/20 border border-blue-800'
-                                                        }`}>
-                                                        <p className={`font-medium ${rebalanceResult.collateralChange === 'increase'
-                                                            ? 'text-green-300'
-                                                            : 'text-blue-300'
-                                                            }`}>
-                                                            {rebalanceResult.collateralChange === 'increase' ? '📈 ' : '📉 '}
-                                                            Collateral Value {rebalanceResult.collateralChange === 'increase' ? 'Increased' : 'Decreased'} by ${formatCompactNumber(rebalanceResult.collateralChangeAmount)}
+                                                    <div className={`rounded-lg p-3 my-3 ${rebalanceResult.collateralChange === 'increase' ? 'bg-green-900/20 border border-green-800' : 'bg-blue-900/20 border border-blue-800'}`}>
+                                                        <p className={`font-medium ${rebalanceResult.collateralChange === 'increase' ? 'text-green-300' : 'text-blue-300'}`}>
+                                                            {rebalanceResult.collateralChange === 'increase' ? '📈 ' : '📉 '}Collateral Value
+                                                            {rebalanceResult.collateralChange === 'increase' ? 'Increased' : 'Decreased'} by $ {formatCompactNumber(rebalanceResult.collateralChangeAmount)}
                                                             {rebalanceResult.collateralChange === 'decrease'}
                                                         </p>
                                                     </div>
@@ -509,18 +560,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     </div>
                                                 )}
 
-                                                <div className={`rounded-lg p-3 my-3 ${rebalanceAnalysis.type === 'growth'
-                                                    ? 'bg-green-900/20 border border-green-800'
-                                                    : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal'
-                                                        ? 'bg-blue-900/20 border border-blue-800'
-                                                        : 'bg-orange-900/20 border border-orange-800'
-                                                    }`}>
-                                                    <p className={`font-medium ${rebalanceAnalysis.type === 'growth'
-                                                        ? 'text-green-300'
-                                                        : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal'
-                                                            ? 'text-blue-300'
-                                                            : 'text-orange-300'
-                                                        }`}>
+                                                <div className={`rounded-lg p-3 my-3 ${rebalanceAnalysis.type === 'growth' ? 'bg-green-900/20 border border-green-800' : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal' ? 'bg-blue-900/20 border border-blue-800' : 'bg-orange-900/20 border border-orange-800'}`}>
+                                                    <p className={`font-medium ${rebalanceAnalysis.type === 'growth' ? 'text-green-300' : rebalanceAnalysis.type === 'identical' || rebalanceAnalysis.type === 'minimal' ? 'text-blue-300' : 'text-orange-300'}`}>
                                                         {rebalanceAnalysis.type === 'growth' && '📈 '}
                                                         {rebalanceAnalysis.type === 'identical' && '🔄 '}
                                                         {rebalanceAnalysis.type === 'minimal' && '📊 '}
@@ -529,7 +570,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                     </p>
                                                 </div>
                                             </>
-                                        }
+                                        )}
 
                                         <div className='flex justify-between my-2'>
                                             <h3 className='font-medium'>
@@ -596,81 +637,62 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             </TableRow>
                                                         </TableHeader>
                                                         <TableBody>
-                                                            {rebalanceResult.internalSwaps.map(
-                                                                (trade, tradeIndex) => (
-                                                                    <TableRow key={tradeIndex}>
-                                                                        <TableCell className='font-medium uppercase text-red-400'>{trade.sellToken}</TableCell>
-                                                                        <TableCell>{formatCompactNumber(trade.sellAmount)}</TableCell>
-                                                                        <TableCell className='text-center text-gray-500'>→</TableCell>
-                                                                        <TableCell className='font-medium uppercase text-green-400'>{trade.buyToken}</TableCell>
-                                                                        <TableCell>{formatCompactNumber(trade.buyAmount)}</TableCell>
-                                                                        <TableCell>${formatCompactNumber(trade.valueUSD)}</TableCell>
-                                                                    </TableRow>
-                                                                )
+                                                            {rebalanceResult.internalSwaps.map((trade, tradeIndex) => (
+                                                                <TableRow key={tradeIndex}>
+                                                                    <TableCell className='font-medium uppercase text-red-400'>{trade.sellToken}</TableCell>
+                                                                    <TableCell>{formatCompactNumber(trade.sellAmount)}</TableCell>
+                                                                    <TableCell className='text-center text-gray-500'>→</TableCell>
+                                                                    <TableCell className='font-medium uppercase text-green-400'>{trade.buyToken}</TableCell>
+                                                                    <TableCell>{formatCompactNumber(trade.buyAmount)}</TableCell>
+                                                                    <TableCell>${formatCompactNumber(trade.valueUSD)}</TableCell>
+                                                                </TableRow>
+                                                            )
                                                             )}
                                                         </TableBody>
                                                     </Table>
                                                 ) : (
-                                                    <div className={`border rounded-lg p-4 ${rebalanceAnalysis.type === 'rebalance'
-                                                        ? 'bg-yellow-900/20 border-yellow-800'
-                                                        : 'bg-gray-800 border-gray-700'
-                                                        }`}>
-                                                        <p className={`text-center ${rebalanceAnalysis.type === 'rebalance'
-                                                            ? 'text-yellow-300'
-                                                            : 'text-gray-400'
-                                                            }`}>
-                                                            {rebalanceAnalysis.type === 'rebalance'
-                                                                ? `⚠️ ${rebalanceAnalysis.reason} - but no significant trades calculated (amounts too small)`
-                                                                : `No trades required - ${rebalanceAnalysis.reason.toLowerCase()}`
-                                                            }
+                                                    <div className={`border rounded-lg p-4 ${rebalanceAnalysis.type === 'rebalance' ? 'bg-yellow-900/20 border-yellow-800' : 'bg-gray-800 border-gray-700'}`}>
+                                                        <p className={`text-center ${rebalanceAnalysis.type === 'rebalance' ? 'text-yellow-300' : 'text-gray-400'}`}>
+                                                            {rebalanceAnalysis.type === 'rebalance' ? `⚠️ ${rebalanceAnalysis.reason} - but no significant trades calculated (amounts too small)` : `No trades required - ${rebalanceAnalysis.reason.toLowerCase()}`}
                                                         </p>
                                                     </div>
                                                 )}
                                             </div>
                                         )}
 
-                                        {isDebugMode && <>
-                                            {rebalanceResult.needsExternalLiquidity && rebalanceResult.externalTokens.length > 0 && (
-                                                <div className='mt-4'>
-                                                    <h3 className='font-medium mb-3'>External Liquidity Breakdown</h3>
-                                                    <div className='bg-purple-900/20 border border-purple-800 rounded-lg p-4'>
-                                                        <p className='text-purple-300 mb-3'>
-                                                            Total additional funds needed: <span className='font-semibold'>${formatCompactNumber(rebalanceResult.externalLiquidityAmount)}</span>
-                                                        </p>
-
-                                                        <div className='space-y-3'>
-                                                            {rebalanceResult.externalTokens.map((tokenDetail) => (
-                                                                <div key={tokenDetail.symbol} className='bg-gray-800 rounded-lg p-3 border border-purple-700'>
-                                                                    <div className='flex justify-between items-center'>
-                                                                        <span className='font-semibold uppercase text-purple-200'>
-                                                                            {tokenDetail.symbol}
-                                                                        </span>
-                                                                        <span className='text-purple-300 font-medium'>
-                                                                            ${formatCompactNumber(tokenDetail.valueNeeded)}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className='mt-2 text-sm text-purple-400'>
-                                                                        <div className='flex justify-between'>
-                                                                            <span>Tokens needed:</span>
-                                                                            <span className='font-mono'>{formatCompactNumber(tokenDetail.tokensNeeded)}</span>
+                                        {isDebugMode && (
+                                            <>
+                                                {rebalanceResult.needsExternalLiquidity && rebalanceResult.externalTokens.length > 0 && (
+                                                    <div className='mt-4'>
+                                                        <h3 className='font-medium mb-3'>External Liquidity Breakdown</h3>
+                                                        <div className='bg-purple-900/20 border border-purple-800 rounded-lg p-4'>
+                                                            <p className='text-purple-300 mb-3'>Total additional funds needed: <span className='font-semibold'>${formatCompactNumber(rebalanceResult.externalLiquidityAmount)}</span></p>
+                                                            <div className='space-y-3'>
+                                                                {rebalanceResult.externalTokens.map((tokenDetail) => (
+                                                                    <div key={tokenDetail.symbol} className='bg-gray-800 rounded-lg p-3 border border-purple-700'>
+                                                                        <div className='flex justify-between items-center'>
+                                                                            <span className='font-semibold uppercase text-purple-200'>{tokenDetail.symbol}</span>
+                                                                            <span className='text-purple-300 font-medium'>${formatCompactNumber(tokenDetail.valueNeeded)}</span>
                                                                         </div>
-                                                                        <div className='flex justify-between'>
-                                                                            <span>Price per token:</span>
-                                                                            <span className='font-mono'>${formatCompactNumber(tokenDetail.price)}</span>
+                                                                        <div className='mt-2 text-sm text-purple-400'>
+                                                                            <div className='flex justify-between'>
+                                                                                <span>Tokens needed:</span>
+                                                                                <span className='font-mono'>{formatCompactNumber(tokenDetail.tokensNeeded)}</span>
+                                                                            </div>
+                                                                            <div className='flex justify-between'>
+                                                                                <span>Price per token:</span>
+                                                                                <span className='font-mono'>${formatCompactNumber(tokenDetail.price)}</span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                            ))}
+                                                                ))}
+                                                            </div>
+                                                            <p className='text-purple-400 text-xs mt-3 italic'>* These tokens require external funding as internal swaps cannot cover the full target allocation.</p>
                                                         </div>
-
-                                                        <p className='text-purple-400 text-xs mt-3 italic'>
-                                                            * These tokens require external funding as internal swaps cannot cover the full target allocation.
-                                                        </p>
                                                     </div>
-                                                </div>
-                                            )}
-                                        </>
-                                        }
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                 );
                             })}

@@ -4,8 +4,17 @@ import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { formatCompactNumber } from '@/lib/utils';
 
-export const fetchTokenBalance = async ({ tokenAddress, publicKey, decimals = 9 }: { tokenAddress: string, publicKey: PublicKey, decimals?: number }): Promise<number> => {
+export const fetchTokenBalance = async ({ tokenAddress, publicKey }: { tokenAddress: string, publicKey: PublicKey }): Promise<number> => {
     const customConnection = getCustomConnection();
+
+    let decimals;
+    if (tokenAddress === 'So11111111111111111111111111111111111111111') {
+        decimals = 9;
+    } else if (tokenAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v') {
+        decimals = 6;
+    } else {
+        decimals = 9;
+    }
 
     try {
         if (tokenAddress === 'So11111111111111111111111111111111111111111') {

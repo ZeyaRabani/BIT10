@@ -49,9 +49,11 @@ interface RebalanceData {
     bit10Name: string;
     bit10RebalanceHistory: string;
     bit10TotalCollateral: number;
+    bit10PrevTotalCollateral: number;
     bit10Price: number;
     bit10CurrentPrice: number;
     bit10Supply: number;
+    bit10PrevSupply: number;
     bit10Data: CoinData[];
 }
 
@@ -73,11 +75,11 @@ export default function Collateral() {
                 return [];
             }
 
-            const data = await response.json() as BIT10RebalanceEntry[];
-            return data[0];
+            const data = (await response.json()) as BIT10RebalanceEntry[];
+            return { current: data[0], previous: data[1] ?? null };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            toast.error('An error occured processing your request. Please try again later!')
+            toast.error('An error occured processing your request. Please try again later!');
         }
     };
 
@@ -93,7 +95,7 @@ export default function Collateral() {
             return data.tokenPrice;
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            toast.error('An error occured processing your request. Please try again later!')
+            toast.error('An error occured processing your request. Please try again later!');
         }
     };
 
@@ -108,7 +110,7 @@ export default function Collateral() {
             return response;
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            toast.error('An error occured processing your request. Please try again later!')
+            toast.error('An error occured processing your request. Please try again later!');
         }
     };
 
@@ -121,7 +123,7 @@ export default function Collateral() {
             {
                 queryKey: ['bit10TOPTokenPrice'],
                 queryFn: () => fetchBIT10Price('top'),
-                refetchInterval: 180000, // 30 min.
+                refetchInterval: 180000  // 30 min.
             },
             {
                 queryKey: ['bit10WalletAllocations'],
@@ -130,10 +132,10 @@ export default function Collateral() {
         ],
     });
 
-    const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10TOPRebalanceData = bit10Queries[0].data;
+    const isLoading = bit10Queries.some((query) => query.isLoading);
+    const bit10TOPRebalanceResult = bit10Queries[0].data as | { current: BIT10RebalanceEntry; previous: BIT10RebalanceEntry | null } | undefined;
     const bit10TOPCurrentPrice = bit10Queries[1].data;
-    const bit10Allocation = bit10Queries[2].data as WalletDataType[] || [];
+    const bit10Allocation = (bit10Queries[2].data as WalletDataType[]) || [];
 
     useEffect(() => {
         const handleResize = () => {
@@ -154,15 +156,20 @@ export default function Collateral() {
         };
     }, []);
 
+    const currentTOP = bit10TOPRebalanceResult?.current;
+    const previousTOP = bit10TOPRebalanceResult?.previous;
+
     const initialBIT10RebalanceData: RebalanceData[] = [
         {
             bit10Name: 'BIT10.TOP',
             bit10RebalanceHistory: 'top',
-            bit10TotalCollateral: bit10TOPRebalanceData && 'priceOfTokenToBuy' in bit10TOPRebalanceData ? (bit10TOPRebalanceData).priceOfTokenToBuy : 0,
-            bit10Price: bit10TOPRebalanceData && 'indexValue' in bit10TOPRebalanceData ? (bit10TOPRebalanceData).indexValue : 0,
+            bit10TotalCollateral: currentTOP?.priceOfTokenToBuy ?? 0,
+            bit10PrevTotalCollateral: previousTOP?.priceOfTokenToBuy ?? 0,
+            bit10Price: currentTOP?.indexValue ?? 0,
             bit10CurrentPrice: bit10TOPCurrentPrice ?? 0,
-            bit10Supply: bit10TOPRebalanceData && 'priceOfTokenToBuy' in bit10TOPRebalanceData && 'indexValue' in bit10TOPRebalanceData ? (bit10TOPRebalanceData).priceOfTokenToBuy / (bit10TOPRebalanceData).indexValue : 0,
-            bit10Data: bit10TOPRebalanceData && 'newTokens' in bit10TOPRebalanceData ? bit10TOPRebalanceData?.newTokens : []
+            bit10Supply: currentTOP?.priceOfTokenToBuy && currentTOP?.indexValue ? currentTOP.priceOfTokenToBuy / currentTOP.indexValue : 0,
+            bit10PrevSupply: previousTOP?.priceOfTokenToBuy && previousTOP?.indexValue ? previousTOP.priceOfTokenToBuy / previousTOP.indexValue : 0,
+            bit10Data: currentTOP?.newTokens ?? []
         }
     ];
 
@@ -192,19 +199,26 @@ export default function Collateral() {
         }));
     };
 
-    const bit10RebalanceData = initialBIT10RebalanceData.map(data => {
+    const calcPercentChange = (current: number, previous: number) => {
+        if (!previous || previous === 0) return 0;
+        return ((current - previous) / previous) * 100;
+    };
+
+    const bit10RebalanceData = initialBIT10RebalanceData.map((data) => {
         const tokenName = data.bit10Name;
         const tokenLink = data.bit10RebalanceHistory;
         const totalCollateral = data.bit10TotalCollateral;
+        const collateralPercentChange = calcPercentChange(data.bit10TotalCollateral, data.bit10PrevTotalCollateral);
         const tokenPrice = data.bit10Price;
         const tokenCurrentPrice = data.bit10CurrentPrice;
         const percentChange = tokenPrice && tokenPrice !== 0 ? ((tokenCurrentPrice - tokenPrice) / tokenPrice) * 100 : 0;
         const tokenSupply = data.bit10Supply;
+        const supplyPercentChange = calcPercentChange(data.bit10Supply, data.bit10PrevSupply);
         const chartConfig = generateChartConfig(data.bit10Data);
         const pieChartData = generatePieChartData(data.bit10Data);
         const tokenData = data.bit10Data;
 
-        return { ...data, tokenName, tokenLink, totalCollateral, tokenPrice, tokenCurrentPrice, percentChange, tokenSupply, chartConfig, pieChartData, tokenData };
+        return { ...data, tokenName, tokenLink, totalCollateral, collateralPercentChange, tokenPrice, tokenCurrentPrice, percentChange, tokenSupply, supplyPercentChange, chartConfig, pieChartData, tokenData };
     });
 
     return (
@@ -222,26 +236,11 @@ export default function Collateral() {
                             ))}
                         </div>
                         <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-4'>
-                            <Card className='p-3 flex flex-col space-y-2'>
-                                {['h-24 w-full'].map((classes, index) => (
-                                    <Skeleton key={index} className={classes} />
-                                ))}
-                            </Card>
-                            <Card className='p-3 flex flex-col space-y-2'>
-                                {['h-24 w-full'].map((classes, index) => (
-                                    <Skeleton key={index} className={classes} />
-                                ))}
-                            </Card>
-                            <Card className='p-3 flex flex-col space-y-2'>
-                                {['h-24 w-full'].map((classes, index) => (
-                                    <Skeleton key={index} className={classes} />
-                                ))}
-                            </Card>
-                            <Card className='p-3 flex flex-col space-y-2'>
-                                {['h-24 w-full'].map((classes, index) => (
-                                    <Skeleton key={index} className={classes} />
-                                ))}
-                            </Card>
+                            {Array.from({ length: 4 }).map((_, index) => (
+                                <Card key={index} className='p-3 flex flex-col space-y-2'>
+                                    <Skeleton className='h-24 w-full' />
+                                </Card>
+                            ))}
                         </div>
                         <div className='grid md:grid-cols-3 gap-4 items-center'>
                             {['h-56 w-full col-span-1', 'h-56 w-full col-span-2'].map((classes, index) => (
@@ -270,6 +269,7 @@ export default function Collateral() {
                                         </div>
                                         <div className='-mt-4 flex flex-row items-end justify-start space-x-2'>
                                             <div className='text-4xl font-semibold'>${formatCompactPercentNumber(data.totalCollateral)}</div>
+                                            <div className={`pb-0.5 ${data.collateralPercentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>{data.collateralPercentChange > 0 ? '+' : ''}{data.collateralPercentChange.toFixed(2)}%</div>
                                         </div>
                                     </Card>
 
@@ -280,9 +280,7 @@ export default function Collateral() {
                                         </div>
                                         <div className='-mt-4 flex flex-row items-end justify-start space-x-2'>
                                             <div className='text-4xl font-semibold'>${formatCompactPercentNumber(data.tokenCurrentPrice)}</div>
-                                            <div className={`pb-0.5 ${data.percentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                                {data.percentChange > 0 ? '+' : ''}{data.percentChange.toFixed(2)}%
-                                            </div>
+                                            <div className={`pb-0.5 ${data.percentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>{data.percentChange > 0 ? '+' : ''}{data.percentChange.toFixed(2)}%</div>
                                         </div>
                                     </Card>
 
@@ -293,6 +291,11 @@ export default function Collateral() {
                                         </div>
                                         <div className='-mt-4 flex flex-row items-end justify-start space-x-2'>
                                             <div className='text-4xl font-semibold'>{formatCompactPercentNumber(data.tokenSupply)}</div>
+                                            {data.supplyPercentChange !== 0 &&
+                                                <div className={`pb-0.5 ${data.supplyPercentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                                    {data.supplyPercentChange > 0 ? '+' : ''} {data.supplyPercentChange.toFixed(2)}%
+                                                </div>
+                                            }
                                         </div>
                                     </Card>
 
@@ -314,45 +317,22 @@ export default function Collateral() {
                                             className='aspect-square max-h-75'
                                         >
                                             <PieChart>
-                                                <ChartTooltip
-                                                    cursor={false}
-                                                    content={<ChartTooltipContent hideLabel />}
-                                                />
-                                                <Pie
-                                                    data={data.pieChartData}
-                                                    dataKey='value'
-                                                    nameKey='name'
-                                                    innerRadius={innerRadius}
-                                                    strokeWidth={5}
-                                                >
-                                                    <Label
-                                                        content={({ viewBox }) => {
-                                                            if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
-                                                                return (
-                                                                    <text
-                                                                        x={viewBox.cx}
-                                                                        y={viewBox.cy}
-                                                                        textAnchor='middle'
-                                                                        dominantBaseline='middle'
-                                                                    >
-                                                                        <tspan
-                                                                            x={viewBox.cx}
-                                                                            y={viewBox.cy}
-                                                                            className='fill-foreground text-xl font-bold'
-                                                                        >
-                                                                            {data.bit10Name}
-                                                                        </tspan>
-                                                                        <tspan
-                                                                            x={viewBox.cx}
-                                                                            y={(viewBox.cy ?? 0) + 24}
-                                                                            className='fill-muted-foreground'
-                                                                        >
-                                                                            Allocations
-                                                                        </tspan>
-                                                                    </text>
-                                                                )
-                                                            }
-                                                        }}
+                                                <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                                                <Pie data={data.pieChartData} dataKey='value' nameKey='name' innerRadius={innerRadius} strokeWidth={5}>
+                                                    <Label content={({ viewBox }) => {
+                                                        if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                            return (
+                                                                <text x={viewBox.cx} y={viewBox.cy} textAnchor='middle' dominantBaseline='middle'>
+                                                                    <tspan x={viewBox.cx} y={viewBox.cy} className='fill-foreground text-xl font-bold'>
+                                                                        {data.bit10Name}
+                                                                    </tspan>
+                                                                    <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 24} className='fill-muted-foreground'>
+                                                                        Allocations
+                                                                    </tspan>
+                                                                </text>
+                                                            )
+                                                        }
+                                                    }}
                                                     />
                                                 </Pie>
                                             </PieChart>

@@ -94,7 +94,7 @@ export default function BalanceAndAllocation() {
             queries.push(
                 {
                     queryKey: ['bit10TOPBalanceSolana'],
-                    queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9', publicKey: publicKey, decimals: 9 })
+                    queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9', publicKey: publicKey })
                 }
             );
         }
