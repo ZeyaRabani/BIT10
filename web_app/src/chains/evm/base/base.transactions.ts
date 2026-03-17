@@ -22,13 +22,6 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
             referral: []
         }) as TransactionResponse;
 
-        const tx = {
-            to: create_transaction.to,
-            value: create_transaction.value,
-            data: create_transaction.data,
-            from: create_transaction.from
-        };
-
         const ethereumProvider = window.ethereum as ethers.Eip1193Provider | undefined;
 
         if (!ethereumProvider) {
@@ -41,7 +34,25 @@ export const buyBIT10Token = async ({ tokenInAmount, tokenInAddress, tokenOutAmo
         const provider = new ethers.BrowserProvider(ethereumProvider);
         const signer = await provider.getSigner();
 
-        const txResponse = await signer.sendTransaction(tx);
+        const directProvider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+        const feeData = await directProvider.getFeeData();
+        const nonce = await directProvider.getTransactionCount(walletAddress, 'pending');
+
+        const legacyTx = {
+            to: create_transaction.to,
+            value: create_transaction.value,
+            data: create_transaction.data,
+            from: create_transaction.from,
+            nonce,
+            gasPrice: feeData.gasPrice,
+            chainId: 8453,
+            type: 0
+        };
+
+        const gasEstimate = await directProvider.estimateGas(legacyTx);
+        const legacyTxWithGas = { ...legacyTx, gasLimit: (gasEstimate * 120n) / 100n };
+
+        const txResponse = await signer.sendTransaction(legacyTxWithGas);
 
         onStepUpdate?.(0, { status: 'success', description: 'Transaction submitted successfully.' });
         onStepUpdate?.(1, { status: 'processing', description: 'Waiting for blockchain confirmation...' });

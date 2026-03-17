@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useChain } from '@/context/ChainContext';
 import { useICPWallet } from '@/context/ICPWalletContext';
 import { useEVMWallet } from '@/context/EVMWalletContext';
@@ -22,8 +22,12 @@ import MetamaskLogo from '@/assets/wallet/metamsak.svg';
 // import TalismanLogo from '@/assets/wallet/talisman.svg'
 import PlugImg from '@/assets/wallet/plug.svg';
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useQueries, type UseQueryOptions } from '@tanstack/react-query';
+import { CHAIN_REGISTRY } from '@/chains/chain.registry';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Loader2, WalletMinimal } from 'lucide-react';
+import { formatCompactNumber } from '@/lib/utils';
+import { ArrowLeftIcon, Loader2Icon, WalletMinimalIcon, CopyIcon } from 'lucide-react';
 
 const containerVariants = {
     visible: {
@@ -60,6 +64,7 @@ export default function WalletBtn() {
     const [open, setOpen] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState(false);
     const [selectedChain, setSelectedChain] = useState<'icp' | 'base' | 'solana' | 'bsc' | null>(null);
+    const [, setCopied] = useState(false);
 
     const { isICPConnected, icpAddress, connectICPWallet, disconnectICPWallet } = useICPWallet();
 
@@ -72,6 +77,7 @@ export default function WalletBtn() {
 
     const solanaWallet = useWallet();
     const { wallets: solanaWallets, connected: isSolanaConnected } = solanaWallet;
+    const { publicKey } = useWallet();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundSolanaSelect = (walletName: any) => {
@@ -179,6 +185,120 @@ export default function WalletBtn() {
         }
     };
 
+    const balanceQueries = useMemo((): UseQueryOptions[] => {
+        const queries: UseQueryOptions[] = [];
+
+        if (chain === 'icp' && icpAddress) {
+            queries.push(
+                {
+                    queryKey: ['tokenBalanceICPCkUSDC', icpAddress, chain],
+                    queryFn: () => CHAIN_REGISTRY.icp.fetchTokenBalance({ canisterId: 'xevnm-gaaaa-aaaar-qafnq-cai', address: icpAddress }),
+                    refetchInterval: 30000,
+                },
+                {
+                    queryKey: ['tokenBalanceICPBIT10TOP', icpAddress, chain],
+                    queryFn: () => CHAIN_REGISTRY.icp.fetchTokenBalance({ canisterId: 'g37b3-lqaaa-aaaap-qp4hq-cai', address: icpAddress }),
+                    refetchInterval: 30000,
+                }
+            );
+        }
+
+        if (chain === 'base' && evmAddress) {
+            queries.push(
+                {
+                    queryKey: ['tokenBalanceBaseUSDC', evmAddress, chain],
+                    queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', address: evmAddress }),
+                    refetchInterval: 30000,
+                },
+                {
+                    queryKey: ['tokenBalanceBaseBIT10TOP', evmAddress, chain],
+                    queryFn: () => CHAIN_REGISTRY.base.fetchTokenBalance({ tokenAddress: '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa', address: evmAddress }),
+                    refetchInterval: 30000,
+                }
+            );
+        }
+
+        if (chain === 'solana' && publicKey) {
+            queries.push(
+                {
+                    queryKey: ['tokenBalanceSolanaUSDC', publicKey, chain],
+                    queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', publicKey: publicKey }),
+                    refetchInterval: 30000,
+                },
+                {
+                    queryKey: ['tokenBalanceSolanaBIT10TOP', publicKey, chain],
+                    queryFn: () => CHAIN_REGISTRY.solana.fetchTokenBalance({ tokenAddress: 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9', publicKey: publicKey }),
+                    refetchInterval: 30000,
+                }
+            );
+        }
+
+        if (chain === 'bsc' && evmAddress) {
+            queries.push(
+                {
+                    queryKey: ['tokenBalanceBSCUSDC', evmAddress, chain],
+                    queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d', address: evmAddress }),
+                    refetchInterval: 30000,
+                },
+                {
+                    queryKey: ['tokenBalanceBSCBIT10TOP', evmAddress, chain],
+                    queryFn: () => CHAIN_REGISTRY.bsc.fetchTokenBalance({ tokenAddress: '0x9782d2af62cd502ce2c823d58276e17dc23ebc21', address: evmAddress }),
+                    refetchInterval: 30000,
+                }
+            );
+        }
+
+        return queries;
+    }, [chain, evmAddress, icpAddress, publicKey]);
+
+    const allBalanceQueries = useQueries({ queries: balanceQueries });
+
+    let currentBalanceIndex = 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const balanceIndices: Record<string, number> = {};
+
+    if (chain === 'icp') {
+        balanceIndices.icpCkUSDC = currentBalanceIndex++;
+        balanceIndices.icpBIT10TOP = currentBalanceIndex++;
+    } else if (chain === 'base') {
+        balanceIndices.baseUSDC = currentBalanceIndex++;
+        balanceIndices.baseBIT10TOP = currentBalanceIndex++;
+    } else if (chain === 'solana') {
+        balanceIndices.solanaUSDC = currentBalanceIndex++;
+        balanceIndices.solanaBIT10TOP = currentBalanceIndex++;
+    } else if (chain === 'bsc') {
+        balanceIndices.bscUSDC = currentBalanceIndex++;
+        balanceIndices.bscBIT10TOP = currentBalanceIndex++;
+    }
+
+    const tokenBalanceUSDC = useMemo<number>(() => {
+        const idx =
+            chain === 'icp' ? balanceIndices.icpCkUSDC :
+                chain === 'base' ? balanceIndices.baseUSDC :
+                    chain === 'solana' ? balanceIndices.solanaUSDC :
+                        chain === 'bsc' ? balanceIndices.bscUSDC :
+                            undefined;
+
+        if (idx == null) return 0;
+
+        const q = allBalanceQueries[idx];
+        return Number(q?.data ?? 0);
+    }, [allBalanceQueries, balanceIndices, chain]);
+
+    const tokenBalanceBIT10TOP = useMemo<number>(() => {
+        const idx =
+            chain === 'icp' ? balanceIndices.icpBIT10TOP :
+                chain === 'base' ? balanceIndices.baseBIT10TOP :
+                    chain === 'solana' ? balanceIndices.solanaBIT10TOP :
+                        chain === 'bsc' ? balanceIndices.bscBIT10TOP :
+                            undefined;
+
+        if (idx == null) return 0;
+
+        const q = allBalanceQueries[idx];
+        return Number(q?.data ?? 0);
+    }, [allBalanceQueries, balanceIndices, chain]);
+
     const renderChainContent = () => {
         switch (selectedChain) {
             case 'icp':
@@ -258,7 +378,7 @@ export default function WalletBtn() {
                                 <div className='flex flex-col space-y-2 items-center justify-center'>
                                     <motion.h1 variants={cardVariantsRight} className='text-xl md:text-2xl tracking-wide text-center'>You&apos;ll need a wallet on Solana to continue</motion.h1>
                                     <motion.div variants={cardVariantsRight} className='p-4 rounded-full border-2'>
-                                        <WalletMinimal strokeWidth={1} className='h-16 w-16 font-light' />
+                                        <WalletMinimalIcon strokeWidth={1} className='h-16 w-16 font-light' />
                                     </motion.div>
                                     <motion.div variants={cardVariantsRight} className='flex flex-row justify-center py-2'>
                                         <a href='https://phantom.app' target='_blank'>
@@ -334,26 +454,74 @@ export default function WalletBtn() {
         }
     };
 
+    const activeAddress = isICPConnected ? icpAddress : isEVMConnected ? evmAddress : isSolanaConnected ? solanaWallet.publicKey?.toBase58() : null;
+
+    const handleCopyAddress = async () => {
+        if (!activeAddress) return;
+        await navigator.clipboard.writeText(activeAddress);
+        setCopied(true);
+        toast.info('Address copied to clipboard!');
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    function truncateAddress(address: string) {
+        if (!address) return '';
+        return `${address.slice(0, 5)}.....${address.slice(-5)}`;
+    }
+
     return (
         <div>
-            {isICPConnected || isEVMConnected || isSolanaConnected ? (
-                <Button variant='destructive' onClick={handleDisconnect} className='w-full'>Disconnect wallet</Button>
+            {isICPConnected || isEVMConnected || isSolanaConnected && activeAddress ? (
+                <div>
+                    <div className='hidden md:block'>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant='outline'>{truncateAddress(activeAddress ?? '')}</Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align='end'>
+                                <DropdownMenuGroup>
+                                    <DropdownMenuLabel className='flex flex-row items-center justify-between space-x-4 cursor-pointer' onClick={handleCopyAddress}>
+                                        {truncateAddress(activeAddress ?? '')}
+                                        <CopyIcon size={15} />
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuLabel>Balance</DropdownMenuLabel>
+                                    <DropdownMenuItem className='flex flex-row items-center justify-between space-x-4 cursor-pointer'>
+                                        <div>USDC</div>
+                                        <div>{formatCompactNumber(tokenBalanceUSDC)}</div>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className='flex flex-row items-center justify-between space-x-4 cursor-pointer'>
+                                        <div>BIT10.TOP</div>
+                                        <div>{formatCompactNumber(tokenBalanceBIT10TOP)}</div>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem onClick={handleDisconnect} className='bg-destructive text-white data-highlighted:bg-destructive/90 data-highlighted:text-white focus-visible:ring-destructive/20 px-4 cursor-pointer'>Disconnect wallet</DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                    <div className='block md:hidden'>
+                        <Button variant='destructive' onClick={handleDisconnect} className='w-full'>Disconnect wallet</Button>
+                    </div>
+                </div>
             ) : (
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
                         <Button disabled={isConnecting} className='w-full'>
-                            {isConnecting && <Loader2 className='animate-spin' size={15} />}
+                            {isConnecting && <Loader2Icon className='animate-spin' size={15} />}
                             {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className='max-w-[90vw] md:max-w-[600px] border-none'>
+                    <DialogContent className='max-w-[90vw] md:max-w-150 border-none'>
                         <DialogHeader>
                             <DialogTitle className='tracking-wide pt-2 md:pt-0'>
                                 {selectedChain ? (
                                     <div className='flex flex-col items-start space-y-2'>
                                         <div>Connect your wallet to get started</div>
                                         <Button variant='ghost' size='sm' onClick={handleBack}>
-                                            <ArrowLeft /> Select different chain
+                                            <ArrowLeftIcon /> Select different chain
                                         </Button>
                                     </div>
                                 ) : (

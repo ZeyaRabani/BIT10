@@ -36,7 +36,7 @@ const config = {
             },
             {
                 source: '/telegram',
-                destination: 'https://t.me/zr00083',
+                destination: 'https://t.me/+7LRp1ZtAlt45ZjY0',
                 permanent: true,
             }
         ]

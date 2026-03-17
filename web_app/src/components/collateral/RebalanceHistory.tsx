@@ -461,7 +461,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                             <div className='grid lg:grid-cols-2 gap-6'>
                                 <div className='border rounded-lg p-4 space-y-2'>
                                     <p className='font-semibold text-base'>Total Collateral (USD)</p>
-                                    <div className='flex select-none -ml-8'>
+                                    <div className='flex select-none -ml-6'>
                                         <ChartContainer config={collateralChartConfig} className='max-h-52 w-full'>
                                             <LineChart accessibilityLayer data={collateralChartData}>
                                                 <CartesianGrid vertical={false} />

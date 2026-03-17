@@ -184,14 +184,9 @@ export const getTokenName = (tokenAddress: string): string => {
     case 'xevnm-gaaaa-aaaar-qafnq-cai'.toLocaleLowerCase():
       return 'ckUSDC';
     case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913'.toLocaleLowerCase():
-      return 'ETH';
-    case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
-      return 'SOL';
     case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
     case '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d'.toLocaleLowerCase():
       return 'USDC';
-    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913nb'.toLocaleLowerCase():
-      return 'BNB';
     default:
       return tokenAddress;
   }
@@ -207,17 +202,13 @@ export const getTokenExplorer = (tokenAddress: string): string => {
       return '/explorer/';
 
     case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913'.toLocaleLowerCase():
-    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913ase'.toLocaleLowerCase():
-    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913'.toLocaleLowerCase():
     case '0xcb9696f280e93764c73d7b83f432de8dadf4b2fa'.toLocaleLowerCase():
       return 'https://basescan.org/tx/';
 
     case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
-    case 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLocaleLowerCase():
     case 'bitPZfP3vC9YKH1F2wfqD6kckPE95hq8QQEAKpACVw9'.toLocaleLowerCase():
       return 'https://explorer.solana.com/tx/';
 
-    case '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913nb'.toLocaleLowerCase():
     case '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d'.toLocaleLowerCase():
     case '0x9782d2af62cd502ce2c823d58276e17dc23ebc21'.toLocaleLowerCase():
       return 'https://bscscan.com/tx/';

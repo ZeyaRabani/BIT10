@@ -268,7 +268,7 @@ export default function Collateral() {
                                             <div className='text-lg'>Total Collateral</div>
                                         </div>
                                         <div className='-mt-4 flex flex-row items-end justify-start space-x-2'>
-                                            <div className='text-4xl font-semibold'>${formatCompactPercentNumber(data.totalCollateral)}</div>
+                                            <div className='text-4xl font-semibold'>${(data.totalCollateral).toFixed(2)}</div>
                                             <div className={`pb-0.5 ${data.collateralPercentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>{data.collateralPercentChange > 0 ? '+' : ''}{data.collateralPercentChange.toFixed(2)}%</div>
                                         </div>
                                     </Card>
