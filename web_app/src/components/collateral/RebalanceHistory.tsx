@@ -481,7 +481,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                             <LineChart accessibilityLayer data={supplyChartData}>
                                                 <CartesianGrid vertical={false} />
                                                 <XAxis dataKey='date' tickLine axisLine tickMargin={8} tickFormatter={(value: string) => value.slice(0, value.indexOf(','))} stroke='#ffffff' />
-                                                <YAxis tickLine axisLine tickMargin={8} tickCount={6} tickFormatter={(value) => `$${(value as number).toFixed(0)}`} stroke='#ffffff' />
+                                                <YAxis tickLine axisLine tickMargin={8} tickCount={6} tickFormatter={(value) => `${(value as number).toFixed(0)}`} stroke='#ffffff' />
                                                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                                 <Line dataKey='totalSupply' type='linear' stroke='#21C45D' strokeWidth={2} dot={false} />
                                             </LineChart>

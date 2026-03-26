@@ -23,16 +23,16 @@ export const fetchTokenBalance = async ({ canisterId, address }: { canisterId: s
                     return Number(value);
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error) {
-                    toast.error('An error occurred while fetching user portfolio. Please try again!');
+                    toast.error('An error occurred while fetching user balance. Please try again!');
                 }
             } else {
-                toast.error('An error occurred while fetching user portfolio. Please try again!');
+                toast.error('An error occurred while fetching user balance. Please try again!');
                 return 0;
             }
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-        toast.error('An error occurred while fetching user portfolio. Please try again!');
+        toast.error('An error occurred while fetching user balance. Please try again!');
         return 0;
     }
 }

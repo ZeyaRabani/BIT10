@@ -90,17 +90,6 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
     const { publicKey } = useWallet();
     const wallet = useWallet();
 
-    const userAddress = useMemo(() => {
-        if (chain == 'icp') {
-            return icpAddress;
-        } else if (chain == 'base' || chain == 'bsc') {
-            return evmAddress;
-        } else if (chain == 'solana') {
-            return wallet.publicKey?.toBase58();
-        }
-        return undefined;
-    }, [icpAddress, evmAddress, wallet, chain]);
-
     const fetchBIT10Price = useCallback(async (tokenPriceAPI: string) => {
         try {
             const response = await fetch(tokenPriceAPI);
@@ -659,24 +648,6 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
         }
     }
 
-    const formatWalletAddress = (id: string) => {
-        if (!id) return '';
-        if (id.length <= 7) return id;
-        return `${id.slice(0, 6)}....${id.slice(-4)}`;
-    };
-
-    const handleCopyAddress = () => {
-        if (!userAddress) return;
-
-        navigator.clipboard.writeText(userAddress)
-            .then(() => {
-                toast.info('Wallet address copied to clipboard.');
-            })
-            .catch(() => {
-                toast.error('Failed to copy wallet address.')
-            });
-    };
-
     const fromAmount = Number((formWatchSellingAmount * parseFloat(selectedBIT10TokenPrice.toFixed(6))) / Number(sellingTokenPrice) * PLATFORM_FEE);
     const balance = Number(sellingTokenBalance);
 
@@ -748,13 +719,6 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                 <div className='bg-muted rounded-t-2xl w-full px-4 py-2 flex flex-col space-y-2'>
                                     <div className='flex flex-row space-x-2 justify-between items-center'>
                                         <div>You Sell</div>
-                                        {
-                                            chain &&
-                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row items-center justify-center border-muted-foreground'>
-                                                <div className='font-light'>From</div>
-                                                <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
-                                            </Badge>
-                                        }
                                     </div>
                                     {/* <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 bg-red-500'> */}
                                     <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2'>
@@ -886,13 +850,6 @@ export default function SellModule({ onSwitchToBuy }: SellModuleProps) {
                                 <div className='bg-muted rounded-b-2xl w-full px-4 py-2 flex flex-col space-y-2 -mt-6 md:mt-2'>
                                     <div className='flex flex-row space-x-2 justify-between items-center'>
                                         <div>You Receive</div>
-                                        {
-                                            chain &&
-                                            <Badge variant='outline' onClick={handleCopyAddress} className='cursor-pointer flex flex-row items-center justify-center border-muted-foreground'>
-                                                <div className='font-light'>To</div>
-                                                <div className='font-semibold'>{formatWalletAddress(userAddress ?? '')}</div>
-                                            </Badge>
-                                        }
                                     </div>
                                     {/* <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 bg-red-500'> */}
                                     <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2'>

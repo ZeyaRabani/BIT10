@@ -2,7 +2,14 @@ import { type StaticImageData } from 'next/image';
 import USDCImg from '@/assets/tokens/usdc.svg'
 import BIT10Img from '@/assets/tokens/bit10.svg';
 
-export const BASE_RPC_URL = 'https://mainnet.base.org';
+export const BASE_RPC_URLS = [
+    'https://mainnet.base.org',
+    'https://base.publicnode.com',
+    'https://base-rpc.publicnode.com',
+    'https://1rpc.io/base'
+];
+
+export const BASE_RPC_URL = BASE_RPC_URLS[0]!;
 export const ICP_HOST = 'https://icp-api.io';
 export const BIT10_EXCHANGE_CANISTER_ID = '6phs7-6yaaa-aaaap-qpvoq-cai';
 export const BIT10_REWARDS_CANISTER_ID = ' 5fll2-liaaa-aaaap-qqlwa-cai';

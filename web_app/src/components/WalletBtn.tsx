@@ -253,23 +253,26 @@ export default function WalletBtn() {
 
     const allBalanceQueries = useQueries({ queries: balanceQueries });
 
-    let currentBalanceIndex = 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const balanceIndices: Record<string, number> = {};
+    const balanceIndices = useMemo(() => {
+        const indices: Record<string, number> = {};
+        let idx = 0;
 
-    if (chain === 'icp') {
-        balanceIndices.icpCkUSDC = currentBalanceIndex++;
-        balanceIndices.icpBIT10TOP = currentBalanceIndex++;
-    } else if (chain === 'base') {
-        balanceIndices.baseUSDC = currentBalanceIndex++;
-        balanceIndices.baseBIT10TOP = currentBalanceIndex++;
-    } else if (chain === 'solana') {
-        balanceIndices.solanaUSDC = currentBalanceIndex++;
-        balanceIndices.solanaBIT10TOP = currentBalanceIndex++;
-    } else if (chain === 'bsc') {
-        balanceIndices.bscUSDC = currentBalanceIndex++;
-        balanceIndices.bscBIT10TOP = currentBalanceIndex++;
-    }
+        if (chain === 'icp') {
+            indices.icpCkUSDC = idx++;
+            indices.icpBIT10TOP = idx++;
+        } else if (chain === 'base') {
+            indices.baseUSDC = idx++;
+            indices.baseBIT10TOP = idx++;
+        } else if (chain === 'solana') {
+            indices.solanaUSDC = idx++;
+            indices.solanaBIT10TOP = idx++;
+        } else if (chain === 'bsc') {
+            indices.bscUSDC = idx++;
+            indices.bscBIT10TOP = idx++;
+        }
+
+        return indices;
+    }, [chain]);
 
     const tokenBalanceUSDC = useMemo<number>(() => {
         const idx =
