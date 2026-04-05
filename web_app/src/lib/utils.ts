@@ -43,7 +43,7 @@ export const formatCompactNumber = (value: number | string | null | undefined): 
   let numValue: number;
   if (typeof value === 'string') numValue = parseFloat(value);
   else numValue = value!;
-  if (!numValue || isNaN(numValue)) return '-';
+  if (!numValue || isNaN(numValue)) return '0';
   if (numValue === 0) return '0';
 
   const absValue = Math.abs(numValue), isNegative = numValue < 0, sign = isNegative ? '-' : '';
@@ -80,7 +80,7 @@ export const formatCompactPercentNumber = (value: number | string | null | undef
   let numValue: number;
   if (typeof value === 'string') numValue = parseFloat(value);
   else numValue = value!;
-  if (!numValue || isNaN(numValue)) return '-';
+  if (!numValue || isNaN(numValue)) return '0';
   if (numValue === 0) return '0';
 
   const absValue = Math.abs(numValue), isNegative = numValue < 0, sign = isNegative ? '-' : '';

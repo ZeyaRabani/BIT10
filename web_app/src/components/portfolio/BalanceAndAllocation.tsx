@@ -352,7 +352,7 @@ export default function BalanceAndAllocation() {
                                                     // })
                                                     .map((token, index) => {
                                                         const isTopToken = token.token === 'BIT10.TOP';
-                                                        const tokenValue = isTopToken && '$' + (parseFloat(token.balance) * bit10TOPPrice).toFixed(2);
+                                                        const tokenValue = isTopToken && '$' + ((parseFloat(token.balance) || 0) * (bit10TOPPrice || 0)).toFixed(2);
 
                                                         return (
                                                             <div key={index} className='flex flex-row justify-between items-center hover:bg-accent py-1 px-2 rounded'>

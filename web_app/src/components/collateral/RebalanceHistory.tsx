@@ -535,7 +535,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                     <div key={entry.timestmpz} className='border p-4 rounded-lg'>
                                         <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                                         <p className='text-lg'>Index Value: {formatCompactPercentNumber(entry.indexValue)} USD</p>
-                                        <p className='text-lg'>Total Collateral: {formatCompactPercentNumber(calculateTotalCollateral(entry.newTokens))} USD</p>
+                                        <p className='text-lg'>Total Collateral: {calculateTotalCollateral(entry.newTokens).toFixed(2)} USD</p>
 
                                         {isDebugMode && (
                                             <>
