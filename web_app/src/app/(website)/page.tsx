@@ -819,7 +819,7 @@ export default function Page() {
                 </motion.div>
             </div>
 
-            <MaxWidthWrapper className='flex flex-col space-y-4 md:space-y-16 lg:space-y-20 py-8 lg:px-36'>
+            <MaxWidthWrapper className='flex flex-col w-full items-center space-y-4 md:space-y-16 lg:space-y-20 py-8 lg:px-36'>
                 <div className='container relative z-10 px-4'>
                     <div className='mx-auto text-center mb-16'>
                         <motion.span
@@ -1318,7 +1318,7 @@ export default function Page() {
                     </div>
                 </div>
 
-                <div className='relative overflow-hidden' id='reserves'>
+                <div className='relative flex overflow-hidden w-full items-center justify-center' id='reserves'>
                     <div className='container px-4'>
                         <div className='max-w-4xl mx-auto text-center mb-12'>
                             <motion.span
@@ -1614,7 +1614,7 @@ export default function Page() {
                     </motion.div>
                 </div>
 
-                <div className='flex flex-col space-y-4 items-center overflow-hidden'>
+                <div className='flex flex-col space-y-4 w-full items-center overflow-x-hidden'>
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}

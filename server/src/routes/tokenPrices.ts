@@ -1,9 +1,9 @@
-import type { IncomingMessage, ServerResponse } from 'http'
-import fs from 'fs/promises'
-import path from 'path'
-import NodeCache from 'node-cache'
-import cron from 'node-cron'
-import { URL } from 'url'
+import type { IncomingMessage, ServerResponse } from 'http';
+import fs from 'fs/promises';
+import path from 'path';
+import NodeCache from 'node-cache';
+import cron from 'node-cron';
+import { URL } from 'url';
 
 type CoinData = {
     id: string;

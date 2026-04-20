@@ -1,31 +1,32 @@
-import http from 'http'
-import { WebSocketServer, WebSocket } from 'ws'
-import dotenv from 'dotenv'
-import { fetchAndUpdateBIT10DEFIData } from './services/bit10DEFI'
-import { fetchAndUpdateBIT10TOPData } from './services/bit10TOP'
-import { fetchAndUpdateBIT10MEMEData } from './services/bit10MEME'
-import { fetchAndUpdateBIT10TOPComparisonData } from './services/bit10TOPComparison'
-import { handleBIT10DEFICurrentPrice } from './routes/bit10DEFICurrentPrice'
-import { handleBIT10DEFIFilterData } from './routes/bit10DEFIFilterData'
-import { handleBIT10BRC20CurrentPrice } from './routes/bit10BRC20CurrentPrice'
-import { handleBIT10BRC20FilterData } from './routes/bit10BRC20FilterData'
-import { handleBIT10BRC20RebalanceData } from './routes/bit10BRC20RabalanceHistory'
-import { handleBIT10TOPCurrentPrice } from './routes/bit10TOPCurrentPrice'
-import { handleBIT10TOPFilterData } from './routes/bit10TOPFilterData'
-import { handleBIT10TopRebalanceData } from './routes/bit10TOPRabalanceHistory'
-import { handleBIT10MEMECurrentPrice } from './routes/bit10MEMECurrentPrice'
-import { handleBIT10MEMEFilterData } from './routes/bit10MEMEFilterData'
-import { handleTestBIT10MEMERebalanceData } from './routes/testBit10MEMERabalanceHistory'
-import { handleVerifyTransaction } from './routes/verifyTransaction'
-import { handelCreateTransaction } from './routes/createTransaction'
-import { handleBIT10ComparisonData } from './routes/bit10Comparison'
-import { handleTokenCurrentPrices } from './routes/tokenPrices'
-import { handleBIT10TOPPrice, handleBIT10TOPBalance, getPriceData, cleanup as cleanupPriceData } from './institutions/api/v1/bit10TopPrice'
-import { handleBuyBIT10 } from './institutions/api/v1/buyBIT10'
-import { handleBuyBIT10Trx } from './institutions/api/v1/buyBIT10Trx'
-import { handleSellBIT10 } from './institutions/api/v1/sellBIT10'
-import { handleSellBIT10Trx } from './institutions/api/v1/sellBIT10Trx'
-import { swaggerSpec } from './swagger'
+import http from 'http';
+import { WebSocketServer, WebSocket } from 'ws';
+import dotenv from 'dotenv';
+import { fetchAndUpdateBIT10DEFIData } from './services/bit10DEFI';
+import { fetchAndUpdateBIT10TOPData } from './services/bit10TOP';
+import { fetchAndUpdateBIT10MEMEData } from './services/bit10MEME';
+import { fetchAndUpdateBIT10TOPComparisonData } from './services/bit10TOPComparison';
+import { handleBIT10DEFICurrentPrice } from './routes/bit10DEFICurrentPrice';
+import { handleBIT10DEFIFilterData } from './routes/bit10DEFIFilterData';
+import { handleBIT10BRC20CurrentPrice } from './routes/bit10BRC20CurrentPrice';
+import { handleBIT10BRC20FilterData } from './routes/bit10BRC20FilterData';
+import { handleBIT10BRC20RebalanceData } from './routes/bit10BRC20RabalanceHistory';
+import { handleBIT10TOPCurrentPrice } from './routes/bit10TOPCurrentPrice';
+import { handleBIT10TOPFilterData } from './routes/bit10TOPFilterData';
+import { handleBIT10TopRebalanceData } from './routes/bit10TOPRabalanceHistory';
+import { handleBIT10MEMECurrentPrice } from './routes/bit10MEMECurrentPrice';
+import { handleBIT10MEMEFilterData } from './routes/bit10MEMEFilterData';
+import { handleTestBIT10MEMERebalanceData } from './routes/testBit10MEMERabalanceHistory';
+import { handleVerifyTransaction } from './routes/verifyTransaction';
+import { handelCreateTransaction } from './routes/createTransaction';
+import { handleBIT10TOPComparisonData } from './routes/bit10TOPComparison';
+import { handleBIT10SOLComparisonData } from './routes/bit10SOLComparison';
+import { handleTokenCurrentPrices } from './routes/tokenPrices';
+import { handleBIT10TOPPrice, handleBIT10TOPBalance, getPriceData, cleanup as cleanupPriceData } from './institutions/api/v1/bit10TopPrice';
+import { handleBuyBIT10 } from './institutions/api/v1/buyBIT10';
+import { handleBuyBIT10Trx } from './institutions/api/v1/buyBIT10Trx';
+import { handleSellBIT10 } from './institutions/api/v1/sellBIT10';
+import { handleSellBIT10Trx } from './institutions/api/v1/sellBIT10Trx';
+import { swaggerSpec } from './swagger';
 
 dotenv.config();
 
@@ -48,7 +49,8 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/test-bit10-meme-rebalance': handleTestBIT10MEMERebalanceData,
     '/verify-transaction': handleVerifyTransaction,
     '/create-transaction': handelCreateTransaction,
-    '/bit10-comparison': handleBIT10ComparisonData,
+    '/bit10-comparison': handleBIT10TOPComparisonData,
+    '/bit10-sol-comparison': handleBIT10SOLComparisonData,
     '/token-prices': handleTokenCurrentPrices,
     '/api/v1/balancer/bit10top/price': handleBIT10TOPPrice,
     '/api/v1/balancer/bit10top/balance': handleBIT10TOPBalance,

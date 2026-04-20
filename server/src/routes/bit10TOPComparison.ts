@@ -1,9 +1,9 @@
-import { db } from '../db'
-import { bit10Comparison } from '../db/schema'
-import { desc, gte } from 'drizzle-orm'
-import type { IncomingMessage, ServerResponse } from 'http'
-import NodeCache from 'node-cache'
-import cron from 'node-cron'
+import { db } from '../db';
+import { bit10Comparison } from '../db/schema';
+import { desc, gte } from 'drizzle-orm';
+import type { IncomingMessage, ServerResponse } from 'http';
+import NodeCache from 'node-cache';
+import cron from 'node-cron';
 
 const cache = new NodeCache({ stdTTL: 21600 }); // 6 hr TTL (seconds)
 
@@ -70,7 +70,7 @@ cron.schedule('0 */6 * * *', async () => { // 6 hr
 
 warmUpCache().catch(error => console.error('Error during initial cache warm-up:', error));
 
-export const handleBIT10ComparisonData = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBIT10TOPComparisonData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));

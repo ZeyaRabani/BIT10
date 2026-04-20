@@ -269,7 +269,9 @@ export default function Collateral() {
                                         </div>
                                         <div className='-mt-4 flex flex-row items-end justify-start space-x-2'>
                                             <div className='text-4xl font-semibold'>${(data.totalCollateral).toFixed(2)}</div>
-                                            <div className={`pb-0.5 ${data.collateralPercentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>{data.collateralPercentChange > 0 ? '+' : ''}{data.collateralPercentChange.toFixed(2)}%</div>
+                                            {data.collateralPercentChange !== 0 &&
+                                                <div className={`pb-0.5 ${data.collateralPercentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>{data.collateralPercentChange > 0 ? '+' : ''}{data.collateralPercentChange.toFixed(2)}%</div>
+                                            }
                                         </div>
                                     </Card>
 
@@ -280,7 +282,9 @@ export default function Collateral() {
                                         </div>
                                         <div className='-mt-4 flex flex-row items-end justify-start space-x-2'>
                                             <div className='text-4xl font-semibold'>${formatCompactPercentNumber(data.tokenCurrentPrice)}</div>
-                                            <div className={`pb-0.5 ${data.percentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>{data.percentChange > 0 ? '+' : ''}{data.percentChange.toFixed(2)}%</div>
+                                            {data.percentChange !== 0 &&
+                                                <div className={`pb-0.5 ${data.percentChange > 0 ? 'text-green-500' : 'text-red-500'}`}>{data.percentChange > 0 ? '+' : ''}{data.percentChange.toFixed(2)}%</div>
+                                            }
                                         </div>
                                     </Card>
 

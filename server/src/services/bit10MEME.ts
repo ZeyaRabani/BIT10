@@ -1,10 +1,10 @@
-import { db } from '../db'
-import { testBit10MemeRebalance, bit10MemeHistoricalData, bit10CollateralTokenPrices } from '../db/schema'
-import { desc, eq } from 'drizzle-orm'
-import axios from 'axios'
-import fs from 'fs/promises'
-import path from 'path'
-import cron from 'node-cron'
+import { db } from '../db';
+import { testBit10MemeRebalance, bit10MemeHistoricalData, bit10CollateralTokenPrices } from '../db/schema';
+import { desc, eq } from 'drizzle-orm';
+import axios from 'axios';
+import fs from 'fs/promises';
+import path from 'path';
+import cron from 'node-cron';
 
 type Coin = {
     id: number;

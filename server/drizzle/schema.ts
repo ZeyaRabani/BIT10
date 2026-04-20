@@ -1,5 +1,5 @@
-import { pgTable, text, boolean, unique, timestamp, doublePrecision, index, json, date, numeric, bigint, serial, varchar, foreignKey, check, primaryKey, pgEnum } from 'drizzle-orm/pg-core'
-import { sql } from 'drizzle-orm'
+import { pgTable, text, boolean, unique, timestamp, doublePrecision, index, json, date, numeric, bigint, serial, varchar, foreignKey, check, primaryKey, pgEnum } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
 export const action = pgEnum('action', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'ERROR'])
@@ -323,6 +323,38 @@ export const mbTokenSwap = pgTable('mb_token_swap', {
 	unique('mb_token_swap_transaction_index_key').on(table.transactionIndex),
 ]);
 
+export const dex = pgTable('dex', {
+	swapId: text('swap_id').primaryKey().notNull(),
+	poolId: text('pool_id').notNull(),
+	tickInWalletAddress: text('tick_in_wallet_address').notNull(),
+	tickOutWalletAddress: text('tick_out_wallet_address').notNull(),
+	swapType: text('swap_type').notNull(),
+	sourceChain: text('source_chain').notNull(),
+	destinationChain: text('destination_chain').notNull(),
+	tokenInAddress: text('token_in_address').notNull(),
+	tokenOutAddress: text('token_out_address').notNull(),
+	amountIn: text('amount_in').notNull(),
+	amountOut: text('amount_out').notNull(),
+	slippage: text().notNull(),
+	txHashIn: text('tx_hash_in').notNull(),
+	txHashOut: text('tx_hash_out').notNull(),
+	status: text().notNull(),
+	// You can use { mode: 'bigint' } if numbers are exceeding js number limitations
+	timestamp: bigint({ mode: 'number' }).notNull(),
+}, (table) => [
+	index('idx_dex_destination_chain').using('btree', table.destinationChain.asc().nullsLast().op('text_ops')),
+	index('idx_dex_source_chain').using('btree', table.sourceChain.asc().nullsLast().op('text_ops')),
+	index('idx_dex_timestamp').using('btree', table.timestamp.asc().nullsLast().op('int8_ops')),
+	check('check_positive_amounts', sql`((amount_in)::numeric >= (0)::numeric) AND ((amount_out)::numeric >= (0)::numeric)`),
+]);
+
+export const walletAllocations = pgTable('wallet_allocations', {
+	walletAddress: text('wallet_address').primaryKey().notNull(),
+	explorerAddress: text('explorer_address').notNull(),
+	bit10: text().array().notNull(),
+	tokenId: text('token_id').array(),
+});
+
 export const teLend = pgTable('te_lend', {
 	lenderAddress: text('lender_address').notNull(),
 	tokenChain: text('token_chain').notNull(),
@@ -410,6 +442,18 @@ export const teDexSwap = pgTable('te_dex_swap', {
 	index('idx_dex_swap_source_chain').using('btree', table.sourceChain.asc().nullsLast().op('text_ops')),
 	index('idx_dex_swap_timestamp').using('btree', table.timestamp.asc().nullsLast().op('int8_ops')),
 	check('check_positive_amounts', sql`((amount_in)::numeric >= (0)::numeric) AND ((amount_out)::numeric >= (0)::numeric)`),
+]);
+
+export const bit10SolComparison = pgTable('bit10_sol_comparison', {
+	date: date().primaryKey().notNull(),
+	bit10Sol: numeric('bit10_sol').notNull(),
+	btc: numeric().notNull(),
+	sol: numeric().notNull(),
+	eth: numeric().notNull(),
+	sp500: numeric().notNull(),
+	gold: numeric().notNull(),
+}, (table) => [
+	index('idx_bit10_sol_comparison_date').using('btree', table.date.asc().nullsLast().op('date_ops')),
 ]);
 
 export const users = pgTable('users', {

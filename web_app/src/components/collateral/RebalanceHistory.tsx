@@ -6,10 +6,12 @@ import { useQueries } from '@tanstack/react-query';
 import { formatCompactNumber, formatCompactPercentNumber } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 type CoinSetData = {
     id: string;
@@ -40,6 +42,7 @@ type RebalanceTrade = {
 };
 
 const CHART_START_DATE = new Date('2026-03-02T11:00:00.855Z');
+const ITEMS_PER_PAGE = 10;
 
 const collateralChartConfig = {
     totalCollateral: {
@@ -61,6 +64,8 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
 
     const isDebugMode = searchParams.get('debug') === 'true';
 
+    const [currentPage, setCurrentPage] = useState(1);
+
     const fetchBIT10RebalanceHistory = async (tokenRebalanceAPI: string) => {
         const response = await fetch(`/bit10-rebalance-history-${tokenRebalanceAPI}`);
 
@@ -68,7 +73,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             return [];
         }
 
-        const data = await response.json() as BIT10RebalanceEntry[];
+        const data = (await response.json()) as BIT10RebalanceEntry[];
         return data;
     };
 
@@ -78,10 +83,10 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                 queryKey: ['bit10TOPRebalance'],
                 queryFn: () => fetchBIT10RebalanceHistory('top')
             }
-        ],
+        ]
     });
 
-    const isLoading = bit10Queries.some(query => query.isLoading);
+    const isLoading = bit10Queries.some((query) => query.isLoading);
     const bit10TOPRebalanceHistory = bit10Queries[0].data;
 
     const bit10Token = (): BIT10RebalanceEntry[] => {
@@ -105,8 +110,19 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
 
     const supplyChartData = chartEntries.map((entry) => ({
         date: new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        totalSupply: entry.indexValue > 0 ? parseFloat((calculateTotalCollateral(entry.newTokens) / entry.indexValue).toFixed(6)) : 0,
+        totalSupply: entry.indexValue > 0 ? parseFloat((calculateTotalCollateral(entry.newTokens) / entry.indexValue).toFixed(6)) : 0
     }));
+
+    const totalPages = Math.ceil(selectedBIT10Token.length / ITEMS_PER_PAGE);
+    const paginatedEntries = selectedBIT10Token.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const calculateRebalanceTrades = (prevTokens: CoinSetData[], newTokens: CoinSetData[]): {
         trades: RebalanceTrade[];
@@ -122,15 +138,15 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         collateralChange: 'increase' | 'decrease' | 'same';
         collateralChangeAmount: number;
     } => {
-        const prevMap = new Map(prevTokens.map(t => [t.symbol, t]));
-        const newMap = new Map(newTokens.map(t => [t.symbol, t]));
+        const prevMap = new Map(prevTokens.map((t) => [t.symbol, t]));
+        const newMap = new Map(newTokens.map((t) => [t.symbol, t]));
 
         const prevTotalValue = calculateTotalCollateral(prevTokens);
         const newTotalValue = calculateTotalCollateral(newTokens);
         const collatteralValueChange = newTotalValue - prevTotalValue;
         const absCollateralChange = Math.abs(collatteralValueChange);
 
-        const MIN_CHANGE_THRESHOLD = 0.01; // $0.01 minimum to consider a change
+        const MIN_CHANGE_THRESHOLD = 0.01;  // $0.01 minimum to consider a change
         let collateralChange: 'increase' | 'decrease' | 'same' = 'same';
         if (collatteralValueChange > MIN_CHANGE_THRESHOLD) {
             collateralChange = 'increase';
@@ -146,7 +162,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             tokensChange: number;
         }>();
 
-        newTokens.forEach(newToken => {
+        newTokens.forEach((newToken) => {
             const prevToken = prevMap.get(newToken.symbol);
             const prevValue = prevToken ? prevToken.noOfTokens * newToken.price : 0;
             const newValue = newToken.noOfTokens * newToken.price;
@@ -162,7 +178,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             });
         });
 
-        prevTokens.forEach(prevToken => {
+        prevTokens.forEach((prevToken) => {
             if (!newMap.has(prevToken.symbol)) {
                 const valueChange = -(prevToken.noOfTokens * prevToken.price);
                 tokenValueChanges.set(prevToken.symbol, {
@@ -334,11 +350,11 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
     } => {
         const prevTotal = calculateTotalCollateral(prevTokens);
         const newTotal = calculateTotalCollateral(newTokens);
-        const prevMap = new Map(prevTokens.map(t => [t.symbol, t]));
+        const prevMap = new Map(prevTokens.map((t) => [t.symbol, t]));
 
-        const prevSymbols = new Set(prevTokens.map(t => t.symbol));
-        const newSymbols = new Set(newTokens.map(t => t.symbol));
-        const sameTokens = prevSymbols.size === newSymbols.size && [...prevSymbols].every(s => newSymbols.has(s));
+        const prevSymbols = new Set(prevTokens.map((t) => t.symbol));
+        const newSymbols = new Set(newTokens.map((t) => t.symbol));
+        const sameTokens = prevSymbols.size === newSymbols.size && [...prevSymbols].every((s) => newSymbols.has(s));
 
         if (!sameTokens) {
             return {
@@ -349,7 +365,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         }
 
         const IDENTICAL_TOLERANCE = 1e-8;
-        const isIdentical = newTokens.every(newToken => {
+        const isIdentical = newTokens.every((newToken) => {
             const prevToken = prevMap.get(newToken.symbol);
             if (!prevToken) return false;
             return (Math.abs(newToken.noOfTokens - prevToken.noOfTokens) < IDENTICAL_TOLERANCE);
@@ -367,7 +383,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         const GROWTH_TOLERANCE = 0.02; // 2% tolerance
 
         if (growthRatio > 1.02) { // At least 2% growth
-            const isProportionalGrowth = newTokens.every(newToken => {
+            const isProportionalGrowth = newTokens.every((newToken) => {
                 const prevToken = prevMap.get(newToken.symbol);
                 if (!prevToken) return false;
 
@@ -389,7 +405,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         const MIN_MEANINGFUL_TRADE = 0.01;
         let totalTradeValue = 0;
 
-        newTokens.forEach(newToken => {
+        newTokens.forEach((newToken) => {
             const prevToken = prevMap.get(newToken.symbol);
             if (prevToken) {
                 const changeValue = Math.abs((newToken.noOfTokens - prevToken.noOfTokens) * newToken.price);
@@ -406,13 +422,13 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
         }
 
         const ALLOCATION_TOLERANCE = 0.001; // 0.1% tolerance
-        const sameAllocations = newTokens.every(newToken => {
+        const sameAllocations = newTokens.every((newToken) => {
             const prevToken = prevMap.get(newToken.symbol);
             if (!prevToken) return false;
 
             const prevAllocation = (prevToken.noOfTokens * prevToken.price) / prevTotal;
             const newAllocation = (newToken.noOfTokens * newToken.price) / newTotal;
-            return Math.abs(prevAllocation - newAllocation) < ALLOCATION_TOLERANCE;
+            return (Math.abs(prevAllocation - newAllocation) < ALLOCATION_TOLERANCE);
         });
 
         if (sameAllocations) {
@@ -431,7 +447,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
     };
 
     return (
-        <div>
+        <div className='pb-4'>
             {isLoading ? (
                 <Card>
                     <CardContent className='w-full animate-fade-left-slow'>
@@ -447,9 +463,9 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
             ) : (
                 <Card className='bg-transparent'>
                     <CardContent className='flex flex-col space-y-4'>
-                        <div className='border-2 rounded-lg p-2 flex flex-row items-center space-x-1'>
-                            <InfoIcon className='size-4' />
-                            <div>Daily auto-rebalancing is skipped if gas fees exceed transfer value or if allocation exceeds <span className='font-semibold'> 110% </span> collateralization.</div>
+                        <div className='border-2 rounded-lg p-2 flex flex-row items-start space-x-2'>
+                            <InfoIcon className='size-4 shrink-0 mt-1' />
+                            <div>Daily auto-rebalancing is skipped if gas fees exceed transfer value or if allocation exceeds{' '}<span className='font-semibold'>110%</span> collateralization.</div>
                         </div>
                         <h1 className='flex flex-row space-x-1 items-center'>
                             <div className='text-xl md:text-2xl font-semibold uppercase'>
@@ -492,16 +508,16 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                         )}
 
                         <div className='space-y-8'>
-                            {selectedBIT10Token.map((entry, index) => {
-                                if (index === selectedBIT10Token.length - 1) {
+                            {paginatedEntries.map((entry, index) => {
+                                const globalIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
+
+                                if (globalIndex === selectedBIT10Token.length - 1) {
                                     return (
                                         <div key={entry.timestmpz} className='border p-4 rounded-lg'>
                                             <p className='font-semibold text-lg'>Rebalance Date: {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                                             <p className='text-lg'>Index Value: {formatCompactPercentNumber(entry.indexValue)} USD</p>
                                             <p className='text-lg'>Total Collateral: {formatCompactPercentNumber(calculateTotalCollateral(entry.newTokens))} USD</p>
-                                            <h3 className='font-medium my-2'>
-                                                Allocation (Effective {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
-                                            </h3>
+                                            <h3 className='font-medium my-2'>Allocation (Effective {new Date(entry.timestmpz).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})</h3>
                                             <div className='grid grid-cols-1 gap-4'>
                                                 <Table className='border-collapse border text-[16px]'>
                                                     <TableHeader>
@@ -526,7 +542,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                     );
                                 }
 
-                                const nextEntry = selectedBIT10Token[index + 1];
+                                const nextEntry = selectedBIT10Token[globalIndex + 1];
                                 if (!nextEntry) return null;
                                 const rebalanceResult = calculateRebalanceTrades(nextEntry.newTokens, entry.newTokens);
                                 const rebalanceAnalysis = analyzeRebalanceReason(nextEntry.newTokens, entry.newTokens);
@@ -555,7 +571,7 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                                             💰 External Liquidity Required: ${formatCompactNumber(rebalanceResult.externalLiquidityAmount)}
                                                         </p>
                                                         <p className='text-purple-400 text-sm mt-1'>
-                                                            Tokens requiring external funds: <span className='uppercase'>{rebalanceResult.externalTokens.map(t => t.symbol).join(', ')}</span>
+                                                            Tokens requiring external funds: <span className='uppercase'>{rebalanceResult.externalTokens.map((t) => t.symbol).join(', ')}</span>
                                                         </p>
                                                     </div>
                                                 )}
@@ -697,6 +713,65 @@ export default function RebalanceHistory({ index_fund }: { index_fund: string })
                                 );
                             })}
                         </div>
+
+                        {totalPages > 1 && (
+                            <div className='flex flex-col md:flex-row items-center justify-between px-2 w-full'>
+                                <p className='text-sm text-muted-foreground'>Showing {currentPage} of {totalPages} - {selectedBIT10Token.length} total rebalance</p>
+                                <div className='flex items-center space-x-2'>
+                                    <Button
+                                        variant='outline'
+                                        size='icon'
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                        aria-label='Previous page'
+                                    >
+                                        <ChevronLeft className='size-4' />
+                                    </Button>
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                        .filter((page) => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
+                                        .reduce<(number | '...')[]>(
+                                            (acc, page, idx, arr) => {
+                                                if (
+                                                    idx > 0 &&
+                                                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+                                                    (arr[idx - 1]! as number) < page - 1
+                                                ) {
+                                                    acc.push('...');
+                                                }
+                                                acc.push(page);
+                                                return acc;
+                                            },
+                                            []
+                                        )
+                                        .map((item, idx) =>
+                                            item === '...' ? (
+                                                <span key={`ellipsis-${idx}`} className='px-2 text-muted-foreground'>…</span>
+                                            ) : (
+                                                <Button
+                                                    key={item}
+                                                    variant={currentPage === item ? 'default' : 'outline'}
+                                                    size='icon'
+                                                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+                                                    onClick={() => handlePageChange(item as number)}
+                                                    aria-label={`Page ${item}`}
+                                                    aria-current={currentPage === item ? 'page' : undefined}
+                                                >
+                                                    {item}
+                                                </Button>
+                                            )
+                                        )}
+                                    <Button
+                                        variant='outline'
+                                        size='icon'
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                        aria-label='Next page'
+                                    >
+                                        <ChevronRight className='size-4' />
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             )}

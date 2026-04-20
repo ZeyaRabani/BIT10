@@ -444,6 +444,18 @@ export const teDexSwap = pgTable('te_dex_swap', {
 	check('check_positive_amounts', sql`((amount_in)::numeric >= (0)::numeric) AND ((amount_out)::numeric >= (0)::numeric)`),
 ]);
 
+export const bit10SolComparison = pgTable('bit10_sol_comparison', {
+	date: date().primaryKey().notNull(),
+	bit10Sol: numeric('bit10_sol').notNull(),
+	btc: numeric().notNull(),
+	sol: numeric().notNull(),
+	eth: numeric().notNull(),
+	sp500: numeric().notNull(),
+	gold: numeric().notNull(),
+}, (table) => [
+	index('idx_bit10_sol_comparison_date').using('btree', table.date.asc().nullsLast().op('date_ops')),
+]);
+
 export const users = pgTable('users', {
 	userId: text('user_id').notNull(),
 	userPaymentAddress: text('user_payment_address').notNull(),

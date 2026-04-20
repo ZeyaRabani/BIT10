@@ -1,9 +1,9 @@
-import type { IncomingMessage, ServerResponse } from 'http'
-import { URL } from 'url'
-import axios from 'axios'
-import NodeCache from 'node-cache'
-import fs from 'fs/promises'
-import path from 'path'
+import type { IncomingMessage, ServerResponse } from 'http';
+import { URL } from 'url';
+import axios from 'axios';
+import NodeCache from 'node-cache';
+import fs from 'fs/promises';
+import path from 'path';
 
 const cache = new NodeCache({
     stdTTL: 10,  // 10 sec

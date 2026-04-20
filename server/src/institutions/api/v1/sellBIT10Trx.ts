@@ -1,6 +1,6 @@
-import http from 'http'
-const { Actor, HttpAgent } = require('@dfinity/agent')
-import { idlFactory } from '../../../lib/buy.did'
+import http from 'http';
+const { Actor, HttpAgent } = require('@dfinity/agent');
+import { idlFactory } from '../../../lib/buy.did';
 
 /**
  * @swagger

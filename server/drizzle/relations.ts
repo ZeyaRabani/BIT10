@@ -1,5 +1,5 @@
-import { relations } from 'drizzle-orm/relations'
-import { teUsers, teTokenSwap, users, tokenSwap, mbUsers, mbTokenSwap } from './schema'
+import { relations } from 'drizzle-orm/relations';
+import { teUsers, teTokenSwap, users, tokenSwap, mbUsers, mbTokenSwap } from './schema';
 
 export const teTokenSwapRelations = relations(teTokenSwap, ({ one }) => ({
 	teUser: one(teUsers, {

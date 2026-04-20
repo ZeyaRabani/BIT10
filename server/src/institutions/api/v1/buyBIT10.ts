@@ -1,6 +1,6 @@
-import http from 'http'
-const { Actor, HttpAgent } = require('@dfinity/agent')
-import { idlFactory } from '../../../lib/buy.did'
+import http from 'http';
+const { Actor, HttpAgent } = require('@dfinity/agent');
+import { idlFactory } from '../../../lib/buy.did';
 
 async function fetchPriceData(): Promise<{ ethPrice: number; bit10Price: number } | null> {
     return new Promise((resolve) => {

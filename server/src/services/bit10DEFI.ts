@@ -1,9 +1,9 @@
-import { db } from '../db'
-import { bit10Defi } from '../db/schema'
-import axios from 'axios'
-import fs from 'fs/promises'
-import path from 'path'
-import cron from 'node-cron'
+import { db } from '../db';
+import { bit10Defi } from '../db/schema';
+import axios from 'axios';
+import fs from 'fs/promises';
+import path from 'path';
+import cron from 'node-cron';
 
 type CoinData = {
     id: number;

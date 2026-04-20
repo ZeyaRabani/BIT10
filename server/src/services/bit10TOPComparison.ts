@@ -1,9 +1,9 @@
-import { db } from '../db'
-import { bit10Comparison } from '../db/schema'
-import axios from 'axios'
-import fs from 'fs/promises'
-import path from 'path'
-import cron from 'node-cron'
+import { db } from '../db';
+import { bit10Comparison } from '../db/schema';
+import axios from 'axios';
+import fs from 'fs/promises';
+import path from 'path';
+import cron from 'node-cron';
 
 const BIT10_TOP_JSON_FILE_PATH = path.join(__dirname, '../../../data/bit10_top.json');
 const JSON_FILE_PATH = path.resolve(__dirname, '../../../data/cg_token_list.json');

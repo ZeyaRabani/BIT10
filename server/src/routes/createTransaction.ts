@@ -1,7 +1,7 @@
-import type { IncomingMessage, ServerResponse } from 'http'
-import { URL } from 'url'
-import axios from 'axios'
-import NodeCache from 'node-cache'
+import type { IncomingMessage, ServerResponse } from 'http';
+import { URL } from 'url';
+import axios from 'axios';
+import NodeCache from 'node-cache';
 
 const cache = new NodeCache({
     stdTTL: 30,  // 30 sec

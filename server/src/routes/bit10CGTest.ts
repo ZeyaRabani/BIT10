@@ -1,8 +1,8 @@
-import type { IncomingMessage, ServerResponse } from 'http'
-import axios from 'axios'
-import fs from 'fs/promises'
-import path from 'path'
-import cron from 'node-cron'
+import type { IncomingMessage, ServerResponse } from 'http';
+import axios from 'axios';
+import fs from 'fs/promises';
+import path from 'path';
+import cron from 'node-cron';
 
 type CoinGeckoMarketData = {
     id: string;

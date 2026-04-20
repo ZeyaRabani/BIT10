@@ -1,9 +1,9 @@
-import type { IncomingMessage, ServerResponse } from 'http'
-import fs from 'fs/promises'
-import path from 'path'
-import NodeCache from 'node-cache'
-import cron from 'node-cron'
-import { HermesClient } from '@pythnetwork/hermes-client'
+import type { IncomingMessage, ServerResponse } from 'http';
+import fs from 'fs/promises';
+import path from 'path';
+import NodeCache from 'node-cache';
+import cron from 'node-cron';
+import { HermesClient } from '@pythnetwork/hermes-client';
 
 type CoinDataInput = {
     id: string;

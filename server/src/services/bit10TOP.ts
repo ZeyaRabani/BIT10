@@ -1,12 +1,12 @@
-import { db } from '../db'
-import { bit10TopRebalance, bit10TopHistoricalData, bit10CollateralTokenPrices } from '../db/schema'
-import { desc, eq } from 'drizzle-orm'
-import { idlFactory } from '../lib/buy.did'
-import axios from 'axios'
-import fs from 'fs/promises'
-import path from 'path'
-import cron from 'node-cron'
-const { Actor, HttpAgent } = require('@icp-sdk/core/agent')
+import { db } from '../db';
+import { bit10TopRebalance, bit10TopHistoricalData, bit10CollateralTokenPrices } from '../db/schema';
+import { desc, eq } from 'drizzle-orm';
+import { idlFactory } from '../lib/buy.did';
+import axios from 'axios';
+import fs from 'fs/promises';
+import path from 'path';
+import cron from 'node-cron';
+const { Actor, HttpAgent } = require('@icp-sdk/core/agent');
 
 type ApiResponse = {
     timestmpz: string;
