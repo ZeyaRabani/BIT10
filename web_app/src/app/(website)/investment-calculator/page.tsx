@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Card, CardTitle, CardContent, CardHeader, CardDescription, CardFooter } from '@/components/ui/card';
@@ -26,8 +26,12 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 type BIT10Entry = {
     date: string;
     bit10Top: string;
+    bit10Sol: string;
     btc: string;
+    eth: string;
+    sol: string;
     sp500: string;
+    gold: string;
 };
 
 type ProcessedDataPoint = {
@@ -93,8 +97,8 @@ export default function Page() {
                 return null;
             }
 
-            const data = await response.json() as { bit10_top: BIT10Entry[] };
-            return { bit10_top: data.bit10_top.reverse() };
+            const data = await response.json() as { bit10: BIT10Entry[] };
+            return { bit10: data.bit10.reverse() };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             toast.error('Network error. Please try again!');
@@ -113,7 +117,7 @@ export default function Page() {
 
     const isLoading = bit10Queries.some(query => query.isLoading);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const bit10ComparisonCalculator = bit10Queries[0].data?.bit10_top ?? [];
+    const bit10ComparisonCalculator = bit10Queries[0].data?.bit10 ?? [];
 
     const investmentChartConfig = {
         bit10TopValue: {
@@ -168,9 +172,10 @@ export default function Page() {
         };
     }, [dateFormatter]);
 
-    const tickFormatter = useMemo(() =>
-        (value: string) => value.slice(0, value.indexOf(',')), []
-    );
+    const tickFormatter = useCallback((value: string) => {
+        const match = /\d{4}/.exec(value);
+        return match ? match[0] : value;
+    }, []);
 
     const yAxisFormatter = useMemo(() =>
         (value: number) => `$${value}`, []

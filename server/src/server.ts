@@ -18,8 +18,7 @@ import { handleBIT10MEMEFilterData } from './routes/bit10MEMEFilterData';
 import { handleTestBIT10MEMERebalanceData } from './routes/testBit10MEMERabalanceHistory';
 import { handleVerifyTransaction } from './routes/verifyTransaction';
 import { handelCreateTransaction } from './routes/createTransaction';
-import { handleBIT10TOPComparisonData } from './routes/bit10TOPComparison';
-import { handleBIT10SOLComparisonData } from './routes/bit10SOLComparison';
+import { handleBIT10ComparisonData } from './routes/bit10Comparison';
 import { handleTokenCurrentPrices } from './routes/tokenPrices';
 import { handleBIT10TOPPrice, handleBIT10TOPBalance, getPriceData, cleanup as cleanupPriceData } from './institutions/api/v1/bit10TopPrice';
 import { handleBuyBIT10 } from './institutions/api/v1/buyBIT10';
@@ -49,8 +48,7 @@ const routeHandlers: Record<string, (req: http.IncomingMessage, res: http.Server
     '/test-bit10-meme-rebalance': handleTestBIT10MEMERebalanceData,
     '/verify-transaction': handleVerifyTransaction,
     '/create-transaction': handelCreateTransaction,
-    '/bit10-comparison': handleBIT10TOPComparisonData,
-    '/bit10-sol-comparison': handleBIT10SOLComparisonData,
+    '/bit10-comparison': handleBIT10ComparisonData,
     '/token-prices': handleTokenCurrentPrices,
     '/api/v1/balancer/bit10top/price': handleBIT10TOPPrice,
     '/api/v1/balancer/bit10top/balance': handleBIT10TOPBalance,

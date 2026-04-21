@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, unique, timestamp, doublePrecision, index, json, date, numeric, bigint, serial, varchar, foreignKey, check, primaryKey, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, text, boolean, unique, timestamp, doublePrecision, index, json, bigint, serial, varchar, foreignKey, check, date, numeric, primaryKey, pgEnum } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3'])
@@ -111,16 +111,6 @@ export const referralApr2025Tasks = pgTable('referral_apr_2025_tasks', {
 	task3: boolean('task_3').default(false).notNull(),
 }, (table) => [
 	unique('referral_apr_2025_tasks_address_key').on(table.address),
-]);
-
-export const bit10Comparison = pgTable('bit10_comparison', {
-	date: date().primaryKey().notNull(),
-	bit10Top: numeric('bit10_top').notNull(),
-	btc: numeric().notNull(),
-	sp500: numeric().notNull(),
-	gold: numeric().notNull(),
-}, (table) => [
-	index('idx_bit10_comparison_date').using('btree', table.date.asc().nullsLast().op('date_ops')),
 ]);
 
 export const bit10Meme = pgTable('bit10_meme', {
@@ -452,8 +442,19 @@ export const bit10SolComparison = pgTable('bit10_sol_comparison', {
 	eth: numeric().notNull(),
 	sp500: numeric().notNull(),
 	gold: numeric().notNull(),
+});
+
+export const bit10Comparison = pgTable('bit10_comparison', {
+	date: date().primaryKey().notNull(),
+	bit10Top: numeric('bit10_top').notNull(),
+	btc: numeric().notNull(),
+	sp500: numeric().notNull(),
+	gold: numeric().notNull(),
+	bit10Sol: numeric('bit10_sol').default('0').notNull(),
+	sol: numeric().default('0').notNull(),
+	eth: numeric().default('0').notNull(),
 }, (table) => [
-	index('idx_bit10_sol_comparison_date').using('btree', table.date.asc().nullsLast().op('date_ops')),
+	index('idx_bit10_comparison_date').using('btree', table.date.asc().nullsLast().op('date_ops')),
 ]);
 
 export const users = pgTable('users', {

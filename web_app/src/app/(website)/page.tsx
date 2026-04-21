@@ -439,13 +439,13 @@ const fetchBIT10Tokens = async (tokenPriceAPI: string) => {
     }
 };
 
-const fetchBIT1010YPerformance = async (): Promise<{ bit10_top: BIT10Entry[] } | null> => {
+const fetchBIT1010YPerformance = async (): Promise<{ bit10: BIT10Entry[] } | null> => {
     try {
         const response = await fetch('bit10-comparison-data-10');
         if (!response.ok) throw new Error('Network error');
 
-        const data = (await response.json()) as { bit10_top?: BIT10Entry[] };
-        return { bit10_top: (data.bit10_top ?? []).reverse() };
+        const data = (await response.json()) as { bit10?: BIT10Entry[] };
+        return { bit10: (data.bit10 ?? []).reverse() };
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         toast.error('Error fetching BIT10 performance. Please try again!');
@@ -506,8 +506,8 @@ export default function Page() {
 
     const bit10TOPData = useMemo(() => {
         const performanceData = queryData?.[1];
-        if (performanceData && typeof performanceData === 'object' && 'bit10_top' in performanceData) {
-            return (performanceData as { bit10_top: BIT10Entry[] }).bit10_top ?? [];
+        if (performanceData && typeof performanceData === 'object' && 'bit10' in performanceData) {
+            return (performanceData as { bit10: BIT10Entry[] }).bit10 ?? [];
         }
         return [];
     }, [queryData]);

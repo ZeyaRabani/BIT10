@@ -16,8 +16,12 @@ const tabs = ['30D', '60D', '1Y', '3Y'];
 type BIT10Entry = {
     date: string;
     bit10Top: string;
+    bit10Sol: string;
     btc: string;
+    eth: string;
+    sol: string;
     sp500: string;
+    gold: string;
 };
 
 export default function BIT10Preformance() {
@@ -39,8 +43,8 @@ export default function BIT10Preformance() {
                 return null;
             }
 
-            const data = await response.json() as { bit10_top: BIT10Entry[] };
-            return { bit10_top: data.bit10_top.reverse() };
+            const data = await response.json() as { bit10: BIT10Entry[] };
+            return { bit10: data.bit10.reverse() };
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             toast.error('Network error. Please try again!');
@@ -58,7 +62,7 @@ export default function BIT10Preformance() {
     });
 
     const isLoading = bit10Queries.some(query => query.isLoading);
-    const bit10TOPPreformance3Y = bit10Queries[0].data?.bit10_top ?? [];
+    const bit10TOPPreformance3Y = bit10Queries[0].data?.bit10 ?? [];
 
     const getBIT10Performance = (data: BIT10Entry[], range: string) => {
         if (!data || data.length === 0) {

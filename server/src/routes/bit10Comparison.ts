@@ -7,7 +7,7 @@ import cron from 'node-cron';
 
 const cache = new NodeCache({ stdTTL: 21600 }); // 6 hr TTL (seconds)
 
-const YEARS_TO_CACHE = [1, 3, 5, 10, 15];
+const YEARS_TO_CACHE = Array.from({ length: 15 }, (_, i) => i + 1); // [1, 2, 3, ..., 15]
 
 async function fetchData(years: number) {
     try {
@@ -17,8 +17,12 @@ async function fetchData(years: number) {
         const result = await db.select({
             date: bit10Comparison.date,
             bit10Top: bit10Comparison.bit10Top,
+            bit10Sol: bit10Comparison.bit10Sol,
             btc: bit10Comparison.btc,
-            sp500: bit10Comparison.sp500
+            eth: bit10Comparison.eth,
+            sol: bit10Comparison.sol,
+            sp500: bit10Comparison.sp500,
+            gold: bit10Comparison.gold
         })
             .from(bit10Comparison)
             .where(gte(bit10Comparison.date, startDateCalc.toISOString()))
@@ -70,7 +74,7 @@ cron.schedule('0 */6 * * *', async () => { // 6 hr
 
 warmUpCache().catch(error => console.error('Error during initial cache warm-up:', error));
 
-export const handleBIT10TOPComparisonData = async (request: IncomingMessage, response: ServerResponse) => {
+export const handleBIT10ComparisonData = async (request: IncomingMessage, response: ServerResponse) => {
     if (request.method !== 'GET') {
         response.writeHead(405, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify({ error: 'Method Not Allowed' }));
@@ -87,10 +91,10 @@ export const handleBIT10TOPComparisonData = async (request: IncomingMessage, res
             return;
         }
 
-        const bit10_top = await getCachedData(years);
+        const bit10 = await getCachedData(years);
 
         response.writeHead(200, { 'Content-Type': 'application/json' });
-        response.end(JSON.stringify({ bit10_top }));
+        response.end(JSON.stringify({ bit10 }));
     } catch (error) {
         console.error('Error serving data:', error);
         response.writeHead(500, { 'Content-Type': 'application/json' });

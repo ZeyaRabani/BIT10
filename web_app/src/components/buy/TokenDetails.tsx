@@ -11,6 +11,17 @@ import { TrendingUpIcon, TrendingDownIcon } from 'lucide-react';
 
 const tabs = ['30D', '60D', '1Y', '3Y'];
 
+type BIT10ComparisonEntry = {
+    date: string;
+    bit10Top: string;
+    bit10Sol: string;
+    btc: string;
+    eth: string;
+    sol: string;
+    sp500: string;
+    gold: string;
+};
+
 type BIT10Entry = {
     timestmpz: string;
     tokenPrice: string;
@@ -58,13 +69,10 @@ export default function TokenDetails({ token_price, token_name, token_list }: { 
 
             if (tokenHistoricalDataAPI === 'bit10-comparison-data-3') {
                 const data = await response.json() as {
-                    bit10_top: Array<{
-                        date: string;
-                        bit10Top: string;
-                    }>;
+                    bit10: BIT10ComparisonEntry[];
                 };
 
-                const formattedData = data.bit10_top.map((item) => ({
+                const formattedData = data.bit10.map((item) => ({
                     timestmpz: `${item.date} 00:00:00+00`,
                     tokenPrice: Number(item.bit10Top),
                 }));

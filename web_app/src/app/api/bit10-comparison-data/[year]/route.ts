@@ -23,8 +23,12 @@ export async function GET(request: NextRequest, context: { params: Promise<{ yea
         const data = (await res.json()) as {
             date: string;
             bit10Top: string;
+            bit10Sol: string;
             btc: string;
+            eth: string;
+            sol: string;
             sp500: string;
+            gold: string;
         };
 
         return new Response(JSON.stringify(data), {
