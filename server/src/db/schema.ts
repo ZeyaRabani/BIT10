@@ -338,6 +338,14 @@ export const dex = pgTable('dex', {
 	check('check_positive_amounts', sql`((amount_in)::numeric >= (0)::numeric) AND ((amount_out)::numeric >= (0)::numeric)`),
 ]);
 
+export const bit10SolHistoricalData = pgTable('bit10_sol_historical_data', {
+	timestmpz: timestamp({ withTimezone: true, mode: 'string' }).primaryKey().notNull(),
+	tokenPrice: doublePrecision('token_price').notNull(),
+	data: json().notNull(),
+}, (table) => [
+	index('bit10_sol_historical_data_timestmpz_idx').using('btree', table.timestmpz.desc().nullsFirst().op('timestamptz_ops')),
+]);
+
 export const walletAllocations = pgTable('wallet_allocations', {
 	walletAddress: text('wallet_address').primaryKey().notNull(),
 	explorerAddress: text('explorer_address').notNull(),

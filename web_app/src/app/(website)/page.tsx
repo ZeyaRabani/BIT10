@@ -1614,7 +1614,7 @@ export default function Page() {
                     </motion.div>
                 </div>
 
-                <div className='flex flex-col space-y-4 w-full items-center overflow-x-hidden'>
+                <div className='flex flex-col space-y-4 w-full items-center overflow-hidden'>
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}

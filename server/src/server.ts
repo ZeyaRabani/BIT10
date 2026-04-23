@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 import { fetchAndUpdateBIT10DEFIData } from './services/bit10DEFI';
 import { fetchAndUpdateBIT10TOPData } from './services/bit10TOP';
 import { fetchAndUpdateBIT10MEMEData } from './services/bit10MEME';
-import { fetchAndUpdateBIT10TOPComparisonData } from './services/bit10TOPComparison';
+import { fetchAndUpdateBIT10SOLData } from './services/bit10SOL';
+import { fetchAndUpdateBIT10ComparisonData } from './services/bit10Comparison';
 import { handleBIT10DEFICurrentPrice } from './routes/bit10DEFICurrentPrice';
 import { handleBIT10DEFIFilterData } from './routes/bit10DEFIFilterData';
 import { handleBIT10BRC20CurrentPrice } from './routes/bit10BRC20CurrentPrice';
@@ -244,10 +245,11 @@ server.listen(PORT, '::', async () => {
 
     try {
         const results = await Promise.allSettled([
-            fetchAndUpdateBIT10TOPComparisonData(),
+            fetchAndUpdateBIT10ComparisonData(),
             fetchAndUpdateBIT10DEFIData(),
             fetchAndUpdateBIT10TOPData(),
-            fetchAndUpdateBIT10MEMEData()
+            fetchAndUpdateBIT10MEMEData(),
+            fetchAndUpdateBIT10SOLData()
         ]);
 
         results.forEach((result, index) => {

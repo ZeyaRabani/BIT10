@@ -27,6 +27,7 @@ type BIT10Data = {
     bit10_defi_current_price?: BIT10Entry[];
     bit10_meme_current_price?: BIT10Entry[];
     bit10_brc20_current_price?: BIT10Entry[];
+    bit10_sol_current_price?: BIT10Entry[];
 };
 
 type CGTokenData = {
@@ -87,6 +88,12 @@ const BIT10_CONFIG = {
         dataKey: 'bit10_meme_current_price',
         cacheKey: 'bit10_meme_data',
         name: 'BIT10.MEME'
+    },
+    'AC24C9CFBBD': {
+        filePath: path.join(__dirname, '../../../data/bit10_sol.json'),
+        dataKey: 'bit10_sol_current_price',
+        cacheKey: 'bit10_sol_data',
+        name: 'BIT10.SOL'
     }
 };
 
